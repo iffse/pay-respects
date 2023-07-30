@@ -44,9 +44,17 @@ fn gen_string_hashmap(rules: Vec<Rule>) -> String {
 		let command = rule.command.to_owned();
 		string_hashmap.push_str(&format!("(\"{}\", vec![", command));
 		for match_output in rule.match_output {
-			let pattern = match_output.pattern;
+			let pattern = match_output
+				.pattern
+				.iter()
+				.map(|x| x.to_lowercase())
+				.collect::<Vec<String>>();
 			let suggest = match_output.suggest;
-			string_hashmap.push_str(&format!("(vec![\"{}\"], \"{}\"),", pattern.join("\", \""), suggest));
+			string_hashmap.push_str(&format!(
+				"(vec![\"{}\"], \"{}\"),",
+				pattern.join("\", \""),
+				suggest
+			));
 		}
 		string_hashmap.push_str("]),");
 	}
