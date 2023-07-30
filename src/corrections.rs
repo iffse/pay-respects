@@ -9,8 +9,6 @@ pub fn correct_command() -> Option<String> {
 	let shell = find_shell();
 	let last_command = find_last_command(&shell);
 	let command_output = command_output(&shell, &last_command);
-	println!("Last command: {}", last_command);
-	println!("Command output: {}", command_output);
 
 	let split_command = last_command.split_whitespace().collect::<Vec<&str>>();
 	let command = match split_command.first().expect("No command found.") {

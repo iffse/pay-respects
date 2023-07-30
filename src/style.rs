@@ -15,9 +15,11 @@ pub fn highlight_difference(corrected_command: &str, last_command: &str) -> Stri
 			}
 		}
 		if changed {
-			highlighted_command.push_str(&new.red().bold());
+			let colored = new.red().bold();
+			highlighted_command = format!("{}{}", highlighted_command, colored);
 		} else {
-			highlighted_command.push_str(&new.green());
+			let colored = new.green();
+			highlighted_command = format!("{}{}", highlighted_command, colored);
 		}
 		highlighted_command.push(' ');
 	}
