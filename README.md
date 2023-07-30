@@ -7,9 +7,23 @@ Typed a wrong command? Pay Respect will try to correct your wrong console comman
 The binary is named `pay-respect`, by adding an alias to your shell
 configuration:
 ``` shell
+# Note: You may need to have the binary exposed in your path
 alias f="pay_respect"
 ```
 You can now **press `F` to Pay Respect**!
+
+## Installing
+
+If you are using Arch Linux, you can install from AUR directly:
+```shell
+paru -S pay_respect
+```
+
+Otherwise, you can use cargo to compile the project:
+```
+cargo build --release
+```
+and the binary can be found at `target/release/pay_respect`.
 
 ## Rule Files
 
