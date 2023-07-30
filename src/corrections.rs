@@ -62,8 +62,14 @@ fn eval_suggest(suggest: &str, last_command: &str) -> String {
 
 		let range = suggest[placeholder.to_owned()].trim_matches(|c| c == '[' || c == ']');
 		if let Some((start, end)) = range.split_once(':') {
-			let start = start.parse::<usize>().unwrap();
-			let end = end.parse::<usize>().unwrap();
+			let start = match start {
+				"" => 0,
+				_ => start.parse::<usize>().unwrap(),
+			};
+			let end = match end {
+				"" => last_command.split_whitespace().count(),
+				_ => end.parse::<usize>().unwrap(),
+			};
 			let split_command = last_command.split_whitespace().collect::<Vec<&str>>();
 			let command = split_command[start..end].join(" ");
 			suggest = suggest.replace(&suggest[placeholder], &command);
