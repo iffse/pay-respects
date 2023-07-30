@@ -71,3 +71,13 @@ fn shell_default_history_file(shell: &str) -> String {
 	let file = shell_file_map.get(shell).expect("Unsupported shell.");
 	format!("{}/{}", std::env::var("HOME").unwrap(), file)
 }
+
+pub fn get_privilege() -> Option<String> {
+	let list = vec!["sudo", "doas"];
+	for command in list {
+		if std::process::Command::new(command).output().is_ok() {
+			return Some(command.to_string());
+		}
+	}
+	None
+}

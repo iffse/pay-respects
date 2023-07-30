@@ -92,22 +92,28 @@ pub fn confirm_correction(shell: &str, command: &str, last_command: &str) {
 	println!("Press enter to execute the corrected command. Or press Ctrl+C to exit.");
 	std::io::stdin().read_line(&mut String::new()).unwrap();
 
-	if command.starts_with("sudo") {
-		std::process::Command::new("sudo")
-			.arg(shell)
-			.arg("-c")
-			.arg(command)
-			.spawn()
-			.expect("failed to execute process")
-			.wait()
-			.expect("failed to wait on process");
-	} else {
-		std::process::Command::new(shell)
-			.arg("-c")
-			.arg(command)
-			.spawn()
-			.expect("failed to execute process")
-			.wait()
-			.expect("failed to wait on process");
+	let privilege = Vec::from(["sudo", "doas"]);
+
+	for p in privilege {
+		if command.starts_with(p){
+			let command = command.replace(p, "");
+			std::process::Command::new(p)
+				.arg(shell)
+				.arg("-c")
+				.arg(command)
+				.spawn()
+				.expect("failed to execute process")
+				.wait()
+				.expect("failed to wait on process");
+			return;
+		}
 	}
+
+	std::process::Command::new(shell)
+		.arg("-c")
+		.arg(command)
+		.spawn()
+		.expect("failed to execute process")
+		.wait()
+		.expect("failed to wait on process");
 }

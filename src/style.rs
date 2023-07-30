@@ -1,3 +1,4 @@
+
 use colored::*;
 
 pub fn highlight_difference(corrected_command: &str, last_command: &str) -> String {
