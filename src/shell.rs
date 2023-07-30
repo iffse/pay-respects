@@ -50,15 +50,11 @@ pub fn find_last_command(shell: &str) -> String {
 }
 
 pub fn command_output(shell: &str, command: &str) -> String {
-	println!("Running command: {}", command);
 	let output = std::process::Command::new(shell)
 		.arg("-c")
 		.arg(command)
-		.stderr(std::process::Stdio::piped())
-		.spawn()
-		.expect("failed to execute process")
-		.wait_with_output()
-		.expect("failed to wait on process");
+		.output()
+		.expect("failed to execute process");
 
 	String::from_utf8_lossy(&output.stderr)
 		.to_string()
