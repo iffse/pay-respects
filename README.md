@@ -20,14 +20,14 @@ Syntax of a rule file (placed under [rules](./rules)):
 # this field should be the name of the command
 command = "world"
 
-# you can add as much section of like this as you like
+# you can add as much section of this as you like
 [[match_output]]
 # the suggestion of this section will be used for the following patterns of the command output
 pattern = [
 	"pattern 1",
 	"pattern 2",
 ]
-# this will keep the change the second argument to `fix`
+# this will change the first argument to `fix`, while keeping the rest intact
 suggest = "{{command[0]}} fix {{command[2:]}}"
 
 [[match_output]]
@@ -46,5 +46,5 @@ The placeholder is evaluated as following:
 
 ## Current Progress
 
-Currently, only correction to `sudo` permission is implemented.
+We need more rule files!
 
