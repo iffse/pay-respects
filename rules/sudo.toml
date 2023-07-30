@@ -1,6 +1,34 @@
 command = "sudo"
 
 [[match_output]]
-pattern = [ "permission denied" ]
+pattern = [
+	"authentication is required",
+	"eacces",
+	"edspermissionerror",
+	"error: insufficient privileges",
+	"must be root",
+	"must be run as root",
+	"must be superuser",
+	"must run as root",
+	"need root",
+	"need to be root",
+	"needs to be run as root",
+	"non-root users cannot",
+	"not super-user",
+	"only root can ",
+	"operation not permitted",
+	"permission denied",
+	"pkg: insufficient privileges",
+	"requested operation requires superuser privilege",
+	"root privilege",
+	"sudorequirederror",
+	"superuser privilege",
+	"this command has to be run under the root user.",
+	"this operation requires root.",
+	"updatedb: can not open a temporary file"
+	"use `sudo`",
+	"you cannot perform this operation unless you are root",
+	"you don't have access to the history db.",
+	"you don't have write permissions",
+]
 suggest = 'sudo {{command}}'
-
