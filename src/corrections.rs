@@ -2,11 +2,11 @@ use std::collections::HashMap;
 
 use rule_parser::parse_rules;
 
-use crate::shell::{command_output};
+use crate::shell::command_output;
 use crate::style::highlight_difference;
 
 pub fn correct_command(shell: &str, last_command: &str) -> Option<String> {
-	let command_output = command_output(&shell, &last_command);
+	let command_output = command_output(shell, last_command);
 
 	let split_command = last_command.split_whitespace().collect::<Vec<&str>>();
 	let command = match split_command.first().expect("No command found.") {
@@ -17,13 +17,13 @@ pub fn correct_command(shell: &str, last_command: &str) -> Option<String> {
 	if split_command[0] != "sudo" {
 		let suggest = match_pattern("sudo", &command_output);
 		if let Some(suggest) = suggest {
-			let suggest = eval_suggest(&suggest, &last_command);
+			let suggest = eval_suggest(&suggest, last_command);
 			return Some(suggest);
 		}
 	}
 	let suggest = match_pattern(command, &command_output);
 	if let Some(suggest) = suggest {
-		let suggest = eval_suggest(&suggest, &last_command);
+		let suggest = eval_suggest(&suggest, last_command);
 		if split_command[0] == "sudo" {
 			return Some(format!("sudo {}", suggest));
 		}
@@ -85,14 +85,29 @@ fn eval_suggest(suggest: &str, last_command: &str) -> String {
 }
 
 pub fn confirm_correction(shell: &str, command: &str, last_command: &str) {
-	println!("Did you mean {}?", highlight_difference(command, last_command));
+	println!(
+		"Did you mean {}?",
+		highlight_difference(command, last_command)
+	);
 	println!("Press enter to execute the corrected command. Or press Ctrl+C to exit.");
 	std::io::stdin().read_line(&mut String::new()).unwrap();
 
-	println!("{}", command);
-	std::process::Command::new(shell)
-		.arg("-c")
-		.arg(command.to_string())
-		.spawn()
-		.expect("failed to execute process");
+	if command.starts_with("sudo") {
+		std::process::Command::new("sudo")
+			.arg(shell)
+			.arg("-c")
+			.arg(command)
+			.spawn()
+			.expect("failed to execute process")
+			.wait()
+			.expect("failed to wait on process");
+	} else {
+		std::process::Command::new(shell)
+			.arg("-c")
+			.arg(command)
+			.spawn()
+			.expect("failed to execute process")
+			.wait()
+			.expect("failed to wait on process");
+	}
 }
