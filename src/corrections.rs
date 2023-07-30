@@ -2,12 +2,10 @@ use std::collections::HashMap;
 
 use rule_parser::parse_rules;
 
-use crate::shell::{command_output, find_last_command, find_shell};
+use crate::shell::{command_output};
 use crate::style::highlight_difference;
 
-pub fn correct_command() -> Option<String> {
-	let shell = find_shell();
-	let last_command = find_last_command(&shell);
+pub fn correct_command(shell: &str, last_command: &str) -> Option<String> {
 	let command_output = command_output(&shell, &last_command);
 
 	let split_command = last_command.split_whitespace().collect::<Vec<&str>>();
@@ -20,14 +18,16 @@ pub fn correct_command() -> Option<String> {
 		let suggest = match_pattern("sudo", &command_output);
 		if let Some(suggest) = suggest {
 			let suggest = eval_suggest(&suggest, &last_command);
-			return Some(highlight_difference(&suggest, &last_command));
+			return Some(suggest);
 		}
 	}
-
 	let suggest = match_pattern(command, &command_output);
 	if let Some(suggest) = suggest {
 		let suggest = eval_suggest(&suggest, &last_command);
-		return Some(highlight_difference(&suggest, &last_command));
+		if split_command[0] == "sudo" {
+			return Some(format!("sudo {}", suggest));
+		}
+		return Some(suggest);
 	}
 	None
 }
@@ -84,14 +84,15 @@ fn eval_suggest(suggest: &str, last_command: &str) -> String {
 	suggest
 }
 
-pub fn confirm_correction(command: &str) {
-	println!("Did you mean {}?", command);
+pub fn confirm_correction(shell: &str, command: &str, last_command: &str) {
+	println!("Did you mean {}?", highlight_difference(command, last_command));
 	println!("Press enter to execute the corrected command. Or press Ctrl+C to exit.");
 	std::io::stdin().read_line(&mut String::new()).unwrap();
-	let shell = find_shell();
+
+	println!("{}", command);
 	std::process::Command::new(shell)
 		.arg("-c")
-		.arg(command)
+		.arg(command.to_string())
 		.spawn()
 		.expect("failed to execute process");
 }
