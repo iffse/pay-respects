@@ -1,0 +1,15 @@
+[package]
+name = "rule_parser"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = "1.0"
+quote = "1.0"
+toml = "0.7"
+serde = { version = "1.0", features = ["derive"] }

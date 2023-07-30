@@ -1,0 +1,6 @@
+command = "sudo"
+
+[[match_output]]
+pattern = [ "permission denied" ]
+suggest = 'sudo {{command}}'
+

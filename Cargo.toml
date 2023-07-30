@@ -1,0 +1,8 @@
+[package]
+name = "pay_respect"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+colored = "2.0"
+rule_parser = { path = "rule_parser" }
