@@ -39,6 +39,6 @@ range-diff,\
 rebase,\
 reset,\
 restore,\
-)}}\
+)}} \
 {{command[2:]}}"""
 ]
