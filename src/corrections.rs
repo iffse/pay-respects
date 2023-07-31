@@ -73,9 +73,10 @@ fn check_condition(suggest: &str, command: &str, error_msg: &str) -> Option<Stri
 		}
 	}
 	let conditions = conditions
-		.trim_start_matches(&['#', '['])
+		.trim_start_matches(['#', '['])
 		.trim_end_matches(']')
-		.split(',').collect::<Vec<&str>>();
+		.split(',')
+		.collect::<Vec<&str>>();
 
 	for condition in conditions {
 		let (mut condition, arg) = condition.split_once('(').unwrap();
@@ -133,15 +134,15 @@ fn eval_suggest(suggest: &str, last_command: &str) -> String {
 			let start = {
 				let mut start = start.parse::<i32>().unwrap_or(0);
 				if start < 0 {
-					start = split_command.len() as i32 + start;
-				} 
+					start += split_command.len() as i32;
+				}
 				start as usize
 			};
 			let end = {
 				let mut end = end.parse::<i32>().unwrap_or(split_command.len() as i32 - 1) + 1;
 				if end < 0 {
-					end = split_command.len() as i32 + end;
-				} 
+					end += split_command.len() as i32;
+				}
 				end as usize
 			};
 			let command = split_command[start..end].join(" ");
@@ -175,7 +176,7 @@ fn eval_suggest(suggest: &str, last_command: &str) -> String {
 				.collect::<Vec<&str>>();
 			command_index = split[1].parse::<i32>().unwrap();
 			if command_index < 0 {
-				command_index = split_command(last_command).len() as i32 + command_index;
+				command_index += split_command(last_command).len() as i32;
 			}
 		} else {
 			unreachable!("Typo suggestion must have a command index");
@@ -258,9 +259,7 @@ fn get_path_files() -> Vec<String> {
 }
 
 fn get_directory_files(input: &str) -> Vec<String> {
-	let mut input = input
-		.trim_matches(|c| c == '\'' || c == '"')
-		.to_owned();
+	let mut input = input.trim_matches(|c| c == '\'' || c == '"').to_owned();
 	let files = loop {
 		match std::fs::read_dir(&input) {
 			Ok(files) => break files,

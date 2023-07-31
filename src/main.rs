@@ -26,5 +26,7 @@ fn main() {
 		"No correction found for the command: {}\n",
 		last_command.red().bold()
 	);
-	println!("If you think there should be a correction, please open an issue or send a pull request!");
+	println!(
+		"If you think there should be a correction, please open an issue or send a pull request!"
+	);
 }
