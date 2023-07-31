@@ -1,0 +1,44 @@
+command = "git"
+
+[[match_err]]
+pattern = [
+	"is not a git command"
+]
+suggest = [
+"""
+{{command[0]}} {{typo[1](\
+add,\
+am,\
+archive,\
+bisect,\
+branch,\
+bundle,\
+checkout,\
+cherry-pick,\
+citool,\
+clean,\
+clone,\
+commit,\
+describe,\
+diff,\
+fetch,\
+format-patch,\
+gc,\
+gitk,\
+grep,\
+gui,\
+init,\
+log,\
+maintenance,\
+merge,\
+mv,\
+notes,\
+pull,\
+push,\
+range-diff,\
+rebase,\
+reset,\
+restore,\
+)}}\
+{{command[2:]}}"""
+]
