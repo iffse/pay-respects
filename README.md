@@ -72,6 +72,7 @@ The placeholder is evaluated as following:
 - `{{command}}`: All the command without any modification
 - `{{command[1]}}`: The first argument of the command (the command itself has index of 0)
 - `{{command[2:5]}}`: The second to fifth arguments. If any of the side is not specified, them it defaults to the start (if it is left) or the end (if it is right).
+- `{{typo[2](fix1, fix2)}}`: This will try to change the second argument to candidates in the parenthesis. The argument in parentheses must have at least 2 values. Single arguments are reserved for specific matches, for instance, `path` to search all commands found in the `$PATH` environment.
 
 The suggestion can have additional conditions to check. To specify the conditions, add a `#[...]` at the first line (just like derive macros in Rust). Available conditions:
 
