@@ -1,6 +1,6 @@
 command = "privilege"
 
-[[match_output]]
+[[match_err]]
 pattern = [
 	"as root",
 	"authentication is required",

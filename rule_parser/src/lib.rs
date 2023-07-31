@@ -14,11 +14,11 @@ pub fn parse_rules(input: TokenStream) -> TokenStream {
 #[derive(serde::Deserialize)]
 struct Rule {
 	command: String,
-	match_output: Vec<MatchOutput>,
+	match_err: Vec<MatchError>,
 }
 
 #[derive(serde::Deserialize)]
-struct MatchOutput {
+struct MatchError {
 	pattern: Vec<String>,
 	suggest: Vec<String>,
 }
@@ -43,13 +43,13 @@ fn gen_string_hashmap(rules: Vec<Rule>) -> String {
 	for rule in rules {
 		let command = rule.command.to_owned();
 		string_hashmap.push_str(&format!("(\"{}\", vec![", command));
-		for match_output in rule.match_output {
-			let pattern = match_output
+		for match_err in rule.match_err {
+			let pattern = match_err
 				.pattern
 				.iter()
 				.map(|x| x.to_lowercase())
 				.collect::<Vec<String>>();
-			let suggest = match_output.suggest;
+			let suggest = match_err.suggest;
 			string_hashmap.push_str(&format!(
 				"(vec![\"{}\"], vec![\"{}\"]),",
 				pattern.join("\", \""),

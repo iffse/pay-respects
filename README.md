@@ -48,9 +48,12 @@ suggest = "{{command[0]}} fix {{command[2:]}}"
 pattern = [
 	"pattern 1",
 ]
-# this will add a `sudo` before the command if the `sudo` is found by `which`
+# this will add a `sudo` before the command if:
+# - the `sudo` is found by `which`
+# - the command last command does not contain `sudo`
+# - the last command typed by the user does not contain `sudo`
 suggest = '''
-#[executable(sudo)]
+#[executable(sudo), !cmd_contains(sudo)]
 sudo {{command}}'''
 ```
 
@@ -59,6 +62,12 @@ The placeholder is evaluated as following:
 - `{{command}}`: All the command without any modification
 - `{{command[1]}}`: The first argument of the command (the command itself has index of 0)
 - `{{command[2:5]}}`: The second to fifth arguments. If any of the side is not specified, them it defaults to the start (if it is left) or the end (if it is right).
+
+The suggestion can have additional conditions to check. To specify the conditions, add a `#[...]` at the first line (just like derive macros in Rust). Available conditions:
+
+- `executable`: Check if the argument can be found by `which`
+- `cmd_contains`: Check if the last user input contains the argument
+- `err_contains`: Check if the error of the command contains the argument
 
 ## Current Progress
 
