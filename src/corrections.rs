@@ -58,23 +58,19 @@ fn check_suggest(suggest: &str, command: &str, error_msg: &str) -> Option<String
 		return Some(suggest.to_owned());
 	}
 	let lines = suggest.lines().collect::<Vec<&str>>();
-	let conditions = lines.first().unwrap().trim().replacen("#", "", 1);
-	let conditions = conditions
-		.trim_start_matches('[')
-		.trim_end_matches(']');
-	let conditions = conditions
-		.split(",")
-		.collect::<Vec<&str>>() ;
+	let conditions = lines.first().unwrap().trim().replacen('#', "", 1);
+	let conditions = conditions.trim_start_matches('[').trim_end_matches(']');
+	let conditions = conditions.split(',').collect::<Vec<&str>>();
 
 	for condition in conditions {
 		let (mut condition, arg) = condition.split_once('(').unwrap();
 		condition = condition.trim();
-		let arg = arg.trim_matches(|c| c == '(' || c == ')');
+		let arg = arg.trim_start_matches('(').trim_end_matches(')');
 		let reverse = match condition.starts_with('!') {
 			true => {
 				condition = condition.trim_start_matches('!');
 				true
-			},
+			}
 			false => false,
 		};
 		if eval_condition(condition, arg, command, error_msg) == reverse {
@@ -92,14 +88,10 @@ fn eval_condition(condition: &str, arg: &str, command: &str, error_msg: &str) ->
 				.output()
 				.expect("failed to execute process");
 			output.status.success()
-		},
-		"err_contains" => {
-			error_msg.contains(arg)
-		},
-		"cmd_contains" => {
-			command.contains(arg)
-		},
-		_ => unreachable!("Unknown condition when evaluation condition: {}", condition)
+		}
+		"err_contains" => error_msg.contains(arg),
+		"cmd_contains" => command.contains(arg),
+		_ => unreachable!("Unknown condition when evaluation condition: {}", condition),
 	}
 }
 
