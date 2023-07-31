@@ -6,3 +6,10 @@ suggest = [
 '''
 {{command[:-2]}} {{typo[-1](file)}}'''
 ]
+
+[[match_err]]
+pattern = [ "is a directory", ]
+suggest = [
+'''
+{{command[0]}} -r {{command[1:]}}'''
+]
