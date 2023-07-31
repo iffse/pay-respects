@@ -131,14 +131,10 @@ fn eval_suggest(suggest: &str, last_command: &str) -> String {
 			let end = end.parse::<usize>().unwrap_or(split_command.len() - 1) + 1;
 			let command = split_command[start..end].join(" ");
 
-			// let command = match start == end {
-			// 	true => split_command[start].to_owned(),
-			// 	false => split_command[start..end].join(" ")
-			// };
 			suggest = suggest.replace(&suggest[start_index..end_index], &command);
 		} else {
 			let range = range.parse::<usize>().unwrap_or(0);
-			let split_command = suggest.split_whitespace().collect::<Vec<&str>>();
+			let split_command = last_command.split_whitespace().collect::<Vec<&str>>();
 			let command = split_command[range].to_owned();
 			suggest = suggest.replace(&suggest[start_index..end_index], &command);
 		}
