@@ -2,6 +2,12 @@
 
 Typed a wrong command? Pay Respect will try to correct your wrong console command simply by pressing `F`!
 
+![example-sudo-echo](img/example-sudo-echo.png)
+
+![example-typo-paru](img/example-typo-paru.png)
+
+![example-typo-git](img/example-typo-git.png)
+
 ## How to Pay Respect
 
 The binary is named `pay-respect`, by adding an alias to your shell
