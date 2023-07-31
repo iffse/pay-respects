@@ -1,6 +1,6 @@
-# Pay Respect
+# Pay Respects
 
-Typed a wrong command? Pay Respect will try to correct your wrong console command simply by pressing `F`!
+Typed a wrong command? Pay Respects will try to correct your wrong console command simply by pressing `F`!
 
 ![example-sudo-echo](img/example-sudo-echo.png)
 
@@ -8,41 +8,41 @@ Typed a wrong command? Pay Respect will try to correct your wrong console comman
 
 ![example-typo-git](img/example-typo-git.png)
 
-## How to Pay Respect
+## How to Pay Respects
 
-The binary is named `pay-respect`, by adding an alias to your shell
+The binary is named `pay-respects`, by adding an alias to your shell
 configuration:
 ``` shell
 # Note: You may need to have the binary exposed in your path
-alias f="$(pay_respect <your_shell_here>)"
+alias f="$(pay_respects <your_shell_here>)"
 
 # for example, using `zsh`:
-alias f="$(pay_respect zsh)"
+alias f="$(pay_respects zsh)"
 
 # for `nushell`, the alias can be added automatically with:
-pay_respect nushell
+pay_respects nushell
 ```
-You can now **press `F` to Pay Respect**!
+You can now **press `F` to Pay Respects**!
 
 Currently, only corrections to `bash`, `zsh`, and `fish` are working flawlessly.
 
 `nushell` has broken aliases, therefore it has following 2 limitations:
 
-- You have to manually add the output of `pay_respect nushell` to your configuration as alias
+- You have to manually add the output of `pay_respects nushell` to your configuration as alias
 - Aliased commands cannot be expanded to their original command
 
 ## Installing
 
 If you are using Arch Linux, you can install from AUR directly:
 ```shell
-paru -S pay_respect
+paru -S pay_respects
 ```
 
 Otherwise, you can use cargo to compile the project:
 ```
 cargo build --release
 ```
-and the binary can be found at `target/release/pay_respect`.
+and the binary can be found at `target/release/pay_respects`.
 
 ## Rule Files
 
