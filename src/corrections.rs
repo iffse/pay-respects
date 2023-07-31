@@ -92,7 +92,7 @@ pub fn confirm_correction(shell: &str, command: &str, last_command: &str) {
 	println!("Press enter to execute the corrected command. Or press Ctrl+C to exit.");
 	std::io::stdin().read_line(&mut String::new()).unwrap();
 
-	let privilege = Vec::from(["sudo", "doas"]);
+	let privilege = Vec::from(["doas", "sudo"]);
 
 	for p in privilege {
 		if command.starts_with(p){

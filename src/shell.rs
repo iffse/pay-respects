@@ -73,7 +73,7 @@ fn shell_default_history_file(shell: &str) -> String {
 }
 
 pub fn get_privilege() -> Option<String> {
-	let list = vec!["sudo", "doas"];
+	let list = vec!["doas", "sudo"];
 	for command in list {
 		if std::process::Command::new(command).output().is_ok() {
 			return Some(command.to_string());
