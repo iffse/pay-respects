@@ -4,7 +4,7 @@ command = "no_command"
 pattern = [
 	"command not found",
 	"unknown command",
-	"executable was not found"
+	"nu::shell::external_command",
 ]
 suggest = [
 '''
