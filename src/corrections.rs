@@ -46,7 +46,7 @@ fn match_pattern(executable: &str, command: &str, error_msg: &str) -> Option<Str
 			for pattern in pattern {
 				if error_msg.contains(pattern) {
 					for suggest in suggest {
-						if let Some(suggest) = check_suggest(suggest, command, error_msg) {
+						if let Some(suggest) = check_condition(suggest, command, error_msg) {
 							return Some(suggest);
 						}
 					}
@@ -59,21 +59,23 @@ fn match_pattern(executable: &str, command: &str, error_msg: &str) -> Option<Str
 	}
 }
 
-fn check_suggest(suggest: &str, command: &str, error_msg: &str) -> Option<String> {
+fn check_condition(suggest: &str, command: &str, error_msg: &str) -> Option<String> {
 	if !suggest.starts_with('#') {
 		return Some(suggest.to_owned());
 	}
 	let mut lines = suggest.lines().collect::<Vec<&str>>();
-	let conditions = lines.first().unwrap().trim().replacen('#', "", 1);
-	let mut conditions = conditions.trim_start_matches('[').to_string();
-	for (i, line) in lines[1..].iter().enumerate() {
+	let mut conditions = String::new();
+	for (i, line) in lines[0..].iter().enumerate() {
 		conditions.push_str(line);
 		if line.ends_with(']') {
-			lines = lines[i + 1..].to_vec();
+			lines = lines[i..].to_vec();
 			break;
 		}
 	}
-	let conditions = conditions.split(',').collect::<Vec<&str>>();
+	let conditions = conditions
+		.trim_start_matches(&['#', '['])
+		.trim_end_matches(']')
+		.split(',').collect::<Vec<&str>>();
 
 	for condition in conditions {
 		let (mut condition, arg) = condition.split_once('(').unwrap();
