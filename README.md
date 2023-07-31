@@ -9,6 +9,9 @@ configuration:
 ``` shell
 # Note: You may need to have the binary exposed in your path
 alias f="$(pay_respect <your_shell_here>)"
+
+# for example, using `zsh`:
+alias f="$(pay_respect zsh)"
 ```
 You can now **press `F` to Pay Respect**!
 
