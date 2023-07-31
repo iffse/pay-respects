@@ -2,20 +2,20 @@ use std::collections::HashMap;
 
 use rule_parser::parse_rules;
 
-use crate::shell::command_output;
+use crate::shell::{command_output, PRIVILEGE_LIST};
 use crate::style::highlight_difference;
 
 pub fn correct_command(shell: &str, last_command: &str) -> Option<String> {
 	let command_output = command_output(shell, last_command);
 
 	let split_command = last_command.split_whitespace().collect::<Vec<&str>>();
-	let command = match split_command.first().expect("No command found.") {
-		&"sudo" => split_command.get(1).expect("No command found."),
-		_ => split_command.first().expect("No command found."),
+	let command = match PRIVILEGE_LIST.contains(&split_command[0]) {
+		true => split_command.get(1).expect("No command found."),
+		false => split_command.first().expect("No command found."),
 	};
 
-	if split_command[0] != "sudo" {
-		let suggest = match_pattern("sudo", &command_output);
+	if !PRIVILEGE_LIST.contains(command) {
+		let suggest = match_pattern("privilege", &command_output);
 		if let Some(suggest) = suggest {
 			let suggest = eval_suggest(&suggest, last_command);
 			return Some(suggest);
@@ -24,8 +24,8 @@ pub fn correct_command(shell: &str, last_command: &str) -> Option<String> {
 	let suggest = match_pattern(command, &command_output);
 	if let Some(suggest) = suggest {
 		let suggest = eval_suggest(&suggest, last_command);
-		if split_command[0] == "sudo" {
-			return Some(format!("sudo {}", suggest));
+		if PRIVILEGE_LIST.contains(command) {
+			return Some(format!("{} {}", split_command[0], suggest));
 		}
 		return Some(suggest);
 	}
@@ -92,12 +92,11 @@ pub fn confirm_correction(shell: &str, command: &str, last_command: &str) {
 	println!("Press enter to execute the corrected command. Or press Ctrl+C to exit.");
 	std::io::stdin().read_line(&mut String::new()).unwrap();
 
-	let privilege = Vec::from(["doas", "sudo"]);
-
-	for p in privilege {
-		if command.starts_with(p){
+	for p in PRIVILEGE_LIST {
+		if command.starts_with(p) {
 			let command = command.replace(p, "");
-			std::process::Command::new(p)
+			println!("{} {}", p, command);
+			std::process::Command::new(p.trim())
 				.arg(shell)
 				.arg("-c")
 				.arg(command)

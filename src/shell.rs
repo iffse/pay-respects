@@ -1,5 +1,7 @@
 use std::{collections::HashMap, fs::read_to_string, process::exit};
 
+pub const PRIVILEGE_LIST: [&str; 2] = ["doas ", "sudo "];
+
 pub fn find_shell() -> String {
 	std::env::var("SHELL")
 		.unwrap_or_else(|_| String::from("bash"))
@@ -17,7 +19,8 @@ pub fn find_last_command(shell: &str) -> String {
 		Err(_) => shell_default_history_file(shell),
 	};
 
-	let history = read_to_string(history_file).expect("Could not read history file.");
+	let history = read_to_string(history_file)
+		.expect("Could not read history file. Try setting the HISTFILE environment variable.");
 
 	match shell {
 		"bash" => history.lines().rev().nth(1).unwrap().to_string(),
@@ -73,8 +76,8 @@ fn shell_default_history_file(shell: &str) -> String {
 }
 
 pub fn get_privilege() -> Option<String> {
-	let list = vec!["doas", "sudo"];
-	for command in list {
+	for command in PRIVILEGE_LIST {
+		let command = command.trim();
 		if std::process::Command::new(command).output().is_ok() {
 			return Some(command.to_string());
 		}

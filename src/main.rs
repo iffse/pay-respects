@@ -12,7 +12,7 @@ fn main() {
 	let corrected_command = corrections::correct_command(&shell, &last_command);
 
 	if let Some(mut corrected_command) = corrected_command {
-		if corrected_command.starts_with("sudo") {
+		if corrected_command.starts_with("sudo ") {
 			let privilege = get_privilege();
 			if let Some(privilege) = privilege {
 				if privilege != "sudo" {
@@ -22,6 +22,11 @@ fn main() {
 		}
 		corrections::confirm_correction(&shell, &corrected_command, &last_command);
 	} else {
-		println!("No correction found.");
+		println!(
+			"
+No correction found.
+
+If you think there should be a correction, please open an issue or send a pull request!"
+		);
 	}
 }

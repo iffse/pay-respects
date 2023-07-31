@@ -1,4 +1,4 @@
-command = "sudo"
+command = "privilege"
 
 [[match_output]]
 pattern = [
