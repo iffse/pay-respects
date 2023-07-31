@@ -74,13 +74,3 @@ fn shell_default_history_file(shell: &str) -> String {
 	let file = shell_file_map.get(shell).expect("Unsupported shell.");
 	format!("{}/{}", std::env::var("HOME").unwrap(), file)
 }
-
-pub fn get_privilege() -> Option<String> {
-	for command in PRIVILEGE_LIST {
-		let command = command.trim();
-		if std::process::Command::new(command).output().is_ok() {
-			return Some(command.to_string());
-		}
-	}
-	None
-}
