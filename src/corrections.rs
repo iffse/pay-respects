@@ -8,13 +8,13 @@ use crate::style::highlight_difference;
 pub fn correct_command(shell: &str, last_command: &str) -> Option<String> {
 	let err = command_output(shell, last_command);
 
-	let split_command = last_command.split_whitespace().collect::<Vec<&str>>();
-	let executable = match PRIVILEGE_LIST.contains(&split_command[0]) {
-		true => split_command.get(1).expect("No command found."),
-		false => split_command.first().expect("No command found."),
+	let split_command = split_command(last_command);
+	let executable = match PRIVILEGE_LIST.contains(&split_command[0].as_str()) {
+		true => split_command.get(1).expect("No command found.").as_str(),
+		false => split_command.first().expect("No command found.").as_str(),
 	};
 
-	if !PRIVILEGE_LIST.contains(executable) {
+	if !PRIVILEGE_LIST.contains(&executable) {
 		let suggest = match_pattern("privilege", last_command, &err);
 		if let Some(suggest) = suggest {
 			let suggest = eval_suggest(&suggest, last_command);
@@ -24,7 +24,7 @@ pub fn correct_command(shell: &str, last_command: &str) -> Option<String> {
 	let suggest = match_pattern(executable, last_command, &err);
 	if let Some(suggest) = suggest {
 		let suggest = eval_suggest(&suggest, last_command);
-		if PRIVILEGE_LIST.contains(executable) {
+		if PRIVILEGE_LIST.contains(&executable) {
 			return Some(format!("{} {}", split_command[0], suggest));
 		}
 		return Some(suggest);
@@ -116,6 +116,7 @@ fn eval_suggest(suggest: &str, last_command: &str) -> String {
 	if suggest.contains("{{command}}") {
 		suggest = suggest.replace("{{command}}", last_command);
 	}
+	println!("eval suggest: {}", suggest);
 	while suggest.contains("{{command") {
 		let placeholder_start = "{{command";
 		let placeholder_end = "}}";
@@ -128,19 +129,32 @@ fn eval_suggest(suggest: &str, last_command: &str) -> String {
 		let placeholder = start_index + placeholder_start.len()..end_index - placeholder_end.len();
 		let range = suggest[placeholder.to_owned()].trim_matches(|c| c == '[' || c == ']');
 		if let Some((start, end)) = range.split_once(':') {
-			let split_command = last_command.split_whitespace().collect::<Vec<&str>>();
-			let start = start.parse::<usize>().unwrap_or(0);
-			let end = end.parse::<usize>().unwrap_or(split_command.len() - 1) + 1;
+			let split_command = split_command(last_command);
+			let start = {
+				let mut start = start.parse::<i32>().unwrap_or(0);
+				if start < 0 {
+					start = split_command.len() as i32 + start;
+				} 
+				start as usize
+			};
+			let end = {
+				let mut end = end.parse::<i32>().unwrap_or(split_command.len() as i32 - 1) + 1;
+				if end < 0 {
+					end = split_command.len() as i32 + end;
+				} 
+				end as usize
+			};
 			let command = split_command[start..end].join(" ");
 
 			suggest = suggest.replace(&suggest[start_index..end_index], &command);
 		} else {
 			let range = range.parse::<usize>().unwrap_or(0);
-			let split_command = last_command.split_whitespace().collect::<Vec<&str>>();
+			let split_command = split_command(last_command);
 			let command = split_command[range].to_owned();
 			suggest = suggest.replace(&suggest[start_index..end_index], &command);
 		}
 	}
+	println!("eval suggest: {}", suggest);
 
 	while suggest.contains("{{typo") {
 		let placeholder_start = "{{typo";
@@ -153,13 +167,18 @@ fn eval_suggest(suggest: &str, last_command: &str) -> String {
 
 		let placeholder = start_index + placeholder_start.len()..end_index - placeholder_end.len();
 
-		let mut command_index = 0;
+		let mut command_index;
 		let mut match_list = vec![];
 		if suggest.contains('[') {
 			let split = suggest[placeholder.to_owned()]
 				.split(&['[', ']'])
 				.collect::<Vec<&str>>();
-			command_index = split[1].parse::<usize>().unwrap();
+			command_index = split[1].parse::<i32>().unwrap();
+			if command_index < 0 {
+				command_index = split_command(last_command).len() as i32 + command_index;
+			}
+		} else {
+			unreachable!("Typo suggestion must have a command index");
 		}
 		if suggest.contains('(') {
 			let split = suggest[placeholder.to_owned()]
@@ -168,17 +187,30 @@ fn eval_suggest(suggest: &str, last_command: &str) -> String {
 			match_list = split[1].split(',').collect::<Vec<&str>>();
 		}
 
-		let command = last_command.split_whitespace().collect::<Vec<&str>>()[command_index];
+		let command = split_command(last_command);
 		let match_list = match_list
 			.iter()
 			.map(|s| s.to_string())
 			.collect::<Vec<String>>();
-		let suggestion = suggest_typo(command, match_list.clone());
+		let command_index = command_index as usize;
+		let suggestion = suggest_typo(&command[command_index], match_list.clone());
 
 		suggest = suggest.replace(&suggest[start_index..end_index], &suggestion);
 	}
+	println!("eval suggest: {}", suggest);
 
 	suggest
+}
+
+pub fn split_command(command: &str) -> Vec<String> {
+	use regex::Regex;
+	let regex = r#"([^\s"\\]+|"(?:\\.|[^"\\])*"|\\.)+"#;
+	let regex = Regex::new(regex).unwrap();
+	let split_command = regex
+		.find_iter(command)
+		.map(|cap| cap.as_str().to_owned())
+		.collect::<Vec<String>>();
+	split_command
 }
 
 fn suggest_typo(typo: &str, candidates: Vec<String>) -> String {
@@ -193,7 +225,10 @@ fn suggest_typo(typo: &str, candidates: Vec<String>) -> String {
 				}
 			}
 			"file" => {
-				unimplemented!();
+				let files = get_directory_files(typo);
+				if let Some(suggest) = find_fimilar(typo, files) {
+					suggestion = suggest;
+				}
 			}
 			_ => {}
 		}
@@ -207,7 +242,6 @@ fn suggest_typo(typo: &str, candidates: Vec<String>) -> String {
 fn get_path_files() -> Vec<String> {
 	let path = std::env::var("PATH").unwrap();
 	let path = path.split(':').collect::<Vec<&str>>();
-	// get all executable files in $PATH
 	let mut all_executable = vec![];
 	for p in path {
 		let files = match std::fs::read_dir(p) {
@@ -221,6 +255,28 @@ fn get_path_files() -> Vec<String> {
 		}
 	}
 	all_executable
+}
+
+fn get_directory_files(input: &str) -> Vec<String> {
+	let mut input = input
+		.trim_matches(|c| c == '\'' || c == '"')
+		.to_owned();
+	let files = loop {
+		match std::fs::read_dir(&input) {
+			Ok(files) => break files,
+			Err(_) => {
+				input = input.rsplit('/').nth(1).unwrap().to_owned();
+			}
+		}
+	};
+
+	let mut all_files = vec![];
+	for file in files {
+		let file = file.unwrap();
+		let file_name = file.path().to_str().unwrap().to_owned();
+		all_files.push(file_name);
+	}
+	all_files
 }
 
 fn find_fimilar(typo: &str, candidates: Vec<String>) -> Option<String> {

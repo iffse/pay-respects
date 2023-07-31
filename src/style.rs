@@ -1,10 +1,11 @@
 use colored::*;
+use crate::corrections::split_command;
 
 pub fn highlight_difference(corrected_command: &str, last_command: &str) -> String {
 	let mut highlighted_command = String::new();
 
-	let split_corrected_command = corrected_command.split(' ');
-	let split_last_command = last_command.split(' ');
+	let split_corrected_command = split_command(corrected_command);
+	let split_last_command = split_command(last_command);
 
 	for new in split_corrected_command {
 		if new == "" {
