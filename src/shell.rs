@@ -1,56 +1,6 @@
-use std::{collections::HashMap, fs::read_to_string, process::exit};
+use std::{process::exit};
 
-pub const PRIVILEGE_LIST: [&str; 2] = ["doas ", "sudo "];
-
-pub fn find_shell() -> String {
-	std::env::var("SHELL")
-		.unwrap_or_else(|_| String::from("bash"))
-		.rsplit('/')
-		.next()
-		.unwrap()
-		.to_string()
-		.to_lowercase()
-}
-
-pub fn find_last_command(shell: &str) -> String {
-	let history_env = std::env::var("HISTFILE");
-	let history_file = match history_env {
-		Ok(file) => file,
-		Err(_) => shell_default_history_file(shell),
-	};
-
-	let history = read_to_string(history_file)
-		.expect("Could not read history file. Try setting the HISTFILE environment variable.");
-
-	match shell {
-		"bash" => history.lines().rev().nth(1).unwrap().to_string(),
-		"zsh" => history
-			.lines()
-			.rev()
-			.nth(1)
-			.unwrap()
-			.split_once(';')
-			.unwrap()
-			.1
-			.to_string(),
-		"fish" => {
-			let mut history_lines = history.lines().rev();
-			let mut last_command = String::new();
-			let mut skips = 0;
-			while skips <= 2 {
-				last_command = history_lines.next().unwrap().to_string();
-				if last_command.starts_with("- cmd") {
-					skips += 1;
-				}
-			}
-			last_command.split_once(": ").unwrap().1.to_string()
-		}
-		_ => {
-			println!("Unsupported shell.");
-			exit(1);
-		}
-	}
-}
+pub const PRIVILEGE_LIST: [&str; 2] = ["sudo", "doas"];
 
 pub fn command_output(shell: &str, command: &str) -> String {
 	let output = std::process::Command::new(shell)
@@ -67,13 +17,79 @@ pub fn command_output(shell: &str, command: &str) -> String {
 		.to_lowercase()
 }
 
-fn shell_default_history_file(shell: &str) -> String {
-	let shell_file_map = HashMap::from([
-		("bash", String::from(".bash_history")),
-		("zsh", String::from(".zsh_history")),
-		("fish", String::from(".local/share/fish/fish_history")),
-	]);
+fn last_command(shell: &str) -> String {
+	let last_command = std::env::var("_PR_LAST_COMMAND").expect("No _PR_LAST_COMMAND in environment. Did you aliased the command with the correct argument?");
+	println!("last_command: {}", last_command);
+	match shell {
+		"bash" => {
+			let first_line = last_command.lines().next().unwrap();
+			let split = first_line.split_whitespace().collect::<Vec<&str>>();
+			split[1..].join(" ")
+		}
+		"zsh" => last_command,
+		"fish" => last_command,
+		_ => {
+			eprintln!("Unsupported shell: {}", shell);
+			exit(1);
+		}
+	}
+}
 
-	let file = shell_file_map.get(shell).expect("Unsupported shell.");
-	format!("{}/{}", std::env::var("HOME").unwrap(), file)
+pub fn last_command_expanded_alias(shell: &str) -> String {
+	let alias = std::env::var("_PR_ALIAS").expect(
+		"No _PR_ALIAS in environment. Did you aliased the command with the correct argument?",
+	);
+	let last_command = last_command(shell);
+	if alias.is_empty() {
+		return last_command;
+	}
+
+	let split_command = last_command.split_whitespace().collect::<Vec<&str>>();
+	let command;
+	if PRIVILEGE_LIST.contains(&split_command[0]) {
+		command = split_command[1];
+	} else {
+		command = split_command[0];
+	}
+
+	let mut expanded_command = command.to_string();
+
+	match shell {
+		"bash" => {
+			for line in alias.lines() {
+				if line.starts_with(format!("alias {}=", command).as_str()) {
+					let alias = line.replace(format!("alias {}='", command).as_str(), "");
+					let alias = alias.trim_end_matches('\'').trim_start_matches('\'');
+
+					expanded_command = alias.to_string();
+				}
+			}
+		}
+		"zsh" => {
+			for line in alias.lines() {
+				if line.starts_with(format!("{}=", command).as_str()) {
+					let alias = line.replace(format!("{}=", command).as_str(), "");
+					let alias = alias.trim_start_matches('\'').trim_end_matches('\'');
+
+					expanded_command = alias.to_string();
+				}
+			}
+		}
+		"fish" => {
+			for line in alias.lines() {
+				if line.starts_with(format!("alias {} ", command).as_str()) {
+					let alias = line.replace(format!("alias {} ", command).as_str(), "");
+					let alias = alias.trim_start_matches('\'').trim_end_matches('\'');
+
+					expanded_command = alias.to_string();
+				}
+			}
+		}
+		_ => {
+			eprintln!("Unsupported shell: {}", shell);
+			exit(1);
+		}
+	};
+
+	last_command.replacen(command, &expanded_command, 1)
 }

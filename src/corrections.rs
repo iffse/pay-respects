@@ -139,9 +139,10 @@ pub fn confirm_correction(shell: &str, command: &str, last_command: &str) {
 	std::io::stdin().read_line(&mut String::new()).unwrap();
 
 	for p in PRIVILEGE_LIST {
-		if command.starts_with(p) {
+		let _p = p.to_owned() + " ";
+		if command.starts_with(&_p) {
 			let command = command.replace(p, "");
-			std::process::Command::new(p.trim())
+			std::process::Command::new(p)
 				.arg(shell)
 				.arg("-c")
 				.arg(command)

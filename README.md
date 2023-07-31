@@ -8,9 +8,11 @@ The binary is named `pay-respect`, by adding an alias to your shell
 configuration:
 ``` shell
 # Note: You may need to have the binary exposed in your path
-alias f="pay_respect"
+alias f="$(pay_respect <your_shell_here>)"
 ```
 You can now **press `F` to Pay Respect**!
+
+Currently, only corrections to `bash`, `zsh`, and `fish` are implemented.
 
 ## Installing
 
