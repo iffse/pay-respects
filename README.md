@@ -51,7 +51,6 @@ pattern = [
 # this will add a `sudo` before the command if:
 # - the `sudo` is found by `which`
 # - the command last command does not contain `sudo`
-# - the last command typed by the user does not contain `sudo`
 suggest = '''
 #[executable(sudo), !cmd_contains(sudo)]
 sudo {{command}}'''
