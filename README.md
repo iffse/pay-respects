@@ -48,8 +48,10 @@ suggest = "{{command[0]}} fix {{command[2:]}}"
 pattern = [
 	"pattern 1",
 ]
-# this will add a `sudo` before the command, without touching the rest
-suggest = "sudo {{command}}"
+# this will add a `sudo` before the command if the `sudo` is found by `which`
+suggest = '''
+#[executable(sudo)]
+sudo {{command}}'''
 ```
 
 The placeholder is evaluated as following:

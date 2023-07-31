@@ -2,8 +2,6 @@ mod corrections;
 mod shell;
 mod style;
 
-use shell::get_privilege;
-
 fn main() {
 	std::env::set_var("LC_ALL", "C");
 
@@ -11,15 +9,7 @@ fn main() {
 	let last_command = shell::find_last_command(&shell);
 	let corrected_command = corrections::correct_command(&shell, &last_command);
 
-	if let Some(mut corrected_command) = corrected_command {
-		if corrected_command.starts_with("sudo ") {
-			let privilege = get_privilege();
-			if let Some(privilege) = privilege {
-				if privilege != "sudo" {
-					corrected_command = corrected_command.replacen("sudo", &privilege, 1);
-				}
-			}
-		}
+	if let Some(corrected_command) = corrected_command {
 		corrections::confirm_correction(&shell, &corrected_command, &last_command);
 	} else {
 		println!(

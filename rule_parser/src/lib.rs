@@ -20,7 +20,7 @@ struct Rule {
 #[derive(serde::Deserialize)]
 struct MatchOutput {
 	pattern: Vec<String>,
-	suggest: String,
+	suggest: Vec<String>,
 }
 
 fn get_rules(directory: String) -> Vec<Rule> {
@@ -51,9 +51,9 @@ fn gen_string_hashmap(rules: Vec<Rule>) -> String {
 				.collect::<Vec<String>>();
 			let suggest = match_output.suggest;
 			string_hashmap.push_str(&format!(
-				"(vec![\"{}\"], \"{}\"),",
+				"(vec![\"{}\"], vec![\"{}\"]),",
 				pattern.join("\", \""),
-				suggest
+				suggest.join("\", \"")
 			));
 		}
 		string_hashmap.push_str("]),");

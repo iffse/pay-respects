@@ -39,13 +39,50 @@ fn match_pattern(command: &str, error_msg: &str) -> Option<String> {
 		for (pattern, suggest) in suggest {
 			for pattern in pattern {
 				if error_msg.contains(pattern) {
-					return Some(suggest.to_owned().to_string());
+					for suggest in suggest {
+						if let Some(suggest) = check_suggest(suggest) {
+							return Some(suggest);
+						}
+					}
 				}
 			}
 		}
 		None
 	} else {
 		None
+	}
+}
+
+fn check_suggest(suggest: &str) -> Option<String> {
+	if !suggest.starts_with('#') {
+		return Some(suggest.to_owned());
+	}
+	let lines = suggest.lines().collect::<Vec<&str>>();
+	let conditions = lines.first().unwrap();
+	let conditions = conditions.trim_matches(|c| c == '#' || c == '[' || c == ']');
+	let conditions = conditions.split(',').collect::<Vec<&str>>();
+	for condition in conditions {
+		let condition = condition.trim();
+		let (condition, arg) = condition.split_once('(').unwrap();
+		let arg = arg.trim_matches(|c| c == '(' || c == ')');
+
+		if eval_condition(condition, arg) == false {
+			return None;
+		}
+	}
+	Some(lines[1..].join("\n"))
+}
+
+fn eval_condition(condition: &str, arg: &str) -> bool {
+	match condition {
+		"executable" => {
+			let output = std::process::Command::new("which")
+				.arg(arg)
+				.output()
+				.expect("failed to execute process");
+			output.status.success()
+		}
+		_ => false,
 	}
 }
 
@@ -95,7 +132,6 @@ pub fn confirm_correction(shell: &str, command: &str, last_command: &str) {
 	for p in PRIVILEGE_LIST {
 		if command.starts_with(p) {
 			let command = command.replace(p, "");
-			println!("{} {}", p, command);
 			std::process::Command::new(p.trim())
 				.arg(shell)
 				.arg("-c")

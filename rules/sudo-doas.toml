@@ -27,4 +27,11 @@ pattern = [
 	"you don't have access to the history db.",
 	"you don't have write permissions",
 ]
-suggest = 'sudo {{command}}'
+suggest = [
+'''
+#[executable(sudo)]
+sudo {{command}}''',
+'''
+#[executable(doas)]
+doas {{command}}''',
+]
