@@ -18,6 +18,9 @@ alias f="$(pay_respect <your_shell_here>)"
 
 # for example, using `zsh`:
 alias f="$(pay_respect zsh)"
+
+# for `nushell`, the alias can be added automatically with:
+pay_respect nushell
 ```
 You can now **press `F` to Pay Respect**!
 
