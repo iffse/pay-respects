@@ -25,5 +25,5 @@ pub fn highlight_difference(corrected_command: &str, last_command: &str) -> Stri
 	}
 
 	highlighted_command.pop();
-	highlighted_command
+	highlighted_command.trim().to_string()
 }
