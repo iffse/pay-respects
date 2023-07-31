@@ -1,3 +1,5 @@
+use colored::Colorize;
+
 mod args;
 mod corrections;
 mod shell;
@@ -16,11 +18,7 @@ fn main() {
 	if let Some(corrected_command) = corrected_command {
 		corrections::confirm_correction(&shell, &corrected_command, &last_command);
 	} else {
-		println!(
-			"
-No correction found.
-
-If you think there should be a correction, please open an issue or send a pull request!"
-		);
+		println!("No correction found for the command: {}\n", last_command.red().bold());
+		println!("If you think there should be a correction, please open an issue or send a pull request!");
 	}
 }
