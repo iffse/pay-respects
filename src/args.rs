@@ -44,7 +44,7 @@ pub fn handle_args() {
 							.arg("echo $nu.config-path")
 							.output()
 							.expect("Failed to execute process");
-						let config_path= String::from_utf8_lossy(&output.stdout);
+						let config_path = String::from_utf8_lossy(&output.stdout);
 						let mut file = std::fs::OpenOptions::new()
 							.write(true)
 							.append(true)
@@ -52,8 +52,8 @@ pub fn handle_args() {
 							.expect("Failed to open config file");
 
 						writeln!(file, "{}", alias).expect("Failed to write to config file");
-					},
-					"n" | _ => std::process::exit(0),
+					}
+					_ => std::process::exit(0),
 				};
 				std::process::exit(0);
 			}
