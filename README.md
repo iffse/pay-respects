@@ -15,7 +15,12 @@ alias f="$(pay_respect zsh)"
 ```
 You can now **press `F` to Pay Respect**!
 
-Currently, only corrections to `bash`, `zsh`, and `fish` are implemented.
+Currently, only corrections to `bash`, `zsh`, and `fish` are working flawlessly.
+
+`nushell` has broken aliases, therefore it has following 2 limitations:
+
+- You have to manually add the output of `pay_respect nushell` to your configuration as alias
+- Aliased commands cannot be expanded to their original command
 
 ## Installing
 

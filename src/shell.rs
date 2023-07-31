@@ -27,6 +27,7 @@ fn last_command(shell: &str) -> String {
 		}
 		"zsh" => last_command,
 		"fish" => last_command,
+		"nu" => last_command,
 		_ => {
 			eprintln!("Unsupported shell: {}", shell);
 			exit(1);
