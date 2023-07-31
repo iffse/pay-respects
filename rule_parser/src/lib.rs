@@ -49,7 +49,11 @@ fn gen_string_hashmap(rules: Vec<Rule>) -> String {
 				.iter()
 				.map(|x| x.to_lowercase())
 				.collect::<Vec<String>>();
-			let suggest = match_err.suggest;
+			let suggest = match_err.
+				suggest
+				.iter()
+				.map(|x| x.to_lowercase())
+				.collect::<Vec<String>>();
 			string_hashmap.push_str(&format!(
 				"(vec![\"{}\"], vec![\"{}\"]),",
 				pattern.join("\", \""),
