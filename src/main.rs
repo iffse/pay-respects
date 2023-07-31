@@ -16,12 +16,15 @@ fn main() {
 	let corrected_command = corrections::correct_command(&shell, &last_command);
 
 	if let Some(corrected_command) = corrected_command {
-		corrections::confirm_correction(&shell, &corrected_command, &last_command);
-	} else {
-		println!(
-			"No correction found for the command: {}\n",
-			last_command.red().bold()
-		);
-		println!("If you think there should be a correction, please open an issue or send a pull request!");
+		if corrected_command != last_command {
+			corrections::confirm_correction(&shell, &corrected_command, &last_command);
+			return;
+		}
 	}
+
+	println!(
+		"No correction found for the command: {}\n",
+		last_command.red().bold()
+	);
+	println!("If you think there should be a correction, please open an issue or send a pull request!");
 }
