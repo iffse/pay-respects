@@ -7,6 +7,9 @@ pub fn highlight_difference(corrected_command: &str, last_command: &str) -> Stri
 	let split_last_command = last_command.split(' ');
 
 	for new in split_corrected_command {
+		if new == "" {
+			continue;
+		}
 		let mut changed = true;
 		for old in split_last_command.clone() {
 			if new == old {
@@ -24,6 +27,5 @@ pub fn highlight_difference(corrected_command: &str, last_command: &str) -> Stri
 		highlighted_command.push(' ');
 	}
 
-	highlighted_command.pop();
 	highlighted_command.trim().to_string()
 }
