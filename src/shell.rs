@@ -1,4 +1,4 @@
-use std::{process::exit};
+use std::process::exit;
 
 pub const PRIVILEGE_LIST: [&str; 2] = ["sudo", "doas"];
 
@@ -45,12 +45,11 @@ pub fn last_command_expanded_alias(shell: &str) -> String {
 	}
 
 	let split_command = last_command.split_whitespace().collect::<Vec<&str>>();
-	let command;
-	if PRIVILEGE_LIST.contains(&split_command[0]) {
-		command = split_command[1];
+	let command = if PRIVILEGE_LIST.contains(&split_command[0]) {
+		split_command[1]
 	} else {
-		command = split_command[0];
-	}
+		split_command[0]
+	};
 
 	let mut expanded_command = command.to_string();
 

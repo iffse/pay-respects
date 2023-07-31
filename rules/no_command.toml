@@ -1,0 +1,10 @@
+command = "no_command"
+
+[[match_err]]
+pattern = [
+	"command not found"
+]
+suggest = [
+'''
+{{typo[0](path)}} {{command[1:]}}'''
+]

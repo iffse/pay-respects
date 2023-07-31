@@ -19,13 +19,16 @@ pub fn handle_args() {
 				last_command = "$(history | head -n 1)";
 				alias = "$(alias)";
 			}
-			"nu" | "nush" | "nushell"=> {
+			"nu" | "nush" | "nushell" => {
 				last_command = "(history | last).command";
 				alias = "\"\"";
-				println!("with-env {{ _PR_LAST_COMMAND : {},\
+				println!(
+					"with-env {{ _PR_LAST_COMMAND : {},\
 					_PR_ALIAS : {},\
-					_PR_SHELL : {} }} \
-					{{ {} }}", last_command, alias, "nu", binary_path);
+					_PR_SHELL : nu }} \
+					{{ {} }}",
+					last_command, alias, binary_path
+				);
 				std::process::exit(0);
 			}
 			_ => {
