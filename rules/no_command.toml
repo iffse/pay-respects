@@ -2,7 +2,9 @@ command = "no_command"
 
 [[match_err]]
 pattern = [
-	"command not found"
+	"command not found",
+	"unknown command",
+	"executable was not found"
 ]
 suggest = [
 '''
