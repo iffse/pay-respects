@@ -19,7 +19,6 @@ pub fn command_output(shell: &str, command: &str) -> String {
 
 fn last_command(shell: &str) -> String {
 	let last_command = std::env::var("_PR_LAST_COMMAND").expect("No _PR_LAST_COMMAND in environment. Did you aliased the command with the correct argument?");
-	println!("last_command: {}", last_command);
 	match shell {
 		"bash" => {
 			let first_line = last_command.lines().next().unwrap();
