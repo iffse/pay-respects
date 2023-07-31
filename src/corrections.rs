@@ -117,7 +117,6 @@ fn eval_suggest(suggest: &str, last_command: &str) -> String {
 	if suggest.contains("{{command}}") {
 		suggest = suggest.replace("{{command}}", last_command);
 	}
-	println!("eval suggest: {}", suggest);
 	while suggest.contains("{{command") {
 		let placeholder_start = "{{command";
 		let placeholder_end = "}}";
@@ -155,7 +154,6 @@ fn eval_suggest(suggest: &str, last_command: &str) -> String {
 			suggest = suggest.replace(&suggest[start_index..end_index], &command);
 		}
 	}
-	println!("eval suggest: {}", suggest);
 
 	while suggest.contains("{{typo") {
 		let placeholder_start = "{{typo";
@@ -198,7 +196,6 @@ fn eval_suggest(suggest: &str, last_command: &str) -> String {
 
 		suggest = suggest.replace(&suggest[start_index..end_index], &suggestion);
 	}
-	println!("eval suggest: {}", suggest);
 
 	suggest
 }
@@ -264,7 +261,11 @@ fn get_directory_files(input: &str) -> Vec<String> {
 		match std::fs::read_dir(&input) {
 			Ok(files) => break files,
 			Err(_) => {
-				input = input.rsplit('/').nth(1).unwrap().to_owned();
+				if let Some((dirs, _)) = input.rsplit_once('/') {
+					input = dirs.to_owned();
+				} else {
+					break std::fs::read_dir("./").unwrap()
+				}
 			}
 		}
 	};
