@@ -1,32 +1,31 @@
-use crate::corrections::split_command;
+use crate::suggestions::split_command;
 use colored::*;
 
-pub fn highlight_difference(corrected_command: &str, last_command: &str) -> String {
-	let mut highlighted_command = String::new();
-
-	let split_corrected_command = split_command(corrected_command);
+pub fn highlight_difference(suggested_command: &str, last_command: &str) -> String {
+	let split_suggested_command = split_command(suggested_command);
 	let split_last_command = split_command(last_command);
 
-	for new in split_corrected_command {
-		if new.is_empty() {
+	let mut old_entries = Vec::new();
+	for command in &split_suggested_command {
+		if command.is_empty() {
 			continue;
 		}
-		let mut changed = true;
-		for old in split_last_command.clone() {
-			if new == old {
-				changed = false;
-				break;
+		'old: for old in split_last_command.clone() {
+			if command == &old {
+				old_entries.push(command.clone());
+				break 'old;
 			}
 		}
-		if changed {
-			let colored = new.red().bold();
-			highlighted_command = format!("{}{}", highlighted_command, colored);
-		} else {
-			let colored = new.green();
-			highlighted_command = format!("{}{}", highlighted_command, colored);
-		}
-		highlighted_command.push(' ');
 	}
 
-	highlighted_command.trim().to_string()
+	let mut highlighted = suggested_command.to_string();
+	for entry in &split_suggested_command {
+		if old_entries.contains(entry) {
+			highlighted = highlighted.replace(entry, &entry.cyan());
+		} else {
+			highlighted = highlighted.replace(entry, &entry.red().bold());
+		}
+	}
+
+	highlighted
 }
