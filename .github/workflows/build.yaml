@@ -1,0 +1,32 @@
+name: Build
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: true
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: build
+      run: |
+        cargo build --release
+
+    - name: Zipping files
+      run: |
+        7z a ./pay_respects-ubuntu-latest.zip ./target/release/pay_respects
+
+    - name: Uploading to release
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: pay_respects-ubuntu-latest.zip
+        allowUpdates: true
+        makeLatest: true
+
