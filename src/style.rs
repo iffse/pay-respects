@@ -21,9 +21,9 @@ pub fn highlight_difference(suggested_command: &str, last_command: &str) -> Stri
 	let mut highlighted = suggested_command.to_string();
 	for entry in &split_suggested_command {
 		if old_entries.contains(entry) {
-			highlighted = highlighted.replace(entry, &entry.cyan());
+			highlighted = highlighted.replace(entry, &entry.cyan().to_string());
 		} else {
-			highlighted = highlighted.replace(entry, &entry.red().bold());
+			highlighted = highlighted.replace(entry, &entry.red().bold().to_string());
 		}
 	}
 

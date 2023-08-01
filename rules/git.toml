@@ -5,7 +5,7 @@ pattern = [
 	"is not a git command"
 ]
 suggest = [
-"""
+'''
 {{command[0]}} {{typo[1](
 add,
 am,
@@ -63,5 +63,5 @@ remote,
 repack,
 replace,
 )}} {{command[2:]}}
-"""
+'''
 ]
