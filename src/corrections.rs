@@ -30,7 +30,7 @@ pub fn correct_command(shell: &str, last_command: &str) -> Option<String> {
 		return Some(suggest);
 	}
 
-	let suggest = match_pattern("no_command", last_command, &err);
+	let suggest = match_pattern("general", last_command, &err);
 	if let Some(suggest) = suggest {
 		let suggest = eval_suggest(&suggest, last_command);
 		return Some(suggest);
@@ -107,16 +107,58 @@ fn eval_condition(condition: &str, arg: &str, command: &str, error_msg: &str) ->
 		}
 		"err_contains" => error_msg.contains(arg),
 		"cmd_contains" => command.contains(arg),
-		"match_typo_command" => false,
 		_ => unreachable!("Unknown condition when evaluation condition: {}", condition),
 	}
 }
 
 fn eval_suggest(suggest: &str, last_command: &str) -> String {
 	let mut suggest = suggest.to_owned();
+	let mut last_command = last_command.to_owned();
 	if suggest.contains("{{command}}") {
-		suggest = suggest.replace("{{command}}", last_command);
+		suggest = suggest.replace("{{command}}", &last_command);
 	}
+
+	while suggest.contains("{{opt") {
+		let placeholder_start = "{{opt";
+		let placeholder_end = "}}";
+
+		let start_index = suggest.find(placeholder_start).unwrap();
+		let end_index = suggest[start_index..].find(placeholder_end).unwrap()
+			+ start_index
+			+ placeholder_end.len();
+
+		let placeholder = start_index..end_index;
+
+		let args = start_index + placeholder_start.len()..end_index - placeholder_end.len();
+		let range = suggest[args.to_owned()].trim_matches(|c| c == '(' || c == ')');
+		let candidates = range.split(',').collect::<Vec<&str>>();
+		let mut opts = Vec::new();
+		let mut split_command = split_command(&last_command);
+		for opt in candidates {
+			let opt = opt.trim();
+			if opt.ends_with('*') {
+				let opt = opt.trim_end_matches('*');
+				for split in split_command.iter_mut() {
+					if split.starts_with(opt) {
+						opts.push(split.to_owned());
+						split.clear();
+					}
+				}
+				continue;
+			}
+			for split in split_command.iter_mut() {
+				if split == opt {
+					opts.push(split.to_owned());
+					split.clear();
+				}
+			}
+		}
+		last_command = split_command.join(" ");
+		suggest.replace_range(placeholder, &opts.join(" "));
+	}
+
+	let split_command = split_command(&last_command);
+
 	while suggest.contains("{{command") {
 		let placeholder_start = "{{command";
 		let placeholder_end = "}}";
@@ -126,10 +168,11 @@ fn eval_suggest(suggest: &str, last_command: &str) -> String {
 			+ start_index
 			+ placeholder_end.len();
 
-		let placeholder = start_index + placeholder_start.len()..end_index - placeholder_end.len();
-		let range = suggest[placeholder.to_owned()].trim_matches(|c| c == '[' || c == ']');
+		let placeholder = start_index..end_index;
+
+		let args = start_index + placeholder_start.len()..end_index - placeholder_end.len();
+		let range = suggest[args.to_owned()].trim_matches(|c| c == '[' || c == ']');
 		if let Some((start, end)) = range.split_once(':') {
-			let split_command = split_command(last_command);
 			let start = {
 				let mut start = start.parse::<i32>().unwrap_or(0);
 				if start < 0 {
@@ -146,12 +189,11 @@ fn eval_suggest(suggest: &str, last_command: &str) -> String {
 			};
 			let command = split_command[start..end].join(" ");
 
-			suggest = suggest.replace(&suggest[start_index..end_index], &command);
+			suggest.replace_range(placeholder, &command);
 		} else {
 			let range = range.parse::<usize>().unwrap_or(0);
-			let split_command = split_command(last_command);
 			let command = split_command[range].to_owned();
-			suggest = suggest.replace(&suggest[start_index..end_index], &command);
+			suggest.replace_range(placeholder, &command);
 		}
 	}
 
@@ -164,37 +206,37 @@ fn eval_suggest(suggest: &str, last_command: &str) -> String {
 			+ start_index
 			+ placeholder_end.len();
 
-		let placeholder = start_index + placeholder_start.len()..end_index - placeholder_end.len();
+		let placeholder = start_index..end_index;
+		let args = start_index + placeholder_start.len()..end_index - placeholder_end.len();
 
 		let mut command_index;
 		let mut match_list = vec![];
 		if suggest.contains('[') {
-			let split = suggest[placeholder.to_owned()]
+			let split = suggest[args.to_owned()]
 				.split(&['[', ']'])
 				.collect::<Vec<&str>>();
 			command_index = split[1].parse::<i32>().unwrap();
 			if command_index < 0 {
-				command_index += split_command(last_command).len() as i32;
+				command_index += split_command.len() as i32;
 			}
 		} else {
 			unreachable!("Typo suggestion must have a command index");
 		}
 		if suggest.contains('(') {
-			let split = suggest[placeholder.to_owned()]
+			let split = suggest[args.to_owned()]
 				.split(&['(', ')'])
 				.collect::<Vec<&str>>();
 			match_list = split[1].split(',').collect::<Vec<&str>>();
 		}
 
-		let command = split_command(last_command);
 		let match_list = match_list
 			.iter()
-			.map(|s| s.to_string())
+			.map(|s| s.trim().to_string())
 			.collect::<Vec<String>>();
 		let command_index = command_index as usize;
-		let suggestion = suggest_typo(&command[command_index], match_list.clone());
+		let suggestion = suggest_typo(&split_command[command_index], match_list.clone());
 
-		suggest = suggest.replace(&suggest[start_index..end_index], &suggestion);
+		suggest.replace_range(placeholder, &suggestion);
 	}
 
 	suggest

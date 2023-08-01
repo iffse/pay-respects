@@ -1,4 +1,4 @@
-command = "no_command"
+command = "general"
 
 [[match_err]]
 pattern = [
