@@ -30,10 +30,8 @@ pattern = [
 suggest = [
 '''
 #[executable(sudo)]
-sudo {{command}}
-''',
+sudo {{command}}''',
 '''
 #[executable(doas)]
-doas {{command}}
-''',
+doas {{command}}''',
 ]
