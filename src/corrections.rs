@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use regex_lite::Regex;
 
 use rule_parser::parse_rules;
 
@@ -118,8 +119,8 @@ fn eval_suggest(suggest: &str, last_command: &str) -> String {
 		suggest = suggest.replace("{{command}}", &last_command);
 	}
 
-	while suggest.contains("{{opt") {
-		let placeholder_start = "{{opt";
+	while suggest.contains("{{opt::") {
+		let placeholder_start = "{{opt::";
 		let placeholder_end = "}}";
 
 		let start_index = suggest.find(placeholder_start).unwrap();
@@ -130,31 +131,18 @@ fn eval_suggest(suggest: &str, last_command: &str) -> String {
 		let placeholder = start_index..end_index;
 
 		let args = start_index + placeholder_start.len()..end_index - placeholder_end.len();
-		let range = suggest[args.to_owned()].trim_matches(|c| c == '(' || c == ')');
-		let candidates = range.split(',').collect::<Vec<&str>>();
-		let mut opts = Vec::new();
-		let mut split_command = split_command(&last_command);
-		for opt in candidates {
-			let opt = opt.trim();
-			if opt.ends_with('*') {
-				let opt = opt.trim_end_matches('*');
-				for split in split_command.iter_mut() {
-					if split.starts_with(opt) {
-						opts.push(split.to_owned());
-						split.clear();
-					}
-				}
-				continue;
-			}
-			for split in split_command.iter_mut() {
-				if split == opt {
-					opts.push(split.to_owned());
-					split.clear();
-				}
-			}
-		}
-		last_command = split_command.join(" ");
+		let opt = &suggest[args.to_owned()];
+		let regex = opt.trim();
+		let regex = Regex::new(regex).unwrap();
+		let opts = regex
+			.find_iter(&last_command)
+			.map(|cap| cap.as_str().to_owned())
+			.collect::<Vec<String>>();
+
 		suggest.replace_range(placeholder, &opts.join(" "));
+		for opt in opts {
+			last_command = last_command.replace(&opt, "");
+		}
 	}
 
 	let split_command = split_command(&last_command);
@@ -243,7 +231,6 @@ fn eval_suggest(suggest: &str, last_command: &str) -> String {
 }
 
 pub fn split_command(command: &str) -> Vec<String> {
-	use regex::Regex;
 	let regex = r#"([^\s"\\]+|"(?:\\.|[^"\\])*"|\\.)+"#;
 	let regex = Regex::new(regex).unwrap();
 	let split_command = regex

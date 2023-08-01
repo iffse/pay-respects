@@ -6,4 +6,4 @@ edition = "2021"
 [dependencies]
 colored = "2.0"
 rule_parser = { path = "rule_parser" }
-regex = "1.0"
+regex-lite = "0.1"

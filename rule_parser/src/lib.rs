@@ -55,9 +55,9 @@ fn gen_string_hashmap(rules: Vec<Rule>) -> String {
 				.map(|x| x.to_lowercase())
 				.collect::<Vec<String>>();
 			string_hashmap.push_str(&format!(
-				"(vec![\"{}\"], vec![\"{}\"]),",
+				"(vec![\"{}\"], vec![r###\"{}\"###]),",
 				pattern.join("\", \""),
-				suggest.join("\", \"")
+				suggest.join("\"###, r###\"")
 			));
 		}
 		string_hashmap.push_str("]),");

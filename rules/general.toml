@@ -8,5 +8,6 @@ pattern = [
 ]
 suggest = [
 '''
-{{typo[0](path)}} {{command[1:]}}'''
+{{typo[0](path)}} {{command[1:]}}
+'''
 ]

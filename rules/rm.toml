@@ -4,13 +4,15 @@ command = "rm"
 pattern = [ "is a directory", ]
 suggest = [
 '''
-{{command}} --recursive'''
+{{command}} --recursive
+'''
 ]
 
 [[match_err]]
 pattern = [ "no such file or directory", ]
 suggest = [
 '''
-{{command[0}} {{opt(-*)}} {{typo[-1](file)}}'''
+{{command[0}} {{opt::(?:\s)-[\w]+}} {{typo[-1](file)}}
+'''
 ]
 
