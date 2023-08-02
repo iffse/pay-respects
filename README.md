@@ -64,7 +64,7 @@ pattern = [
 	"pattern 2",
 ]
 # this will change the first argument to `fix`, while keeping the rest intact
-suggest = "{{command[0]}} fix {{command[2:]}}"
+suggest = { "{{command[0]}} fix {{command[2:]}}" }
 
 [[match_err]]
 pattern = [
@@ -73,9 +73,11 @@ pattern = [
 # this will add a `sudo` before the command if:
 # - the `sudo` is found by `which`
 # - the last command does not contain `sudo`
-suggest = '''
+suggest = [
+'''
 #[executable(sudo), !cmd_contains(sudo)]
 sudo {{command}}'''
+]
 ```
 
 The placeholder is evaluated as following:

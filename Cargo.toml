@@ -7,3 +7,6 @@ edition = "2021"
 colored = "2.0"
 rule_parser = { path = "rule_parser" }
 regex-lite = "0.1"
+
+[profile.release]
+strip = true
