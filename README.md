@@ -38,6 +38,8 @@ If you are using Arch Linux, you can install from AUR directly:
 paru -S pay_respects
 ```
 
+Alternatively, you can download Linux binary from [releases](https://github.com/iffse/pay_respects/releases).
+
 Otherwise, you can use cargo to compile the project:
 ```
 cargo build --release
