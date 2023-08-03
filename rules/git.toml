@@ -97,3 +97,14 @@ suggest = [
 git pull --set-upstream origin {{shell(git rev-parse --abbrev-ref HEAD)}}
 git pull'''
 ]
+
+[[match_err]]
+pattern = [
+	"a branch named"
+]
+suggest = [
+'''
+#[cmd_contains(branch)]
+git checkout {{command[2]}}
+'''
+]
