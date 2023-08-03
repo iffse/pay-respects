@@ -86,3 +86,14 @@ suggest = [
 git push --set-upstream origin {{shell(git rev-parse --abbrev-ref HEAD)}}
 '''
 ]
+
+[[match_err]]
+pattern = [
+	"no tracking information for the current branch"
+]
+suggest = [
+'''
+#[cmd_contains(pull)]
+git pull --set-upstream origin {{shell(git rev-parse --abbrev-ref HEAD)}}
+git pull'''
+]
