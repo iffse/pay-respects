@@ -78,7 +78,7 @@ git checkout {{typo[2]({{shell(git branch)}})}}
 
 [[match_err]]
 pattern = [
-	"current branch test has no upstream branch"
+	"has no upstream branch"
 ]
 suggest = [
 '''
