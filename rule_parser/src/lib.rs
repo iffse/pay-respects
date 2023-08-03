@@ -60,7 +60,7 @@ fn gen_match_rules(rules: Vec<Rule>) -> TokenStream {
 					let suggests = x
 						.suggest
 						.iter()
-						.map(|x| x.to_lowercase())
+						.map(|x| x.to_string())
 						.collect::<Vec<String>>();
 					(pattern, suggests)
 				})

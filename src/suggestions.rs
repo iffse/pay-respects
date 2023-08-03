@@ -75,7 +75,6 @@ fn eval_shell_command(shell: &str, command: &str) -> Vec<String> {
 		.expect("failed to execute process");
 	let output = String::from_utf8_lossy(&output.stdout);
 	let split_output = output.split('\n').collect::<Vec<&str>>();
-	println!("{:?}", split_output);
 	split_output
 		.iter()
 		.map(|s| s.trim().to_string())
