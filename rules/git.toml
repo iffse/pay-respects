@@ -64,3 +64,14 @@ repack,
 replace,
 )}} {{command[2:]}}'''
 ]
+
+[[match_err]]
+pattern = [
+	"did not match any file"
+]
+suggest = [
+'''
+#[cmd_contains(checkout)]
+git checkout {{typo[2]({{shell(git branch)}})}}
+'''
+]
