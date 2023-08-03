@@ -14,21 +14,25 @@ fn tag (name: &str, x: i32) -> String {
 	tag
 }
 
+fn eval_placeholder(string: &str, start: &str, end: &str) -> (std::ops::Range<usize>, std::ops::Range<usize>) {
+	let start_index = string.find(start).unwrap();
+	let end_index = string[start_index..].find(end).unwrap()
+		+ start_index
+		+ end.len();
+
+	let placeholder = start_index..end_index;
+
+	let args = start_index + start.len()..end_index - end.len();
+
+	(placeholder, args)
+}
+
 pub fn opts(suggest: &mut String, replace_list: &mut Vec<TokenStream2>, opt_list: &mut Vec<TokenStream2>) {
 	let mut replace_tag = 0;
 	let tag_name = "opts";
 	while suggest.contains("{{opt::") {
-		let placeholder_start = "{{opt::";
-		let placeholder_end = "}}";
+		let (placeholder, args) = eval_placeholder(suggest, "{{opt::", "}}");
 
-		let start_index = suggest.find(placeholder_start).unwrap();
-		let end_index = suggest[start_index..].find(placeholder_end).unwrap()
-			+ start_index
-			+ placeholder_end.len();
-
-		let placeholder = start_index..end_index;
-
-		let args = start_index + placeholder_start.len()..end_index - placeholder_end.len();
 		let opt = &suggest[args.to_owned()];
 		let regex = opt.trim();
 		let current_tag = tag(tag_name, replace_tag);
@@ -48,17 +52,8 @@ pub fn command(suggest: &mut String, replace_list: &mut Vec<TokenStream2>) {
 	let mut replace_tag = 0;
 	let tag_name = "command";
 	while suggest.contains("{{command") {
-		let placeholder_start = "{{command";
-		let placeholder_end = "}}";
-
-		let start_index = suggest.find(placeholder_start).unwrap();
-		let end_index = suggest[start_index..].find(placeholder_end).unwrap()
-			+ start_index
-			+ placeholder_end.len();
-
-		let placeholder = start_index..end_index;
-
-		let args = start_index + placeholder_start.len()..end_index - placeholder_end.len();
+		let (placeholder, args) = eval_placeholder(suggest, "{{command", "}}");
+		
 		let range = suggest[args.to_owned()].trim_matches(|c| c == '[' || c == ']');
 		if let Some((start, end)) = range.split_once(':') {
 			let mut start_string = start.to_string();
@@ -100,16 +95,7 @@ pub fn typo(suggest: &mut String, replace_list: &mut Vec<TokenStream2>) {
 	let tag_name = "typo";
 
 	while suggest.contains("{{typo") {
-		let placeholder_start = "{{typo";
-		let placeholder_end = "}}";
-
-		let start_index = suggest.find(placeholder_start).unwrap();
-		let end_index = suggest[start_index..].find(placeholder_end).unwrap()
-			+ start_index
-			+ placeholder_end.len();
-
-		let placeholder = start_index..end_index;
-		let args = start_index + placeholder_start.len()..end_index - placeholder_end.len();
+		let (placeholder, args) = eval_placeholder(suggest, "{{typo", "}}");
 
 		let string_index;
 		if suggest.contains('[') {
@@ -118,7 +104,6 @@ pub fn typo(suggest: &mut String, replace_list: &mut Vec<TokenStream2>) {
 				.collect::<Vec<&str>>();
 			let command_index = split[1].parse::<i32>().unwrap();
 			if command_index < 0 {
-				// command_index += split_command.len() as i32;
 				string_index = format!("split_command.len() {}", command_index);
 			} else {
 				string_index = command_index.to_string();
@@ -126,26 +111,85 @@ pub fn typo(suggest: &mut String, replace_list: &mut Vec<TokenStream2>) {
 		} else {
 			unreachable!("Typo suggestion must have a command index");
 		}
-		let mut match_list = Vec::new();
+		let match_list;
 		if suggest.contains('(') {
 			let split = suggest[args.to_owned()]
-				.split(&['(', ')'])
-				.collect::<Vec<&str>>();
-			match_list = split[1].trim().split(',').collect::<Vec<&str>>();
+				.split_once("(").unwrap().1.rsplit_once(")").unwrap().0;
+			match_list = split.split(',').collect::<Vec<&str>>();
+		} else {
+			unreachable!("Typo suggestion must have a match list");
 		}
 
 		let match_list = match_list
 			.iter()
 			.map(|s| s.trim().to_string())
 			.collect::<Vec<String>>();
-		let string_match_list = match_list.join(r#"".to_string(), ""#);
-		let string_match_list = format!(r#""{}".to_string()"#, string_match_list);
 
-		let command = format!("suggest_typo(&split_command[{}], vec![{}])", string_index, string_match_list);
+		let command;
+		if match_list[0].starts_with("eval_shell_command("){
+			let function = match_list.join(",");
+			// add a " after first comma, and a " before last )
+			let function = format!("{}\"{}{}",
+				&function[..function.find(',').unwrap() + 1],
+				&function[function.find(',').unwrap() + 1..function.len() - 1], "\")");
+			command = format!("suggest_typo(&split_command[{}], {})", string_index, function);
+		} else {
+			let match_list = match_list
+				.iter()
+				.map(|s| s.trim().to_string())
+				.collect::<Vec<String>>();
+			let string_match_list = match_list.join("\".to_string(), \"");
+			let string_match_list = format!("\"{}\".to_string()", string_match_list);
+			command = format!("suggest_typo(&split_command[{}], vec![{}])", string_index, string_match_list);
+		}
+
 
 		replace_list.push(rtag(tag_name, replace_tag, command));
 		suggest.replace_range(placeholder, &tag(tag_name, replace_tag));
 		replace_tag += 1;
 	}
 
+}
+
+pub fn err(suggest: &mut String, replace_list: &mut Vec<TokenStream2>) {
+	let mut replace_tag = 0;
+	let tag_name = "err";
+
+	while suggest.contains("{{err::") {
+		let (placeholder, args) = eval_placeholder(suggest, "{{err::", "}}");
+
+		let regex = suggest[args.to_owned()].trim();
+
+		let command = format!("opt_regex({}, &mut error_msg)", regex);
+
+		replace_list.push(rtag(tag_name, replace_tag, command));
+		suggest.replace_range(placeholder, &tag(tag_name, replace_tag));
+		replace_tag += 1;
+	}
+}
+
+pub fn shell(suggest: &mut String, cmd_list: &mut Vec<String>) {
+	while suggest.contains("{{shell") {
+		let (placeholder, args) = eval_placeholder(suggest, "{{shell", "}}");
+		let range = suggest[args.to_owned()].trim_matches(|c| c == '(' || c == ')');
+
+		let command = format!("eval_shell_command(shell, {})", range);
+
+		suggest.replace_range(placeholder, &command);
+		cmd_list.push(command);
+	}
+}
+
+pub fn shell_tag(suggest: &mut String, replace_list: &mut Vec<TokenStream2>, cmd_list: Vec<String>) {
+	let mut replace_tag = 0;
+	let tag_name = "shell";
+
+	for command in cmd_list {
+		if suggest.contains(&command) {
+
+			*suggest = suggest.replace(&command, &tag(tag_name, replace_tag));
+			replace_list.push(rtag(tag_name, replace_tag, command));
+			replace_tag += 1;
+		}
+	}
 }

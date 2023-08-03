@@ -177,7 +177,7 @@ fn eval_condition(condition: &str, arg: &str) -> TokenStream2 {
 			}
 		},
 		"err_contains" => quote!{error_msg.contains(#arg)},
-		"cmd_contains" => quote!{command.contains(#arg)},
+		"cmd_contains" => quote!{last_command.contains(#arg)},
 		_ => unreachable!("Unknown condition when evaluation condition: {}", condition),
 	}
 }
@@ -190,10 +190,13 @@ fn eval_suggest(suggest: &str) -> TokenStream2 {
 
 	let mut replace_list = Vec::new();
 	let mut opt_list = Vec::new();
+	let mut cmd_list = Vec::new();
 
 	replaces::opts(&mut suggest, &mut replace_list, &mut opt_list);
+	replaces::shell(&mut suggest, &mut cmd_list);
 	replaces::command(&mut suggest, &mut replace_list);
 	replaces::typo(&mut suggest, &mut replace_list);
+	replaces::shell_tag(&mut suggest, &mut replace_list, cmd_list);
 
 	quote! {
 		#(#opt_list)*

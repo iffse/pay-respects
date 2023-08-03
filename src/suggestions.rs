@@ -16,12 +16,12 @@ pub fn suggest_command(shell: &str, last_command: &str) -> Option<String> {
 	};
 
 	if !PRIVILEGE_LIST.contains(&executable) {
-		let suggest = match_pattern("privilege", last_command, &err);
+		let suggest = match_pattern("privilege", last_command, &err, shell);
 		if suggest.is_some() {
 			return suggest;
 		}
 	}
-	let suggest = match_pattern(executable, last_command, &err);
+	let suggest = match_pattern(executable, last_command, &err, shell);
 	if let Some(suggest) = suggest {
 		if PRIVILEGE_LIST.contains(&executable) {
 			return Some(format!("{} {}", split_command[0], suggest));
@@ -29,14 +29,19 @@ pub fn suggest_command(shell: &str, last_command: &str) -> Option<String> {
 		return Some(suggest);
 	}
 
-	let suggest = match_pattern("general", last_command, &err);
+	let suggest = match_pattern("general", last_command, &err, shell);
 	if let Some(suggest) = suggest {
 		return Some(suggest);
 	}
 	None
 }
 
-fn match_pattern(executable: &str, last_command: &str, error_msg: &str) -> Option<String> {
+fn match_pattern(
+	executable: &str,
+	last_command: &str,
+	error_msg: &str,
+	shell: &str,
+) -> Option<String> {
 	parse_rules!("rules");
 }
 
@@ -50,6 +55,31 @@ fn opt_regex(regex: &str, command: &mut String) -> String {
 		*command = command.replace(&opt, "");
 	}
 	opts.join(" ")
+}
+
+fn err_regex(regex: &str, error_msg: &str) -> String {
+	let regex = Regex::new(regex).unwrap();
+	let err = regex
+		.find_iter(error_msg)
+		.map(|cap| cap.as_str().to_owned())
+		.collect::<Vec<String>>();
+
+	err.join(" ")
+}
+
+fn eval_shell_command(shell: &str, command: &str) -> Vec<String> {
+	let output = std::process::Command::new(shell)
+		.arg("-c")
+		.arg(command)
+		.output()
+		.expect("failed to execute process");
+	let output = String::from_utf8_lossy(&output.stdout);
+	let split_output = output.split('\n').collect::<Vec<&str>>();
+	println!("{:?}", split_output);
+	split_output
+		.iter()
+		.map(|s| s.trim().to_string())
+		.collect::<Vec<String>>()
 }
 
 pub fn split_command(command: &str) -> Vec<String> {
