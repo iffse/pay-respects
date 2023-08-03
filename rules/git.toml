@@ -75,3 +75,14 @@ suggest = [
 git checkout {{typo[2]({{shell(git branch)}})}}
 '''
 ]
+
+[[match_err]]
+pattern = [
+	"current branch test has no upstream branch"
+]
+suggest = [
+'''
+#[cmd_contains(push)]
+git push --set-upstream origin {{shell(git rev-parse --abbrev-ref HEAD)}}
+'''
+]

@@ -188,7 +188,13 @@ pub fn shell_tag(suggest: &mut String, replace_list: &mut Vec<TokenStream2>, cmd
 		if suggest.contains(&command) {
 
 			*suggest = suggest.replace(&command, &tag(tag_name, replace_tag));
-			replace_list.push(rtag(tag_name, replace_tag, command));
+
+			let split = command.split_once(',').unwrap();
+			let argument = split.1.trim_end_matches(')').trim();
+			let argument = format!("\"{}\"", argument);
+			let function = format!("{}, {}).join(\"\")", split.0, argument);
+			// let function = format!("\"{}, {}\"", split.0, split.1);
+			replace_list.push(rtag(tag_name, replace_tag, function));
 			replace_tag += 1;
 		}
 	}
