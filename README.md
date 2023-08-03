@@ -48,7 +48,7 @@ and the binary can be found at `target/release/pay_respects`.
 
 ## Rule Files
 
-Rule files are parsed at compilation. What actually gets compiled is a HashMap that contains patterns and suggestions for a specific command.
+Rule files are parsed at compilation. Everything in rule files is converted to Rust code before compiling.
 
 Syntax of a rule file (placed under [rules](./rules)):
 ```toml
