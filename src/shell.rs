@@ -1,5 +1,5 @@
-use std::process::exit;
 use std::io::prelude::*;
+use std::process::exit;
 
 pub const PRIVILEGE_LIST: [&str; 2] = ["sudo", "doas"];
 
@@ -95,71 +95,71 @@ pub fn last_command_expanded_alias(shell: &str) -> String {
 }
 
 pub fn print_command_with_env(shell: &str, binary_path: &str) {
-		let last_command;
-		let alias;
+	let last_command;
+	let alias;
 
-		match shell {
-			"bash" => {
-				last_command = "$(history 2)";
-				alias = "$(alias)"
-			}
-			"zsh" => {
-				last_command = "$(fc -ln -1)";
-				alias = "$(alias)"
-			}
-			"fish" => {
-				last_command = "$(history | head -n 1)";
-				alias = "$(alias)";
-			}
-			"nu" | "nush" | "nushell" => {
-				last_command = "(history | last).command";
-				alias = "\"\"";
-				let command = format!(
-					"with-env {{ _PR_LAST_COMMAND : {},\
+	match shell {
+		"bash" => {
+			last_command = "$(history 2)";
+			alias = "$(alias)"
+		}
+		"zsh" => {
+			last_command = "$(fc -ln -1)";
+			alias = "$(alias)"
+		}
+		"fish" => {
+			last_command = "$(history | head -n 1)";
+			alias = "$(alias)";
+		}
+		"nu" | "nush" | "nushell" => {
+			last_command = "(history | last).command";
+			alias = "\"\"";
+			let command = format!(
+				"with-env {{ _PR_LAST_COMMAND : {},\
 					_PR_ALIAS : {},\
 					_PR_SHELL : nu }} \
 					{{ {} }}",
-					last_command, alias, binary_path
-				);
-				println!("{}\n", command);
-				println!("Add following to your config file? (Y/n)");
-				let alias = format!("alias f = {}", command);
-				println!("{}", alias);
-				let mut input = String::new();
-				std::io::stdin().read_line(&mut input).unwrap();
-				match input.trim() {
-					"Y" | "y" | "" => {
-						let output = std::process::Command::new("nu")
-							.arg("-c")
-							.arg("echo $nu.config-path")
-							.output()
-							.expect("Failed to execute process");
-						let config_path = String::from_utf8_lossy(&output.stdout);
-						let mut file = std::fs::OpenOptions::new()
-							.write(true)
-							.append(true)
-							.open(config_path.trim())
-							.expect("Failed to open config file");
+				last_command, alias, binary_path
+			);
+			println!("{}\n", command);
+			println!("Add following to your config file? (Y/n)");
+			let alias = format!("alias f = {}", command);
+			println!("{}", alias);
+			let mut input = String::new();
+			std::io::stdin().read_line(&mut input).unwrap();
+			match input.trim() {
+				"Y" | "y" | "" => {
+					let output = std::process::Command::new("nu")
+						.arg("-c")
+						.arg("echo $nu.config-path")
+						.output()
+						.expect("Failed to execute process");
+					let config_path = String::from_utf8_lossy(&output.stdout);
+					let mut file = std::fs::OpenOptions::new()
+						.write(true)
+						.append(true)
+						.open(config_path.trim())
+						.expect("Failed to open config file");
 
-						writeln!(file, "{}", alias).expect("Failed to write to config file");
-					}
-					_ => std::process::exit(0),
-				};
-				std::process::exit(0);
-			}
-			_ => {
-				println!("Unknown shell: {}", shell);
-				std::process::exit(1);
-			}
+					writeln!(file, "{}", alias).expect("Failed to write to config file");
+				}
+				_ => std::process::exit(0),
+			};
+			std::process::exit(0);
 		}
+		_ => {
+			println!("Unknown shell: {}", shell);
+			std::process::exit(1);
+		}
+	}
 
-		println!(
-			"\
+	println!(
+		"\
 			_PR_LAST_COMMAND=\"{}\" \
 			_PR_ALIAS=\"{}\" \
 			_PR_SHELL=\"{}\" \
 			\"{}\"",
-			last_command, alias, shell, binary_path
-		);
-		std::process::exit(0);
+		last_command, alias, shell, binary_path
+	);
+	std::process::exit(0);
 }

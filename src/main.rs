@@ -1,6 +1,7 @@
 use colored::Colorize;
 
 mod args;
+mod files;
 mod shell;
 mod style;
 mod suggestions;
