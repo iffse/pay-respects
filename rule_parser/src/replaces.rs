@@ -160,7 +160,7 @@ pub fn err(suggest: &mut String, replace_list: &mut Vec<TokenStream2>) {
 
 		let regex = suggest[args.to_owned()].trim();
 
-		let command = format!("opt_regex({}, &mut error_msg)", regex);
+		let command = format!("err_regex(r###\"{}\"###, error_msg)", regex);
 
 		replace_list.push(rtag(tag_name, replace_tag, command));
 		suggest.replace_range(placeholder, &tag(tag_name, replace_tag));

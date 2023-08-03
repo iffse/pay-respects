@@ -193,8 +193,9 @@ fn eval_suggest(suggest: &str) -> TokenStream2 {
 	let mut cmd_list = Vec::new();
 
 	replaces::opts(&mut suggest, &mut replace_list, &mut opt_list);
-	replaces::shell(&mut suggest, &mut cmd_list);
+	replaces::err(&mut suggest, &mut replace_list);
 	replaces::command(&mut suggest, &mut replace_list);
+	replaces::shell(&mut suggest, &mut cmd_list);
 	replaces::typo(&mut suggest, &mut replace_list);
 	replaces::shell_tag(&mut suggest, &mut replace_list, cmd_list);
 
