@@ -1,6 +1,8 @@
 use crate::suggestions::split_command;
 use colored::*;
 
+// to_string() is necessary here, otherwise there won't be color in the output
+#[warn(clippy::unnecessary_to_owned)]
 pub fn highlight_difference(suggested_command: &str, last_command: &str) -> String {
 	let split_suggested_command = split_command(suggested_command);
 	let split_last_command = split_command(last_command);

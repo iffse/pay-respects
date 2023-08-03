@@ -39,7 +39,7 @@ range-diff,
 rebase,
 reset,
 restore,
-revert
+revert,
 rm,
 scalar,
 shortlog,
