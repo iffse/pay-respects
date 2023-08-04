@@ -157,7 +157,7 @@ fn compare_string(a: &str, b: &str) -> usize {
 }
 
 pub fn confirm_suggestion(shell: &str, command: &str, last_command: &str) {
-	println!("{}\n", highlight_difference(command, last_command));
+	println!("{}\n", highlight_difference(shell, command, last_command));
 	println!("Press enter to execute the suggestion. Or press Ctrl+C to exit.");
 	std::io::stdin().read_line(&mut String::new()).unwrap();
 

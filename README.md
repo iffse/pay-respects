@@ -6,9 +6,7 @@ Typed a wrong command? Pay Respects will try to correct your wrong console comma
 - ✏️ **Easy to write rules**: You don't need to know Rust. The rules are written in a TOML file that is simple to work with!
 - 🪶 **Tiny binary size**: Not even 1MB!
 
-![example-sudo-echo](img/example-sudo-echo.png)
-
-(This is not the correct syntax for shell, but the command is always executed as `sudo shell -c "echo ..."`, so it runs)
+![example-sudo-echo-write](img/example-sudo-echo-write.png)
 
 ![example-typo-paru](img/example-typo-paru.png)
 
