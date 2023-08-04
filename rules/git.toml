@@ -95,7 +95,6 @@ suggest = [
 '''
 #[cmd_contains(pull)]
 git pull --set-upstream origin {{shell(git rev-parse --abbrev-ref HEAD)}}
-git pull
 '''
 ]
 
