@@ -1,6 +1,6 @@
 # Pay Respects
 
-Typed a wrong command? Pay Respects will try to correct your wrong console command simply by pressing `F`!
+Typed a wrong command? Pay Respects will try to correct your wrong console command by simply pressing `F`!
 
 ![example-sudo-echo](img/example-sudo-echo.png)
 
@@ -48,9 +48,9 @@ and the binary can be found at `target/release/pay_respects`.
 
 ## Rule Files
 
-Rule files are parsed at compilation. Everything in rule files is converted to Rust code before compiling.
+Rule files are parsed at compilation. Everything in rule files is converted to Rust code before compiling. You don't have to know the project structure nor Rust to write the rules!
 
-Syntax of a rule file (placed under [rules](./rules)):
+Syntax of a rule file (will be read by simply placing the file under [rules](./rules)):
 ```toml
 # this field should be the name of the command
 command = "world"
@@ -103,5 +103,7 @@ The suggestion can have additional conditions to check. To specify the condition
 
 ## Current Progress
 
-We need more rule files!
+Current option to write rules should cover most of the cases.
+
+We need more rule files, contributions are welcomed!
 
