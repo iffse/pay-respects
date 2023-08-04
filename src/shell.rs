@@ -94,7 +94,7 @@ pub fn last_command_expanded_alias(shell: &str) -> String {
 	last_command.replacen(command, &expanded_command, 1)
 }
 
-pub fn print_command_with_env(shell: &str, binary_path: &str) {
+pub fn initialization(shell: &str, binary_path: &str, auto_alias: &str) {
 	let last_command;
 	let alias;
 
@@ -153,7 +153,7 @@ pub fn print_command_with_env(shell: &str, binary_path: &str) {
 		}
 	}
 
-	println!(
+	let mut init = format!(
 		"\
 			_PR_LAST_COMMAND=\"{}\" \
 			_PR_ALIAS=\"{}\" \
@@ -161,5 +161,29 @@ pub fn print_command_with_env(shell: &str, binary_path: &str) {
 			\"{}\"",
 		last_command, alias, shell, binary_path
 	);
+
+	if auto_alias.is_empty() {
+		println!("{}", init);
+		std::process::exit(0);
+	}
+
+	match shell {
+		"bash" | "zsh" => {
+			init = format!(r#"alias {}='{}'"#, auto_alias, init);
+		}
+		"fish" => {
+			init = format!(
+				r#"function {} -d "Terminal command correction"; {}; end"#,
+				auto_alias, init
+			);
+		}
+		_ => {
+			println!("Unsupported shell: {}", shell);
+			exit(1);
+		}
+	}
+
+	println!("{}", init);
+
 	std::process::exit(0);
 }

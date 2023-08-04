@@ -23,6 +23,12 @@ alias f="$(pay_respects <your_shell_here>)"
 # for example, using `zsh`:
 alias f="$(pay_respects zsh)"
 
+# Alternatively, you can also use the following initialization in your config file
+# for bash and zsh
+eval "$(pay_respects <shell> --alias)"
+# for fish
+pay_respects fish --alias | source
+
 # for `nushell`, the alias can be added automatically with:
 pay_respects nushell
 ```
