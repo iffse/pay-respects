@@ -61,10 +61,12 @@ command = "world"
 # note that the error is formatted to lowercase without extra spaces
 pattern = [
 	"pattern 1",
-	"pattern 2",
+	"pattern 2"
 ]
 # this will change the first argument to `fix`, while keeping the rest intact
-suggest = [ "{{command[0]}} fix {{command[2:]}}" ]
+suggest = [
+	"{{command[0]}} fix {{command[2:]}}",
+]
 
 [[match_err]]
 pattern = [
@@ -76,7 +78,8 @@ pattern = [
 suggest = [
 '''
 #[executable(sudo), !cmd_contains(sudo)]
-sudo {{command}}'''
+sudo {{command}}
+'''
 ]
 ```
 
