@@ -8,6 +8,8 @@ Typed a wrong command? Pay Respects will try to correct your wrong console comma
 
 ![example-sudo-echo](img/example-sudo-echo.png)
 
+(This is not the correct syntax for shell, but the command is always executed as `sudo shell -c "echo ..."`, so it runs)
+
 ![example-typo-paru](img/example-typo-paru.png)
 
 ![example-typo-git](img/example-typo-git.png)
