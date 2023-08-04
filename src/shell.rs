@@ -173,7 +173,11 @@ pub fn initialization(shell: &str, binary_path: &str, auto_alias: &str) {
 		}
 		"fish" => {
 			init = format!(
-				r#"function {} -d "Terminal command correction"; {}; end"#,
+				r#"
+function {} -d "Terminal command correction"
+	{}
+end
+"#,
 				auto_alias, init
 			);
 		}
