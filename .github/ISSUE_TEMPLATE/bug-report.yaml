@@ -8,7 +8,7 @@ body:
       id: description
       attributes:
           label: What happened?
-          description: Please leave a brief description about the bug you files.
+          description: Please leave a brief description about the bug you file.
       validations:
           required: true
           
