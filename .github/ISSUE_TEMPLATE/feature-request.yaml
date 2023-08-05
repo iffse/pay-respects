@@ -2,12 +2,12 @@ name: Feature Request
 description: File a feature request
 title: '[Feature Request]: '
 labels:
-    - feature-request
+  - feature-request
 body:
-    - type: textarea
-      id: feature-request-content
-      attributes:
-          label: What do you want us to work on?
-          description: Please let us know what do you think
+  - type: textarea
+    id: feature-request-content
+    attributes:
+      label: What do you want us to work on?
+      description: Please let us know what do you think
       validations:
-          required: true
+        required: true

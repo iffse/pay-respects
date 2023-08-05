@@ -2,29 +2,29 @@ name: Bug Report
 description: File a bug report
 title: '[Bug]: '
 labels:
-    - bug
+  - bug
 body:
-    - type: textarea
-      id: description
-      attributes:
-          label: What happened?
-          description: Please leave a brief description about the bug you file.
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Please leave a brief description about the bug you file.
       validations:
-          required: true
-          
-    - type: textarea
-      id: log
-      attributes:
-          label: The command and output
-          description: Please provide us the command and output you are running
+        required: true
+
+  - type: textarea
+    id: log
+    attributes:
+      label: The command and output
+      description: Please provide us the command and output you are running
       validations:
+        required: true
+
+  - type: checkboxes
+    id: no-similar-issue
+    attributes:
+      label: No similar issue
+      description: There is no similar issue found in the [issues](https://github.com/iffse/pay-respects/issues)
+      options:
+        - label: I have searched the issue list and there is no similar issue found
           required: true
-          
-    - type: checkboxes
-      id: no-similar-issue
-      attributes:
-          label: No similar issue
-          description: There is no similar issue found in the [issues](https://github.com/iffse/pay-respects/issues)
-          options:
-              - label: I have searched the issue list and there is no similar issue found
-                required: true
