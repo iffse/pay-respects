@@ -21,12 +21,12 @@ jobs:
 
     - name: Zipping files
       run: |
-        7z a ./pay_respects-ubuntu-latest.zip ./target/release/pay_respects
+        7z a ./pay-respects-ubuntu-latest.zip ./target/release/pay-respects
 
     - name: Uploading to release
       uses: ncipollo/release-action@v1
       with:
-        artifacts: pay_respects-ubuntu-latest.zip
+        artifacts: pay-respects-ubuntu-latest.zip
         allowUpdates: true
         makeLatest: true
 
