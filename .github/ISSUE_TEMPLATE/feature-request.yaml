@@ -9,5 +9,5 @@ body:
     attributes:
       label: What do you want us to work on?
       description: Please let us know what do you think
-      validations:
-        required: true
+    validations:
+      required: true

@@ -9,16 +9,16 @@ body:
     attributes:
       label: What happened?
       description: Please leave a brief description about the bug you file.
-      validations:
-        required: true
+    validations:
+      required: true
 
   - type: textarea
     id: log
     attributes:
       label: The command and output
       description: Please provide us the command and output you are running
-      validations:
-        required: true
+    validations:
+      required: true
 
   - type: checkboxes
     id: no-similar-issue
