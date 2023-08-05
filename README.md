@@ -18,19 +18,19 @@ The binary is named `pay-respects`, by adding an alias to your shell
 configuration:
 ``` shell
 # Note: You may need to have the binary exposed in your path
-alias f="$(pay_respects <your_shell_here>)"
+alias f="$(pay-respects <your_shell_here>)"
 
 # for example, using `zsh`:
-alias f="$(pay_respects zsh)"
+alias f="$(pay-respects zsh)"
 
 # Alternatively, you can also use the following initialization in your config file
 # for bash and zsh
-eval "$(pay_respects <shell> --alias)"
+eval "$(pay-respects <shell> --alias)"
 # for fish
-pay_respects fish --alias | source
+pay-respects fish --alias | source
 
 # for `nushell`, the alias can be added automatically with:
-pay_respects nushell
+pay-respects nushell
 ```
 You can now **press `F` to Pay Respects**!
 
@@ -38,23 +38,23 @@ Currently, only corrections to `bash`, `zsh`, and `fish` are working flawlessly.
 
 `nushell` has broken aliases, therefore it has following 2 limitations:
 
-- You have to manually add the output of `pay_respects nushell` to your configuration as alias
+- You have to manually add the output of `pay-respects nushell` to your configuration as alias
 - Aliased commands cannot be expanded to their original command
 
 ## Installing
 
 If you are using Arch Linux, you can install from AUR directly:
 ```shell
-paru -S pay_respects
+paru -S pay-respects
 ```
 
-Alternatively, you can download Linux binary from [releases](https://github.com/iffse/pay_respects/releases).
+Alternatively, you can download Linux binary from [releases](https://github.com/iffse/pay-respects/releases).
 
 Otherwise, you can use cargo to compile the project:
 ```
 cargo build --release
 ```
-and the binary can be found at `target/release/pay_respects`.
+and the binary can be found at `target/release/pay-respects`.
 
 ## Rule Files
 
