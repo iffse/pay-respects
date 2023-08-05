@@ -10,3 +10,5 @@ regex-lite = "0.1"
 
 [profile.release]
 strip = true
+codegen-units = 1
+lto = true
