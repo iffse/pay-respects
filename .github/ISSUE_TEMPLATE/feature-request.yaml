@@ -4,7 +4,7 @@ title: '[Feature Request]: '
 labels:
     - feature-request
 body:
-    - type: textareas
+    - type: textarea
       id: feature-request-content
       attributes:
           label: What do you want us to work on?
