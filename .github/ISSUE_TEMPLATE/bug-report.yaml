@@ -16,7 +16,7 @@ body:
       id: log
       attributes:
           label: The command and output
-          description: Please give me the command and output you are running
+          description: Please provide us the command and output you are running
       validations:
           required: true
           
