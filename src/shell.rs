@@ -1,22 +1,44 @@
 use std::io::prelude::*;
 use std::process::exit;
 
+
+use std::sync::mpsc::channel;
+use std::thread;
+use std::time::Duration;
+
 pub const PRIVILEGE_LIST: [&str; 2] = ["sudo", "doas"];
 
 pub fn command_output(shell: &str, command: &str) -> String {
-	let output = std::process::Command::new(shell)
-		.arg("-c")
-		.arg(command)
-		.env("LC_ALL", "C")
-		.output()
-		.expect("failed to execute process");
 
-	String::from_utf8_lossy(&output.stderr)
-		.to_string()
-		.split_whitespace()
-		.collect::<Vec<&str>>()
-		.join(" ")
-		.to_lowercase()
+	let (sender, receiver) = channel();
+
+	let _shell = shell.to_owned();
+	let _command = command.to_owned();
+	thread::spawn(move || {
+		sender.send(std::process::Command::new(_shell)
+			.arg("-c")
+			.arg(_command)
+			.env("LC_ALL", "C")
+			.output()
+			.expect("failed to execute process"))
+			.expect("failed to send output");
+	});
+
+	match receiver.recv_timeout(Duration::from_secs(3)) {
+		Ok(output) => {
+			String::from_utf8_lossy(&output.stderr)
+				.to_string()
+				.split_whitespace()
+				.collect::<Vec<&str>>()
+				.join(" ")
+				.to_lowercase()
+		}
+		Err(_) => {
+			use colored::*;
+			eprintln!("Timeout while executing command: {}", command.red());
+			exit(1);
+		}
+	}
 }
 
 fn last_command(shell: &str) -> String {
