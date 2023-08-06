@@ -7,7 +7,6 @@ mod style;
 mod suggestions;
 
 fn main() {
-	std::env::set_var("LC_ALL", "C");
 	args::handle_args();
 
 	let shell = std::env::var("_PR_SHELL").expect(

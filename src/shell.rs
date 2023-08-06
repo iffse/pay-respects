@@ -7,6 +7,7 @@ pub fn command_output(shell: &str, command: &str) -> String {
 	let output = std::process::Command::new(shell)
 		.arg("-c")
 		.arg(command)
+		.env("LC_ALL", "C")
 		.output()
 		.expect("failed to execute process");
 
