@@ -1,0 +1,14 @@
+command = "cd"
+
+[[match_err]]
+pattern = [
+	"no such file or directory"
+]
+# as rust runs on its own environment, it's not possible to change
+# the directory automatically
+suggest = [
+'''
+#[err_contains(no such file or directory)]
+mkdir -p {{command[1]}}
+'''
+]
