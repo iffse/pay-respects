@@ -1,0 +1,12 @@
+command = "mkdir"
+
+[[match_err]]
+pattern = [
+	"cannot create directory"
+]
+suggest = [
+'''
+#[err_contains(no such file or directory)]
+{{command}} --parents
+'''
+]
