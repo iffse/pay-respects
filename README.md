@@ -3,7 +3,7 @@
 Typed a wrong command? Pay Respects will try to correct your wrong console command by simply pressing `F`!
 
 - 🚀 **Blazing fast suggestion**: You won't notice any delay for asking suggestions!
-- ✏️ **Easy to write rules**: You don't need to know Rust. The rules are written in a TOML file that is simple to work with!
+- ✏️ **Easy to write rules**: You don't need to know Rust. The rules are written in a TOML file that is simple to work with and evaluated to Rust code upon compilation!
 - 🪶 **Tiny binary size**: Not even 1MB!
 
 ![example-sudo-echo-write](img/example-sudo-echo-write.png)
