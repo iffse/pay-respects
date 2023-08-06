@@ -23,9 +23,8 @@ fn last_command(shell: &str) -> String {
 	let last_command = std::env::var("_PR_LAST_COMMAND").expect("No _PR_LAST_COMMAND in environment. Did you aliased the command with the correct argument?");
 	match shell {
 		"bash" => {
-			let first_line = last_command.lines().next().unwrap();
-			let split = first_line.split_whitespace().collect::<Vec<&str>>();
-			split[1..].join(" ")
+			let first_line = last_command.lines().next().unwrap().trim();
+			first_line.split_once(" ").unwrap().1.to_string()
 		}
 		"zsh" => last_command,
 		"fish" => last_command,
