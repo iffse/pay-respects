@@ -72,8 +72,7 @@ pattern = [
 suggest = [
 '''
 #[cmd_contains(checkout)]
-git checkout {{typo[2]({{shell(git branch)}})}}
-'''
+git checkout {{typo[2]({{shell(git branch)}})}} '''
 ]
 
 [[match_err]]
@@ -83,8 +82,7 @@ pattern = [
 suggest = [
 '''
 #[cmd_contains(push)]
-git push --set-upstream origin {{shell(git rev-parse --abbrev-ref HEAD)}}
-'''
+git push --set-upstream origin {{shell(git rev-parse --abbrev-ref HEAD)}} '''
 ]
 
 [[match_err]]
@@ -94,8 +92,7 @@ pattern = [
 suggest = [
 '''
 #[cmd_contains(pull)]
-git pull --set-upstream origin {{shell(git rev-parse --abbrev-ref HEAD)}}
-'''
+git pull --set-upstream origin {{shell(git rev-parse --abbrev-ref HEAD)}} '''
 ]
 
 [[match_err]]
@@ -105,6 +102,5 @@ pattern = [
 suggest = [
 '''
 #[cmd_contains(branch)]
-git checkout {{command[2]}}
-'''
+git checkout {{command[2]}} '''
 ]

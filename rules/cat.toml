@@ -6,8 +6,7 @@ pattern = [
 ]
 suggest = [
 '''
-cat {{typo[1](file)}}
-'''
+cat {{typo[1](file)}} '''
 ]
 
 [[match_err]]
@@ -16,6 +15,5 @@ pattern = [
 ]
 suggest = [
 '''
-ls {{command[1:]}} --almost-all --color=auto --group-directories-first
-'''
+ls {{command[1:]}} --almost-all --color=auto --group-directories-first '''
 ]

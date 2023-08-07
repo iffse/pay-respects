@@ -4,10 +4,9 @@ command = "general"
 pattern = [
 	"command not found",
 	"unknown command",
-	"nu::shell::external_command",
+	"nu::shell::external_command"
 ]
 suggest = [
 '''
-{{typo[0](path)}} {{command[1:]}}
-'''
+{{typo[0](path)}} {{command[1:]}} '''
 ]

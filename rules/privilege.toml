@@ -25,15 +25,13 @@ pattern = [
 	"updatedb: can not open a temporary file",
 	"use `sudo`",
 	"you don't have access to the history db.",
-	"you don't have write permissions",
+	"you don't have write permissions"
 ]
 suggest = [
 '''
 #[executable(sudo)]
-sudo {{command}}
-''',
+sudo {{command}} ''',
 '''
 #[executable(doas)]
-doas {{command}}
-''',
+doas {{command}} '''
 ]

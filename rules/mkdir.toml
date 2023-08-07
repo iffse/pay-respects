@@ -7,6 +7,5 @@ pattern = [
 suggest = [
 '''
 #[err_contains(no such file or directory)]
-{{command}} --parents
-'''
+{{command}} --parents '''
 ]

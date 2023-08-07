@@ -9,6 +9,5 @@ pattern = [
 suggest = [
 '''
 #[err_contains(no such file or directory)]
-mkdir -p {{command[1]}}
-'''
+mkdir -p {{command[1]}} '''
 ]
