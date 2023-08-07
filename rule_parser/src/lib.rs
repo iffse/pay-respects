@@ -93,7 +93,7 @@ fn gen_match_rules(rules: Vec<Rule>) -> TokenStream {
 			suggestion_tokens.push(match_tokens);
 
 			let string_patterns = pattern.join("\", \"");
-			let string_patterns: TokenStream2 = format!("vec![\"{}\"]", string_patterns).parse().unwrap();
+			let string_patterns: TokenStream2 = format!("[\"{}\"]", string_patterns).parse().unwrap();
 			patterns_tokens.push(string_patterns);
 		}
 

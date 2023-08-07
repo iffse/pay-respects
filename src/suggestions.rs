@@ -167,7 +167,7 @@ fn compare_string(a: &str, b: &str) -> usize {
 }
 
 pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Result<(), ()> {
-	println!{"{}\n", highlighted}
+	println! {"{}\n", highlighted}
 	println!("Press enter to execute the suggestion. Or press Ctrl+C to exit.");
 	std::io::stdin().read_line(&mut String::new()).unwrap();
 
@@ -201,8 +201,8 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 		.expect("failed to wait on process");
 
 	if process.success() {
-		return Ok(());
+		Ok(())
 	} else {
-		return Err(());
+		Err(())
 	}
 }

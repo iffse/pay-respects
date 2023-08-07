@@ -38,13 +38,16 @@ pub fn get_best_match_file(input: &str) -> Option<String> {
 	};
 
 	while let Some(exit_dir) = exit_dirs.pop() {
-		let dir_files = files.filter_map(|file| {
-			let file = file.unwrap();
-			let file_name = file.file_name().into_string().unwrap();
-			Some(file_name)
-		}).collect::<Vec<String>>();
+		let dir_files = files
+			.map(|file| {
+				let file = file.unwrap();
+
+				file.file_name().into_string().unwrap()
+			})
+			.collect::<Vec<String>>();
 
 		let best_match = find_similar(&exit_dir, dir_files);
+		best_match.as_ref()?;
 
 		input = format!("{}/{}", input, best_match.unwrap());
 		files = match std::fs::read_dir(&input) {
