@@ -2,7 +2,7 @@ use regex_lite::Regex;
 
 use rule_parser::parse_rules;
 
-use crate::files::{get_directory_files, get_path_files};
+use crate::files::{get_best_match_file, get_path_files};
 use crate::shell::{command_output, PRIVILEGE_LIST};
 
 pub fn suggest_command(shell: &str, last_command: &str) -> Option<String> {
@@ -105,8 +105,7 @@ fn suggest_typo(typo: &str, candidates: Vec<String>) -> String {
 				}
 			}
 			"file" => {
-				let files = get_directory_files(typo);
-				if let Some(suggest) = find_similar(typo, files) {
+				if let Some(suggest) = get_best_match_file(typo) {
 					suggestion = suggest;
 				}
 			}
@@ -115,7 +114,6 @@ fn suggest_typo(typo: &str, candidates: Vec<String>) -> String {
 	} else if let Some(suggest) = find_similar(typo, candidates) {
 		suggestion = suggest;
 	}
-
 	suggestion
 }
 
@@ -158,8 +156,8 @@ fn compare_string(a: &str, b: &str) -> usize {
 	matrix[a.chars().count()][b.chars().count()]
 }
 
-pub fn confirm_suggestion(shell: &str, command: &str) {
-	println!{"{}\n", command}
+pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) {
+	println!{"{}\n", highlighted}
 	println!("Press enter to execute the suggestion. Or press Ctrl+C to exit.");
 	std::io::stdin().read_line(&mut String::new()).unwrap();
 
