@@ -18,8 +18,8 @@ fn main() {
 
 	if let Some(corrected_command) = corrected_command {
 		let command_difference = highlight_difference(&shell, &corrected_command, &last_command);
-		if let Some(command) = command_difference {
-			suggestions::confirm_suggestion(&shell, &command);
+		if let Some(highlighted_command) = command_difference {
+			suggestions::confirm_suggestion(&shell, &corrected_command, &highlighted_command);
 			return;
 		}
 	}
