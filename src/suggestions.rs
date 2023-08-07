@@ -4,7 +4,6 @@ use rule_parser::parse_rules;
 
 use crate::files::{get_directory_files, get_path_files};
 use crate::shell::{command_output, PRIVILEGE_LIST};
-use crate::style::highlight_difference;
 
 pub fn suggest_command(shell: &str, last_command: &str) -> Option<String> {
 	let err = command_output(shell, last_command);
@@ -54,6 +53,7 @@ fn opt_regex(regex: &str, command: &mut String) -> String {
 	for opt in opts.clone() {
 		*command = command.replace(&opt, "");
 	}
+
 	opts.join(" ")
 }
 
@@ -119,7 +119,7 @@ fn suggest_typo(typo: &str, candidates: Vec<String>) -> String {
 	suggestion
 }
 
-fn find_similar(typo: &str, candidates: Vec<String>) -> Option<String> {
+pub fn find_similar(typo: &str, candidates: Vec<String>) -> Option<String> {
 	let mut min_distance = 10;
 	let mut min_distance_index = None;
 	for (i, candidate) in candidates.iter().enumerate() {
@@ -158,8 +158,8 @@ fn compare_string(a: &str, b: &str) -> usize {
 	matrix[a.chars().count()][b.chars().count()]
 }
 
-pub fn confirm_suggestion(shell: &str, command: &str, last_command: &str) {
-	println!("{}\n", highlight_difference(shell, command, last_command));
+pub fn confirm_suggestion(shell: &str, command: &str) {
+	println!{"{}\n", command}
 	println!("Press enter to execute the suggestion. Or press Ctrl+C to exit.");
 	std::io::stdin().read_line(&mut String::new()).unwrap();
 

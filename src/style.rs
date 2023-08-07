@@ -4,9 +4,15 @@ use colored::*;
 
 // to_string() is necessary here, otherwise there won't be color in the output
 #[warn(clippy::unnecessary_to_owned)]
-pub fn highlight_difference(shell: &str, suggested_command: &str, last_command: &str) -> String {
+pub fn highlight_difference(shell: &str, suggested_command: &str, last_command: &str) -> Option<String> {
 	let mut split_suggested_command = split_command(suggested_command);
 	let split_last_command = split_command(last_command);
+	println!("split_suggested_command: {:?}", split_suggested_command);
+	println!("split_last_command: {:?}", split_last_command);
+
+	if split_suggested_command == split_last_command {
+		return None;
+	}
 
 	let privileged = PRIVILEGE_LIST.contains(&split_suggested_command[0].as_str());
 
@@ -50,5 +56,5 @@ pub fn highlight_difference(shell: &str, suggested_command: &str, last_command: 
 		highlighted = split_suggested_command.join(" ");
 	}
 
-	highlighted
+	Some(highlighted)
 }

@@ -1,4 +1,5 @@
 use colored::Colorize;
+use crate::style::highlight_difference;
 
 mod args;
 mod files;
@@ -16,8 +17,9 @@ fn main() {
 	let corrected_command = suggestions::suggest_command(&shell, &last_command);
 
 	if let Some(corrected_command) = corrected_command {
-		if corrected_command != last_command {
-			suggestions::confirm_suggestion(&shell, &corrected_command, &last_command);
+		let command_difference = highlight_difference(&shell, &corrected_command, &last_command);
+		if let Some(command) = command_difference {
+			suggestions::confirm_suggestion(&shell, &command);
 			return;
 		}
 	}
