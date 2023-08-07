@@ -5,7 +5,8 @@ use colored::*;
 // to_string() is necessary here, otherwise there won't be color in the output
 #[warn(clippy::unnecessary_to_owned)]
 pub fn highlight_difference(shell: &str, suggested_command: &str, last_command: &str) -> Option<String> {
-	let mut split_suggested_command = split_command(suggested_command);
+	let replaced_newline = suggested_command.replace("\n", r" {{newline}}");
+	let mut split_suggested_command = split_command(&replaced_newline);
 	let split_last_command = split_command(last_command);
 
 	if split_suggested_command == split_last_command {
@@ -29,6 +30,9 @@ pub fn highlight_difference(shell: &str, suggested_command: &str, last_command: 
 
 	// let mut highlighted = suggested_command.to_string();
 	'next: for entry in split_suggested_command.iter_mut() {
+		if entry == r"{{newline}" {
+			continue
+		}
 		for old in &old_entries {
 			if old == entry {
 				*entry = entry.cyan().to_string();
@@ -54,5 +58,5 @@ pub fn highlight_difference(shell: &str, suggested_command: &str, last_command: 
 		highlighted = split_suggested_command.join(" ");
 	}
 
-	Some(highlighted)
+	Some(highlighted.replace(r"{{newline}}", "\n"))
 }
