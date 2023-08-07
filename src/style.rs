@@ -35,7 +35,7 @@ pub fn highlight_difference(shell: &str, suggested_command: &str, last_command: 
 		}
 		for old in &old_entries {
 			if old == entry {
-				*entry = entry.cyan().to_string();
+				*entry = entry.blue().to_string();
 				continue 'next;
 			}
 		}

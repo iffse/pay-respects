@@ -166,7 +166,7 @@ fn compare_string(a: &str, b: &str) -> usize {
 	matrix[a.chars().count()][b.chars().count()]
 }
 
-pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) {
+pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Result<(), ()> {
 	println!{"{}\n", highlighted}
 	println!("Press enter to execute the suggestion. Or press Ctrl+C to exit.");
 	std::io::stdin().read_line(&mut String::new()).unwrap();
@@ -175,7 +175,7 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) {
 		let _p = p.to_owned() + " ";
 		if command.starts_with(&_p) {
 			let command = command.replace(p, "");
-			std::process::Command::new(p)
+			let process = std::process::Command::new(p)
 				.arg(shell)
 				.arg("-c")
 				.arg(command)
@@ -183,15 +183,26 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) {
 				.expect("failed to execute process")
 				.wait()
 				.expect("failed to wait on process");
-			return;
+
+			if process.success() {
+				return Ok(());
+			} else {
+				return Err(());
+			}
 		}
 	}
 
-	std::process::Command::new(shell)
+	let process = std::process::Command::new(shell)
 		.arg("-c")
 		.arg(command)
 		.spawn()
 		.expect("failed to execute process")
 		.wait()
 		.expect("failed to wait on process");
+
+	if process.success() {
+		return Ok(());
+	} else {
+		return Err(());
+	}
 }

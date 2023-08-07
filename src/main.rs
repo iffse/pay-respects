@@ -13,17 +13,28 @@ fn main() {
 	let shell = std::env::var("_PR_SHELL").expect(
 		"No _PR_SHELL in environment. Did you aliased the binary with the correct arguments?",
 	);
-	let last_command = shell::last_command_expanded_alias(&shell);
-	let corrected_command = suggestions::suggest_command(&shell, &last_command);
+	let mut last_command = shell::last_command_expanded_alias(&shell);
+	loop {
 
-	if let Some(corrected_command) = corrected_command {
-		let command_difference = highlight_difference(&shell, &corrected_command, &last_command);
-		if let Some(highlighted_command) = command_difference {
-			suggestions::confirm_suggestion(&shell, &corrected_command, &highlighted_command);
-			return;
+		let corrected_command = suggestions::suggest_command(&shell, &last_command);
+
+		if let Some(corrected_command) = corrected_command {
+			let command_difference = highlight_difference(&shell, &corrected_command, &last_command);
+			if let Some(highlighted_command) = command_difference {
+				let execution = suggestions::confirm_suggestion(&shell, &corrected_command, &highlighted_command);
+				if execution.is_ok() {
+					return;
+				}
+				else {
+					let retry_message = format!("{}", "Looking for new suggestion...".cyan().bold());
+					println!("\n{}\n", retry_message);
+					last_command = corrected_command;
+				}
+			}
+		} else {
+			break;
 		}
 	}
-
 	println!(
 		"No correction found for the command: {}\n",
 		last_command.red()
