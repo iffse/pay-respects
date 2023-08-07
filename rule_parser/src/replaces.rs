@@ -48,6 +48,41 @@ pub fn opts(suggest: &mut String, replace_list: &mut Vec<TokenStream2>, opt_list
 	}
 }
 
+pub fn cmd_reg(suggest: &mut String, replace_list: &mut Vec<TokenStream2>) {
+	let mut replace_tag = 0;
+	let tag_name = "cmd";
+
+	while suggest.contains("{{cmd::") {
+		let (placeholder, args) = eval_placeholder(suggest, "{{cmd::", "}}");
+
+		let regex = suggest[args.to_owned()].trim();
+
+		let command = format!("cmd_regex(r###\"{}\"###, &last_command)", regex);
+
+		replace_list.push(rtag(tag_name, replace_tag, command));
+		suggest.replace_range(placeholder, &tag(tag_name, replace_tag));
+		replace_tag += 1;
+	}
+}
+
+pub fn err(suggest: &mut String, replace_list: &mut Vec<TokenStream2>) {
+	let mut replace_tag = 0;
+	let tag_name = "err";
+
+	while suggest.contains("{{err::") {
+		let (placeholder, args) = eval_placeholder(suggest, "{{err::", "}}");
+
+		let regex = suggest[args.to_owned()].trim();
+
+		let command = format!("err_regex(r###\"{}\"###, error_msg)", regex);
+
+		replace_list.push(rtag(tag_name, replace_tag, command));
+		suggest.replace_range(placeholder, &tag(tag_name, replace_tag));
+		replace_tag += 1;
+	}
+}
+
+
 pub fn command(suggest: &mut String, replace_list: &mut Vec<TokenStream2>) {
 	let mut replace_tag = 0;
 	let tag_name = "command";
@@ -149,23 +184,6 @@ pub fn typo(suggest: &mut String, replace_list: &mut Vec<TokenStream2>) {
 		replace_tag += 1;
 	}
 
-}
-
-pub fn err(suggest: &mut String, replace_list: &mut Vec<TokenStream2>) {
-	let mut replace_tag = 0;
-	let tag_name = "err";
-
-	while suggest.contains("{{err::") {
-		let (placeholder, args) = eval_placeholder(suggest, "{{err::", "}}");
-
-		let regex = suggest[args.to_owned()].trim();
-
-		let command = format!("err_regex(r###\"{}\"###, error_msg)", regex);
-
-		replace_list.push(rtag(tag_name, replace_tag, command));
-		suggest.replace_range(placeholder, &tag(tag_name, replace_tag));
-		replace_tag += 1;
-	}
 }
 
 pub fn shell(suggest: &mut String, cmd_list: &mut Vec<String>) {

@@ -67,6 +67,16 @@ fn err_regex(regex: &str, error_msg: &str) -> String {
 	err.join(" ")
 }
 
+fn cmd_regex(regex: &str, command: &str) -> String {
+	let regex = Regex::new(regex).unwrap();
+	let err = regex
+		.find_iter(command)
+		.map(|cap| cap.as_str().to_owned())
+		.collect::<Vec<String>>();
+
+	err.join(" ")
+}
+
 fn eval_shell_command(shell: &str, command: &str) -> Vec<String> {
 	let output = std::process::Command::new(shell)
 		.arg("-c")
