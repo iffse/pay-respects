@@ -82,7 +82,9 @@ fn eval_shell_command(shell: &str, command: &str) -> Vec<String> {
 }
 
 pub fn split_command(command: &str) -> Vec<String> {
-	let regex = r#"([^\s"\\]+|"(?:\\.|[^"\\])*"|\\.)+"#;
+	// this regex splits the command separated by spaces, except when the space
+	// is escaped by a backslash or surrounded by quotes
+	let regex = r#"([^\s"'\\]+|"(?:\\.|[^"\\])*"|\\.+|'(?:\\.|[^'\\])*'|\\.)+"#;
 	let regex = Regex::new(regex).unwrap();
 	let split_command = regex
 		.find_iter(command)
