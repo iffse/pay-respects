@@ -30,14 +30,13 @@ eval "$(pay-respects <shell> --alias)"
 pay-respects fish --alias | source
 
 # for `nushell`, the alias can be added automatically with:
-# it's however very very broken, not recommended to use right now
 pay-respects nushell
 ```
 You can now **press `F` to Pay Respects**!
 
 Currently, only corrections to `bash`, `zsh`, and `fish` are working flawlessly.
 
-`nushell` is currently usable, but there is no alias expansion and you will have to add the corresponding environment variables manually.
+`nushell` is currently usable, but there is no alias expansion and you will have to put the evaluated initialization command in your config file (added automatically with `pay-respects nushell`).
 
 ## Installing
 
@@ -73,12 +72,13 @@ pattern = [
 ]
 # this will change the first argument to `fix`, while keeping the rest intact
 suggest = [
-	"{{command[0]}} fix {{command[2:]}}",
+'''
+{{command[0]}} fix {{command[2:]}} '''
 ]
 
 [[match_err]]
 pattern = [
-	"pattern 1",
+	"pattern 1"
 ]
 # this will add a `sudo` before the command if:
 # - the `sudo` is found by `command -v`
@@ -86,8 +86,7 @@ pattern = [
 suggest = [
 '''
 #[executable(sudo), !cmd_contains(sudo)]
-sudo {{command}}
-'''
+sudo {{command}} '''
 ]
 ```
 
