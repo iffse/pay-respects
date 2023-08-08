@@ -191,14 +191,14 @@ fn compare_string(a: &str, b: &str) -> usize {
 }
 
 pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Result<(), ()> {
-	println! {"{}\n", highlighted}
+	println!("{}\n", highlighted);
 	println!("Press enter to execute the suggestion. Or press Ctrl+C to exit.");
 	std::io::stdin().read_line(&mut String::new()).unwrap();
 
 	for p in PRIVILEGE_LIST {
 		let _p = p.to_owned() + " ";
 		if command.starts_with(&_p) {
-			let command = command.replace(p, "");
+			let command = command.replacen(p, "", 1);
 			let process = std::process::Command::new(p)
 				.arg(shell)
 				.arg("-c")
