@@ -168,8 +168,9 @@ fn eval_condition(condition: &str, arg: &str) -> TokenStream2 {
 	match condition {
 		"executable" => {
 			quote!{
-				std::process::Command::new("which")
-					.arg(#arg)
+				std::process::Command::new(shell)
+					.arg("-c")
+					.arg(format!("command -v {}", #arg))
 					.output()
 					.expect("failed to execute process")
 					.status

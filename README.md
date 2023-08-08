@@ -83,7 +83,7 @@ pattern = [
 	"pattern 1",
 ]
 # this will add a `sudo` before the command if:
-# - the `sudo` is found by `which`
+# - the `sudo` is found by `command -v`
 # - the last command does not contain `sudo`
 suggest = [
 '''
