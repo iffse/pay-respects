@@ -1,13 +1,13 @@
+use std::process::Stdio;
+
 use regex_lite::Regex;
 
 use rule_parser::parse_rules;
 
 use crate::files::{get_best_match_file, get_path_files};
-use crate::shell::{command_output, PRIVILEGE_LIST};
+use crate::shell::{PRIVILEGE_LIST};
 
-pub fn suggest_command(shell: &str, last_command: &str) -> Option<String> {
-	let err = command_output(shell, last_command);
-
+pub fn suggest_command(shell: &str, last_command: &str, error_msg: &str) -> Option<String> {
 	let split_command = split_command(last_command);
 	let executable = match PRIVILEGE_LIST.contains(&split_command[0].as_str()) {
 		true => split_command.get(1).expect("No command found.").as_str(),
@@ -15,12 +15,12 @@ pub fn suggest_command(shell: &str, last_command: &str) -> Option<String> {
 	};
 
 	if !PRIVILEGE_LIST.contains(&executable) {
-		let suggest = match_pattern("privilege", last_command, &err, shell);
+		let suggest = match_pattern("privilege", last_command, error_msg, shell);
 		if suggest.is_some() {
 			return suggest;
 		}
 	}
-	let suggest = match_pattern(executable, last_command, &err, shell);
+	let suggest = match_pattern(executable, last_command, error_msg, shell);
 	if let Some(suggest) = suggest {
 		if PRIVILEGE_LIST.contains(&executable) {
 			return Some(format!("{} {}", split_command[0], suggest));
@@ -28,7 +28,7 @@ pub fn suggest_command(shell: &str, last_command: &str) -> Option<String> {
 		return Some(suggest);
 	}
 
-	let suggest = match_pattern("general", last_command, &err, shell);
+	let suggest = match_pattern("general", last_command, error_msg, shell);
 	if let Some(suggest) = suggest {
 		return Some(suggest);
 	}
@@ -46,26 +46,21 @@ fn match_pattern(
 
 fn check_executable(shell: &str, executable: &str) -> bool {
 	match shell {
-		"nu" => {
-			std::process::Command::new(shell)
-				.arg("-c")
-				.arg(format!("if (which {} | is-empty) {{ exit 1 }}", executable))
-				.output()
-				.expect("failed to execute process")
-				.status
-				.success()
-		}
-		_ => {
-			std::process::Command::new(shell)
-				.arg("-c")
-				.arg(format!("command -v {}", executable))
-				.output()
-				.expect("failed to execute process")
-				.status
-				.success()
-		}
+		"nu" => std::process::Command::new(shell)
+			.arg("-c")
+			.arg(format!("if (which {} | is-empty) {{ exit 1 }}", executable))
+			.output()
+			.expect("failed to execute process")
+			.status
+			.success(),
+		_ => std::process::Command::new(shell)
+			.arg("-c")
+			.arg(format!("command -v {}", executable))
+			.output()
+			.expect("failed to execute process")
+			.status
+			.success(),
 	}
-
 }
 
 fn opt_regex(regex: &str, command: &mut String) -> String {
@@ -190,7 +185,7 @@ fn compare_string(a: &str, b: &str) -> usize {
 	matrix[a.chars().count()][b.chars().count()]
 }
 
-pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Result<(), ()> {
+pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Result<(), String> {
 	println!("{}\n", highlighted);
 	println!("Press enter to execute the suggestion. Or press Ctrl+C to exit.");
 	std::io::stdin().read_line(&mut String::new()).unwrap();
@@ -203,15 +198,15 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 				.arg(shell)
 				.arg("-c")
 				.arg(command)
-				.spawn()
-				.expect("failed to execute process")
-				.wait()
-				.expect("failed to wait on process");
+				.stdout(Stdio::piped())
+				.output()
+				.expect("failed to execute process");
 
-			if process.success() {
+			if process.status.success() {
 				return Ok(());
 			} else {
-				return Err(());
+				let error_msg = String::from_utf8_lossy(&process.stderr);
+				return Err(error_msg.to_string());
 			}
 		}
 	}
@@ -219,14 +214,14 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 	let process = std::process::Command::new(shell)
 		.arg("-c")
 		.arg(command)
-		.spawn()
-		.expect("failed to execute process")
-		.wait()
-		.expect("failed to wait on process");
+		.stdout(Stdio::piped())
+		.output()
+		.expect("failed to execute process");
 
-	if process.success() {
+	if process.status.success() {
 		Ok(())
 	} else {
-		Err(())
+		let error_msg = String::from_utf8_lossy(&process.stderr);
+		Err(error_msg.to_string())
 	}
 }

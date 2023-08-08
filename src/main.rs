@@ -1,4 +1,4 @@
-use crate::style::highlight_difference;
+use crate::{shell::command_output, style::highlight_difference};
 use colored::Colorize;
 
 mod args;
@@ -14,8 +14,9 @@ fn main() {
 		"No _PR_SHELL in environment. Did you aliased the binary with the correct arguments?",
 	);
 	let mut last_command = shell::last_command_expanded_alias(&shell);
+	let mut error_msg = command_output(&shell, &last_command);
 	loop {
-		let corrected_command = suggestions::suggest_command(&shell, &last_command);
+		let corrected_command = suggestions::suggest_command(&shell, &last_command, &error_msg);
 
 		if let Some(corrected_command) = corrected_command {
 			let command_difference =
@@ -33,6 +34,7 @@ fn main() {
 						format!("{}", "Looking for new suggestion...".cyan().bold());
 					println!("\n{}\n", retry_message);
 					last_command = corrected_command;
+					error_msg = execution.err().unwrap();
 				}
 			} else {
 				break;
