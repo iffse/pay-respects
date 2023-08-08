@@ -30,16 +30,14 @@ eval "$(pay-respects <shell> --alias)"
 pay-respects fish --alias | source
 
 # for `nushell`, the alias can be added automatically with:
+# it's however very very broken, not recommended to use right now
 pay-respects nushell
 ```
 You can now **press `F` to Pay Respects**!
 
 Currently, only corrections to `bash`, `zsh`, and `fish` are working flawlessly.
 
-`nushell` has broken aliases, therefore it has following 2 limitations:
-
-- You have to manually add the output of `pay-respects nushell` to your configuration as alias
-- Aliased commands cannot be expanded to their original command
+Note that `nushell` support is currently very broken.
 
 ## Installing
 
