@@ -198,7 +198,8 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 				.arg(shell)
 				.arg("-c")
 				.arg(command)
-				.stdout(Stdio::piped())
+				.stdout(Stdio::inherit())
+				.stderr(Stdio::inherit())
 				.output()
 				.expect("failed to execute process");
 
