@@ -37,7 +37,7 @@ You can now **press `F` to Pay Respects**!
 
 Currently, only corrections to `bash`, `zsh`, and `fish` are working flawlessly.
 
-Note that `nushell` support is currently very broken.
+`nushell` is currently usable, but there is no alias expansion and you will have to add the corresponding environment variables manually.
 
 ## Installing
 

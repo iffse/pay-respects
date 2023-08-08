@@ -166,17 +166,7 @@ fn parse_conditions(suggest: &str) -> (String, Vec<TokenStream2>) {
 
 fn eval_condition(condition: &str, arg: &str) -> TokenStream2 {
 	match condition {
-		"executable" => {
-			quote!{
-				std::process::Command::new(shell)
-					.arg("-c")
-					.arg(format!("command -v {}", #arg))
-					.output()
-					.expect("failed to execute process")
-					.status
-					.success()
-			}
-		},
+		"executable" => quote!{check_executable(shell, #arg)},
 		"err_contains" => quote!{error_msg.contains(#arg)},
 		"cmd_contains" => quote!{last_command.contains(#arg)},
 		_ => unreachable!("Unknown condition when evaluation condition: {}", condition),

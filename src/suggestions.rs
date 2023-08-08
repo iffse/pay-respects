@@ -44,6 +44,30 @@ fn match_pattern(
 	parse_rules!("rules");
 }
 
+fn check_executable(shell: &str, executable: &str) -> bool {
+	match shell {
+		"nu" => {
+			std::process::Command::new(shell)
+				.arg("-c")
+				.arg(format!("if (which {} | is-empty) {{ exit 1 }}", executable))
+				.output()
+				.expect("failed to execute process")
+				.status
+				.success()
+		}
+		_ => {
+			std::process::Command::new(shell)
+				.arg("-c")
+				.arg(format!("command -v {}", executable))
+				.output()
+				.expect("failed to execute process")
+				.status
+				.success()
+		}
+	}
+
+}
+
 fn opt_regex(regex: &str, command: &mut String) -> String {
 	let regex = Regex::new(regex).unwrap();
 	let opts = regex
