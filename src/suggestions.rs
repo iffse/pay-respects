@@ -1,4 +1,5 @@
-use std::process::Stdio;
+use std::process::{Stdio, exit};
+use std::time::{Instant, Duration};
 
 use regex_lite::Regex;
 
@@ -194,6 +195,8 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 		let _p = p.to_owned() + " ";
 		if command.starts_with(&_p) {
 			let command = command.replacen(p, "", 1);
+
+			let now = Instant::now();
 			let process = std::process::Command::new(p)
 				.arg(shell)
 				.arg("-c")
@@ -208,6 +211,9 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 			if process.success() {
 				return Ok(());
 			} else {
+				if now.elapsed() > Duration::from_secs(3) {
+					exit(1);
+				}
 				let process = std::process::Command::new(p)
 					.arg(shell)
 					.arg("-c")
@@ -220,6 +226,7 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 		}
 	}
 
+	let now = Instant::now();
 	let process = std::process::Command::new(shell)
 		.arg("-c")
 		.arg(command)
@@ -233,6 +240,9 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 	if process.success() {
 		Ok(())
 	} else {
+		if now.elapsed() > Duration::from_secs(3) {
+			exit(1);
+		}
 		let process = std::process::Command::new(shell)
 			.arg("-c")
 			.arg(command)
