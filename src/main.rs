@@ -1,4 +1,4 @@
-// pay-respect: Press F to correct your command
+// pay-respects: Press F to correct your command
 // Copyright (C) 2023 iff
 
 // This program is free software: you can redistribute it and/or modify
@@ -26,9 +26,14 @@ mod suggestions;
 fn main() {
 	args::handle_args();
 
-	let shell = std::env::var("_PR_SHELL").expect(
-		"No _PR_SHELL in environment. Did you aliased the binary with the correct arguments?",
-	);
+	let shell = match std::env::var("_PR_SHELL") {
+		Ok(shell) => shell,
+		Err(_) => {
+			eprintln!("No _PR_SHELL in environment. Did you aliased the command with the correct argument?\n\nUse `pay-respects -h` for help");
+			std::process::exit(1);
+		}
+	};
+
 	let mut last_command = shell::last_command_expanded_alias(&shell);
 	let mut error_msg = command_output(&shell, &last_command);
 	loop {
