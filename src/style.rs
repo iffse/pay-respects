@@ -9,7 +9,7 @@ pub fn highlight_difference(
 	suggested_command: &str,
 	last_command: &str,
 ) -> Option<String> {
-	let replaced_newline = suggested_command.replace('\n', r" {{newline}}");
+	let replaced_newline = suggested_command.replace('\n', r" {{newline}} ");
 	let mut split_suggested_command = split_command(&replaced_newline);
 	let split_last_command = split_command(last_command);
 
@@ -34,7 +34,7 @@ pub fn highlight_difference(
 
 	// let mut highlighted = suggested_command.to_string();
 	'next: for entry in split_suggested_command.iter_mut() {
-		if entry == r"{{newline}" {
+		if entry == r"{{newline}}" {
 			continue;
 		}
 		for old in &old_entries {
@@ -62,5 +62,5 @@ pub fn highlight_difference(
 		highlighted = split_suggested_command.join(" ");
 	}
 
-	Some(highlighted.replace(r"{{newline}}", "\n"))
+	Some(highlighted.replace(r" {{newline}} ", "\n"))
 }
