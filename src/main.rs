@@ -46,11 +46,15 @@ fn main() {
 				if execution.is_ok() {
 					return;
 				} else {
+					last_command = corrected_command;
+					let msg = execution.err().unwrap();
+					error_msg = msg.to_lowercase();
+
 					let retry_message =
 						format!("{}", "Looking for new suggestion...".cyan().bold());
+
+					println!("\n{} {}", "ERROR:".red().bold(), msg);
 					println!("\n{}\n", retry_message);
-					last_command = corrected_command;
-					error_msg = execution.err().unwrap();
 				}
 			} else {
 				break;

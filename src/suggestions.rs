@@ -5,7 +5,7 @@ use regex_lite::Regex;
 use rule_parser::parse_rules;
 
 use crate::files::{get_best_match_file, get_path_files};
-use crate::shell::{PRIVILEGE_LIST};
+use crate::shell::PRIVILEGE_LIST;
 
 pub fn suggest_command(shell: &str, last_command: &str, error_msg: &str) -> Option<String> {
 	let split_command = split_command(last_command);
@@ -199,7 +199,7 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 				.arg("-c")
 				.arg(command)
 				.stdout(Stdio::inherit())
-				.stderr(Stdio::inherit())
+				.stderr(Stdio::piped())
 				.output()
 				.expect("failed to execute process");
 
@@ -215,7 +215,8 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 	let process = std::process::Command::new(shell)
 		.arg("-c")
 		.arg(command)
-		.stdout(Stdio::piped())
+		.stdout(Stdio::inherit())
+		.stderr(Stdio::piped())
 		.output()
 		.expect("failed to execute process");
 
