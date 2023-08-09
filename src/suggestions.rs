@@ -21,16 +21,25 @@ pub fn suggest_command(shell: &str, last_command: &str, error_msg: &str) -> Opti
 			return suggest;
 		}
 	}
+
+	let last_command = match PRIVILEGE_LIST.contains(&split_command[0].as_str()) {
+		true => &last_command[split_command[0].len() + 1..],
+		false => &last_command,
+	};
+
 	let suggest = match_pattern(executable, last_command, error_msg, shell);
 	if let Some(suggest) = suggest {
-		if PRIVILEGE_LIST.contains(&executable) {
+		if PRIVILEGE_LIST.contains(&split_command[0].as_str()) {
 			return Some(format!("{} {}", split_command[0], suggest));
 		}
 		return Some(suggest);
 	}
 
-	let suggest = match_pattern("general", last_command, error_msg, shell);
+	let suggest = match_pattern("general", &last_command, error_msg, shell);
 	if let Some(suggest) = suggest {
+		if PRIVILEGE_LIST.contains(&split_command[0].as_str()) {
+			return Some(format!("{} {}", split_command[0], suggest));
+		}
 		return Some(suggest);
 	}
 	None
