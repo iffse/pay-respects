@@ -58,7 +58,7 @@ fn main() {
 					let retry_message =
 						format!("{}", "Looking for new suggestion...".cyan().bold());
 
-					println!("\n{} {}", "ERROR:".red().bold(), msg);
+					// println!("\n{} {}", "ERROR:".red().bold(), msg);
 					println!("\n{}\n", retry_message);
 				}
 			} else {

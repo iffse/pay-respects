@@ -197,15 +197,23 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 			let process = std::process::Command::new(p)
 				.arg(shell)
 				.arg("-c")
-				.arg(command)
+				.arg(&command)
 				.stdout(Stdio::inherit())
-				.stderr(Stdio::piped())
-				.output()
-				.expect("failed to execute process");
+				.stderr(Stdio::inherit())
+				.spawn()
+				.expect("failed to execute process")
+				.wait()
+				.unwrap();
 
-			if process.status.success() {
+			if process.success() {
 				return Ok(());
 			} else {
+				let process = std::process::Command::new(p)
+					.arg(shell)
+					.arg("-c")
+					.arg(command)
+					.output()
+					.expect("failed to execute process");
 				let error_msg = String::from_utf8_lossy(&process.stderr);
 				return Err(error_msg.to_string());
 			}
@@ -216,13 +224,20 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 		.arg("-c")
 		.arg(command)
 		.stdout(Stdio::inherit())
-		.stderr(Stdio::piped())
-		.output()
-		.expect("failed to execute process");
+		.stderr(Stdio::inherit())
+		.spawn()
+		.expect("failed to execute process")
+		.wait()
+		.unwrap();
 
-	if process.status.success() {
+	if process.success() {
 		Ok(())
 	} else {
+		let process = std::process::Command::new(shell)
+			.arg("-c")
+			.arg(command)
+			.output()
+			.expect("failed to execute process");
 		let error_msg = String::from_utf8_lossy(&process.stderr);
 		Err(error_msg.to_string())
 	}
