@@ -42,7 +42,7 @@ pub fn get_best_match_file(input: &str) -> Option<String> {
 			.map(|file| {
 				let file = file.unwrap();
 
-				file.file_name().into_string().unwrap()
+				file.file_name().into_string().unwrap().replace(" ", "\\ ")
 			})
 			.collect::<Vec<String>>();
 
