@@ -1,24 +1,26 @@
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
 
-fn rtag (name: &str, x: i32, y: String) -> TokenStream2 {
+fn rtag(name: &str, x: i32, y: String) -> TokenStream2 {
 	let tag = format!("{}{} = {}", name, x, y);
 	let tag: TokenStream2 = tag.parse().unwrap();
 	tag
 }
 
-fn tag (name: &str, x: i32) -> String {
+fn tag(name: &str, x: i32) -> String {
 	let tag = format!("{{{}{}}}", name, x);
 	let tag = tag.as_str();
 	let tag = tag.to_owned();
 	tag
 }
 
-fn eval_placeholder(string: &str, start: &str, end: &str) -> (std::ops::Range<usize>, std::ops::Range<usize>) {
+fn eval_placeholder(
+	string: &str,
+	start: &str,
+	end: &str,
+) -> (std::ops::Range<usize>, std::ops::Range<usize>) {
 	let start_index = string.find(start).unwrap();
-	let end_index = string[start_index..].find(end).unwrap()
-		+ start_index
-		+ end.len();
+	let end_index = string[start_index..].find(end).unwrap() + start_index + end.len();
 
 	let placeholder = start_index..end_index;
 
@@ -27,7 +29,11 @@ fn eval_placeholder(string: &str, start: &str, end: &str) -> (std::ops::Range<us
 	(placeholder, args)
 }
 
-pub fn opts(suggest: &mut String, replace_list: &mut Vec<TokenStream2>, opt_list: &mut Vec<TokenStream2>) {
+pub fn opts(
+	suggest: &mut String,
+	replace_list: &mut Vec<TokenStream2>,
+	opt_list: &mut Vec<TokenStream2>,
+) {
 	let mut replace_tag = 0;
 	let tag_name = "opts";
 	while suggest.contains("{{opt::") {
@@ -82,13 +88,12 @@ pub fn err(suggest: &mut String, replace_list: &mut Vec<TokenStream2>) {
 	}
 }
 
-
 pub fn command(suggest: &mut String, replace_list: &mut Vec<TokenStream2>) {
 	let mut replace_tag = 0;
 	let tag_name = "command";
 	while suggest.contains("{{command") {
 		let (placeholder, args) = eval_placeholder(suggest, "{{command", "}}");
-		
+
 		let range = suggest[args.to_owned()].trim_matches(|c| c == '[' || c == ']');
 		if let Some((start, end)) = range.split_once(':') {
 			let mut start_string = start.to_string();
@@ -109,19 +114,18 @@ pub fn command(suggest: &mut String, replace_list: &mut Vec<TokenStream2>) {
 				}
 			};
 
-			let command = format!{r#"split_command[{}..{}].join(" ")"#, start_string, end_string};
+			let command = format! {r#"split_command[{}..{}].join(" ")"#, start_string, end_string};
 
 			replace_list.push(rtag(tag_name, replace_tag, command));
 			suggest.replace_range(placeholder, &tag(tag_name, replace_tag));
-			replace_tag += 1;
 		} else {
 			let range = range.parse::<i32>().unwrap_or(0);
 			let command = format!("split_command[{}]", range);
 
 			replace_list.push(rtag(tag_name, replace_tag, command));
 			suggest.replace_range(placeholder, &tag(tag_name, replace_tag));
-			replace_tag += 1;
 		}
+		replace_tag += 1;
 	}
 }
 
@@ -132,24 +136,54 @@ pub fn typo(suggest: &mut String, replace_list: &mut Vec<TokenStream2>) {
 	while suggest.contains("{{typo") {
 		let (placeholder, args) = eval_placeholder(suggest, "{{typo", "}}");
 
-		let string_index;
-		if suggest.contains('[') {
+		let string_index = if suggest.contains('[') {
 			let split = suggest[args.to_owned()]
 				.split(&['[', ']'])
 				.collect::<Vec<&str>>();
-			let command_index = split[1].parse::<i32>().unwrap();
-			if command_index < 0 {
-				string_index = format!("split_command.len() {}", command_index);
+			let command_index = split[1];
+			if !command_index.contains(':') {
+				let command_index = command_index.parse::<i32>().unwrap();
+
+				let index = if command_index < 0 {
+					format!("split_command.len() {}", command_index)
+				} else {
+					command_index.to_string()
+				};
+				format!("{}..{} + 1", index, index)
 			} else {
-				string_index = command_index.to_string();
+				let (start, end) = command_index.split_once(':').unwrap();
+				let start = start.parse::<i32>().unwrap_or(0);
+				let start_string = if start < 0 {
+					format!("split_command.len() {}", start)
+				} else {
+					start.to_string()
+				};
+				let end = end.parse::<i32>();
+				let end_string = if end.is_err() {
+					String::from("split_command.len()")
+				} else {
+					let end = end.unwrap();
+					if end < 0 {
+						format!("split_command.len() {}", end + 1)
+					} else {
+						(end + 1).to_string()
+					}
+				};
+
+				format!("{}..{}", start_string, end_string)
 			}
 		} else {
 			unreachable!("Typo suggestion must have a command index");
-		}
+		};
 		let match_list;
 		if suggest.contains('(') {
 			let split = suggest[args.to_owned()]
-				.split_once("(").unwrap().1.rsplit_once(")").unwrap().0;
+				.split_once("(")
+				.unwrap()
+				.1
+				.rsplit_once(")")
+				.unwrap()
+				.0;
 			match_list = split.split(',').collect::<Vec<&str>>();
 		} else {
 			unreachable!("Typo suggestion must have a match list");
@@ -161,13 +195,19 @@ pub fn typo(suggest: &mut String, replace_list: &mut Vec<TokenStream2>) {
 			.collect::<Vec<String>>();
 
 		let command;
-		if match_list[0].starts_with("eval_shell_command("){
+		if match_list[0].starts_with("eval_shell_command(") {
 			let function = match_list.join(",");
 			// add a " after first comma, and a " before last )
-			let function = format!("{}\"{}{}",
+			let function = format!(
+				"{}\"{}{}",
 				&function[..function.find(',').unwrap() + 1],
-				&function[function.find(',').unwrap() + 1..function.len() - 1], "\")");
-			command = format!("suggest_typo(&split_command[{}], {})", string_index, function);
+				&function[function.find(',').unwrap() + 1..function.len() - 1],
+				"\")"
+			);
+			command = format!(
+				"suggest_typo(&split_command[{}], &{})",
+				string_index, function
+			);
 		} else {
 			let match_list = match_list
 				.iter()
@@ -175,15 +215,16 @@ pub fn typo(suggest: &mut String, replace_list: &mut Vec<TokenStream2>) {
 				.collect::<Vec<String>>();
 			let string_match_list = match_list.join("\".to_string(), \"");
 			let string_match_list = format!("\"{}\".to_string()", string_match_list);
-			command = format!("suggest_typo(&split_command[{}], vec![{}])", string_index, string_match_list);
+			command = format!(
+				"suggest_typo(&split_command[{}], &[{}])",
+				string_index, string_match_list
+			);
 		}
-
 
 		replace_list.push(rtag(tag_name, replace_tag, command));
 		suggest.replace_range(placeholder, &tag(tag_name, replace_tag));
 		replace_tag += 1;
 	}
-
 }
 
 pub fn shell(suggest: &mut String, cmd_list: &mut Vec<String>) {
@@ -198,13 +239,16 @@ pub fn shell(suggest: &mut String, cmd_list: &mut Vec<String>) {
 	}
 }
 
-pub fn shell_tag(suggest: &mut String, replace_list: &mut Vec<TokenStream2>, cmd_list: Vec<String>) {
+pub fn shell_tag(
+	suggest: &mut String,
+	replace_list: &mut Vec<TokenStream2>,
+	cmd_list: Vec<String>,
+) {
 	let mut replace_tag = 0;
 	let tag_name = "shell";
 
 	for command in cmd_list {
 		if suggest.contains(&command) {
-
 			*suggest = suggest.replace(&command, &tag(tag_name, replace_tag));
 
 			let split = command.split_once(',').unwrap();
