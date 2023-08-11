@@ -1,6 +1,6 @@
 [package]
 name = "pay-respects"
-version = "0.4.7"
+version = "0.4.12"
 edition = "2021"
 
 [dependencies]
