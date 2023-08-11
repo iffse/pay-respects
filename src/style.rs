@@ -9,8 +9,8 @@ pub fn highlight_difference(
 	suggested_command: &str,
 	last_command: &str,
 ) -> Option<String> {
-	let replaced_newline = suggested_command.replace('\n', r" {{newline}} ");
-	let mut split_suggested_command = split_command(&replaced_newline);
+	// let replaced_newline = suggested_command.replace('\n', r" {{newline}} ");
+	let mut split_suggested_command = split_command(suggested_command);
 	let split_last_command = split_command(last_command);
 
 	if split_suggested_command == split_last_command {
@@ -34,7 +34,7 @@ pub fn highlight_difference(
 
 	// let mut highlighted = suggested_command.to_string();
 	'next: for entry in split_suggested_command.iter_mut() {
-		if entry == r"{{newline}}" {
+		if entry == "\n" {
 			continue;
 		}
 		for old in &old_entries {
@@ -46,7 +46,6 @@ pub fn highlight_difference(
 		*entry = entry.red().bold().to_string();
 	}
 
-	let highlighted;
 	if privileged
 		&& (suggested_command.contains("&&")
 			|| suggested_command.contains("||")
@@ -57,10 +56,8 @@ pub fn highlight_difference(
 		let len = split_suggested_command.len() - 1;
 		split_suggested_command[len] =
 			split_suggested_command[len].clone() + "\"".red().bold().to_string().as_str();
-		highlighted = split_suggested_command.join(" ");
-	} else {
-		highlighted = split_suggested_command.join(" ");
 	}
+	let highlighted = split_suggested_command.join(" ");
 
-	Some(highlighted.replace(r" {{newline}} ", "\n"))
+	Some(highlighted.replace(" \n ", "\n"))
 }
