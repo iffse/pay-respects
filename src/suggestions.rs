@@ -232,6 +232,7 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 					.arg(shell)
 					.arg("-c")
 					.arg(command)
+					.env("LC_ALL", "C")
 					.output()
 					.expect("failed to execute process");
 				let error_msg = String::from_utf8_lossy(&process.stderr);
@@ -260,6 +261,7 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 		let process = std::process::Command::new(shell)
 			.arg("-c")
 			.arg(command)
+			.env("LC_ALL", "C")
 			.output()
 			.expect("failed to execute process");
 		let error_msg = String::from_utf8_lossy(&process.stderr);
