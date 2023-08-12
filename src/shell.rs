@@ -183,10 +183,10 @@ pub fn initialization(shell: &str, binary_path: &str, auto_alias: &str) {
 
 	let mut init = format!(
 		"\
-			_PR_LAST_COMMAND=\"{}\" \
+			eval $(_PR_LAST_COMMAND=\"{}\" \
 			_PR_ALIAS=\"{}\" \
 			_PR_SHELL=\"{}\" \
-			\"{}\"",
+			\"{}\")",
 		last_command, alias, shell, binary_path
 	);
 
@@ -197,7 +197,7 @@ pub fn initialization(shell: &str, binary_path: &str, auto_alias: &str) {
 
 	match shell {
 		"bash" | "zsh" => {
-			init = format!(r#"alias {}='{}'"#, auto_alias, init);
+			init = format!(r#"alias {}=eval '$({})'"#, auto_alias, init);
 		}
 		"fish" => {
 			init = format!(

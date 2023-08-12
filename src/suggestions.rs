@@ -226,6 +226,7 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 				.unwrap();
 
 			if process.success() {
+				println!("{}", shell_evaluated_commands(&command));
 				return Ok(());
 			} else {
 				if now.elapsed() > Duration::from_secs(3) {
@@ -257,6 +258,7 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 		.unwrap();
 
 	if process.success() {
+		println!("{}", shell_evaluated_commands(&command));
 		Ok(())
 	} else {
 		if now.elapsed() > Duration::from_secs(3) {
@@ -271,4 +273,19 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 		let error_msg = String::from_utf8_lossy(&process.stderr);
 		Err(error_msg.to_string())
 	}
+}
+
+fn shell_evaluated_commands(command: &str) -> String {
+	let lines = command
+		.lines()
+		.map(|line| line.trim().trim_end_matches(['\\', ';', '|', '&']))
+		.collect::<Vec<&str>>();
+	let mut commands = Vec::new();
+	for line in lines {
+		if line.starts_with("cd") {
+			commands.push(line.to_string());
+		}
+	}
+
+	commands.join(" && ")
 }
