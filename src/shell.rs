@@ -197,7 +197,7 @@ pub fn initialization(shell: &str, binary_path: &str, auto_alias: &str) {
 
 	match shell {
 		"bash" | "zsh" => {
-			init = format!(r#"alias {}=eval '$({})'"#, auto_alias, init);
+			init = format!(r#"alias {}='{}'"#, auto_alias, init);
 		}
 		"fish" => {
 			init = format!(
