@@ -203,7 +203,7 @@ pub fn initialization(shell: &str, binary_path: &str, auto_alias: &str) {
 			init = format!(
 				r#"
 function {} -d "Terminal command correction"
-	{}
+	eval $({})
 end
 "#,
 				auto_alias, init
