@@ -1,14 +1,20 @@
 command = "rm"
 
 [[match_err]]
-pattern = [ "is a directory" ]
+pattern = [
+	"is a directory",
+	"try --recursive"
+]
 suggest = [
 '''
 {{command}} --recursive '''
 ]
 
 [[match_err]]
-pattern = [ "no such file or directory" ]
+pattern = [
+	"no such file or directory",
+	"file(s) not found"
+]
 suggest = [
 '''
 {{command[0}} {{opt::(?:\s)-[\w]+}} {{typo[1:](file)}} '''

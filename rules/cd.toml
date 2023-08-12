@@ -5,10 +5,17 @@ pattern = [
 	"no such file or directory",
 	"does not exist"
 ]
-# as rust runs on its own environment, it's not possible to change
-# the directory automatically
 suggest = [
 '''
-mkdir -p {{command[1]}} && \
+mkdir --parents {{command[1]}} && \
 cd {{command[1]}} '''
+]
+
+[[match_err]]
+pattern = [
+	"nu::shell::directory_not_found"
+]
+suggest = [
+'''
+mkdir {{command[1]}} '''
 ]

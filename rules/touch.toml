@@ -1,9 +1,17 @@
 command = "touch"
 
 [[match_err]]
-pattern = [ "No such file or directory" ]
+pattern = [ "cannot touch" ]
 suggest = [
 '''
 mkdir --parents {{cmd::(?:\s)+(.*[\\\/])(?:\s)*}} && \
+touch {{command[1:]}} '''
+]
+
+[[match_err]]
+pattern = [ "nu::shell::create_not_possible" ]
+suggest = [
+'''
+mkdir {{cmd::(?:\s)+(.*[\\\/])(?:\s)*}} and \
 touch {{command[1:]}} '''
 ]
