@@ -36,7 +36,7 @@ You can now **press `F` to Pay Respects**!
 
 Currently, only corrections to `bash`, `zsh`, and `fish` are working flawlessly.
 
-`nushell` is currently usable, but there is no alias expansion and you will have to put the evaluated initialization command in your config file (added automatically with `pay-respects nushell`).
+`nushell` is currently usable, but there is no alias expansion and you will have to put the evaluated initialization command in your config file (added automatically with `pay-respects nushell`). In addition, commands that need to be evaluated in the current working shell (such as `cd`) cannot yet be implemented in `nushell`.
 
 ## Installing
 
