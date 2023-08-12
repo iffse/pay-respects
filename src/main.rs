@@ -24,6 +24,8 @@ mod style;
 mod suggestions;
 
 fn main() {
+	colored::control::set_override(true);
+
 	args::handle_args();
 
 	let shell = match std::env::var("_PR_SHELL") {
@@ -59,7 +61,7 @@ fn main() {
 						format!("{}", "Looking for new suggestion...".cyan().bold());
 
 					// println!("\n{} {}", "ERROR:".red().bold(), msg);
-					println!("\n{}\n", retry_message);
+					eprintln!("\n{}\n", retry_message);
 				}
 			} else {
 				break;
@@ -68,11 +70,11 @@ fn main() {
 			break;
 		}
 	}
-	println!(
+	eprintln!(
 		"No correction found for the command: {}\n",
 		last_command.red()
 	);
-	println!(
+	eprintln!(
 		"If you think there should be a correction, please open an issue or send a pull request!"
 	);
 }

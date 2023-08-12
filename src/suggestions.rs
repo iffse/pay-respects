@@ -1,3 +1,5 @@
+use std::io::stderr;
+use std::os::fd::AsFd;
 use std::process::{exit, Stdio};
 use std::time::{Duration, Instant};
 
@@ -201,8 +203,8 @@ fn compare_string(a: &str, b: &str) -> usize {
 }
 
 pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Result<(), String> {
-	println!("{}\n", highlighted);
-	println!("Press enter to execute the suggestion. Or press Ctrl+C to exit.");
+	eprintln!("{}\n", highlighted);
+	eprintln!("Press enter to execute the suggestion. Or press Ctrl+C to exit.");
 	std::io::stdin().read_line(&mut String::new()).unwrap();
 
 	for p in PRIVILEGE_LIST {
@@ -215,7 +217,8 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 				.arg(shell)
 				.arg("-c")
 				.arg(&command)
-				.stdout(Stdio::inherit())
+				// .stdout(Stdio::inherit())
+				.stdout(stderr().as_fd().try_clone_to_owned().unwrap())
 				.stderr(Stdio::inherit())
 				.spawn()
 				.expect("failed to execute process")
@@ -245,7 +248,8 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 	let process = std::process::Command::new(shell)
 		.arg("-c")
 		.arg(command)
-		.stdout(Stdio::inherit())
+		// .stdout(Stdio::inherit())
+		.stdout(stderr().as_fd().try_clone_to_owned().unwrap())
 		.stderr(Stdio::inherit())
 		.spawn()
 		.expect("failed to execute process")
