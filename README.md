@@ -4,13 +4,12 @@ Typed a wrong command? Pay Respects will try to correct your wrong console comma
 
 - 🚀 **Blazing fast suggestion**: You won't notice any delay for asking suggestions!
 - ✏️ **Easy to write rules**: You don't need to know Rust. The rules are written in a TOML file that is simple to work with and evaluated to Rust code upon compilation!
+- 🎯 **Accurate results**: Suggestions must pass several conditions in order to be prompted to the user, no `sudo` suggestions when you are using `doas`!
 - 🪶 **Tiny binary size**: Not even 1MB!
 
-![example-sudo-echo-write](img/example-sudo-echo-write.png)
+![pacman-fix](img/pacman-fix.png)
 
-![example-typo-paru](img/example-typo-paru.png)
-
-![example-typo-git](img/example-typo-git.png)
+![cd-fix](img/cd-fix.png)
 
 ## How to Pay Respects
 
