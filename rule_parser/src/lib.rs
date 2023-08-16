@@ -101,6 +101,7 @@ fn gen_match_rules(rules: Vec<Rule>) -> TokenStream {
 			#(
 			for pattern in #patterns_tokens {
 				if error_msg.contains(pattern) {
+					let split_command = split_command(&last_command);
 					#suggestion_tokens;
 				};
 			})*
@@ -169,6 +170,9 @@ fn eval_condition(condition: &str, arg: &str) -> TokenStream2 {
 		"executable" => quote!{check_executable(shell, #arg)},
 		"err_contains" => quote!{error_msg.contains(#arg)},
 		"cmd_contains" => quote!{last_command.contains(#arg)},
+		"min_length" => quote!{(split_command.len() >= #arg.parse::<usize>().unwrap())},
+		"length" => quote!{(split_command.len() == #arg.parse::<usize>().unwrap())},
+		"max_length" => quote!{(split_command.len() <= #arg.parse::<usize>().unwrap() + 1)},
 		_ => unreachable!("Unknown condition when evaluation condition: {}", condition),
 	}
 }
@@ -193,7 +197,6 @@ fn eval_suggest(suggest: &str) -> TokenStream2 {
 
 	quote! {
 		#(#opt_list)*
-		let split_command = split_command(&last_command);
 		return Some(format!{#suggest, #(#replace_list),*});
 	}
 }
