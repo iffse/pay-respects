@@ -1,0 +1,17 @@
+command = "c"
+
+[[match_err]]
+pattern = [
+	"command not found",
+	"unknown command",
+	"nu::shell::external_command"
+]
+suggest = [
+'''
+#[length(2)]
+cd {{command[1:]}} ''',
+'''
+#[min_length(3)]
+cp {{command[1:]}} '''
+]
+
