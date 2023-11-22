@@ -6,6 +6,7 @@ pattern = [
 	"authentication is required",
 	"be root",
 	"be superuser",
+	"cannot access",
 	"eacces",
 	"edspermissionerror",
 	"error: insufficient privileges",
