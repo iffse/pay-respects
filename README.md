@@ -41,16 +41,16 @@ Currently, only corrections to `bash`, `zsh`, and `fish` are working flawlessly.
 
 If you are using Arch Linux, you can install from AUR directly:
 ```shell
-paru -S pay-respects
+paru -S pay-respects     # compile from source
+paru -S pay-respects-bin # binary version
+```
+
+Or if you have cargo installed, you can install it from [crates.io](https://crates.io/):
+```
+cargo install pay-respects
 ```
 
 Alternatively, you can download Linux binary from [releases](https://github.com/iffse/pay-respects/releases).
-
-Otherwise, you can use cargo to compile the project:
-```
-cargo build --release
-```
-and the binary can be found at `target/release/pay-respects`.
 
 ## Rule Files
 
