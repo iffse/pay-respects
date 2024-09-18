@@ -5,7 +5,7 @@ use std::time::{Duration, Instant};
 
 use regex_lite::Regex;
 
-use rule_parser::parse_rules;
+use pay_respects_parser::parse_rules;
 
 use crate::files::{get_best_match_file, get_path_files};
 use crate::shell::PRIVILEGE_LIST;

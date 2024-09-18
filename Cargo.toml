@@ -3,9 +3,20 @@ name = "pay-respects"
 version = "0.4.13"
 edition = "2021"
 
+# for crates.io
+description = "Terminal command correction, alternative to thefuck written in Rust"
+repository = "https://github.com/iffse/pay-respects-parser"
+keywords = ["cli", "terminal", "utility", "shell"]
+categories = ["command-line-utilities"]
+license = "AGPL-3.0"
+include = [
+	"**/*.rs",
+	"**/*.toml",
+]
+
 [dependencies]
 colored = "2.0"
-rule_parser = { path = "rule_parser" }
+pay-respects-parser = "0.2.2"
 regex-lite = "0.1"
 
 [profile.release]
