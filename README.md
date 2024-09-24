@@ -54,23 +54,22 @@ cargo install pay-respects
 git clone --depth 1 https://github.com/iffse/pay-respects
 cd pay-respects
 cargo install --path .
+
+# compile without installing
+# binary can be found at ./target/release/pay-respects
+cargo build --release
 ```
 
 Alternatively, you can download Linux binary from [releases](https://github.com/iffse/pay-respects/releases).
 
-## Compiling
-
-Using cargo, the process is straight forward:
-```shell
-git clone --depth 1 https://github.com/iffse/pay-respects
-cd pay-respects
-cargo build --release
-```
-
-
 ## Rule Files
 
 Rule files are parsed at compilation. Everything in rule files is converted to Rust code before compiling. You don't have to know the project structure nor Rust to write the rules!
+
+If only rules are changed, cargo won't recompile the project because Rust code were intact. You will have to notify it manually by:
+```shell
+touch src/suggestions.rs && cargo build
+```
 
 Syntax of a rule file (will be read by simply placing the file under [rules](./rules)):
 ```toml
