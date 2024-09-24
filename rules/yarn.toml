@@ -1,0 +1,10 @@
+command = "yarn"
+
+[[match_err]]
+pattern = [
+	"error `install` has been replaced with `add` to add new dependencies."
+]
+suggest = [
+'''
+yarn add {{command[2:]}} '''
+]
