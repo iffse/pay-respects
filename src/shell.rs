@@ -26,12 +26,23 @@ pub fn command_output(shell: &str, command: &str) -> String {
 	});
 
 	match receiver.recv_timeout(Duration::from_secs(3)) {
-		Ok(output) => String::from_utf8_lossy(&output.stderr)
-			.to_string()
-			.split_whitespace()
-			.collect::<Vec<&str>>()
-			.join(" ")
-			.to_lowercase(),
+		Ok(output) => {
+			if !output.stderr.is_empty() {
+				String::from_utf8_lossy(&output.stderr)
+					.to_string()
+					.split_whitespace()
+					.collect::<Vec<&str>>()
+					.join(" ")
+					.to_lowercase()
+			} else {
+				String::from_utf8_lossy(&output.stdout)
+					.to_string()
+					.split_whitespace()
+					.collect::<Vec<&str>>()
+					.join(" ")
+					.to_lowercase()
+			}
+		}
 		Err(_) => {
 			use colored::*;
 			eprintln!("Timeout while executing command: {}", command.red());
