@@ -76,6 +76,6 @@ fn main() {
 			break;
 		}
 	}
-	eprintln!("{}: {}\n", t!("no-suggestions"), last_command.red());
+	eprintln!("{}: {}\n", t!("no-suggestion"), last_command.red());
 	eprintln!("{}", t!("contribute"));
 }
