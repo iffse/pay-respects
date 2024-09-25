@@ -1,0 +1,244 @@
+_version = 2
+
+[help]
+en = '''
+Usage: pay-respects [your shell] [--alias [alias]]
+
+Example 1, manual aliasing: `%{manual}`
+
+The command will output the command that you can use to execute the binary with
+the correct environment. You can alias such output to a shorter key. Such as
+%{manual_example})
+
+Example 2, auto aliasing: `%{auto}`
+
+The command will output a declaration that can be directly embedded in your
+config file with `%{auto_example}`. For fish, use
+`%{auto_example_fish}` instead.
+'''
+es = '''
+Uso: pay-respects [tu shell] [--alias [alias]]
+
+Ejemplo 1, alias manual: `%{manual}`
+
+El comando mostrará el comando que puedes usar para ejecutar el binario con el
+entorno correcto. Puedes asociar dicho comando a una tecla más corta. Por ejemplo
+%{manual_example})
+
+Ejemplo 2, alias automático: `%{auto}`
+
+El comando mostrará una declaración que puede ser incrustada directamente en tu
+archivo de configuración con `%{auto_example}`. Para fish, usa
+`%{auto_example_fish}` en su lugar.
+'''
+de = '''
+Verwendung: pay-respects [deine Shell] [--alias [alias]]
+
+Beispiel 1, manuelles Alias: `%{manual}`
+
+Der Befehl gibt den Befehl aus, den du verwenden kannst, um das Binär mit der
+richtigen Umgebung auszuführen. Du kannst ein solches Ergebnis einem kürzeren
+Schlüssel zuordnen. Zum Beispiel %{manual_example})
+
+Beispiel 2, automatisches Alias: `%{auto}`
+
+Der Befehl gibt eine Deklaration aus, die direkt in deine Konfigurationsdatei
+mit `%{auto_example}` eingebettet werden kann. Für fish, verwende
+`%{auto_example_fish}` stattdessen.
+'''
+fr = '''
+Utilisation: pay-respects [votre shell] [--alias [alias]]
+
+Exemple 1, alias manuel: `%{manual}`
+
+La commande affichera la commande que vous pouvez utiliser pour exécuter le
+binaire avec l'environnement correct. Vous pouvez associer une telle sortie à
+une touche plus courte. Par exemple %{manual_example})
+
+Exemple 2, alias automatique: `%{auto}`
+
+La commande affichera une déclaration qui peut être directement intégrée dans
+votre fichier de configuration avec `%{auto_example}`. Pour fish, utilisez
+`%{auto_example_fish}` à la place.
+'''
+it = '''
+Utilizzo: pay-respects [la tua shell] [--alias [alias]]
+
+Esempio 1, alias manuale: `%{manual}`
+
+Il comando restituirà il comando che puoi utilizzare per eseguire il binario con
+l'ambiente corretto. Puoi associare tale output a una chiave più corta. Ad
+esempio %{manual_example})
+
+Esempio 2, alias automatico: `%{auto}`
+
+Il comando restituirà una dichiarazione che può essere incorporata direttamente
+nel tuo file di configurazione con `%{auto_example}`. Per fish, utilizza
+`%{auto_example_fish}` invece.
+'''
+pt = '''
+Uso: pay-respects [seu shell] [--alias [alias]]
+
+Exemplo 1, alias manual: `%{manual}`
+
+O comando exibirá o comando que você pode usar para executar o binário com o
+ambiente correto. Você pode associar tal saída a uma tecla mais curta. Por
+exemplo %{manual_example})
+
+Exemplo 2, alias automático: `%{auto}`
+
+O comando exibirá uma declaração que pode ser incorporada diretamente em seu
+arquivo de configuração com `%{auto_example}`. Para fish, use
+`%{auto_example_fish}` em vez disso.
+'''
+ru = '''
+Использование: pay-respects [ваш shell] [--alias [alias]]
+
+Пример 1, ручное создание псевдонима: `%{manual}`
+
+Команда выведет команду, которую вы можете использовать для выполнения бинарного
+файла с правильной средой. Вы можете создать псевдоним для такого вывода с
+помощью более короткого ключа. Например, %{manual_example})
+
+Пример 2, автоматическое создание псевдонима: `%{auto}`
+
+Команда выведет декларацию, которую можно непосредственно встроить в ваш файл
+конфигурации с помощью `%{auto_example}`. Для fish используйте
+`%{auto_example_fish}` вместо этого.
+'''
+ja = '''
+使用法: pay-respects [あなたのシェル] [--alias [alias]]
+
+例1、手動エイリアス: `%{manual}`
+
+コマンドは、正しい環境でバイナリを実行するために使用できるコマンドを出力します。
+そのような出力を短いキーにエイリアスすることができます。例えば、%{manual_example})
+
+例2、自動エイリアス: `%{auto}`
+
+コマンドは、`%{auto_example}`で直接埋め込むことができる宣言を出力します。fishの場合は、
+代わりに`%{auto_example_fish}`を使用してください。
+'''
+ko = '''
+사용법: pay-respects [당신의 쉘] [--alias [alias]]
+
+예 1, 수동 별칭: `%{manual}`
+
+명령은 올바른 환경에서 바이너리를 실행하는 데 사용할 수 있는 명령을 출력합니다.
+이러한 출력을 더 짧은 키에 별칭 지정할 수 있습니다. 예를 들어 %{manual_example})
+
+예 2, 자동 별칭: `%{auto}`
+
+명령은 `%{auto_example}`로 직접 구성 파일에 포함할 수 있는 선언을 출력합니다. fish의 경우
+대신 `%{auto_example_fish}`를 사용하십시오.
+'''
+zh = '''
+用法: pay-respects [你的 shell] [--alias [alias]]
+
+示例 1，手动别名: `%{manual}`
+
+该命令将输出可用于使用正确环境执行二进制文件的命令。您可以将此类输出别名为更短的键。
+例如 %{manual_example})
+
+示例 2，自动别名: `%{auto}`
+
+该命令将输出一个声明，可以直接嵌入到您的配置文件中，示例 `%{auto_example}`。
+对于 fish， 请使用`%{auto_example_fish}`。
+'''
+
+[no-env-setup]
+en = "No %{var} in environment. Did you aliased the command with the correct argument?\n\nUse `%{help}` for help."
+es = "No se encontró %{var} en el entorno. ¿Has aliased el comando con el argumento correcto?\n\nUsa `%{help}` para obtener ayuda."
+de = "Kein %{var} in der Umgebung gefunden. Hast du den Befehl mit dem richtigen Argument verknüpft?\n\nVerwende `%{help}` für Hilfe."
+fr = "Pas de %{var} dans l'environnement. Avez-vous aliased la commande avec le bon argument?\n\nUtilisez `%{help}` pour obtenir de l'aide."
+it = "Nessun %{var} nell'ambiente. Hai associato il comando con l'argomento corretto?\n\nUsa `%{help}` per ottenere aiuto."
+pt = "Nenhum %{var} no ambiente. Você aliou o comando com o argumento correto?\n\nUse `%{help}` para obter ajuda."
+ru = "Переменная %{var} не найдена в среде. Вы алиасили команду с правильным аргументом?\n\nИспользуйте `%{help}` для помощи."
+ja = "環境変数に %{var} が見つかりません。コマンドに正しい引数をエイリアスしましたか？\n\nヘルプを表示するには `%{help}` を使用してください。"
+ko = "환경 변수에 %{var}가 없습니다. 올바른 인수로 명령을 별칭했습니까?\n\n도움말을 보려면 `%{help}`를 사용하십시오."
+zh = "环境中没有 %{var}。您是否使用正确的参数别名了命令？\n\n使用 `%{help}` 获取帮助。"
+
+[no-shell]
+en = "No shell specified. Please specify a shell."
+es = "No se especificó ninguna shell. Por favor, especifica una shell."
+de = "Keine Shell angegeben. Bitte gib eine Shell an."
+fr = "Aucune shell spécifiée. Veuillez spécifier une shell."
+it = "Nessuna shell specificata. Specificare una shell."
+pt = "Nenhuma shell especificada. Por favor, especifique uma shell."
+ru = "Оболочка не указана. Укажите оболочку."
+ja = "シェルが指定されていません。シェルを指定してください。"
+ko = "쉘이 지정되지 않았습니다. 쉘을 지정하십시오."
+zh = "未指定 shell。请指定一个 shell。"
+
+[no-command]
+en = "No command found."
+es = "No se encontró ningún comando."
+de = "Kein Befehl gefunden."
+fr = "Aucune commande trouvée."
+it = "Nessun comando trovato."
+pt = "Nenhum comando encontrado."
+ru = "Команда не найдена."
+ja = "コマンドが見つかりません。"
+ko = "명령을 찾을 수 없습니다."
+zh = "找不到命令。"
+
+[confirm]
+en = "Execute suggestion?"
+es = "¿Ejecutar sugerencia?"
+de = "Vorschlag ausführen?"
+fr = "Exécuter la suggestion?"
+it = "Eseguire la proposta?"
+pt = "Executar sugestão?"
+ru = "Выполнить предложение?"
+ja = "提案を実行しますか？"
+ko = "제안 실행?"
+zh = "执行建议？"
+
+[confirm-yes]
+en = "Enter"
+es = "Entrar"
+de = "Eingabetaste"
+fr = "Entrée"
+it = "Invio"
+pt = "Entrar"
+ru = "Ввод"
+ja = "エンター"
+ko = "엔터"
+zh = "回车"
+
+[retry]
+en = "Looking for new suggestion"
+es = "Buscando nueva sugerencia"
+de = "Suche nach neuem Vorschlag"
+fr = "Recherche d'une nouvelle suggestion"
+it = "Ricerca di una nuova proposta"
+pt = "Procurando nova sugestão"
+ru = "Поиск нового предложения"
+ja = "新しい提案を探しています"
+ko = "새 제안 찾는 중"
+zh = "寻找新建议"
+
+[no-suggestion]
+en = "No suggestion found for command"
+es = "No se encontró ninguna sugerencia para el comando"
+de = "Kein Vorschlag für den Befehl gefunden"
+fr = "Aucune suggestion trouvée pour la commande"
+it = "Nessuna proposta trovata per il comando"
+pt = "Nenhuma sugestão encontrada para o comando"
+ru = "Предложение для команды не найдено"
+ja = "コマンドの提案が見つかりません"
+ko = "명령에 대한 제안을 찾을 수 없습니다"
+zh = "找不到命令的建议"
+
+[contribute]
+en = "If you think there should be a suggestion, please open an issue or send a pull request!"
+es = "Si crees que debería haber una sugerencia, ¡por favor abre un issue o envía un pull request!"
+de = "Wenn du denkst, dass es einen Vorschlag geben sollte, öffne bitte ein Issue oder sende einen Pull-Request!"
+fr = "Si vous pensez qu'il devrait y avoir une suggestion, veuillez ouvrir un ticket ou envoyer une demande de tirage !"
+it = "Se pensi che dovrebbe esserci una proposta, apri una issue o invia una pull request!"
+pt = "Se você acha que deveria haver uma sugestão, por favor abra uma issue ou envie um pull request!"
+ru = "Если вы считаете, что должно быть предложение, пожалуйста, откройте issue или отправьте pull request!"
+ja = "提案があるべきだと思う場合は、issueを開いてプルリクエストを送信してください！"
+ko = "제안이 있어야 한다고 생각하는 경우 이슈를 열거나 풀 리퀘스트를 보내주세요!"
+zh = "如果您认为应该有建议，请打开一个问题或发送一个拉取请求！"
+

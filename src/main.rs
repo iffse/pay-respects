@@ -23,6 +23,10 @@ mod shell;
 mod style;
 mod suggestions;
 
+#[macro_use]
+extern crate rust_i18n;
+i18n!("i18n", fallback = "en", minify_key = true);
+
 fn main() {
 	colored::control::set_override(true);
 
@@ -31,7 +35,10 @@ fn main() {
 	let shell = match std::env::var("_PR_SHELL") {
 		Ok(shell) => shell,
 		Err(_) => {
-			eprintln!("No _PR_SHELL in environment. Did you aliased the command with the correct argument?\n\nUse `pay-respects -h` for help");
+			eprintln!(
+				"{}",
+				t!("no-env-setup", var = "_PR_SHELL", help = "pay-respects -h")
+			);
 			std::process::exit(1);
 		}
 	};
@@ -57,11 +64,10 @@ fn main() {
 					let msg = execution.err().unwrap();
 					error_msg = msg.to_lowercase();
 
-					let retry_message =
-						format!("{}", "Looking for new suggestion...".cyan().bold());
+					let retry_message = format!("{}...", t!("retry"));
 
 					// println!("\n{} {}", "ERROR:".red().bold(), msg);
-					eprintln!("\n{}\n", retry_message);
+					eprintln!("\n{}\n", retry_message.cyan().bold());
 				}
 			} else {
 				break;
@@ -70,11 +76,6 @@ fn main() {
 			break;
 		}
 	}
-	eprintln!(
-		"No correction found for the command: {}\n",
-		last_command.red()
-	);
-	eprintln!(
-		"If you think there should be a correction, please open an issue or send a pull request!"
-	);
+	eprintln!("{}: {}\n", t!("no-suggestions"), last_command.red());
+	eprintln!("{}", t!("contribute"));
 }

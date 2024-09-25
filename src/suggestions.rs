@@ -3,6 +3,7 @@ use std::os::fd::AsFd;
 use std::process::{exit, Stdio};
 use std::time::{Duration, Instant};
 
+use colored::Colorize;
 use regex_lite::Regex;
 
 use pay_respects_parser::parse_rules;
@@ -13,8 +14,8 @@ use crate::shell::PRIVILEGE_LIST;
 pub fn suggest_command(shell: &str, last_command: &str, error_msg: &str) -> Option<String> {
 	let split_command = split_command(last_command);
 	let executable = match PRIVILEGE_LIST.contains(&split_command[0].as_str()) {
-		true => split_command.get(1).expect("No command found.").as_str(),
-		false => split_command.first().expect("No command found.").as_str(),
+		true => split_command.get(1).expect(&t!("no-command")).as_str(),
+		false => split_command.first().expect(&t!("no-command")).as_str(),
 	};
 
 	if !PRIVILEGE_LIST.contains(&executable) {
@@ -204,7 +205,8 @@ fn compare_string(a: &str, b: &str) -> usize {
 
 pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Result<(), String> {
 	eprintln!("{}\n", highlighted);
-	eprintln!("Press enter to execute the suggestion. Or press Ctrl+C to exit.");
+	let confirm = format!("[{}]", t!("confirm-yes")).green();
+	eprintln!("{}: {} {}", t!("confirm"), confirm, "[Ctrl+C]".red());
 	std::io::stdin().read_line(&mut String::new()).unwrap();
 
 	for p in PRIVILEGE_LIST {

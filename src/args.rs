@@ -34,7 +34,7 @@ pub fn handle_args() {
 	}
 
 	if shell.is_empty() {
-		eprintln!("No shell specified. Please specify a shell.");
+		eprintln!("{}", t!("no-shell"));
 		std::process::exit(1);
 	}
 
@@ -44,23 +44,16 @@ pub fn handle_args() {
 }
 
 fn print_help() {
-	let help_message = String::from(
-		"
-Usage: pay_respects [your shell] [--alias [alias]]
-
-Example 1, manual aliasing: `pay_respects bash`
-
-The command will output the command that you can use to execute the binary with
-the correct environment. You can alias such output to a shorter key. Such as
-alias f=$(pay_respects bash)
-
-Example 2, auto aliasing: `pay_respects bash --alias f`
-
-The command will output a declaration that can be directly embedded in your
-config file with `eval $(pay_respects bash --alias)`. For fish, use
-`pay_respects fish --alias | source` instead.
-	",
+	println!(
+		"{}",
+		t!(
+			"help",
+			manual = "pay-respects bash",
+			manual_example = "alias f=$(pay-respects bash)",
+			auto = "pay-respects bash --alias f",
+			auto_example = "eval $(pay-respects bash --alias f)",
+			auto_example_fish = "pay-respects fish --alias | source",
+		)
 	);
-	println!("{}", help_message);
 	std::process::exit(0);
 }
