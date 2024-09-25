@@ -124,7 +124,7 @@ Suggestions can have additional conditions to check. To specify conditions, add 
 - `min_length`: Check whether the given command has at least the length of the argument
 - `max_length`: Check whether the given command has at most the length of the argument
 
-
+For locale other than English, be aware that patterns should be the output having `LC_ALL=C` environment variable.
 
 ## Current Progress
 
