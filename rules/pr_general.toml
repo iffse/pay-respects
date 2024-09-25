@@ -1,4 +1,4 @@
-command = "general"
+command = "_PR_general"
 
 [[match_err]]
 pattern = [

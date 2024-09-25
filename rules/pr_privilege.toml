@@ -1,4 +1,4 @@
-command = "privilege"
+command = "_PR_privilege"
 
 [[match_err]]
 pattern = [
