@@ -19,7 +19,7 @@ pub fn suggest_command(shell: &str, last_command: &str, error_msg: &str) -> Opti
 	};
 
 	if !PRIVILEGE_LIST.contains(&executable) {
-		let suggest = match_pattern("privilege", last_command, error_msg, shell);
+		let suggest = match_pattern("_PR_privilege", last_command, error_msg, shell);
 		if suggest.is_some() {
 			return suggest;
 		}
@@ -38,7 +38,7 @@ pub fn suggest_command(shell: &str, last_command: &str, error_msg: &str) -> Opti
 		return Some(suggest);
 	}
 
-	let suggest = match_pattern("general", last_command, error_msg, shell);
+	let suggest = match_pattern("_PR_general", last_command, error_msg, shell);
 	if let Some(suggest) = suggest {
 		if PRIVILEGE_LIST.contains(&split_command[0].as_str()) {
 			return Some(format!("{} {}", split_command[0], suggest));
