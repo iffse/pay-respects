@@ -77,5 +77,5 @@ fn main() {
 		}
 	}
 	eprintln!("{}: {}\n", t!("no-suggestion"), last_command.red());
-	eprintln!("{}", t!("contribute"));
+	eprintln!("{}\n{}", t!("contribute"), "https://github.com/iffse/pay-respects");
 }
