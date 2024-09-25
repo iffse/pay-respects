@@ -55,7 +55,14 @@ fn last_command(shell: &str) -> String {
 	let last_command = match std::env::var("_PR_LAST_COMMAND") {
 		Ok(command) => command,
 		Err(_) => {
-			eprintln!("No _PR_LAST_COMMAND in environment. Did you aliased the command with the correct argument?\n\nUse `pay-respects -h` for help");
+			eprintln!(
+				"{}",
+				t!(
+					"no-env-setup",
+					var = "_PR_LAST_COMMAND",
+					help = "pay-respects -h"
+				)
+			);
 			exit(1);
 		}
 	};
@@ -76,9 +83,11 @@ fn last_command(shell: &str) -> String {
 }
 
 pub fn last_command_expanded_alias(shell: &str) -> String {
-	let alias = std::env::var("_PR_ALIAS").expect(
-		"No _PR_ALIAS in environment. Did you aliased the command with the correct argument?",
-	);
+	let alias = std::env::var("_PR_ALIAS").expect(&t!(
+		"no-env-setup",
+		var = "_PR_ALIAS",
+		help = "pay-respects -h"
+	));
 	let last_command = last_command(shell);
 	if alias.is_empty() {
 		return last_command;
