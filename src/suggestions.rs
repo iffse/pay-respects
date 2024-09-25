@@ -211,39 +211,40 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 
 	for p in PRIVILEGE_LIST {
 		let _p = p.to_owned() + " ";
-		if command.starts_with(&_p) {
-			let command = command.replacen(p, "", 1);
+		if !command.starts_with(&_p) {
+			continue;
+		}
+		let command = command.replacen(&_p, "", 1);
 
-			let now = Instant::now();
+		let now = Instant::now();
+		let process = std::process::Command::new(p)
+			.arg(shell)
+			.arg("-c")
+			.arg(&command)
+			// .stdout(Stdio::inherit())
+			.stdout(stderr().as_fd().try_clone_to_owned().unwrap())
+			.stderr(Stdio::inherit())
+			.spawn()
+			.expect("failed to execute process")
+			.wait()
+			.unwrap();
+
+		if process.success() {
+			println!("{}", shell_evaluated_commands(&command));
+			return Ok(());
+		} else {
+			if now.elapsed() > Duration::from_secs(3) {
+				exit(1);
+			}
 			let process = std::process::Command::new(p)
 				.arg(shell)
 				.arg("-c")
-				.arg(&command)
-				// .stdout(Stdio::inherit())
-				.stdout(stderr().as_fd().try_clone_to_owned().unwrap())
-				.stderr(Stdio::inherit())
-				.spawn()
-				.expect("failed to execute process")
-				.wait()
-				.unwrap();
-
-			if process.success() {
-				println!("{}", shell_evaluated_commands(&command));
-				return Ok(());
-			} else {
-				if now.elapsed() > Duration::from_secs(3) {
-					exit(1);
-				}
-				let process = std::process::Command::new(p)
-					.arg(shell)
-					.arg("-c")
-					.arg(command)
-					.env("LC_ALL", "C")
-					.output()
-					.expect("failed to execute process");
-				let error_msg = String::from_utf8_lossy(&process.stderr);
-				return Err(error_msg.to_string());
-			}
+				.arg(command)
+				.env("LC_ALL", "C")
+				.output()
+				.expect("failed to execute process");
+			let error_msg = String::from_utf8_lossy(&process.stderr);
+			return Err(error_msg.to_string());
 		}
 	}
 
@@ -284,7 +285,7 @@ fn shell_evaluated_commands(command: &str) -> String {
 		.collect::<Vec<&str>>();
 	let mut commands = Vec::new();
 	for line in lines {
-		if line.starts_with("cd") {
+		if line.starts_with("cd ") {
 			commands.push(line.to_string());
 		}
 	}
