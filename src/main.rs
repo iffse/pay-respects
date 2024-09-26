@@ -61,8 +61,7 @@ fn main() {
 					return;
 				} else {
 					last_command = corrected_command;
-					let msg = execution.err().unwrap();
-					error_msg = msg.to_lowercase();
+					error_msg = execution.err().unwrap();
 
 					let retry_message = format!("{}...", t!("retry"));
 
