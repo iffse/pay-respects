@@ -79,7 +79,7 @@ command = "world"
 # you can add as many `[[match_err]]` section as you want
 [[match_err]]
 # the suggestion of this section will be used for the following patterns of the error output
-# note that the error is formatted to lowercase without extra spaces
+# note that the error is formatted to lowercase
 pattern = [
 	"pattern 1",
 	"pattern 2"

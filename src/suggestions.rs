@@ -243,7 +243,10 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 				.env("LC_ALL", "C")
 				.output()
 				.expect("failed to execute process");
-			let error_msg = String::from_utf8_lossy(&process.stderr);
+			let error_msg = match process.stderr.is_empty() {
+				true => String::from_utf8_lossy(&process.stdout),
+				false => String::from_utf8_lossy(&process.stderr),
+			};
 			return Err(error_msg.to_string());
 		}
 	}
@@ -273,7 +276,10 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 			.env("LC_ALL", "C")
 			.output()
 			.expect("failed to execute process");
-		let error_msg = String::from_utf8_lossy(&process.stderr);
+		let error_msg = match process.stderr.is_empty() {
+			true => String::from_utf8_lossy(&process.stdout),
+			false => String::from_utf8_lossy(&process.stderr),
+		};
 		Err(error_msg.to_string())
 	}
 }
