@@ -7,7 +7,7 @@ pub fn handle_args() {
 	}
 	let mut auto_aliasing = String::new();
 	let mut shell = String::new();
-	let mut index = 0;
+	let mut index = 1;
 	while index < args.len() {
 		match args[index].as_str() {
 			"-h" | "--help" => {
