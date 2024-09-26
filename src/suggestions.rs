@@ -277,8 +277,8 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 			.output()
 			.expect("failed to execute process");
 		let error_msg = match process.stderr.is_empty() {
-			true => String::from_utf8_lossy(&process.stdout),
-			false => String::from_utf8_lossy(&process.stderr),
+			true => String::from_utf8_lossy(&process.stdout).to_lowercase(),
+			false => String::from_utf8_lossy(&process.stderr).to_lowercase(),
 		};
 		Err(error_msg.to_string())
 	}
