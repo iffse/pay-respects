@@ -29,6 +29,8 @@ i18n!("i18n", fallback = "en", minify_key = true);
 
 fn main() {
 	colored::control::set_override(true);
+	let locale = std::env::var("LANG").unwrap_or("en_US".to_string());
+	rust_i18n::set_locale(&locale[0..2]);
 
 	args::handle_args();
 
