@@ -8,7 +8,7 @@ Example 1, manual aliasing: `%{manual}`
 
 The command will output the command that you can use to execute the binary with
 the correct environment. You can alias such output to a shorter key. Such as
-%{manual_example})
+`%{manual_example}`)
 
 Example 2, auto aliasing: `%{auto}`
 
@@ -23,7 +23,7 @@ Ejemplo 1, alias manual: `%{manual}`
 
 El comando mostrará el comando que puedes usar para ejecutar el binario con el
 entorno correcto. Puedes asociar dicho comando a una tecla más corta. Por ejemplo
-%{manual_example})
+`%{manual_example}`)
 
 Ejemplo 2, alias automático: `%{auto}`
 
@@ -38,7 +38,7 @@ Beispiel 1, manuelles Alias: `%{manual}`
 
 Der Befehl gibt den Befehl aus, den du verwenden kannst, um das Binär mit der
 richtigen Umgebung auszuführen. Du kannst ein solches Ergebnis einem kürzeren
-Schlüssel zuordnen. Zum Beispiel %{manual_example})
+Schlüssel zuordnen. Zum Beispiel `%{manual_example}`)
 
 Beispiel 2, automatisches Alias: `%{auto}`
 
@@ -53,7 +53,7 @@ Exemple 1, alias manuel: `%{manual}`
 
 La commande affichera la commande que vous pouvez utiliser pour exécuter le
 binaire avec l'environnement correct. Vous pouvez associer une telle sortie à
-une touche plus courte. Par exemple %{manual_example})
+une touche plus courte. Par exemple `%{manual_example}`)
 
 Exemple 2, alias automatique: `%{auto}`
 
@@ -68,7 +68,7 @@ Esempio 1, alias manuale: `%{manual}`
 
 Il comando restituirà il comando che puoi utilizzare per eseguire il binario con
 l'ambiente corretto. Puoi associare tale output a una chiave più corta. Ad
-esempio %{manual_example})
+esempio `%{manual_example}`)
 
 Esempio 2, alias automatico: `%{auto}`
 
@@ -83,7 +83,7 @@ Exemplo 1, alias manual: `%{manual}`
 
 O comando exibirá o comando que você pode usar para executar o binário com o
 ambiente correto. Você pode associar tal saída a uma tecla mais curta. Por
-exemplo %{manual_example})
+exemplo `%{manual_example}`)
 
 Exemplo 2, alias automático: `%{auto}`
 
@@ -98,7 +98,7 @@ ru = '''
 
 Команда выведет команду, которую вы можете использовать для выполнения бинарного
 файла с правильной средой. Вы можете создать псевдоним для такого вывода с
-помощью более короткого ключа. Например, %{manual_example})
+помощью более короткого ключа. Например, `%{manual_example}`)
 
 Пример 2, автоматическое создание псевдонима: `%{auto}`
 
@@ -112,7 +112,7 @@ ja = '''
 例1、手動エイリアス: `%{manual}`
 
 コマンドは、正しい環境でバイナリを実行するために使用できるコマンドを出力します。
-そのような出力を短いキーにエイリアスすることができます。例えば、%{manual_example})
+そのような出力を短いキーにエイリアスすることができます。例えば、`%{manual_example}`)
 
 例2、自動エイリアス: `%{auto}`
 
@@ -125,7 +125,7 @@ ko = '''
 예 1, 수동 별칭: `%{manual}`
 
 명령은 올바른 환경에서 바이너리를 실행하는 데 사용할 수 있는 명령을 출력합니다.
-이러한 출력을 더 짧은 키에 별칭 지정할 수 있습니다. 예를 들어 %{manual_example})
+이러한 출력을 더 짧은 키에 별칭 지정할 수 있습니다. 예를 들어 `%{manual_example}`)
 
 예 2, 자동 별칭: `%{auto}`
 
@@ -138,7 +138,7 @@ zh = '''
 示例 1，手动别名: `%{manual}`
 
 该命令将输出可用于使用正确环境执行二进制文件的命令。您可以将此类输出别名为更短的键。
-例如 %{manual_example})
+例如 `%{manual_example}`)
 
 示例 2，自动别名: `%{auto}`
 
@@ -147,16 +147,16 @@ zh = '''
 '''
 
 [no-env-setup]
-en = "No %{var} in environment. Did you aliased the command with the correct argument?\n\nUse `%{help}` for help."
-es = "No se encontró %{var} en el entorno. ¿Has aliased el comando con el argumento correcto?\n\nUsa `%{help}` para obtener ayuda."
-de = "Kein %{var} in der Umgebung gefunden. Hast du den Befehl mit dem richtigen Argument verknüpft?\n\nVerwende `%{help}` für Hilfe."
-fr = "Pas de %{var} dans l'environnement. Avez-vous aliased la commande avec le bon argument?\n\nUtilisez `%{help}` pour obtenir de l'aide."
-it = "Nessun %{var} nell'ambiente. Hai associato il comando con l'argomento corretto?\n\nUsa `%{help}` per ottenere aiuto."
-pt = "Nenhum %{var} no ambiente. Você aliou o comando com o argumento correto?\n\nUse `%{help}` para obter ajuda."
-ru = "Переменная %{var} не найдена в среде. Вы алиасили команду с правильным аргументом?\n\nИспользуйте `%{help}` для помощи."
-ja = "環境変数に %{var} が見つかりません。コマンドに正しい引数をエイリアスしましたか？\n\nヘルプを表示するには `%{help}` を使用してください。"
-ko = "환경 변수에 %{var}가 없습니다. 올바른 인수로 명령을 별칭했습니까?\n\n도움말을 보려면 `%{help}`를 사용하십시오."
-zh = "环境中没有 %{var}。您是否使用正确的参数别名了命令？\n\n使用 `%{help}` 获取帮助。"
+en = "No %{var} in environment. Have you aliased the command with the correct argument?\n\nUse `%{help}` for help."
+es = "No se encontró %{var} en el entorno. ¿Has aliado el comando con el argumento correcto?\n\nUsa `%{help}` para obtener ayuda."
+de = "Kein %{var} in der Umgebung gefunden. Hast du den Befehl mit dem richtigen Argument verknüpft?\n\nBenutze `%{help}` für Hilfe."
+fr = "Aucun %{var} trouvé dans l'environnement. Avez-vous associé la commande avec le bon argument ?\n\nUtilisez `%{help}` pour obtenir de l'aide."
+it = "Nessun %{var} trovato nell'ambiente. Hai associato il comando con l'argomento corretto?\n\nUsa `%{help}` per ottenere aiuto."
+pt = "Nenhum %{var} encontrado no ambiente. Você associou o comando com o argumento correto?\n\nUse `%{help}` para obter ajuda."
+ru = "Переменная %{var} не найдена в окружении. Вы создали псевдоним для команды с правильным аргументом?\n\nИспользуйте `%{help}` для помощи."
+ja = "環境変数 %{var} が見つかりません。コマンドを正しい引数でエイリアスしましたか？\n\nヘルプを表示するには `%{help}` を使用してください。"
+ko = "환경 변수 %{var}을(를) 찾을 수 없습니다. 명령을 올바른 인수로 별칭 지정했습니까?\n\n도움말을 보려면 `%{help}`를 사용하십시오."
+zh = "在环境中找不到 %{var}。您是否使用正确的参数别名了命令？\n\n使用 `%{help}` 获取帮助。"
 
 [no-shell]
 en = "No shell specified. Please specify a shell."
