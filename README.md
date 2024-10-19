@@ -134,3 +134,9 @@ Current option to write rules should cover most of the cases.
 
 We need more rule files, contributions are welcomed!
 
+This project is hosted at various sites, choose the one that suits you best:
+
+- [Codeberg](https://codeberg.org/iff/pay-respects)
+- [GitHub](https://github.com/iffse/pay-respects)
+- [GitLab](https://gitlab.com/iffse/pay-respects)
+
