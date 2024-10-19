@@ -29,7 +29,7 @@ pub fn command_output(shell: &str, command: &str) -> String {
 		Ok(output) => match output.stderr.is_empty() {
 			true => String::from_utf8_lossy(&output.stdout).to_lowercase(),
 			false => String::from_utf8_lossy(&output.stderr).to_lowercase(),
-		}
+		},
 		Err(_) => {
 			use colored::*;
 			eprintln!("Timeout while executing command: {}", command.red());
