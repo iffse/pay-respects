@@ -57,11 +57,11 @@ fn main() {
 		};
 
 		let highlighted_suggestion = {
-			let deffirence = highlight_difference(&shell, &suggestion, &last_command);
-			if deffirence.is_none() {
+			let difference = highlight_difference(&shell, &suggestion, &last_command);
+			if difference.is_none() {
 				break;
 			};
-			deffirence.unwrap()
+			difference.unwrap()
 		};
 
 		let execution =
