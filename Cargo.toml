@@ -16,6 +16,7 @@ include = [
 
 [dependencies]
 colored = "2.0"
+sys-locale = "0.3.2"
 rust-i18n = "3"
 regex-lite = "0.1"
 
