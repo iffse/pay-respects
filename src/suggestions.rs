@@ -6,9 +6,8 @@ use std::time::{Duration, Instant};
 use colored::Colorize;
 use regex_lite::Regex;
 
-use pay_respects_parser::parse_rules;
-
 use crate::files::{get_best_match_file, get_path_files};
+use crate::rules::match_pattern;
 use crate::shell::PRIVILEGE_LIST;
 
 pub fn suggest_command(shell: &str, last_command: &str, error_msg: &str) -> Option<String> {
@@ -48,16 +47,7 @@ pub fn suggest_command(shell: &str, last_command: &str, error_msg: &str) -> Opti
 	None
 }
 
-fn match_pattern(
-	executable: &str,
-	last_command: &str,
-	error_msg: &str,
-	shell: &str,
-) -> Option<String> {
-	parse_rules!("rules");
-}
-
-fn check_executable(shell: &str, executable: &str) -> bool {
+pub fn check_executable(shell: &str, executable: &str) -> bool {
 	match shell {
 		"nu" => std::process::Command::new(shell)
 			.arg("-c")
@@ -76,7 +66,7 @@ fn check_executable(shell: &str, executable: &str) -> bool {
 	}
 }
 
-fn opt_regex(regex: &str, command: &mut String) -> String {
+pub fn opt_regex(regex: &str, command: &mut String) -> String {
 	let regex = Regex::new(regex).unwrap();
 	let opts = regex
 		.find_iter(command)
@@ -89,7 +79,7 @@ fn opt_regex(regex: &str, command: &mut String) -> String {
 	opts.join(" ")
 }
 
-fn err_regex(regex: &str, error_msg: &str) -> String {
+pub fn err_regex(regex: &str, error_msg: &str) -> String {
 	let regex = Regex::new(regex).unwrap();
 	let err = regex
 		.find_iter(error_msg)
@@ -99,7 +89,7 @@ fn err_regex(regex: &str, error_msg: &str) -> String {
 	err.join(" ")
 }
 
-fn cmd_regex(regex: &str, command: &str) -> String {
+pub fn cmd_regex(regex: &str, command: &str) -> String {
 	let regex = Regex::new(regex).unwrap();
 	let err = regex
 		.find_iter(command)
@@ -109,7 +99,7 @@ fn cmd_regex(regex: &str, command: &str) -> String {
 	err.join(" ")
 }
 
-fn eval_shell_command(shell: &str, command: &str) -> Vec<String> {
+pub fn eval_shell_command(shell: &str, command: &str) -> Vec<String> {
 	let output = std::process::Command::new(shell)
 		.arg("-c")
 		.arg(command)
@@ -135,7 +125,7 @@ pub fn split_command(command: &str) -> Vec<String> {
 	split_command
 }
 
-fn suggest_typo(typos: &[String], candidates: &[String]) -> String {
+pub fn suggest_typo(typos: &[String], candidates: &[String]) -> String {
 	let mut path_files = Vec::new();
 	let mut suggestions = Vec::new();
 	for typo in typos {
@@ -181,7 +171,7 @@ pub fn find_similar(typo: &str, candidates: &[String]) -> Option<String> {
 }
 
 #[allow(clippy::needless_range_loop)]
-fn compare_string(a: &str, b: &str) -> usize {
+pub fn compare_string(a: &str, b: &str) -> usize {
 	let mut matrix = vec![vec![0; b.chars().count() + 1]; a.chars().count() + 1];
 
 	for i in 0..a.chars().count() + 1 {
