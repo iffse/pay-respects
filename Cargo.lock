@@ -37,9 +37,9 @@ checksum = "b048fb63fd8b5923fc5aa7b340d8e156aec7ec02f0c78fa8a6ddc2613f6f71de"
 
 [[package]]
 name = "bstr"
-version = "1.10.0"
+version = "1.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "40723b8fb387abc38f4f4a37c09073622e41dd12327033091ef8950659e6dc0c"
+checksum = "1a68f1f47cdf0ec8ee4b941b2eee2a80cb796db73118c0dd09ac63fbe405be22"
 dependencies = [
  "memchr",
  "serde",
@@ -244,20 +244,22 @@ checksum = "1261fe7e33c73b354eab43b1273a57c8f967d0391e80353e51f764ac02cf6775"
 
 [[package]]
 name = "pay-respects"
-version = "0.4.18"
+version = "0.5.0"
 dependencies = [
  "colored",
  "pay-respects-parser",
  "regex-lite",
  "rust-i18n",
+ "serde",
  "sys-locale",
+ "toml",
 ]
 
 [[package]]
 name = "pay-respects-parser"
-version = "0.2.2"
+version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c8369efcde0ef26e4d0b31377d2571ee5326fe446feb5950da0c48766a178ed5"
+checksum = "2a340ac0c985d74fed32eed5ca2623d9444af503199c40ca9ee6ea9faddcc58e"
 dependencies = [
  "proc-macro2",
  "quote",
