@@ -25,6 +25,11 @@ mod shell;
 mod style;
 mod suggestions;
 
+#[cfg(feature = "runtime-rules")]
+mod replaces;
+#[cfg(feature = "runtime-rules")]
+mod runtime_rules;
+
 #[macro_use]
 extern crate rust_i18n;
 i18n!("i18n", fallback = "en", minify_key = true);

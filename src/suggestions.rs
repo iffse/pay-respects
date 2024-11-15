@@ -44,6 +44,19 @@ pub fn suggest_command(shell: &str, last_command: &str, error_msg: &str) -> Opti
 		}
 		return Some(suggest);
 	}
+
+	#[cfg(feature = "runtime-rules")]
+	{
+		use crate::runtime_rules::runtime_match;
+		let suggest = runtime_match(executable, last_command, error_msg, shell);
+		if let Some(suggest) = suggest {
+			if PRIVILEGE_LIST.contains(&split_command[0].as_str()) {
+				return Some(format!("{} {}", split_command[0], suggest));
+			}
+			return Some(suggest);
+		}
+	}
+
 	None
 }
 
@@ -125,7 +138,7 @@ pub fn split_command(command: &str) -> Vec<String> {
 	split_command
 }
 
-pub fn suggest_typo(typos: &[String], candidates: &[String]) -> String {
+pub fn suggest_typo(typos: &[String], candidates: Vec<String>) -> String {
 	let mut path_files = Vec::new();
 	let mut suggestions = Vec::new();
 	for typo in typos {
@@ -147,14 +160,14 @@ pub fn suggest_typo(typos: &[String], candidates: &[String]) -> String {
 				}
 				_ => {}
 			}
-		} else if let Some(suggest) = find_similar(typo, candidates) {
+		} else if let Some(suggest) = find_similar(typo, &candidates) {
 			suggestions.push(suggest);
 		}
 	}
 	suggestions.join(" ")
 }
 
-pub fn find_similar(typo: &str, candidates: &[String]) -> Option<String> {
+pub fn find_similar(typo: &str, candidates: &Vec<String>) -> Option<String> {
 	let mut min_distance = 10;
 	let mut min_distance_index = None;
 	for (i, candidate) in candidates.iter().enumerate() {
