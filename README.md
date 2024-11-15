@@ -70,7 +70,7 @@ Rule files are parsed at compilation. Everything in rule files is converted to R
 
 If only rules are changed, cargo won't recompile the project because Rust code were intact. You will have to notify it manually by:
 ```shell
-touch src/suggestions.rs && cargo build
+touch src/rules.rs && cargo build
 ```
 
 Syntax of a rule file (will be read by simply placing the file under [rules](./rules)):
