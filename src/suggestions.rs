@@ -8,7 +8,7 @@ use regex_lite::Regex;
 
 use crate::files::{get_best_match_file, get_path_files};
 use crate::rules::match_pattern;
-use crate::shell::PRIVILEGE_LIST;
+use crate::shell::{expand_alias, PRIVILEGE_LIST};
 
 pub fn suggest_command(shell: &str, last_command: &str, error_msg: &str) -> Option<String> {
 	let split_command = split_command(last_command);
@@ -217,7 +217,8 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 		if !command.starts_with(&_p) {
 			continue;
 		}
-		let command = command.replacen(&_p, "", 1);
+		let mut command = command.replacen(&_p, "", 1);
+		command = expand_alias(shell, &command);
 
 		let now = Instant::now();
 		let process = std::process::Command::new(p)
@@ -254,10 +255,11 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 		}
 	}
 
+	let command = expand_alias(shell, command);
 	let now = Instant::now();
 	let process = std::process::Command::new(shell)
 		.arg("-c")
-		.arg(command)
+		.arg(&command)
 		// .stdout(Stdio::inherit())
 		.stdout(stderr().as_fd().try_clone_to_owned().unwrap())
 		.stderr(Stdio::inherit())
@@ -299,5 +301,5 @@ fn shell_evaluated_commands(command: &str) -> String {
 		}
 	}
 
-	commands.join(" && ")
+	commands.join(" && \\ \n")
 }

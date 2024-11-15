@@ -38,7 +38,7 @@ pub fn command_output(shell: &str, command: &str) -> String {
 	}
 }
 
-fn last_command(shell: &str) -> String {
+pub fn last_command(shell: &str) -> String {
 	let last_command = match std::env::var("_PR_LAST_COMMAND") {
 		Ok(command) => command,
 		Err(_) => {
@@ -69,25 +69,24 @@ fn last_command(shell: &str) -> String {
 	}
 }
 
-pub fn last_command_expanded_alias(shell: &str) -> String {
+pub fn expand_alias(shell: &str, full_command: &str) -> String {
 	let alias = std::env::var("_PR_ALIAS").expect(&t!(
 		"no-env-setup",
 		var = "_PR_ALIAS",
 		help = "pay-respects -h"
 	));
-	let last_command = last_command(shell);
 	if alias.is_empty() {
-		return last_command;
+		return full_command.to_string();
 	}
 
-	let split_command = last_command.split_whitespace().collect::<Vec<&str>>();
+	let split_command = full_command.split_whitespace().collect::<Vec<&str>>();
 	let command = if PRIVILEGE_LIST.contains(&split_command[0]) {
 		split_command[1]
 	} else {
 		split_command[0]
 	};
 
-	let mut expanded_command = command.to_string();
+	let mut expanded_command = Option::None;
 
 	match shell {
 		"bash" => {
@@ -96,7 +95,7 @@ pub fn last_command_expanded_alias(shell: &str) -> String {
 					let alias = line.replace(format!("alias {}='", command).as_str(), "");
 					let alias = alias.trim_end_matches('\'').trim_start_matches('\'');
 
-					expanded_command = alias.to_string();
+					expanded_command = Some(alias.to_string());
 				}
 			}
 		}
@@ -106,7 +105,7 @@ pub fn last_command_expanded_alias(shell: &str) -> String {
 					let alias = line.replace(format!("{}=", command).as_str(), "");
 					let alias = alias.trim_start_matches('\'').trim_end_matches('\'');
 
-					expanded_command = alias.to_string();
+					expanded_command = Some(alias.to_string());
 				}
 			}
 		}
@@ -116,7 +115,7 @@ pub fn last_command_expanded_alias(shell: &str) -> String {
 					let alias = line.replace(format!("alias {} ", command).as_str(), "");
 					let alias = alias.trim_start_matches('\'').trim_end_matches('\'');
 
-					expanded_command = alias.to_string();
+					expanded_command = Some(alias.to_string());
 				}
 			}
 		}
@@ -126,7 +125,11 @@ pub fn last_command_expanded_alias(shell: &str) -> String {
 		}
 	};
 
-	last_command.replacen(command, &expanded_command, 1)
+	if expanded_command.is_none() {
+		full_command.to_string()
+	} else {
+		full_command.replacen(command, &expanded_command.unwrap(), 1)
+	}
 }
 
 pub fn initialization(shell: &str, binary_path: &str, auto_alias: &str) {

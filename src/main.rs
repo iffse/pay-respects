@@ -53,7 +53,8 @@ fn main() {
 		}
 	};
 
-	let mut last_command = shell::last_command_expanded_alias(&shell);
+	let mut last_command = shell::last_command(&shell);
+	last_command = shell::expand_alias(&shell, &last_command);
 	let mut error_msg = command_output(&shell, &last_command);
 	loop {
 		let suggestion = {

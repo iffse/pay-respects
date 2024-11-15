@@ -15,5 +15,5 @@ pattern = [
 ]
 suggest = [
 '''
-ls {{command[1:]}} --almost-all --color=auto --group-directories-first '''
+ls {{command[1:]}}'''
 ]
