@@ -20,13 +20,25 @@ pub fn runtime_match(
 ) -> Option<String> {
 	let xdg_config_home = std::env::var("XDG_CONFIG_HOME")
 		.unwrap_or_else(|_| std::env::var("HOME").unwrap() + "/.config");
-	let rule_dir = format!("{}/pay-respects/rules", xdg_config_home);
+	let xdg_config_dirs = std::env::var("XDG_CONFIG_DIRS").unwrap_or("/etc/xdg".to_owned());
 
-	let file = format!("{}/{}.toml", rule_dir, executable);
+	let user_rule_dir = format!("{}/pay-respects/rules", xdg_config_home);
+	let system_rule_dir = format!("{}/pay-respects/rules", xdg_config_dirs);
 
-	if !std::path::Path::new(&file).exists() {
+
+	let user_rule_file = format!("{}/{}.toml", user_rule_dir, executable);
+	let system_rule_file = format!("{}/{}.toml", system_rule_dir, executable);
+
+	let file;
+
+	if std::path::Path::new(&user_rule_file).exists() {
+		file = user_rule_file;
+	} else if std::path::Path::new(&system_rule_file).exists() {
+		file = system_rule_file;
+	} else {
 		return None;
 	}
+
 
 	let file = std::fs::read_to_string(file).unwrap();
 	let rule: Rule = toml::from_str(&file).unwrap();
