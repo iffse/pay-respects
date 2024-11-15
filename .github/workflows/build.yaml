@@ -17,7 +17,7 @@ jobs:
 
     - name: build
       run: |
-        cargo build --release
+        cargo build --release --all-features
 
     - name: Zipping files
       run: |
