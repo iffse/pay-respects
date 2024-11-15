@@ -23,6 +23,7 @@ pub fn runtime_match(
 	let rule_dir = format!("{}/pay-respects/rules", xdg_config_home);
 
 	let file = format!("{}/{}.toml", rule_dir, executable);
+
 	if !std::path::Path::new(&file).exists() {
 		return None;
 	}
@@ -30,6 +31,8 @@ pub fn runtime_match(
 	let file = std::fs::read_to_string(file).unwrap();
 	let rule: Rule = toml::from_str(&file).unwrap();
 	let split_command = split_command(&last_command);
+
+	let mut pure_suggest;
 
 	for match_err in rule.match_err {
 		for pattern in match_err.pattern {
@@ -75,14 +78,15 @@ pub fn runtime_match(
 							}
 						}
 
-						// replacing placeholders
-						let mut suggest = lines.join("\n").to_owned();
-						if suggest.contains("{{command}}") {
-							suggest = suggest.replace("{{command}}", last_command);
-						}
-						eval_suggest(&suggest, last_command, error_msg, shell, &split_command);
-						return Some(suggest);
+						pure_suggest = lines.join("\n").to_owned();
+					} else {
+						pure_suggest = suggest.to_owned();
 					}
+					// replacing placeholders
+					if pure_suggest.contains("{{command}}") {
+						pure_suggest = pure_suggest.replace("{{command}}", last_command);
+					}
+					return eval_suggest(&pure_suggest, last_command, error_msg, shell, &split_command);
 				}
 			}
 		}
