@@ -57,7 +57,7 @@ pub fn command(suggest: &mut String, split_command: &Vec<String>) {
 		if let Some((start, end)) = range.split_once(':') {
 			let mut start_index = start.parse::<i32>().unwrap_or(0);
 			if start_index < 0 {
-				start_index = split_command.len() as i32 - start_index;
+				start_index = split_command.len() as i32 + start_index;
 			};
 			let mut end_index;
 			let parsed_end = end.parse::<i32>();
@@ -66,7 +66,7 @@ pub fn command(suggest: &mut String, split_command: &Vec<String>) {
 			} else {
 				end_index = parsed_end.unwrap();
 				if end_index < 0 {
-					end_index = split_command.len() as i32 - end_index + 1;
+					end_index = split_command.len() as i32 + end_index + 1;
 				} else {
 					end_index = end_index + 1;
 				}
@@ -97,7 +97,7 @@ pub fn typo(suggest: &mut String, split_command: &Vec<String>) {
 				let command_index = command_index.parse::<i32>().unwrap();
 
 				let index = if command_index < 0 {
-					split_command.len() as i32 - command_index
+					split_command.len() as i32 + command_index
 				} else {
 					command_index
 				};
@@ -106,7 +106,7 @@ pub fn typo(suggest: &mut String, split_command: &Vec<String>) {
 				let (start, end) = command_index.split_once(':').unwrap();
 				let start = start.parse::<i32>().unwrap_or(0);
 				let start_index = if start < 0 {
-					split_command.len() as i32 - start
+					split_command.len() as i32 + start
 				} else {
 					start
 				};
@@ -116,7 +116,7 @@ pub fn typo(suggest: &mut String, split_command: &Vec<String>) {
 				} else {
 					let end = end.unwrap();
 					if end < 0 {
-						split_command.len() as i32 - end + 1
+						split_command.len() as i32 + end + 1
 					} else {
 						end + 1
 					}
