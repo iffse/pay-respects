@@ -62,9 +62,13 @@ fn print_help() {
 }
 
 fn print_version() {
-	println!("version: {}", option_env!("CARGO_PKG_VERSION").unwrap_or("unknown"));
+	println!(
+		"version: {}",
+		option_env!("CARGO_PKG_VERSION").unwrap_or("unknown")
+	);
 	println!("compile features:");
-	#[cfg(feature = "runtime-rules")] {
+	#[cfg(feature = "runtime-rules")]
+	{
 		println!("  - runtime-rules");
 	}
 	std::process::exit(0);

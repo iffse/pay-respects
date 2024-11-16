@@ -84,7 +84,7 @@ pub fn command(suggest: &mut String, split_command: &Vec<String>) {
 	}
 }
 
-pub fn typo(suggest: &mut String, split_command: &Vec<String>) {
+pub fn typo(suggest: &mut String, split_command: &Vec<String>, shell: &str) {
 	while suggest.contains("{{typo") {
 		let (placeholder, args) = eval_placeholder(suggest, "{{typo", "}}");
 
@@ -148,13 +148,14 @@ pub fn typo(suggest: &mut String, split_command: &Vec<String>) {
 			.collect::<Vec<String>>();
 
 		let command;
-		// if match_list[0].starts_with("eval_shell_command(") {
-		// 	// FIXME
-		let match_list = match_list
-			.iter()
-			.map(|s| s.trim().to_string())
-			.collect::<Vec<String>>();
-		command = suggest_typo(&split_command[index], match_list);
+		if match_list[0].starts_with("{{shell") {
+			let function = match_list.join(",");
+			let (_, args) = eval_placeholder(&function, "{{shell", "}}");
+			let function = &function[args.to_owned()].trim_matches(|c| c == '(' || c == ')');
+			command = suggest_typo(&split_command[index], eval_shell_command(shell, function));
+		} else {
+			command = suggest_typo(&split_command[index], match_list);
+		}
 
 		suggest.replace_range(placeholder, &command);
 	}

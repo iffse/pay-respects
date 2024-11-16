@@ -170,7 +170,7 @@ fn eval_suggest(
 	replaces::err(&mut suggest, error_msg);
 	replaces::command(&mut suggest, split_command);
 	replaces::shell(&mut suggest, shell);
-	replaces::typo(&mut suggest, split_command);
+	replaces::typo(&mut suggest, split_command, shell);
 
 	Some(suggest)
 }
