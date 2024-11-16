@@ -90,6 +90,6 @@ fn main() {
 	eprintln!(
 		"{}\n{}",
 		t!("contribute"),
-		"https://github.com/iffse/pay-respects"
+		option_env!("CARGO_PKG_REPOSITORY").unwrap_or("https://github.com/iffse/pay-respects/")
 	);
 }
