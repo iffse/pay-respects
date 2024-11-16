@@ -1,0 +1,11 @@
+command = "pacman"
+
+[[match_err]]
+pattern = [
+	"no operation specified"
+]
+suggest = [
+'''
+{{command}} -Syu'''
+]
+
