@@ -171,6 +171,9 @@ pub fn find_similar(typo: &str, candidates: &Vec<String>) -> Option<String> {
 	let mut min_distance = 10;
 	let mut min_distance_index = None;
 	for (i, candidate) in candidates.iter().enumerate() {
+		if candidate.is_empty() {
+			continue;
+		}
 		let distance = compare_string(typo, candidate);
 		if distance < min_distance {
 			min_distance = distance;

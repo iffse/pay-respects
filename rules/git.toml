@@ -69,10 +69,12 @@ replace,
 pattern = [
 	"did not match any file"
 ]
+# alternatively `git checkout {{typo[2]({{shell(git branch | sed 's/^*//')}})}}`
 suggest = [
 '''
 #[cmd_contains(checkout)]
-git checkout {{typo[2]({{shell(git branch)}})}} '''
+git branch {{command[2]}} && \
+git checkout {{command[2]}} '''
 ]
 
 [[match_err]]
