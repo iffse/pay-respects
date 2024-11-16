@@ -37,7 +37,7 @@ pub fn opts(suggest: &mut String, last_command: &mut String, opt_list: &mut Vec<
 	}
 }
 
-pub fn cmd_reg(suggest: &mut String, last_command: &mut String) {
+pub fn cmd_reg(suggest: &mut String, last_command: &String) {
 	while suggest.contains("{{cmd::") {
 		let (placeholder, args) = eval_placeholder(suggest, "{{cmd::", "}}");
 
