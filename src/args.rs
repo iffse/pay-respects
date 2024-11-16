@@ -13,6 +13,9 @@ pub fn handle_args() {
 			"-h" | "--help" => {
 				print_help();
 			}
+			"-v" | "--version" => {
+				print_version();
+			}
 			"-a" | "--alias" => {
 				if args.len() > index + 1 {
 					if args[index + 1].starts_with('-') {
@@ -55,5 +58,14 @@ fn print_help() {
 			auto_example_fish = "pay-respects fish --alias | source",
 		)
 	);
+	std::process::exit(0);
+}
+
+fn print_version() {
+	println!("version: {}", option_env!("CARGO_PKG_VERSION").unwrap_or("unknown"));
+	println!("compile features:");
+	#[cfg(feature = "runtime-rules")] {
+		println!("  - runtime-rules");
+	}
 	std::process::exit(0);
 }
