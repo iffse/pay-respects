@@ -41,11 +41,9 @@ Shell is not obtained automatically through environment variables because it won
 
 ## Installing
 
-If you are using Arch Linux, you can install from AUR directly:
-```shell
-paru -S pay-respects     # compile from source
-paru -S pay-respects-bin # binary version
-```
+Install from your package manager if available:
+
+[![Packaging status](https://repology.org/badge/vertical-allrepos/pay-respects.svg)](https://repology.org/project/pay-respects/versions)
 
 Or if you have cargo installed:
 ```shell
