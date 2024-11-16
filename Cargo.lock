@@ -244,7 +244,7 @@ checksum = "1261fe7e33c73b354eab43b1273a57c8f967d0391e80353e51f764ac02cf6775"
 
 [[package]]
 name = "pay-respects"
-version = "0.5.0"
+version = "0.5.2"
 dependencies = [
  "colored",
  "pay-respects-parser",
@@ -257,9 +257,9 @@ dependencies = [
 
 [[package]]
 name = "pay-respects-parser"
-version = "0.2.3"
+version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2a340ac0c985d74fed32eed5ca2623d9444af503199c40ca9ee6ea9faddcc58e"
+checksum = "61bbafecf4ad11407c7c6034a1cdfe660e67a3fd62fc75ad7d5f9ea23dfc8efe"
 dependencies = [
  "proc-macro2",
  "quote",
