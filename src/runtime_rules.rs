@@ -164,13 +164,18 @@ fn eval_suggest(
 	}
 
 	let mut last_command = last_command.to_owned();
+	let mut opt_list = Vec::new();
 
-	replaces::opts(&mut suggest, &mut last_command);
+	replaces::opts(&mut suggest, &mut last_command, &mut opt_list);
 	replaces::cmd_reg(&mut suggest, &mut last_command);
 	replaces::err(&mut suggest, error_msg);
 	replaces::command(&mut suggest, split_command);
 	replaces::shell(&mut suggest, shell);
 	replaces::typo(&mut suggest, split_command, shell);
+
+	for (tag, value) in opt_list {
+		suggest = suggest.replace(&tag, &value);
+	}
 
 	Some(suggest)
 }

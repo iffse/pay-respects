@@ -1,5 +1,9 @@
 use crate::suggestions::*;
 
+fn tag(name: &str, x: i32) -> String {
+	format!("{{{}{}}}", name, x)
+}
+
 pub fn eval_placeholder(
 	string: &str,
 	start: &str,
@@ -15,15 +19,21 @@ pub fn eval_placeholder(
 	(placeholder, args)
 }
 
-pub fn opts(suggest: &mut String, last_command: &mut String) {
+pub fn opts(suggest: &mut String, last_command: &mut String, opt_list: &mut Vec<(String, String)>) {
+	let mut replace_tag = 0;
+	let tag_name = "opts";
+
 	while suggest.contains("{{opt::") {
 		let (placeholder, args) = eval_placeholder(suggest, "{{opt::", "}}");
 
 		let opt = &suggest[args.to_owned()];
 		let regex = opt.trim();
+		let current_tag = tag(tag_name, replace_tag);
 
-		let command = opt_regex(regex, last_command);
-		suggest.replace_range(placeholder, &command)
+		opt_list.push((current_tag.clone(), opt_regex(regex, last_command)));
+		suggest.replace_range(placeholder, &current_tag);
+
+		replace_tag += 1;
 	}
 }
 
