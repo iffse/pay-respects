@@ -1,0 +1,11 @@
+command = "cp"
+
+[[match_err]]
+pattern = [
+	"-r not specified",
+]
+suggest = [
+'''
+{{command[0]}} -r {{command[1:]}} '''
+]
+
