@@ -23,6 +23,10 @@ pub fn runtime_match(
 	let xdg_config_dirs = std::env::var("XDG_CONFIG_DIRS").unwrap_or("/etc/xdg".to_owned());
 	let xdg_config_dirs = xdg_config_dirs.split(':').collect::<Vec<&str>>();
 
+	let xdg_data_dirs =
+		std::env::var("XDG_DATA_DIRS").unwrap_or("/usr/local/share:/usr/share".to_owned());
+	let xdg_data_dirs = xdg_data_dirs.split(':').collect::<Vec<&str>>();
+
 	let user_rule_dir = format!("{}/pay-respects/rules", xdg_config_home);
 	let user_rule_file = format!("{}/{}.toml", user_rule_dir, executable);
 
@@ -30,15 +34,25 @@ pub fn runtime_match(
 
 	if std::path::Path::new(&user_rule_file).exists() {
 		file = Some(user_rule_file);
-	} else {
-		for dir in xdg_config_dirs {
+	}
+
+	let check_dirs = |dirs: Vec<&str>| -> Option<String> {
+		for dir in dirs {
 			let rule_dir = format!("{}/pay-respects/rules", dir);
 			let rule_file = format!("{}/{}.toml", rule_dir, executable);
 			if std::path::Path::new(&rule_file).exists() {
-				file = Some(rule_file);
-				break;
+				return Some(rule_file);
 			}
 		}
+		None
+	};
+
+	if file.is_none() {
+		file = check_dirs(xdg_config_dirs);
+	}
+
+	if file.is_none() {
+		file = check_dirs(xdg_data_dirs);
 	}
 
 	if file.is_none() {
@@ -103,7 +117,13 @@ pub fn runtime_match(
 					if pure_suggest.contains("{{command}}") {
 						pure_suggest = pure_suggest.replace("{{command}}", last_command);
 					}
-					return eval_suggest(&pure_suggest, last_command, error_msg, shell, &split_command);
+					return eval_suggest(
+						&pure_suggest,
+						last_command,
+						error_msg,
+						shell,
+						&split_command,
+					);
 				}
 			}
 		}
