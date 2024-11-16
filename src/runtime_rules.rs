@@ -121,8 +121,7 @@ pub fn runtime_match(
 						&pure_suggest,
 						last_command,
 						error_msg,
-						shell,
-						&split_command,
+						shell
 					);
 				}
 			}
@@ -156,7 +155,6 @@ fn eval_suggest(
 	last_command: &str,
 	error_msg: &str,
 	shell: &str,
-	split_command: &Vec<String>,
 ) -> Option<String> {
 	let mut suggest = suggest.to_owned();
 	if suggest.contains("{{command}}") {
@@ -167,11 +165,13 @@ fn eval_suggest(
 	let mut opt_list = Vec::new();
 
 	replaces::opts(&mut suggest, &mut last_command, &mut opt_list);
-	replaces::cmd_reg(&mut suggest, &mut last_command);
+	let split_command = split_command(&last_command);
+
+	replaces::cmd_reg(&mut suggest, &last_command);
 	replaces::err(&mut suggest, error_msg);
-	replaces::command(&mut suggest, split_command);
+	replaces::command(&mut suggest, &split_command);
 	replaces::shell(&mut suggest, shell);
-	replaces::typo(&mut suggest, split_command, shell);
+	replaces::typo(&mut suggest, &split_command, shell);
 
 	for (tag, value) in opt_list {
 		suggest = suggest.replace(&tag, &value);
