@@ -7,7 +7,13 @@ For compile-time rules, if only rules are changed, cargo won't recompile the pro
 touch src/rules.rs && cargo build
 ```
 
-Runtime rules should be placed under `$XDG_CONFIG_HOME/pay-respects/rules/`, for example `$HOME/.config/pay-respects/rules/cargo.toml`. The name of the runtime rule **MUST** match the command name.
+Runtime rules directories are searched, by the order or priority:
+
+- `XDG_CONFIG_HOME`
+- `XDG_CONFIG_DIRS`
+- `XDG_DATA_DIRS`
+
+The actual rule file should be placed under `pay-respects/rules/`, for example: `~/.config/pay-respects/rules/cargo.toml`. Note that for runtime rules, the name of the file **MUST** match the command name.
 
 Syntax of a rule file:
 ```toml
