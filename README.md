@@ -45,13 +45,29 @@ Install from your package manager if available:
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/pay-respects.svg)](https://repology.org/project/pay-respects/versions)
 
-Or if you have cargo installed:
+For generic x86 Linux desktop, you can get the binary from [releases](https://github.com/iffse/pay-respects/releases).
+```shell
+# download lastest release
+curl -sL -o pay-respects.zip \
+$(curl -s https://api.github.com/repos/iffse/pay-respects/releases/latest \
+| sed 's/[()",{}]/ /g; s/ /\n/g' \
+| grep "https.*pay-respects-ubuntu-latest.zip")
+unzip -q pay-respects.zip pay-respects
+rm pay-respects.zip
+
+# system-wide installation
+sudo chmod a+x pay-respects
+sudo mv pay-respects /usr/local/bin/pay-respects
+```
+
+If you have cargo installed, you can compile it from source (should work regardless of operating system or architecture):
 ```shell
 # install from crates.io
 # enabling runtime-rules is optional
 cargo install pay-respects --features=runtime-rules
 
-# clone from git and install, suitable for adding custom compile-time rules
+# clone from git and install
+# suitable for adding custom compile-time rules
 git clone --depth 1 https://github.com/iffse/pay-respects
 cd pay-respects
 cargo install --path .
@@ -60,8 +76,6 @@ cargo install --path .
 # binary can be found at ./target/release/pay-respects
 cargo build --release
 ```
-
-Alternatively, you can download Linux binary from [releases](https://github.com/iffse/pay-respects/releases).
 
 ## Rule Files
 
