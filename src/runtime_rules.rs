@@ -117,12 +117,7 @@ pub fn runtime_match(
 					if pure_suggest.contains("{{command}}") {
 						pure_suggest = pure_suggest.replace("{{command}}", last_command);
 					}
-					return eval_suggest(
-						&pure_suggest,
-						last_command,
-						error_msg,
-						shell
-					);
+					return eval_suggest(&pure_suggest, last_command, error_msg, shell);
 				}
 			}
 		}
@@ -150,12 +145,7 @@ fn eval_condition(
 	}
 }
 
-fn eval_suggest(
-	suggest: &str,
-	last_command: &str,
-	error_msg: &str,
-	shell: &str,
-) -> Option<String> {
+fn eval_suggest(suggest: &str, last_command: &str, error_msg: &str, shell: &str) -> Option<String> {
 	let mut suggest = suggest.to_owned();
 	if suggest.contains("{{command}}") {
 		suggest = suggest.replace("{{command}}", "{last_command}");
