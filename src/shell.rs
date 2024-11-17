@@ -192,7 +192,6 @@ pub fn initialization(shell: &str, binary_path: &str, auto_alias: &str) {
 						.expect("Failed to execute process");
 					let config_path = String::from_utf8_lossy(&output.stdout);
 					let mut file = std::fs::OpenOptions::new()
-						.write(true)
 						.append(true)
 						.open(config_path.trim())
 						.expect("Failed to open config file");

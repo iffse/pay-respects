@@ -37,7 +37,7 @@ pub fn opts(suggest: &mut String, last_command: &mut String, opt_list: &mut Vec<
 	}
 }
 
-pub fn cmd_reg(suggest: &mut String, last_command: &String) {
+pub fn cmd_reg(suggest: &mut String, last_command: &str) {
 	while suggest.contains("{{cmd::") {
 		let (placeholder, args) = eval_placeholder(suggest, "{{cmd::", "}}");
 
@@ -59,7 +59,7 @@ pub fn err(suggest: &mut String, error_msg: &str) {
 	}
 }
 
-pub fn command(suggest: &mut String, split_command: &Vec<String>) {
+pub fn command(suggest: &mut String, split_command: &[String]) {
 	while suggest.contains("{{command") {
 		let (placeholder, args) = eval_placeholder(suggest, "{{command", "}}");
 
@@ -67,7 +67,7 @@ pub fn command(suggest: &mut String, split_command: &Vec<String>) {
 		if let Some((start, end)) = range.split_once(':') {
 			let mut start_index = start.parse::<i32>().unwrap_or(0);
 			if start_index < 0 {
-				start_index = split_command.len() as i32 + start_index;
+				start_index += split_command.len() as i32;
 			};
 			let mut end_index;
 			let parsed_end = end.parse::<i32>();
@@ -76,9 +76,9 @@ pub fn command(suggest: &mut String, split_command: &Vec<String>) {
 			} else {
 				end_index = parsed_end.unwrap();
 				if end_index < 0 {
-					end_index = split_command.len() as i32 + end_index + 1;
+					end_index += split_command.len() as i32 + 1;
 				} else {
-					end_index = end_index + 1;
+					end_index += 1;
 				}
 			};
 
@@ -89,12 +89,12 @@ pub fn command(suggest: &mut String, split_command: &Vec<String>) {
 			let range = range.parse::<usize>().unwrap_or(0);
 			let command = &split_command[range];
 
-			suggest.replace_range(placeholder, &command);
+			suggest.replace_range(placeholder, command);
 		}
 	}
 }
 
-pub fn typo(suggest: &mut String, split_command: &Vec<String>, shell: &str) {
+pub fn typo(suggest: &mut String, split_command: &[String], shell: &str) {
 	while suggest.contains("{{typo") {
 		let (placeholder, args) = eval_placeholder(suggest, "{{typo", "}}");
 
@@ -138,8 +138,7 @@ pub fn typo(suggest: &mut String, split_command: &Vec<String>, shell: &str) {
 			unreachable!("Typo suggestion must have a command index");
 		};
 
-		let match_list;
-		if suggest.contains('(') {
+		let match_list = if suggest.contains('(') {
 			let split = suggest[args.to_owned()]
 				.split_once("(")
 				.unwrap()
@@ -147,25 +146,24 @@ pub fn typo(suggest: &mut String, split_command: &Vec<String>, shell: &str) {
 				.rsplit_once(")")
 				.unwrap()
 				.0;
-			match_list = split.split(',').collect::<Vec<&str>>();
+			split.split(',').collect::<Vec<&str>>()
 		} else {
 			unreachable!("Typo suggestion must have a match list");
-		}
+		};
 
 		let match_list = match_list
 			.iter()
 			.map(|s| s.trim().to_string())
 			.collect::<Vec<String>>();
 
-		let command;
-		if match_list[0].starts_with("{{shell") {
+		let command = if match_list[0].starts_with("{{shell") {
 			let function = match_list.join(",");
 			let (_, args) = eval_placeholder(&function, "{{shell", "}}");
 			let function = &function[args.to_owned()].trim_matches(|c| c == '(' || c == ')');
-			command = suggest_typo(&split_command[index], eval_shell_command(shell, function));
+			suggest_typo(&split_command[index], eval_shell_command(shell, function))
 		} else {
-			command = suggest_typo(&split_command[index], match_list);
-		}
+			suggest_typo(&split_command[index], match_list)
+		};
 
 		suggest.replace_range(placeholder, &command);
 	}
