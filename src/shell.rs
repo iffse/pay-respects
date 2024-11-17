@@ -80,10 +80,10 @@ pub fn expand_alias(shell: &str, full_command: &str) -> String {
 	}
 
 	let split_command = full_command.split_whitespace().collect::<Vec<&str>>();
-	let command = if PRIVILEGE_LIST.contains(&split_command[0]) {
-		split_command[1]
+	let (command, pure_command) = if PRIVILEGE_LIST.contains(&split_command[0]) {
+		(split_command[1], Some(split_command[1..].join(" ")))
 	} else {
-		split_command[0]
+		(split_command[0], None)
 	};
 
 	let mut expanded_command = Option::None;
@@ -126,10 +126,28 @@ pub fn expand_alias(shell: &str, full_command: &str) -> String {
 	};
 
 	if expanded_command.is_none() {
-		full_command.to_string()
-	} else {
-		full_command.replacen(command, &expanded_command.unwrap(), 1)
+		return full_command.to_string();
+	};
+
+	let expanded_command = expanded_command.unwrap();
+
+	if pure_command.is_some() {
+		let pure_command = pure_command.unwrap();
+		if pure_command.starts_with(&expanded_command) {
+			return full_command.to_string();
+		}
 	}
+
+	full_command.replacen(command, &expanded_command, 1)
+}
+
+pub fn expand_alias_multiline(shell: &str, full_command: &str) -> String {
+	let lines = full_command.lines().collect::<Vec<&str>>();
+	let mut expanded = String::new();
+	for line in lines {
+		expanded = format!("{}\n{}", expanded, expand_alias(shell, line));
+	}
+	expanded
 }
 
 pub fn initialization(shell: &str, binary_path: &str, auto_alias: &str) {
