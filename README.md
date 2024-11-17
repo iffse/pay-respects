@@ -47,17 +47,22 @@ Install from your package manager if available:
 
 For generic x86 Linux desktop, you can get the binary from [releases](https://github.com/iffse/pay-respects/releases).
 ```shell
-# download lastest release
+# download latest release
 curl -sL -o pay-respects.zip \
 $(curl -s https://api.github.com/repos/iffse/pay-respects/releases/latest \
 | sed 's/[()",{}]/ /g; s/ /\n/g' \
 | grep "https.*pay-respects-ubuntu-latest.zip")
-unzip -q pay-respects.zip pay-respects
-rm pay-respects.zip
+
+# extract zip, e.g. one of the following
+7z -x pay-respects.zip
+unzip pay-respects.zip
 
 # system-wide installation
 sudo chmod a+x pay-respects
 sudo mv pay-respects /usr/local/bin/pay-respects
+
+# delete downloaded package
+rm pay-respects.zip
 ```
 
 If you have cargo installed, you can compile it from source (should work regardless of operating system or architecture):

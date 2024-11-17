@@ -55,13 +55,14 @@ pub fn runtime_match(
 		file = check_dirs(xdg_data_dirs);
 	}
 
+	#[allow(clippy::question_mark)]
 	if file.is_none() {
 		return None;
 	}
 
 	let file = std::fs::read_to_string(file.unwrap()).unwrap();
 	let rule: Rule = toml::from_str(&file).unwrap();
-	let split_command = split_command(&last_command);
+	let split_command = split_command(last_command);
 
 	let mut pure_suggest;
 
@@ -132,7 +133,7 @@ fn eval_condition(
 	shell: &str,
 	last_command: &str,
 	error_msg: &str,
-	split_command: &Vec<String>,
+	split_command: &[String],
 ) -> bool {
 	match condition {
 		"executable" => check_executable(shell, arg),

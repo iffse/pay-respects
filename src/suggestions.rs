@@ -167,7 +167,7 @@ pub fn suggest_typo(typos: &[String], candidates: Vec<String>) -> String {
 	suggestions.join(" ")
 }
 
-pub fn find_similar(typo: &str, candidates: &Vec<String>) -> Option<String> {
+pub fn find_similar(typo: &str, candidates: &[String]) -> Option<String> {
 	let mut min_distance = 10;
 	let mut min_distance_index = None;
 	for (i, candidate) in candidates.iter().enumerate() {
