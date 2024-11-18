@@ -61,19 +61,16 @@ pub fn last_command(shell: &str) -> String {
 		"zsh" => last_command,
 		"fish" => last_command,
 		"nu" => last_command,
-		_ => {
-			eprintln!("Unsupported shell: {}", shell);
-			exit(1);
-		}
+		_ => last_command,
 	}
 }
 
 pub fn expand_alias(shell: &str, full_command: &str) -> String {
-	let alias = std::env::var("_PR_ALIAS").expect(&t!(
-		"no-env-setup",
-		var = "_PR_ALIAS",
-		help = "pay-respects -h"
-	));
+	let alias_env = std::env::var("_PR_ALIAS");
+	if alias_env.is_err() {
+		return full_command.to_string();
+	}
+	let alias = alias_env.unwrap();
 	if alias.is_empty() {
 		return full_command.to_string();
 	}
@@ -184,11 +181,13 @@ pub fn initialization(shell: &str, binary_path: &str, auto_alias: &str) {
 		};
 
 		let init = format!(
-			r#"def --env {} [] {{
-	let dir = (with-env {{ _PR_LAST_COMMAND: {}, _PR_ALIAS: {}, _PR_SHELL: nu }} {{ {} }})
+			r#"
+def --env {} [] {{
+	let dir = (with-env {{ _PR_LAST_COMMAND: {}, _PR_SHELL: nu }} {{ {} }})
 	cd $dir
-}}"#,
-			pr_alias, last_command, alias, binary_path
+}}
+"#,
+			pr_alias, last_command, binary_path
 		);
 		println!("{}", init);
 		std::process::exit(0);
