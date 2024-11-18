@@ -142,6 +142,7 @@ fn eval_condition(
 		"min_length" => split_command.len() >= arg.parse::<usize>().unwrap(),
 		"length" => split_command.len() == arg.parse::<usize>().unwrap(),
 		"max_length" => split_command.len() <= arg.parse::<usize>().unwrap() + 1,
+		"shell" => shell == arg,
 		_ => unreachable!("Unknown condition when evaluation condition: {}", condition),
 	}
 }
