@@ -24,7 +24,7 @@ regex-lite = "0.1"
 toml = { version = "0.7", optional = true }
 serde = { version = "1.0", features = ["derive"], optional = true }
 
-pay-respects-parser = "0.2.4"
+pay-respects-parser = "0.2.5"
 # pay-respects-parser = { path = "../pay-respects-parser" }
 
 

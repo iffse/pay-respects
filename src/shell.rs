@@ -176,7 +176,7 @@ pub fn initialization(shell: &str, binary_path: &str, auto_alias: &str) {
 		}
 	}
 
-	if shell == "nu" || shell == "nush" || shell == "nushell"{
+	if shell == "nu" || shell == "nush" || shell == "nushell" {
 		let pr_alias = if auto_alias.is_empty() {
 			"f"
 		} else {
@@ -184,7 +184,7 @@ pub fn initialization(shell: &str, binary_path: &str, auto_alias: &str) {
 		};
 
 		let init = format!(
-r#"def --env {} [] {{
+			r#"def --env {} [] {{
 	let dir = (with-env {{ _PR_LAST_COMMAND: {}, _PR_ALIAS: {}, _PR_SHELL: nu }} {{ {} }})
 	cd $dir
 }}"#,
