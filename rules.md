@@ -9,9 +9,9 @@ touch src/rules.rs && cargo build
 
 Runtime rules directories are searched, by the order or priority:
 
-- `XDG_CONFIG_HOME`
-- `XDG_CONFIG_DIRS`
-- `XDG_DATA_DIRS`
+- `XDG_CONFIG_HOME`, defaults to `$HOME/.config`
+- `XDG_CONFIG_DIRS`, defaults to `/etc/xdg`
+- `XDG_DATA_DIRS`, defaults to `/usr/local/share:/usr/share`
 
 The actual rule file should be placed under `pay-respects/rules/`, for example: `~/.config/pay-respects/rules/cargo.toml`. Note that for runtime rules, the name of the file **MUST** match the command name.
 

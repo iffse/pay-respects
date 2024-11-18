@@ -18,44 +18,7 @@ pub fn runtime_match(
 	error_msg: &str,
 	shell: &str,
 ) -> Option<String> {
-	let xdg_config_home = std::env::var("XDG_CONFIG_HOME")
-		.unwrap_or_else(|_| std::env::var("HOME").unwrap() + "/.config");
-	let xdg_config_dirs = std::env::var("XDG_CONFIG_DIRS").unwrap_or("/etc/xdg".to_owned());
-	let xdg_config_dirs = xdg_config_dirs.split(':').collect::<Vec<&str>>();
-
-	let xdg_data_dirs =
-		std::env::var("XDG_DATA_DIRS").unwrap_or("/usr/local/share:/usr/share".to_owned());
-	let xdg_data_dirs = xdg_data_dirs.split(':').collect::<Vec<&str>>();
-
-	let user_rule_dir = format!("{}/pay-respects/rules", xdg_config_home);
-	let user_rule_file = format!("{}/{}.toml", user_rule_dir, executable);
-
-	let mut file = Option::None;
-
-	if std::path::Path::new(&user_rule_file).exists() {
-		file = Some(user_rule_file);
-	}
-
-	let check_dirs = |dirs: Vec<&str>| -> Option<String> {
-		for dir in dirs {
-			let rule_dir = format!("{}/pay-respects/rules", dir);
-			let rule_file = format!("{}/{}.toml", rule_dir, executable);
-			if std::path::Path::new(&rule_file).exists() {
-				return Some(rule_file);
-			}
-		}
-		None
-	};
-
-	if file.is_none() {
-		file = check_dirs(xdg_config_dirs);
-	}
-
-	if file.is_none() {
-		file = check_dirs(xdg_data_dirs);
-	}
-
-	#[allow(clippy::question_mark)]
+	let file = get_rule(executable);
 	if file.is_none() {
 		return None;
 	}
@@ -170,4 +133,44 @@ fn eval_suggest(suggest: &str, last_command: &str, error_msg: &str, shell: &str)
 	}
 
 	Some(suggest)
+}
+
+fn get_rule(executable: &str) -> Option<String> {
+	let xdg_config_home = std::env::var("XDG_CONFIG_HOME")
+		.unwrap_or_else(|_| std::env::var("HOME").unwrap() + "/.config");
+
+	let user_rule_dir = format!("{}/pay-respects/rules", xdg_config_home);
+	let user_rule_file = format!("{}/{}.toml", user_rule_dir, executable);
+
+	if std::path::Path::new(&user_rule_file).exists() {
+		return Some(user_rule_file);
+	}
+
+	let check_dirs = |dirs: Vec<&str>| -> Option<String> {
+		for dir in dirs {
+			let rule_dir = format!("{}/pay-respects/rules", dir);
+			let rule_file = format!("{}/{}.toml", rule_dir, executable);
+			if std::path::Path::new(&rule_file).exists() {
+				return Some(rule_file);
+			}
+		}
+		None
+	};
+
+	let xdg_config_dirs = std::env::var("XDG_CONFIG_DIRS").unwrap_or("/etc/xdg".to_owned());
+	let xdg_config_dirs = xdg_config_dirs.split(':').collect::<Vec<&str>>();
+
+	if let Some(file) = check_dirs(xdg_config_dirs) {
+		return Some(file);
+	}
+
+	let xdg_data_dirs =
+		std::env::var("XDG_DATA_DIRS").unwrap_or("/usr/local/share:/usr/share".to_owned());
+	let xdg_data_dirs = xdg_data_dirs.split(':').collect::<Vec<&str>>();
+
+	if let Some(file) = check_dirs(xdg_data_dirs) {
+		return Some(file);
+	}
+
+	None
 }
