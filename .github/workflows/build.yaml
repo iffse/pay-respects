@@ -7,26 +7,34 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     permissions:
       contents: write
     strategy:
       fail-fast: true
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: build
       run: |
         cargo build --release --all-features
 
-    - name: Zipping files
+    - name: Zipping files (exe)
+      if: matrix.os == 'windows-latest'
       run: |
-        7z a ./pay-respects-ubuntu-latest.zip ./target/release/pay-respects
+        7z a pay-respects-${{ matrix.os }}.zip ./target/release/pay-respects.exe
+
+    - name: Zipping files (unix)
+      if: matrix.os != 'windows-latest'
+      run: |
+        7z a pay-respects-${{ matrix.os }}.zip ./target/release/pay-respects
 
     - name: Uploading to release
       uses: ncipollo/release-action@v1
       with:
-        artifacts: pay-respects-ubuntu-latest.zip
+        artifacts: pay-respects-${{ matrix.os }}.zip
         allowUpdates: true
         makeLatest: true
 
