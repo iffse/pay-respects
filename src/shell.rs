@@ -246,3 +246,37 @@ end
 
 	std::process::exit(0);
 }
+
+pub fn shell_syntax(shell: &str, command: &mut String) {
+	#[allow(clippy::single_match)]
+	match shell {
+		"nushell" => {
+			*command = command.replace(" && ", " and ");
+		}
+		_ => {}
+	}
+}
+
+pub fn shell_evaluated_commands(shell: &str, command: &str) -> Option<String> {
+	let lines = command
+		.lines()
+		.map(|line| line.trim().trim_end_matches(['\\', ';', '|', '&']))
+		.collect::<Vec<&str>>();
+	let mut dirs = Vec::new();
+	for line in lines {
+		if let Some(dir) = line.strip_prefix("cd ") {
+			dirs.push(dir.to_string());
+		}
+	}
+
+	let cd_dir = dirs.join("");
+	if cd_dir.is_empty() {
+		return None;
+	}
+
+	#[allow(clippy::single_match)]
+	match shell {
+		"nushell" => Some(cd_dir),
+		_ => Some(format!("cd {}", cd_dir)),
+	}
+}

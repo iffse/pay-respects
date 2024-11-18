@@ -8,7 +8,7 @@ use regex_lite::Regex;
 
 use crate::files::{get_best_match_file, get_path_files};
 use crate::rules::match_pattern;
-use crate::shell::{expand_alias_multiline, PRIVILEGE_LIST};
+use crate::shell::{expand_alias_multiline, shell_evaluated_commands, PRIVILEGE_LIST};
 
 pub fn suggest_command(shell: &str, last_command: &str, error_msg: &str) -> Option<String> {
 	let split_command = split_command(last_command);
@@ -237,8 +237,10 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 			.unwrap();
 
 		if process.success() {
-			println!("{}", shell_evaluated_commands(&command));
-			return Ok(());
+			let cd = shell_evaluated_commands(shell, &command);
+			if let Some(cd) = cd {
+				println!("{}", cd);
+			}
 		} else {
 			if now.elapsed() > Duration::from_secs(3) {
 				exit(1);
@@ -272,7 +274,10 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 		.unwrap();
 
 	if process.success() {
-		println!("{}", shell_evaluated_commands(&command));
+		let cd = shell_evaluated_commands(shell, &command);
+		if let Some(cd) = cd {
+			println!("{}", cd);
+		}
 		Ok(())
 	} else {
 		if now.elapsed() > Duration::from_secs(3) {
@@ -290,19 +295,4 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 		};
 		Err(error_msg.to_string())
 	}
-}
-
-fn shell_evaluated_commands(command: &str) -> String {
-	let lines = command
-		.lines()
-		.map(|line| line.trim().trim_end_matches(['\\', ';', '|', '&']))
-		.collect::<Vec<&str>>();
-	let mut commands = Vec::new();
-	for line in lines {
-		if line.starts_with("cd ") {
-			commands.push(line.to_string());
-		}
-	}
-
-	commands.join(" && \\ \n")
 }
