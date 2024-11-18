@@ -7,6 +7,7 @@ pattern = [
 ]
 suggest = [
 '''
+#[!shell(nu)]
 mkdir --parents {{command[1]}} && \
 cd {{command[1]}} '''
 ]
@@ -17,5 +18,6 @@ pattern = [
 ]
 suggest = [
 '''
-mkdir {{command[1]}} '''
+mkdir {{command[1]}} and \
+cd {{command[1]}} '''
 ]

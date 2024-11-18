@@ -249,9 +249,11 @@ end
 
 pub fn shell_syntax(shell: &str, command: &mut String) {
 	#[allow(clippy::single_match)]
+	eprintln!("command: {}", command);
 	match shell {
-		"nushell" => {
+		"nu" => {
 			*command = command.replace(" && ", " and ");
+			eprintln!("command: {}", command);
 		}
 		_ => {}
 	}
@@ -276,7 +278,7 @@ pub fn shell_evaluated_commands(shell: &str, command: &str) -> Option<String> {
 
 	#[allow(clippy::single_match)]
 	match shell {
-		"nushell" => Some(cd_dir),
+		"nu" => Some(cd_dir),
 		_ => Some(format!("cd {}", cd_dir)),
 	}
 }
