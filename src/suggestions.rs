@@ -278,7 +278,7 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 }
 
 #[cfg(not(target_os = "windows"))]
-fn run_suggestion_p (shell: &str, p: &str, command: &str) -> std::process::ExitStatus {
+fn run_suggestion_p(shell: &str, p: &str, command: &str) -> std::process::ExitStatus {
 	use std::os::fd::AsFd;
 	std::process::Command::new(p)
 		.arg(shell)
@@ -293,7 +293,7 @@ fn run_suggestion_p (shell: &str, p: &str, command: &str) -> std::process::ExitS
 }
 
 #[cfg(not(target_os = "windows"))]
-fn run_suggestion (shell: &str, command: &str) -> std::process::ExitStatus {
+fn run_suggestion(shell: &str, command: &str) -> std::process::ExitStatus {
 	use std::os::fd::AsFd;
 	std::process::Command::new(shell)
 		.arg("-c")
@@ -308,7 +308,7 @@ fn run_suggestion (shell: &str, command: &str) -> std::process::ExitStatus {
 }
 
 #[cfg(target_os = "windows")]
-fn run_suggestion_p (shell: &str, p: &str, command: &str) -> std::process::ExitStatus {
+fn run_suggestion_p(shell: &str, p: &str, command: &str) -> std::process::ExitStatus {
 	use std::os::windows::io::AsHandle;
 	std::process::Command::new(p)
 		.arg(shell)
@@ -323,7 +323,7 @@ fn run_suggestion_p (shell: &str, p: &str, command: &str) -> std::process::ExitS
 }
 
 #[cfg(target_os = "windows")]
-fn run_suggestion (shell: &str, command: &str) -> std::process::ExitStatus {
+fn run_suggestion(shell: &str, command: &str) -> std::process::ExitStatus {
 	use std::os::windows::io::AsHandle;
 	std::process::Command::new(shell)
 		.arg("-c")
