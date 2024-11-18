@@ -62,7 +62,10 @@ fn main() {
 			if command.is_none() {
 				break;
 			};
-			command.unwrap()
+
+			let mut command = command.unwrap();
+			shell::shell_syntax(&shell, &mut command);
+			command
 		};
 
 		let highlighted_suggestion = {
