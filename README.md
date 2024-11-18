@@ -19,14 +19,14 @@ Please follow the instruction for your shell:
 	<summary>Bash / Zsh / Fish</summary>
 
 > Manual aliasing:
-> ``` shell
+> ```shell
 > alias f="$(pay-respects bash)"
 > alias f="$(pay-respects zsh)"
 > alias f="$(pay-respects fish)"
 > ```
 
 > Auto aliasing (optional custom alias can be added after `--alias argument`):
-> ``` shell
+> ```shell
 > eval "$(pay-respects bash --alias)"
 > eval "$(pay-respects zsh --alias)"
 > pay-respects fish --alias | source
@@ -60,6 +60,8 @@ You can now **press `F` to Pay Respects**!
 Install from your package manager if available:
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/pay-respects.svg)](https://repology.org/project/pay-respects/versions)
+
+Compiled binaries can be found at [GitHub releases](https://github.com/iffse/pay-respects/releases).
 
 <details>
 	<summary>Generic x86 Desktop Linux</summary>

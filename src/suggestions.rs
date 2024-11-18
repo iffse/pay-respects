@@ -1,5 +1,4 @@
 use std::io::stderr;
-use std::os::fd::AsFd;
 use std::process::{exit, Stdio};
 use std::time::{Duration, Instant};
 
@@ -224,17 +223,7 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 		command = expand_alias_multiline(shell, &command);
 
 		let now = Instant::now();
-		let process = std::process::Command::new(p)
-			.arg(shell)
-			.arg("-c")
-			.arg(&command)
-			// .stdout(Stdio::inherit())
-			.stdout(stderr().as_fd().try_clone_to_owned().unwrap())
-			.stderr(Stdio::inherit())
-			.spawn()
-			.expect("failed to execute process")
-			.wait()
-			.unwrap();
+		let process = run_suggestion_p(shell, p, &command);
 
 		if process.success() {
 			let cd = shell_evaluated_commands(shell, &command);
@@ -262,16 +251,7 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 
 	let command = expand_alias_multiline(shell, command);
 	let now = Instant::now();
-	let process = std::process::Command::new(shell)
-		.arg("-c")
-		.arg(&command)
-		// .stdout(Stdio::inherit())
-		.stdout(stderr().as_fd().try_clone_to_owned().unwrap())
-		.stderr(Stdio::inherit())
-		.spawn()
-		.expect("failed to execute process")
-		.wait()
-		.unwrap();
+	let process = run_suggestion(shell, &command);
 
 	if process.success() {
 		let cd = shell_evaluated_commands(shell, &command);
@@ -295,4 +275,63 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 		};
 		Err(error_msg.to_string())
 	}
+}
+
+#[cfg(not(target_os = "windows"))]
+fn run_suggestion_p (shell: &str, p: &str, command: &str) -> std::process::ExitStatus {
+	use std::os::fd::AsFd;
+	std::process::Command::new(p)
+		.arg(shell)
+		.arg("-c")
+		.arg(command)
+		.stdout(stderr().as_fd().try_clone_to_owned().unwrap())
+		.stderr(Stdio::inherit())
+		.spawn()
+		.expect("failed to execute process")
+		.wait()
+		.unwrap()
+}
+
+#[cfg(not(target_os = "windows"))]
+fn run_suggestion (shell: &str, command: &str) -> std::process::ExitStatus {
+	use std::os::fd::AsFd;
+	std::process::Command::new(shell)
+		.arg("-c")
+		.arg(command)
+		// .stdout(Stdio::inherit())
+		.stdout(stderr().as_fd().try_clone_to_owned().unwrap())
+		.stderr(Stdio::inherit())
+		.spawn()
+		.expect("failed to execute process")
+		.wait()
+		.unwrap()
+}
+
+#[cfg(target_os = "windows")]
+fn run_suggestion_p (shell: &str, p: &str, command: &str) -> std::process::ExitStatus {
+	use std::os::windows::io::AsHandle;
+	std::process::Command::new(p)
+		.arg(shell)
+		.arg("-c")
+		.arg(command)
+		.stdout(stderr().as_handle().try_clone_to_owned().unwrap())
+		.stderr(Stdio::inherit())
+		.spawn()
+		.expect("failed to execute process")
+		.wait()
+		.unwrap()
+}
+
+#[cfg(target_os = "windows")]
+fn run_suggestion (shell: &str, command: &str) -> std::process::ExitStatus {
+	use std::os::windows::io::AsHandle;
+	std::process::Command::new(shell)
+		.arg("-c")
+		.arg(command)
+		.stdout(stderr().as_handle().try_clone_to_owned().unwrap())
+		.stderr(Stdio::inherit())
+		.spawn()
+		.expect("failed to execute process")
+		.wait()
+		.unwrap()
 }
