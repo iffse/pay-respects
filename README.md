@@ -53,6 +53,23 @@ Please follow the instruction for your shell:
 
 </details>
 
+<details>
+	<summary>Custom initialization for arbitrary shell</summary>
+
+> pay-respects only requires 2 environment variables to function:
+>
+> - `_PR_SHELL`: The binary name of the current working shell.
+> - `_PR_LAST_COMMAND`: The last command.
+>
+> pay-respects echos back, if applicable, a `cd` command that can be evaluated by the current working shell.
+>
+> General example:
+> ```shell
+> eval $(_PR_SHELL=sh _PR_LAST_COMMAND="git comit" pay-respects)
+> ```
+
+</details>
+
 You can now **press `F` to Pay Respects**!
 
 ## Installing
