@@ -16,7 +16,7 @@ Typed a wrong command? Pay Respects will try to correct your wrong console comma
 Please follow the instruction for your shell:
 
 <details>
-	<summary>Base / Zsh</summary>
+	<summary>Bash / Zsh</summary>
 
 > Manual aliasing:
 > ``` shell
@@ -50,7 +50,7 @@ Please follow the instruction for your shell:
 <details>
 	<summary>Nushell</summary>
 
-> Add the output of the following file to your configuration file:
+> Add the output of the following output to your configuration file:
 > ```
 > pay-respects nushell [--alias <alias>]
 > ```
