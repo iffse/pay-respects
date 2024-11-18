@@ -1,4 +1,3 @@
-use std::io::prelude::*;
 use std::process::exit;
 
 use std::sync::mpsc::channel;
@@ -170,42 +169,29 @@ pub fn initialization(shell: &str, binary_path: &str, auto_alias: &str) {
 		"nu" | "nush" | "nushell" => {
 			last_command = "(history | last).command";
 			alias = "\"\"";
-			let command = format!(
-				"with-env {{ _PR_LAST_COMMAND : {},\
-					_PR_ALIAS : {},\
-					_PR_SHELL : nu }} \
-					{{ {} }}",
-				last_command, alias, binary_path
-			);
-			println!("{}\n", command);
-			println!("Add following to your config file? (Y/n)");
-			let alias = format!("alias f = {}", command);
-			println!("{}", alias);
-			let mut input = String::new();
-			std::io::stdin().read_line(&mut input).unwrap();
-			match input.trim() {
-				"Y" | "y" | "" => {
-					let output = std::process::Command::new("nu")
-						.arg("-c")
-						.arg("echo $nu.config-path")
-						.output()
-						.expect("Failed to execute process");
-					let config_path = String::from_utf8_lossy(&output.stdout);
-					let mut file = std::fs::OpenOptions::new()
-						.append(true)
-						.open(config_path.trim())
-						.expect("Failed to open config file");
-
-					writeln!(file, "{}", alias).expect("Failed to write to config file");
-				}
-				_ => std::process::exit(0),
-			};
-			std::process::exit(0);
 		}
 		_ => {
 			println!("Unknown shell: {}", shell);
 			std::process::exit(1);
 		}
+	}
+
+	if shell == "nu" || shell == "nush" || shell == "nushell"{
+		let pr_alias = if auto_alias.is_empty() {
+			"f"
+		} else {
+			auto_alias
+		};
+
+		let init = format!(
+r#"def --env {} [] {{
+	let dir = (with-env {{ _PR_LAST_COMMAND: {}, _PR_ALIAS: {}, _PR_SHELL: nu }} {{ {} }})
+	cd $dir
+}}"#,
+			pr_alias, last_command, alias, binary_path
+		);
+		println!("{}", init);
+		std::process::exit(0);
 	}
 
 	let mut init = format!(
@@ -249,11 +235,9 @@ end
 
 pub fn shell_syntax(shell: &str, command: &mut String) {
 	#[allow(clippy::single_match)]
-	eprintln!("command: {}", command);
 	match shell {
 		"nu" => {
 			*command = command.replace(" && ", " and ");
-			eprintln!("command: {}", command);
 		}
 		_ => {}
 	}
