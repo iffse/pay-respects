@@ -16,32 +16,19 @@ Typed a wrong command? Pay Respects will try to correct your wrong console comma
 Please follow the instruction for your shell:
 
 <details>
-	<summary>Bash / Zsh</summary>
+	<summary>Bash / Zsh / Fish</summary>
 
 > Manual aliasing:
 > ``` shell
 > alias f="$(pay-respects bash)"
 > alias f="$(pay-respects zsh)"
+> alias f="$(pay-respects fish)"
 > ```
 
 > Auto aliasing (optional custom alias can be added after `--alias argument`):
 > ``` shell
 > eval "$(pay-respects bash --alias)"
 > eval "$(pay-respects zsh --alias)"
-> ```
-
-</details>
-
-<details>
-	<summary>Fish</summary>
-
-> Manual aliasing:
-> ``` shell
-> alias f="$(pay-respects fish)"
-> ```
-
-> Auto aliasing (optional custom alias can be added after `--alias argument`):
-> ``` shell
 > pay-respects fish --alias | source
 > ```
 
@@ -50,17 +37,17 @@ Please follow the instruction for your shell:
 <details>
 	<summary>Nushell</summary>
 
-> Add the output of the following output to your configuration file:
-> ```
+> Add the following output to your configuration file:
+> ```shell
 > pay-respects nushell [--alias <alias>]
 > ```
 
 > Or save it as a file:
-> ```
+> ```shell
 > pay-respects nushell [--alias <alias>] | save -f ~/.pay-respects.nu
 > ```
 > and source from your config file:
-> ```
+> ```shell
 > source ~/.pay-respects.nu
 > ```
 
