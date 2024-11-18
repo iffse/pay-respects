@@ -111,13 +111,13 @@ ja = '''
 
 例1、手動エイリアス: `%{manual}`
 
-コマンドは、正しい環境でバイナリを実行するために使用できるコマンドを出力します。
-そのような出力を短いキーにエイリアスすることができます。例えば、`%{manual_example}`)
+正しい環境で実行するコマンドを出力します。
+短いキーにエイリアスすることができます。例えば、`%{manual_example}`)
 
 例2、自動エイリアス: `%{auto}`
 
-コマンドは、`%{auto_example}`で直接埋め込むことができる宣言を出力します。fishの場合は、
-代わりに`%{auto_example_fish}`を使用してください。
+コンフィグに直接埋め込むことができる宣言を出力します：`%{auto_example}`。
+fishの場合は、`%{auto_example_fish}`を使用してください。
 '''
 ko = '''
 사용법: pay-respects [당신의 쉘] [--alias [alias]]
@@ -137,7 +137,7 @@ zh = '''
 
 示例 1，手动别名: `%{manual}`
 
-该命令将输出可用于使用正确环境执行二进制文件的命令。您可以将此类输出别名为更短的键。
+该命令将输出使用正确环境执行二进制文件的命令。您可以将此类输出别名为更短的键。
 例如 `%{manual_example}`)
 
 示例 2，自动别名: `%{auto}`
@@ -238,7 +238,7 @@ fr = "Si vous pensez qu'il devrait y avoir une suggestion, veuillez ouvrir un ti
 it = "Se pensi che dovrebbe esserci una proposta, apri una issue o invia una pull request!"
 pt = "Se você acha que deveria haver uma sugestão, por favor abra uma issue ou envie um pull request!"
 ru = "Если вы считаете, что должно быть предложение, пожалуйста, откройте issue или отправьте pull request!"
-ja = "提案があるべきだと思う場合は、issueを開いてプルリクエストを送信してください！"
+ja = "提案があるべきだと思う場合は、issueまたはPull Requestを送信してください！"
 ko = "제안이 있어야 한다고 생각하는 경우 이슈를 열거나 풀 리퀘스트를 보내주세요!"
 zh = "如果您认为应该有建议，请打开一个问题或发送一个拉取请求！"
 
