@@ -20,6 +20,14 @@ body:
     validations:
       required: true
 
+  - type: textarea
+    id: build
+    attributes:
+      label: Build information
+      description: The output of `pay-respects --version`
+    validations:
+      required: true
+
   - type: checkboxes
     id: no-similar-issue
     attributes:
