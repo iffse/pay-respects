@@ -2,10 +2,11 @@ command = "cargo"
 
 [[match_err]]
 pattern = [
-	"did you mean"
+	"no such command"
 ]
 suggest = [
 '''
+#[err_contains(did you mean)]
 {{command[0]}} {{err::(?:did you mean `)(.*)(?:`)}} {{command[2:]}} '''
 ]
 

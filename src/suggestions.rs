@@ -80,35 +80,38 @@ pub fn check_executable(shell: &str, executable: &str) -> bool {
 
 pub fn opt_regex(regex: &str, command: &mut String) -> String {
 	let regex = Regex::new(regex).unwrap();
-	let opts = regex
-		.captures_iter(command)
-		.map(|cap| cap.get(1).unwrap().as_str().to_owned())
-		.collect::<Vec<String>>();
-	for opt in opts.clone() {
-		*command = command.replace(&opt, "");
-	}
 
-	opts.join(" ")
+	let mut opt = Vec::new();
+	for captures in regex.captures_iter(command) {
+		for cap in captures.iter().skip(1).flatten() {
+			opt.push(cap.as_str().to_owned());
+		}
+	}
+	opt.join(" ")
 }
 
 pub fn err_regex(regex: &str, error_msg: &str) -> String {
 	let regex = Regex::new(regex).unwrap();
-	let err = regex
-		.captures_iter(error_msg)
-		.map(|cap| cap.get(1).unwrap().as_str().to_owned())
-		.collect::<Vec<String>>();
 
+	let mut err = Vec::new();
+	for captures in regex.captures_iter(error_msg) {
+		for cap in captures.iter().skip(1).flatten() {
+			err.push(cap.as_str().to_owned());
+		}
+	}
 	err.join(" ")
 }
 
 pub fn cmd_regex(regex: &str, command: &str) -> String {
 	let regex = Regex::new(regex).unwrap();
-	let err = regex
-		.captures_iter(command)
-		.map(|cap| cap.get(1).unwrap().as_str().to_owned())
-		.collect::<Vec<String>>();
 
-	err.join(" ")
+	let mut cmd = Vec::new();
+	for captures in regex.captures_iter(command) {
+		for cap in captures.iter().skip(1).flatten() {
+			cmd.push(cap.as_str().to_owned());
+		}
+	}
+	cmd.join(" ")
 }
 
 pub fn eval_shell_command(shell: &str, command: &str) -> Vec<String> {
