@@ -6,7 +6,7 @@ Typed a wrong command or don't know what to do? Pay Respects will suggest a fix 
 - ✏️ **Easy to write rules**: You don't need to know Rust. The rules are written in a TOML file!
 - 🎯 **Accurate results**: Suggestions are verified before being prompted to the user, no `sudo` suggestions when you are using `doas`!
 - 🤖 **AI Support**: AI comes in aid when there is no rule for your error!
-- 🪶 **Tiny binary size**: Not even 1MB! Even with all features, it's less than 3MB!
+- 🪶 **Tiny binary size**: Not even 1MB! Even with all optional features, it's less than 3MB!
 
 ![pacman-fix](img/pacman-fix.png)
 
