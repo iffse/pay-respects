@@ -81,13 +81,17 @@ pub fn check_executable(shell: &str, executable: &str) -> bool {
 pub fn opt_regex(regex: &str, command: &mut String) -> String {
 	let regex = Regex::new(regex).unwrap();
 
-	let mut opt = Vec::new();
+	let mut opts = Vec::new();
 	for captures in regex.captures_iter(command) {
 		for cap in captures.iter().skip(1).flatten() {
-			opt.push(cap.as_str().to_owned());
+			opts.push(cap.as_str().to_owned());
 		}
 	}
-	opt.join(" ")
+
+	for opt in opts.clone() {
+		*command = command.replace(&opt, "");
+	}
+	opts.join(" ")
 }
 
 pub fn err_regex(regex: &str, error_msg: &str) -> String {
