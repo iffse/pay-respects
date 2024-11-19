@@ -59,23 +59,12 @@ pub fn suggest_command(shell: &str, last_command: &str, error_msg: &str) -> Opti
 	#[cfg(feature = "request-ai")]
 	{
 		use crate::requests::ai_suggestion;
+		use textwrap::{fill, termwidth};
 		let suggest = ai_suggestion(last_command, error_msg);
 		if let Some(suggest) = suggest {
-			let suggest_note = suggest.note.split_whitespace().collect::<Vec<&str>>();
-			let mut note = String::new();
-			let mut line = String::new();
-			for word in suggest_note {
-				if line.len() + word.len() > 80 {
-					note.push_str(&line);
-					note.push('\n');
-					line.clear();
-				}
-				line.push_str(word);
-				line.push(' ');
-			}
-			note.push_str(&line);
-
 			let warn = format!("{}:", t!("ai-suggestion")).bold().blue();
+			let note = fill(&suggest.note, termwidth());
+
 			eprintln!("{}\n{}\n", warn, note);
 			let command = suggest.command;
 			if command != "None" {
