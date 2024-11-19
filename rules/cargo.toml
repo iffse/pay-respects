@@ -2,61 +2,10 @@ command = "cargo"
 
 [[match_err]]
 pattern = [
-	"no such command"
+	"did you mean"
 ]
 suggest = [
 '''
-{{command[0]}} {{typo[1](
-add,
-b,
-bench,
-build,
-c,
-check,
-clean,
-clippy,
-config,
-d,
-doc,
-expand,
-fetch,
-fix,
-fmt,
-generate-lockfile,
-git-checkout,
-help,
-init,
-install,
-lipo,
-locate-project,
-login,
-logout,
-make,
-metadata,
-miri,
-new,
-owner,
-package,
-pkgid,
-publish,
-r,
-read-manifest,
-remove,
-report,
-rm,
-run,
-rustc,
-rustdoc,
-search,
-t,
-test,
-tree,
-uninstall,
-update,
-vendor,
-verify-project,
-version,
-yank
-)}} {{command[2:]}}'''
+{{command[0]}} {{err::(?:did you mean `)(.*)(?:`)}} {{command[2:]}} '''
 ]
 
