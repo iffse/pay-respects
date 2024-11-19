@@ -41,6 +41,8 @@ pub fn ai_suggestion(last_command: &str, error_msg: &str) -> Option<AISuggest> {
 			// Please, don't abuse the key and try to use your own key
 			if env_key.is_none() {
 				Some("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".to_string())
+			} else if env_key.as_ref().unwrap().is_empty() {
+				None
 			} else {
 				env_key
 			}
@@ -107,9 +109,23 @@ You run the command `{last_command}` and get the following error message: `{erro
 	};
 
 	let res = &res.text().unwrap();
-	let json: Value = serde_json::from_str(res).unwrap();
+	let json: Value = {
+		let json = serde_json::from_str(res);
+		if json.is_err() {
+			return None;
+		}
+		json.unwrap()
+	};
+
 	let content = &json["choices"][0]["message"]["content"];
 
-	let suggestion: AISuggest = serde_json::from_str(content.as_str().unwrap()).unwrap();
+	let suggestion: AISuggest = {
+		let str = content.as_str().unwrap();
+		let json = serde_json::from_str(str);
+		if json.is_err() {
+			return None;
+		}
+		json.unwrap()
+	};
 	Some(suggestion)
 }
