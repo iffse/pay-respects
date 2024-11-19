@@ -1,10 +1,10 @@
 # Pay Respects
 
-Typed a wrong command? Pay Respects will try to correct your wrong console command by simply pressing `F`!
+Typed a wrong command or don't know what to do? Pay Respects will suggest a fix to your console command by simply pressing `F`!
 
 - 🚀 **Blazing fast suggestion**: You won't notice any delay for asking suggestions!
-- ✏️ **Easy to write rules**: You don't need to know Rust. The rules are written in a TOML file that is simple to work with and can be evaluated to Rust code upon compilation! Optional runtime user defined rules can be enabled starting from 0.5!
-- 🎯 **Accurate results**: Suggestions must pass several conditions in order to be prompted to the user, no `sudo` suggestions when you are using `doas`!
+- ✏️ **Easy to write rules**: You don't need to know Rust. The rules are written in a TOML file!
+- 🎯 **Accurate results**: Suggestions are verified before being prompted to the user, no `sudo` suggestions when you are using `doas`!
 - 🤖 **AI Support**: AI comes in aid when there is no rule for your error!
 - 🪶 **Tiny binary size**: Not even 1MB! Even with all features, it's less than 3MB!
 
