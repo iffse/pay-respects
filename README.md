@@ -5,6 +5,7 @@ Typed a wrong command? Pay Respects will try to correct your wrong console comma
 - 🚀 **Blazing fast suggestion**: You won't notice any delay for asking suggestions!
 - ✏️ **Easy to write rules**: You don't need to know Rust. The rules are written in a TOML file that is simple to work with and can be evaluated to Rust code upon compilation! Optional runtime user defined rules can be enabled starting from 0.5!
 - 🎯 **Accurate results**: Suggestions must pass several conditions in order to be prompted to the user, no `sudo` suggestions when you are using `doas`!
+- 🤖 **AI Support**: AI comes in aid when there is no rule for your error!
 - 🪶 **Tiny binary size**: Not even 1MB!
 
 ![pacman-fix](img/pacman-fix.png)
@@ -90,19 +91,19 @@ Compiled binaries can be found at [GitHub releases](https://github.com/iffse/pay
 > | sed 's/[()",{}]/ /g; s/ /\n/g' \
 > | grep "https.*pay-respects-ubuntu-latest.zip")
 > ```
-> 
+>
 > 2. Extract zip, e.g. one of the following:
 > ```shell
 > 7z -x pay-respects.zip
 > unzip pay-respects.zip
 > ```
-> 
+>
 > 3. System-wide installation:
 > ```shell
 > sudo chmod a+x pay-respects
 > sudo mv pay-respects /usr/local/bin/pay-respects
 > ```
-> 
+>
 > 4. Delete the downloaded package:
 > ```shell
 > rm pay-respects.zip
@@ -114,12 +115,12 @@ Compiled binaries can be found at [GitHub releases](https://github.com/iffse/pay
 	<summary>Compile from source (any OS/architecture)</summary>
 
 > This installation requires you to have Cargo (the Rust package manager) installed.
-> 
-> Install from [crates.io](https://crates.io/), `runtime-rules` is optional:
+>
+> Install from [crates.io](https://crates.io/), features are optional
 > ```shell
-> cargo install pay-respects --features=runtime-rules
+> cargo install pay-respects --features=runtime-rules,request-ai
 > ```
-> 
+>
 > Clone from git and install, suitable for adding custom compile-time rules:
 > ```
 > git clone --depth 1 https://github.com/iffse/pay-respects
@@ -132,6 +133,64 @@ Compiled binaries can be found at [GitHub releases](https://github.com/iffse/pay
 ## Rule Files
 
 See [writing rules](./rules.md) for how to write rules.
+
+## AI Integration
+
+AI suggestions should work out of the box unless rate limit has reached. Bring your own API keys to avoid it.
+
+If it's useful to you, **please share this project and spread the word**. Also consider making a donation to keep its public usage alive:
+
+<div>
+	<a
+		href="https://liberapay.com/iff/donate"
+		target="_blank"
+		rel="noreferrer"
+		><img
+			src="https://liberapay.com/assets/widgets/donate.svg"
+			alt="Donate using Liberapay"
+		/></a
+	>
+	<a href="https://ko-fi.com/iffse" target="_blank" rel="noreferrer"
+		><img
+			src="https://www.vectorlogo.zone/logos/ko-fi/ko-fi-ar21.svg"
+			alt="Donate using Ko-fi"
+			style="height: 30px;"
+		/></a
+	>
+	<br />
+	<a href="https://iffse.eu.org/stripe" target="_blank" rel="noreferrer"
+		><img
+			src="https://cdn.brandfolder.io/KGT2DTA4/at/8vbr8k4mr5xjwk4hxq4t9vs/Stripe_wordmark_-_blurple.svg"
+			alt="Donate using Stripe"
+			style="height: 30px;"
+		/></a
+	>
+	<a
+		href="https://www.paypal.com/donate/?hosted_button_id=QN7Z7ZHRAAFZL"
+		target="_blank"
+		rel="noreferrer"
+		><img
+			src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg"
+			alt="Donate using PayPal"
+			style="height: 25px; margin-bottom: 3px;"
+		/></a
+	>
+</div>
+
+<details>
+	<summary>AI and API Configuration</summary>
+
+> Configuration is done via environment variables:
+>
+> - `_PR_AI_API_KEY`: You own API key
+> - `_PR_AI_URL`: URL used. Defaults to `https://api.groq.com/openai/v1/chat/completions`
+> - `_PR_AI_MODEL`: Model used. Defaults to `llama3-8b-8192`
+>
+> Compile time variables:
+>
+> - `_DEF_PR_AI_API_KEY`: Default API key, included in compile-time
+>
+> </details>
 
 ## Contributing
 

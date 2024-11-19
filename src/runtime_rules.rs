@@ -19,9 +19,7 @@ pub fn runtime_match(
 	shell: &str,
 ) -> Option<String> {
 	let file = get_rule(executable);
-	if file.is_none() {
-		return None;
-	}
+	file.as_ref()?;
 
 	let file = std::fs::read_to_string(file.unwrap()).unwrap();
 	let rule: Rule = toml::from_str(&file).unwrap();
