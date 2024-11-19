@@ -81,8 +81,8 @@ pub fn check_executable(shell: &str, executable: &str) -> bool {
 pub fn opt_regex(regex: &str, command: &mut String) -> String {
 	let regex = Regex::new(regex).unwrap();
 	let opts = regex
-		.find_iter(command)
-		.map(|cap| cap.as_str().to_owned())
+		.captures_iter(command)
+		.map(|cap| cap.get(1).unwrap().as_str().to_owned())
 		.collect::<Vec<String>>();
 	for opt in opts.clone() {
 		*command = command.replace(&opt, "");
@@ -94,8 +94,8 @@ pub fn opt_regex(regex: &str, command: &mut String) -> String {
 pub fn err_regex(regex: &str, error_msg: &str) -> String {
 	let regex = Regex::new(regex).unwrap();
 	let err = regex
-		.find_iter(error_msg)
-		.map(|cap| cap.as_str().to_owned())
+		.captures_iter(error_msg)
+		.map(|cap| cap.get(1).unwrap().as_str().to_owned())
 		.collect::<Vec<String>>();
 
 	err.join(" ")
@@ -104,8 +104,8 @@ pub fn err_regex(regex: &str, error_msg: &str) -> String {
 pub fn cmd_regex(regex: &str, command: &str) -> String {
 	let regex = Regex::new(regex).unwrap();
 	let err = regex
-		.find_iter(command)
-		.map(|cap| cap.as_str().to_owned())
+		.captures_iter(command)
+		.map(|cap| cap.get(1).unwrap().as_str().to_owned())
 		.collect::<Vec<String>>();
 
 	err.join(" ")
