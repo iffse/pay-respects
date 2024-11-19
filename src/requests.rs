@@ -29,7 +29,16 @@ pub fn ai_suggestion(last_command: &str, error_msg: &str) -> Option<AISuggest> {
 
 	let api_key = match std::env::var("_PR_AI_API_KEY") {
 		Ok(key) => Some(key),
-		Err(_) => option_env!("_DEV_PR_AI_API_KEY").map(|key| key.to_string())
+		Err(_) => {
+			let env_key = option_env!("_DEF_PR_AI_API_KEY").map(|key| key.to_string());
+			// I am keepting the key so anyone can use it, but it is better to use your own key
+			// Please, don't abuse the key
+			if env_key.is_none() {
+				Some("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".to_string())
+			} else {
+				env_key
+			}
+		}
 	};
 
 	let api_key = match api_key {
