@@ -23,6 +23,12 @@ pub struct AISuggest {
 }
 
 pub fn ai_suggestion(last_command: &str, error_msg: &str) -> Option<AISuggest> {
+	let error_msg = if error_msg.len() > 300 {
+		&error_msg[..300]
+	} else {
+		error_msg
+	};
+
 	let mut map = HashMap::new();
 	map.insert("last_command", last_command);
 	map.insert("error_msg", error_msg);
@@ -57,9 +63,12 @@ pub fn ai_suggestion(last_command: &str, error_msg: &str) -> Option<AISuggest> {
 		Err(_) => "llama3-8b-8192".to_string(),
 	};
 
-	let user_locale = std::env::var("_PR_LOCALE").unwrap_or("en_US".to_string());
-	let set_locale = if user_locale != "en_US" {
-		format!("Plese provide the note in the language for the locale {}", user_locale)
+	let user_locale = std::env::var("_PR_LOCALE").unwrap_or("en-US".to_string());
+	let set_locale = if user_locale != "en-US" {
+		format!(
+			"Plese provide the note in the language for the locale {}\n",
+			user_locale
+		)
 	} else {
 		"".to_string()
 	};
@@ -70,8 +79,7 @@ You run the command `{last_command}` and get the following error message: `{erro
 ```
 {{"command":"your suggestion","note":"why you think this command will fix the error"}}
 ```
-{set_locale}
-If you don't know the answer or can't provide a good suggestion, please reply the command field with `None` and a explanation in note
+{set_locale}If you don't know the answer or can't provide a good suggestion, please reply the command field with `None` and a explanation in note
 "#
 	);
 
