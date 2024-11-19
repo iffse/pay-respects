@@ -31,8 +31,8 @@ pub fn ai_suggestion(last_command: &str, error_msg: &str) -> Option<AISuggest> {
 		Ok(key) => Some(key),
 		Err(_) => {
 			let env_key = option_env!("_DEF_PR_AI_API_KEY").map(|key| key.to_string());
-			// I am keepting the key so anyone can use it, but it is better to use your own key
-			// Please, don't abuse the key
+			// I am keeping the key so anyone can use it out of the box
+			// Please, don't abuse the key and try to use your own key
 			if env_key.is_none() {
 				Some("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".to_string())
 			} else {
@@ -59,21 +59,19 @@ pub fn ai_suggestion(last_command: &str, error_msg: &str) -> Option<AISuggest> {
 
 	let user_locale = std::env::var("_PR_LOCALE").unwrap_or("en_US".to_string());
 	let set_locale = if user_locale != "en_US" {
-		format!("Plese provide the note in the language for the locale {}\n", user_locale)
+		format!("Plese provide the note in the language for the locale {}", user_locale)
 	} else {
 		"".to_string()
 	};
 
 	let ai_prompt = format!(
 		r#"
-You are a programmer trying to run a command in your shell. You run the command `{last_command}` and get the following error message: `{error_msg}`. What command should you run next to fix the error?
-
-Answer in the following JSON format without any extra text:
+You run the command `{last_command}` and get the following error message: `{error_msg}`. What command should you run next to fix the error? Answer in the following JSON format without any extra text:
 ```
 {{"command":"your suggestion","note":"why you think this command will fix the error"}}
 ```
 {set_locale}
-If you don't know the answer or can't provide a good suggestion, please reply the command field with `None` and provide a note explaining why you can't provide a suggestion
+If you don't know the answer or can't provide a good suggestion, please reply the command field with `None` and a explanation in note
 "#
 	);
 
