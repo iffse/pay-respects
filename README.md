@@ -152,6 +152,7 @@ If it's useful to you, **please share this project and spread the word**. Also c
 	>
 	<a href="https://ko-fi.com/iffse" target="_blank" rel="noreferrer"
 		><img
+			height='30'
 			src="https://www.vectorlogo.zone/logos/ko-fi/ko-fi-ar21.svg"
 			alt="Donate using Ko-fi"
 			style="height: 30px;"
@@ -160,6 +161,7 @@ If it's useful to you, **please share this project and spread the word**. Also c
 	<br />
 	<a href="https://iffse.eu.org/stripe" target="_blank" rel="noreferrer"
 		><img
+			height='30'
 			src="https://cdn.brandfolder.io/KGT2DTA4/at/8vbr8k4mr5xjwk4hxq4t9vs/Stripe_wordmark_-_blurple.svg"
 			alt="Donate using Stripe"
 			style="height: 30px;"
@@ -170,6 +172,7 @@ If it's useful to you, **please share this project and spread the word**. Also c
 		target="_blank"
 		rel="noreferrer"
 		><img
+			height='30'
 			src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg"
 			alt="Donate using PayPal"
 			style="height: 25px; margin-bottom: 3px;"
