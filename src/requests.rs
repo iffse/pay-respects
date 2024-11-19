@@ -58,6 +58,11 @@ pub fn ai_suggestion(last_command: &str, error_msg: &str) -> Option<AISuggest> {
 	};
 
 	let user_locale = std::env::var("_PR_LOCALE").unwrap_or("en_US".to_string());
+	let set_locale = if user_locale != "en_US" {
+		format!("Plese provide the note in the language for the locale {}\n", user_locale)
+	} else {
+		"".to_string()
+	};
 
 	let ai_prompt = format!(
 		r#"
@@ -67,9 +72,7 @@ Answer in the following JSON format without any extra text:
 ```
 {{"command":"your suggestion","note":"why you think this command will fix the error"}}
 ```
-
-User locale is: {user_locale}, plese make sure to provide the note in the same language.
-
+{set_locale}
 If you don't know the answer or can't provide a good suggestion, please reply the command field with `None` and provide a note explaining why you can't provide a suggestion
 "#
 	);
