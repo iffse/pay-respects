@@ -64,6 +64,8 @@ fn main() {
 	let mut last_command = shell::last_command(&shell);
 	last_command = shell::expand_alias(&shell, &last_command);
 	let mut error_msg = command_output(&shell, &last_command);
+	error_msg = error_msg.split_whitespace().collect::<Vec<&str>>().join(" ");
+
 	loop {
 		let suggestion = {
 			let command = suggestions::suggest_command(&shell, &last_command, &error_msg);
@@ -91,6 +93,7 @@ fn main() {
 		} else {
 			last_command = suggestion;
 			error_msg = execution.err().unwrap();
+			error_msg = error_msg.split_whitespace().collect::<Vec<&str>>().join(" ");
 
 			let retry_message = format!("{}...", t!("retry"));
 
