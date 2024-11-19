@@ -182,6 +182,18 @@ ja = "コマンドが見つかりません。"
 ko = "명령을 찾을 수 없습니다."
 zh = "找不到命令。"
 
+[ai-suggestion]
+en = "Suggestion from AI"
+es = "Sugerencia de la IA"
+de = "Vorschlag von KI"
+fr = "Suggestion de l'IA"
+it = "Proposta dall'IA"
+pt = "Sugestão da IA"
+ru = "Предложение от ИИ"
+ja = "AIからの提案"
+ko = "AI 제안"
+zh = "AI 建议"
+
 [confirm]
 en = "Execute suggestion?"
 es = "¿Ejecutar sugerencia?"

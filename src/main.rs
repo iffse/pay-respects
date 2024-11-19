@@ -30,6 +30,9 @@ mod replaces;
 #[cfg(feature = "runtime-rules")]
 mod runtime_rules;
 
+#[cfg(feature = "request-ai")]
+mod requests;
+
 #[macro_use]
 extern crate rust_i18n;
 i18n!("i18n", fallback = "en", minify_key = true);
@@ -39,6 +42,11 @@ fn main() {
 	// let locale = std::env::var("LANG").unwrap_or("en_US".to_string());
 	let locale = get_locale().unwrap_or("en_US".to_string());
 	rust_i18n::set_locale(&locale[0..2]);
+
+	#[cfg(feature = "request-ai")]
+	{
+		std::env::set_var("_PR_LOCALE", &locale);
+	}
 
 	args::handle_args();
 

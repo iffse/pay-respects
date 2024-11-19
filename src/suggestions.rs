@@ -56,6 +56,21 @@ pub fn suggest_command(shell: &str, last_command: &str, error_msg: &str) -> Opti
 		}
 	}
 
+	#[cfg(feature = "request-ai")]{
+		use crate::requests::ai_suggestion;
+		let suggest = ai_suggestion(last_command, error_msg);
+		if let Some(suggest) = suggest {
+			eprintln!("{}: {}\n", t!("ai-suggestion").bold().blue(), suggest.note);
+			let command = suggest.command;
+			if command != "None" {
+				if PRIVILEGE_LIST.contains(&split_command[0].as_str()) {
+					return Some(format!("{} {}", split_command[0], command));
+				}
+				return Some(command);
+			}
+		}
+	}
+
 	None
 }
 

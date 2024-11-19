@@ -22,7 +22,9 @@ rust-i18n = "3"
 regex-lite = "0.1"
 
 toml = { version = "0.8", optional = true }
+serde_json = { version = "1.0", optional = true }
 serde = { version = "1.0", features = ["derive"], optional = true }
+reqwest = { version = "0.12", features = ["blocking", "json"], optional = true }
 
 pay-respects-parser = "0.2.5"
 # pay-respects-parser = { path = "../pay-respects-parser" }
@@ -30,6 +32,7 @@ pay-respects-parser = "0.2.5"
 
 [features]
 runtime-rules = ["dep:serde", "dep:toml"]
+request-ai = ["dep:serde", "dep:serde_json", "dep:reqwest"]
 
 [profile.release]
 strip = true
