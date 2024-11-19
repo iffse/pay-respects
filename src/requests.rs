@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use reqwest::blocking::Client;
 use serde::{Deserialize, Serialize};
-use serde_json::{Result, Value};
+use serde_json::Value;
 
 #[derive(Serialize, Deserialize)]
 struct Input {
