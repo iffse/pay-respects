@@ -99,6 +99,7 @@ You run the command `{last_command}` and get the following error message: `{erro
 		.header("Authorization", format!("Bearer {}", api_key))
 		.header("Content-Type", "application/json")
 		.json(&messages)
+		.timeout(std::time::Duration::from_secs(10))
 		.send();
 
 	let res = match res {
