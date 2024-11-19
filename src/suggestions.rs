@@ -56,7 +56,8 @@ pub fn suggest_command(shell: &str, last_command: &str, error_msg: &str) -> Opti
 		}
 	}
 
-	#[cfg(feature = "request-ai")]{
+	#[cfg(feature = "request-ai")]
+	{
 		use crate::requests::ai_suggestion;
 		let suggest = ai_suggestion(last_command, error_msg);
 		if let Some(suggest) = suggest {
