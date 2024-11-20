@@ -39,7 +39,7 @@ pattern = [
 	"pattern 1"
 ]
 # this will add a `sudo` before the command if:
-# - the `sudo` is found by `which`
+# - the `sudo` is found as executable
 # - the last command does not contain `sudo`
 suggest = [
 '''
@@ -61,7 +61,7 @@ The placeholder is evaluated as following:
 
 Suggestions can have additional conditions to check. To specify conditions, add a `#[...]` at the first line (just like derive macros in Rust). Available conditions:
 
-- `executable`: Check whether the argument can be found by `which`
+- `executable`: Check whether the argument can be found as executable (`command -v arg`)
 - `cmd_contains`: Check whether the last user input contains the argument
 - `err_contains`: Check whether the error of the command contains the argument
 - `length`: Check whether the given command has the length of the argument
