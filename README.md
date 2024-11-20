@@ -136,7 +136,7 @@ See [writing rules](./rules.md) for how to write rules.
 
 ## AI Integration
 
-> **Disclaimer**: You are using AI generated content at your own risk. Please double-check its suggestions before accepting.
+> **Disclaimer**: You are using AI generated content on your own risk. Please double-check its suggestions before accepting.
 
 AI suggestions should work out of the box unless rate limit has reached. Bring your own API keys to avoid it.
 
@@ -187,7 +187,7 @@ If it's useful to you, **please share this project and spread the word**. Also c
 
 > Configuration is done via environment variables:
 >
-> - `_PR_AI_API_KEY`: You own API key. Set it to an empty value disables AI integration
+> - `_PR_AI_API_KEY`: Your own API key. Set it to an empty string to disable AI integration (`""`)
 > - `_PR_AI_URL`: URL used. Defaults to `https://api.groq.com/openai/v1/chat/completions`
 > - `_PR_AI_MODEL`: Model used. Defaults to `llama3-8b-8192`
 >
