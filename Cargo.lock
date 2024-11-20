@@ -873,15 +873,15 @@ dependencies = [
 
 [[package]]
 name = "pay-respects-parser"
-version = "0.2.5"
+version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3793a4fca8bb4230c885f12e99334dc25d2dce37299464886bda265cba24e365"
+checksum = "0616ebcf9e3b5a8316a6d4466a53f103972336d33f2138f3b94fda0f7b372d51"
 dependencies = [
  "proc-macro2",
  "quote",
  "serde",
  "syn 1.0.109",
- "toml 0.7.8",
+ "toml 0.8.19",
 ]
 
 [[package]]
