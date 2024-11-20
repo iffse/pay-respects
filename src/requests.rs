@@ -50,7 +50,12 @@ pub fn ai_suggestion(last_command: &str, error_msg: &str) -> Option<AISuggest> {
 	};
 
 	let api_key = match api_key {
-		Some(key) => key,
+		Some(key) => {
+			if key.is_empty() {
+				return None;
+			}
+			key
+		}
 		None => {
 			return None;
 		}
@@ -81,7 +86,7 @@ You run the command `{last_command}` and get the following error message: `{erro
 ```
 {{"command":"your suggestion","note":"why you think this command will fix the error"}}
 ```
-{set_locale}If you don't know the answer or can't provide a good suggestion, please reply the command field with `None` and a explanation in note
+{set_locale}If you can't provide a good suggestion, please reply the command field with `None` and a explanation in note
 "#
 	);
 

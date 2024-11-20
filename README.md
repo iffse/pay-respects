@@ -185,7 +185,7 @@ If it's useful to you, **please share this project and spread the word**. Also c
 
 > Configuration is done via environment variables:
 >
-> - `_PR_AI_API_KEY`: You own API key
+> - `_PR_AI_API_KEY`: You own API key. Set it to an empty value disables AI integration
 > - `_PR_AI_URL`: URL used. Defaults to `https://api.groq.com/openai/v1/chat/completions`
 > - `_PR_AI_MODEL`: Model used. Defaults to `llama3-8b-8192`
 >
