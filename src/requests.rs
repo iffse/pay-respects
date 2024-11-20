@@ -125,15 +125,14 @@ You run the command `{last_command}` and get the following error message: `{erro
 
 	let content = &json["choices"][0]["message"]["content"];
 
-
 	let suggestion: AISuggest = {
 		let str = {
 			let str = content.as_str();
-			if str.is_none() {
-				return None;
-			}
-			str.unwrap().trim_start_matches("```").trim_end_matches("```")
-		} ;
+			str?;
+			str.unwrap()
+				.trim_start_matches("```")
+				.trim_end_matches("```")
+		};
 		let json = serde_json::from_str(str);
 		if json.is_err() {
 			return None;
