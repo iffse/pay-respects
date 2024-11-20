@@ -126,7 +126,13 @@ You run the command `{last_command}` and get the following error message: `{erro
 	let content = &json["choices"][0]["message"]["content"];
 
 	let suggestion: AISuggest = {
-		let str = content.as_str().unwrap();
+		let str = {
+			let str = content.as_str();
+			if str.is_none() {
+				return None;
+			}
+			str.unwrap()
+		} ;
 		let json = serde_json::from_str(str);
 		if json.is_err() {
 			return None;
