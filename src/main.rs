@@ -45,7 +45,9 @@ fn main() {
 
 	#[cfg(feature = "request-ai")]
 	{
-		std::env::set_var("_PR_LOCALE", &locale);
+		if std::env::var("_PR_AI_LOCALE").is_err() {
+			std::env::set_var("_PR_AI_LOCALE", &locale);
+		}
 	}
 
 	args::handle_args();

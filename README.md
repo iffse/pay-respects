@@ -63,7 +63,7 @@ Please follow the instruction for your shell:
 > - `_PR_LAST_COMMAND`: The last command.
 >
 > pay-respects echos back, if applicable, a `cd` command that can be evaluated by the current working shell.
->
+
 > General example:
 > ```shell
 > eval $(_PR_SHELL=sh _PR_LAST_COMMAND="git comit" pay-respects)
@@ -115,12 +115,12 @@ Compiled binaries can be found at [GitHub releases](https://github.com/iffse/pay
 	<summary>Compile from source (any OS/architecture)</summary>
 
 > This installation requires you to have Cargo (the Rust package manager) installed.
->
+
 > Install from [crates.io](https://crates.io/), features are optional
 > ```shell
 > cargo install pay-respects --features=runtime-rules,request-ai
 > ```
->
+
 > Clone from git and install, suitable for adding custom compile-time rules:
 > ```
 > git clone --depth 1 https://github.com/iffse/pay-respects
@@ -187,10 +187,12 @@ If it's useful to you, **please share this project and spread the word**. Also c
 
 > Configuration is done via environment variables:
 >
-> - `_PR_AI_API_KEY`: Your own API key. Set it to an empty string to disable AI integration (`""`)
+> - `_PR_AI_API_KEY`: Your own API key
 > - `_PR_AI_URL`: URL used. Defaults to `https://api.groq.com/openai/v1/chat/completions`
 > - `_PR_AI_MODEL`: Model used. Defaults to `llama3-8b-8192`
->
+> - `_PR_AI_DISABLE`: Setting to any value disables AI integration
+> - `_PR_AI_LOCALE`: Locale in which the AI explains the suggestion. Defaults to user system locale
+
 > Compile time variables:
 >
 > - `_DEF_PR_AI_API_KEY`: Default API key, included in compile-time

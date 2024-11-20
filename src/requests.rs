@@ -23,6 +23,10 @@ pub struct AISuggest {
 }
 
 pub fn ai_suggestion(last_command: &str, error_msg: &str) -> Option<AISuggest> {
+	if std::env::var("_PR_AI_DISABLE").is_ok() {
+		return None;
+	}
+
 	let error_msg = if error_msg.len() > 300 {
 		&error_msg[..300]
 	} else {
@@ -70,23 +74,19 @@ pub fn ai_suggestion(last_command: &str, error_msg: &str) -> Option<AISuggest> {
 		Err(_) => "llama3-8b-8192".to_string(),
 	};
 
-	let user_locale = std::env::var("_PR_LOCALE").unwrap_or("en-US".to_string());
-	let set_locale = if user_locale != "en-US" {
-		format!(
-			"Provide the note in the language for the locale {}\n",
-			user_locale
-		)
+	let user_locale = std::env::var("_PR_AI_LOCALE").unwrap_or("en-US".to_string());
+	let set_locale = if !user_locale.starts_with("en") {
+		format!(". Use language for locale {}", user_locale)
 	} else {
 		"".to_string()
 	};
 
 	let ai_prompt = format!(
 		r#"
-You run the command `{last_command}` and get the following error message: `{error_msg}`. What would you run next? Answer in the following JSON format without any extra text:
+The command `{last_command}` returns the following error message: `{error_msg}`. Provide a command to fix it. Answer in the following JSON format without any extra text:
 ```
-{{"command":"suggestion","note":"why it may fix the error"}}
+{{"command":"suggestion","note":"why it may fix the error{set_locale}"}}
 ```
-{set_locale}If you can't provide a good suggestion, reply the command field with `None` and a explanation in note
 "#
 	);
 
