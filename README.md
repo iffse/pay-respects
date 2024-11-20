@@ -136,6 +136,8 @@ See [writing rules](./rules.md) for how to write rules.
 
 ## AI Integration
 
+> **Disclaimer**: You are using AI generated content at your own risk. Please double-check its suggestions before accepting.
+
 AI suggestions should work out of the box unless rate limit has reached. Bring your own API keys to avoid it.
 
 If it's useful to you, **please share this project and spread the word**. Also consider making a donation to keep its public usage alive:
