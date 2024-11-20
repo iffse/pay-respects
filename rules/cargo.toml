@@ -7,6 +7,6 @@ pattern = [
 suggest = [
 '''
 #[err_contains(did you mean)]
-{{command[0]}} {{err::(?:did you mean `)(.*)(?:`)}} {{command[2:]}} '''
+{{command[0]}} {{err::(?:did you mean `)(.*)(?:`\?)}} {{command[2:]}} '''
 ]
 
