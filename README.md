@@ -26,7 +26,7 @@ Please follow the instruction for your shell:
 > alias f="$(pay-respects fish)"
 > ```
 
-> Auto aliasing (optional custom alias can be added after `--alias argument`):
+> Auto aliasing (optional custom alias can be added after `--alias`):
 > ```shell
 > eval "$(pay-respects bash --alias)"
 > eval "$(pay-respects zsh --alias)"
