@@ -17,6 +17,6 @@ pattern = [
 ]
 suggest = [
 '''
-{{command[0}} {{opt::(?:\s)-[\w]+}} {{typo[1:](file)}} '''
+{{command[0}} {{opt::(?:\s)(-[\w]+)}} {{typo[1:](file)}} '''
 ]
 
