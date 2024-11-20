@@ -73,7 +73,7 @@ pub fn ai_suggestion(last_command: &str, error_msg: &str) -> Option<AISuggest> {
 	let user_locale = std::env::var("_PR_LOCALE").unwrap_or("en-US".to_string());
 	let set_locale = if user_locale != "en-US" {
 		format!(
-			"Plese provide the note in the language for the locale {}\n",
+			"Provide the note in the language for the locale {}\n",
 			user_locale
 		)
 	} else {
@@ -82,11 +82,11 @@ pub fn ai_suggestion(last_command: &str, error_msg: &str) -> Option<AISuggest> {
 
 	let ai_prompt = format!(
 		r#"
-You run the command `{last_command}` and get the following error message: `{error_msg}`. What command should you run next to fix the error? Answer in the following JSON format without any extra text:
+You run the command `{last_command}` and get the following error message: `{error_msg}`. What would you run next? Answer in the following JSON format without any extra text:
 ```
-{{"command":"your suggestion","note":"why you think this command will fix the error"}}
+{{"command":"suggestion","note":"why it may fix the error"}}
 ```
-{set_locale}If you can't provide a good suggestion, please reply the command field with `None` and a explanation in note
+{set_locale}If you can't provide a good suggestion, reply the command field with `None` and a explanation in note
 "#
 	);
 
