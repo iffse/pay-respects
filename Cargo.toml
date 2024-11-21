@@ -24,7 +24,6 @@ regex-lite = "0.1"
 toml = { version = "0.8", optional = true }
 serde_json = { version = "1.0", optional = true }
 serde = { version = "1.0", features = ["derive"], optional = true }
-reqwest = { version = "0.12", features = ["blocking", "json"], optional = true }
 textwrap = { version = "0.16", features = ["terminal_size"], optional = true}
 
 pay-respects-parser = "0.2.6"
@@ -33,7 +32,7 @@ pay-respects-parser = "0.2.6"
 
 [features]
 runtime-rules = ["dep:serde", "dep:toml"]
-request-ai = ["dep:serde", "dep:serde_json", "dep:reqwest", "dep:textwrap"]
+request-ai = ["dep:serde", "dep:serde_json", "dep:textwrap"]
 
 [profile.release]
 strip = true
