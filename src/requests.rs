@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 
-use reqwest::blocking::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -98,25 +97,27 @@ The command `{last_command}` returns the following error message: `{error_msg}`.
 		model,
 	};
 
-	let client = Client::new();
-	let res = client
-		.post(&request_url)
-		.header("Authorization", format!("Bearer {}", api_key))
-		.header("Content-Type", "application/json")
-		.json(&messages)
-		.timeout(std::time::Duration::from_secs(10))
-		.send();
+	let res = std::process::Command::new("curl")
+		.arg("-X")
+		.arg("POST")
+		.arg("-H")
+		.arg(format!("Authorization: Bearer {}", api_key))
+		.arg("-H")
+		.arg("Content-Type: application/json")
+		.arg("-d")
+		.arg(serde_json::to_string(&messages).unwrap())
+		.arg(request_url)
+		.output();
 
 	let res = match res {
-		Ok(res) => res,
+		Ok(res) => res.stdout,
 		Err(_) => {
 			return None;
 		}
 	};
 
-	let res = &res.text().unwrap();
 	let json: Value = {
-		let json = serde_json::from_str(res);
+		let json = serde_json::from_str(std::str::from_utf8(&res).unwrap());
 		if json.is_err() {
 			return None;
 		}
