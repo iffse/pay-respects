@@ -2,7 +2,8 @@ command = "mv"
 
 [[match_err]]
 pattern = [
-	"no such file or directory"
+	"no such file or directory",
+	"not a directory"
 ]
 suggest = [
 '''
