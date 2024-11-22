@@ -1,5 +1,6 @@
 [package]
 name = "pay-respects"
+authors = ["iff <iff@ik.me>"]
 version = "0.5.12"
 edition = "2021"
 
@@ -29,7 +30,6 @@ textwrap = { version = "0.16", features = ["terminal_size"], optional = true}
 
 pay-respects-parser = "0.2.6"
 # pay-respects-parser = { path = "../pay-respects-parser" }
-
 
 [features]
 runtime-rules = ["dep:serde", "dep:toml"]

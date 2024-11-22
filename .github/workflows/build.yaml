@@ -4,37 +4,86 @@ on:
   push:
     tags:
       - v*
-
+permissions:
+  contents: write
 jobs:
   build:
+    name: ${{ matrix.target }}
     runs-on: ${{ matrix.os }}
-    permissions:
-      contents: write
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            deb: true
+          - os: macos-latest
+            target: x86_64-apple-darwin
+          - os: macos-latest
+            target: aarch64-apple-darwin
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+          - os: windows-latest
+            target: aarch64-pc-windows-msvc
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: build
-      run: |
-        cargo build --release --all-features
+      - name: get version
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
-    - name: Zipping files (exe)
-      if: matrix.os == 'windows-latest'
-      run: |
-        7z a pay-respects-${{ matrix.os }}.zip ./target/release/pay-respects.exe
+      - name: setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          target: ${{ matrix.target }}
 
-    - name: Zipping files (unix)
-      if: matrix.os != 'windows-latest'
-      run: |
-        7z a pay-respects-${{ matrix.os }}.zip ./target/release/pay-respects
+      # will need to static link openssl
+      # - name: install cross
+      #   if: ${{ runner.os == 'Linux' }}
+      #   uses: actions-rs/cargo@v1
+      #   with:
+      #     command: install
+      #     args: cross --locked
 
-    - name: Uploading to release
-      uses: ncipollo/release-action@v1
-      with:
-        artifacts: pay-respects-${{ matrix.os }}.zip
-        allowUpdates: true
-        makeLatest: true
+      - name: build
+        run:
+          cargo build --release --all-features --locked --target ${{ matrix.target }}
+
+      - name: install cargo-deb
+        if: ${{ matrix.deb == true }}
+        uses: actions-rs/install@v0.1
+        with:
+          crate: cargo-deb
+
+      - name: build deb
+        if: ${{ matrix.deb == true }}
+        uses: actions-rs/cargo@v1
+        with:
+          command: deb
+          args: --no-build --no-strip --output=. --target=${{ matrix.target }}
+
+      - name: zipping files (exe)
+        if: runner.os == 'Windows'
+        # for some reason Windows doesn't support environment variables?
+        run: >
+          7z a pay-respects-${{ matrix.target }}.zip
+          ./target/${{ matrix.target }}/release/pay-respects.exe
+
+      - name: zipping files (unix)
+        if: runner.os != 'Windows'
+        run: >
+          tar -czf pay-respects-${{ steps.version.outputs.VERSION }}-${{ matrix.target }}.tar.gz
+          -C target/${{ matrix.target }}/release pay-respects
+
+      - name: uploading to release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: |
+            *.tar.gz
+            *.zip
+            *.deb
+          allowUpdates: true
+          makeLatest: true
 
