@@ -1,7 +1,11 @@
 use std::collections::HashMap;
+use std::io::Read;
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+
+use curl::easy::Easy as Curl;
+use curl::easy::List;
 
 #[derive(Serialize, Deserialize)]
 struct Input {
@@ -97,32 +101,43 @@ The command `{last_command}` returns the following error message: `{error_msg}`.
 		model,
 	};
 
-	let res = std::process::Command::new("curl")
-		.arg("-X")
-		.arg("POST")
-		.arg("-H")
-		.arg(format!("Authorization: Bearer {}", api_key))
-		.arg("-H")
-		.arg("Content-Type: application/json")
-		.arg("-d")
-		.arg(serde_json::to_string(&messages).unwrap())
-		.arg(request_url)
-		.output();
+	let str_json = serde_json::to_string(&messages).unwrap();
+	let mut data = str_json.as_bytes();
 
-	let res = match res {
-		Ok(res) => res.stdout,
-		Err(_) => {
-			return None;
-		}
-	};
+	let mut dst = Vec::new();
+	let mut handle = Curl::new();
 
-	let json: Value = {
-		let json = serde_json::from_str(std::str::from_utf8(&res).unwrap());
-		if json.is_err() {
-			return None;
-		}
-		json.unwrap()
-	};
+	handle.url(&request_url).unwrap();
+	handle.post(true).unwrap();
+	handle.post_field_size(data.len() as u64).unwrap();
+
+	let mut headers = List::new();
+	headers
+		.append(&format!("Authorization: Bearer {}", api_key))
+		.unwrap();
+	headers.append("Content-Type: application/json").unwrap();
+	handle.http_headers(headers).unwrap();
+
+	{
+		let mut transfer = handle.transfer();
+
+		transfer
+			.read_function(|buf| Ok(data.read(buf).unwrap_or(0)))
+			.unwrap();
+
+		transfer
+			.write_function(|buf| {
+				dst.extend_from_slice(buf);
+				Ok(buf.len())
+			})
+			.unwrap();
+
+		transfer.perform().expect("Failed to perform request");
+	}
+
+	let res = String::from_utf8(dst).unwrap();
+
+	let json: Value = serde_json::from_str(&res).unwrap();
 
 	let content = &json["choices"][0]["message"]["content"];
 
@@ -130,7 +145,7 @@ The command `{last_command}` returns the following error message: `{error_msg}`.
 		let str = {
 			let str = content.as_str();
 			str?;
-			str.unwrap()
+			str.expect("Failed to get content from response")
 				.trim_start_matches("```")
 				.trim_end_matches("```")
 		};
