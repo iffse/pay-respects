@@ -6,7 +6,7 @@ Typed a wrong command or don't know what to do? Pay Respects will suggest a fix 
 - ✏️ **Easy to write rules**: You don't need to know Rust. The rules are written in a TOML file!
 - 🎯 **Accurate results**: Suggestions are verified before being prompted to the user, no `sudo` suggestions when you are using `doas`!
 - 🤖 **AI Support**: AI comes in aid when there is no rule for your error!
-- 🪶 **Tiny binary size**: Not even 1MB! Even with all optional features, it's less than 3MB!
+- 🪶 **Tiny binary size**: Not even 1MB! Approximately 1MB with all optional features!
 
 ![pacman-fix](img/pacman-fix.png)
 
@@ -79,37 +79,10 @@ Install from your package manager if available:
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/pay-respects.svg)](https://repology.org/project/pay-respects/versions)
 
-Compiled binaries can be found at [GitHub releases](https://github.com/iffse/pay-respects/releases).
-
-<details>
-	<summary>Generic x86 Desktop Linux</summary>
-
-> 1. Get the latest binary from [releases](https://github.com/iffse/pay-respects/releases).
-> ```shell
-> curl -sL -o pay-respects.zip \
-> $(curl -s https://api.github.com/repos/iffse/pay-respects/releases/latest \
-> | sed 's/[()",{}]/ /g; s/ /\n/g' \
-> | grep "https.*pay-respects-ubuntu-latest.zip")
-> ```
->
-> 2. Extract zip, e.g. one of the following:
-> ```shell
-> 7z -x pay-respects.zip
-> unzip pay-respects.zip
-> ```
->
-> 3. System-wide installation:
-> ```shell
-> sudo chmod a+x pay-respects
-> sudo mv pay-respects /usr/local/bin/pay-respects
-> ```
->
-> 4. Delete the downloaded package:
-> ```shell
-> rm pay-respects.zip
-> ```
-
-</details>
+Or install compiled binaries from [GitHub releases](https://github.com/iffse/pay-respects/releases) with the install script:
+```
+curl -sSfL https://raw.githubusercontent.com/iffse/pay-respects/main/install.sh | sh
+```
 
 <details>
 	<summary>Compile from source (any OS/architecture)</summary>
