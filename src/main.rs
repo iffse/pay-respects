@@ -63,7 +63,7 @@ fn main() {
 		}
 	};
 
-	let mut last_command = shell::last_command(&shell);
+	let mut last_command = shell::last_command(&shell).trim().to_string();
 	last_command = shell::expand_alias(&shell, &last_command);
 	let mut error_msg = command_output(&shell, &last_command);
 	error_msg = error_msg
