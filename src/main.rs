@@ -40,7 +40,14 @@ i18n!("i18n", fallback = "en", minify_key = true);
 fn main() {
 	colored::control::set_override(true);
 	// let locale = std::env::var("LANG").unwrap_or("en_US".to_string());
-	let locale = get_locale().unwrap_or("en-US".to_string());
+	let locale = {
+		let sys_locale = get_locale().unwrap_or("en-US".to_string());
+		if sys_locale.len() < 2 {
+			"en_US".to_string()
+		} else {
+			sys_locale
+		}
+	};
 	rust_i18n::set_locale(&locale[0..2]);
 
 	#[cfg(feature = "request-ai")]
