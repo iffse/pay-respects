@@ -91,7 +91,7 @@ curl -sSfL https://raw.githubusercontent.com/iffse/pay-respects/main/install.sh 
 
 > Install from [crates.io](https://crates.io/), features are optional
 > ```shell
-> cargo install pay-respects --features=runtime-rules,request-ai
+> cargo install pay-respects --all-features
 > ```
 
 > Clone from git and install, suitable for adding custom compile-time rules:
@@ -100,6 +100,13 @@ curl -sSfL https://raw.githubusercontent.com/iffse/pay-respects/main/install.sh 
 > cd pay-respects
 > cargo install --path .
 > ```
+
+> Features:
+>
+> - `runtime-rules`: Read rules in runtime
+> - `request-ai`: Request AI for suggestion
+> - `libcurl`: Dynamically link `libcurl` for requests
+
 
 </details>
 
