@@ -69,11 +69,15 @@ fn print_version() {
 	println!("compile features:");
 	#[cfg(feature = "runtime-rules")]
 	{
-		println!("\t- runtime-rules");
+		println!("  - runtime-rules");
 	}
 	#[cfg(feature = "request-ai")]
 	{
-		println!("\t- request-ai");
+		println!("  - request-ai");
+	}
+	#[cfg(feature = "libcurl")]
+	{
+		println!("  - libcurl");
 	}
 	std::process::exit(0);
 }

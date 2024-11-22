@@ -33,7 +33,11 @@ pay-respects-parser = "0.2.6"
 
 [features]
 runtime-rules = ["dep:serde", "dep:toml"]
-request-ai = ["dep:serde", "dep:serde_json", "dep:curl", "dep:textwrap"]
+request-ai = ["dep:serde", "dep:serde_json", "dep:textwrap"]
+
+# linking to libcurl dynamically requires openssl when compiling and
+# complicates cross compilation
+libcurl = ["dep:curl"]
 
 [profile.release]
 strip = true

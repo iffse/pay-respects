@@ -1,11 +1,7 @@
 use std::collections::HashMap;
-use std::io::Read;
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-
-use curl::easy::Easy as Curl;
-use curl::easy::List;
 
 #[derive(Serialize, Deserialize)]
 struct Input {
@@ -93,6 +89,7 @@ The command `{last_command}` returns the following error message: `{error_msg}`.
 "#
 	);
 
+	let res;
 	let messages = Messages {
 		messages: vec![Input {
 			role: "user".to_string(),
@@ -101,42 +98,70 @@ The command `{last_command}` returns the following error message: `{error_msg}`.
 		model,
 	};
 
-	let str_json = serde_json::to_string(&messages).unwrap();
-	let mut data = str_json.as_bytes();
-
-	let mut dst = Vec::new();
-	let mut handle = Curl::new();
-
-	handle.url(&request_url).unwrap();
-	handle.post(true).unwrap();
-	handle.post_field_size(data.len() as u64).unwrap();
-
-	let mut headers = List::new();
-	headers
-		.append(&format!("Authorization: Bearer {}", api_key))
-		.unwrap();
-	headers.append("Content-Type: application/json").unwrap();
-	handle.http_headers(headers).unwrap();
-
+	#[cfg(feature = "libcurl")]
 	{
-		let mut transfer = handle.transfer();
+		use curl::easy::Easy as Curl;
+		use curl::easy::List;
+		use std::io::Read;
 
-		transfer
-			.read_function(|buf| Ok(data.read(buf).unwrap_or(0)))
+		let str_json = serde_json::to_string(&messages).unwrap();
+		let mut data = str_json.as_bytes();
+
+		let mut dst = Vec::new();
+		let mut handle = Curl::new();
+
+		handle.url(&request_url).unwrap();
+		handle.post(true).unwrap();
+		handle.post_field_size(data.len() as u64).unwrap();
+
+		let mut headers = List::new();
+		headers
+			.append(&format!("Authorization: Bearer {}", api_key))
 			.unwrap();
+		headers.append("Content-Type: application/json").unwrap();
+		handle.http_headers(headers).unwrap();
 
-		transfer
-			.write_function(|buf| {
-				dst.extend_from_slice(buf);
-				Ok(buf.len())
-			})
-			.unwrap();
+		{
+			let mut transfer = handle.transfer();
 
-		transfer.perform().expect("Failed to perform request");
+			transfer
+				.read_function(|buf| Ok(data.read(buf).unwrap_or(0)))
+				.unwrap();
+
+			transfer
+				.write_function(|buf| {
+					dst.extend_from_slice(buf);
+					Ok(buf.len())
+				})
+				.unwrap();
+
+			transfer.perform().expect("Failed to perform request");
+		}
+
+		res = String::from_utf8(dst).unwrap();
 	}
+	#[cfg(not(feature = "libcurl"))]
+	{
+		let proc = std::process::Command::new("curl")
+			.arg("-X")
+			.arg("POST")
+			.arg("-H")
+			.arg(format!("Authorization: Bearer {}", api_key))
+			.arg("-H")
+			.arg("Content-Type: application/json")
+			.arg("-d")
+			.arg(serde_json::to_string(&messages).unwrap())
+			.arg(request_url)
+			.output();
 
-	let res = String::from_utf8(dst).unwrap();
-
+		let out = match proc {
+			Ok(proc) => proc.stdout,
+			Err(_) => {
+				return None;
+			}
+		};
+		res = String::from_utf8(out).unwrap();
+	}
 	let json: Value = serde_json::from_str(&res).unwrap();
 
 	let content = &json["choices"][0]["message"]["content"];
