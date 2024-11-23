@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use crate::{shell::command_output, style::highlight_difference};
-use colored::Colorize;
 use sys_locale::get_locale;
 
 mod args;
@@ -24,6 +22,7 @@ mod rules;
 mod shell;
 mod style;
 mod suggestions;
+mod modes;
 
 #[cfg(feature = "runtime-rules")]
 mod replaces;
@@ -59,66 +58,17 @@ fn main() {
 
 	args::handle_args();
 
-	let shell = match std::env::var("_PR_SHELL") {
-		Ok(shell) => shell,
+	let mode = match std::env::var("_PR_MODE") {
+		Ok(mode) => mode,
 		Err(_) => {
-			eprintln!(
-				"{}",
-				t!("no-env-setup", var = "_PR_SHELL", help = "pay-respects -h")
-			);
-			std::process::exit(1);
+			"suggestion".to_string()
 		}
 	};
 
-	let mut last_command = shell::last_command(&shell).trim().to_string();
-	last_command = shell::expand_alias(&shell, &last_command);
-	let mut error_msg = command_output(&shell, &last_command);
-	error_msg = error_msg
-		.split_whitespace()
-		.collect::<Vec<&str>>()
-		.join(" ");
-
-	loop {
-		let suggestion = {
-			let command = suggestions::suggest_command(&shell, &last_command, &error_msg);
-			if command.is_none() {
-				break;
-			};
-
-			let mut command = command.unwrap();
-			shell::shell_syntax(&shell, &mut command);
-			command
-		};
-
-		let highlighted_suggestion = {
-			let difference = highlight_difference(&shell, &suggestion, &last_command);
-			if difference.is_none() {
-				break;
-			};
-			difference.unwrap()
-		};
-
-		let execution =
-			suggestions::confirm_suggestion(&shell, &suggestion, &highlighted_suggestion);
-		if execution.is_ok() {
-			return;
-		} else {
-			last_command = suggestion;
-			error_msg = execution.err().unwrap();
-			error_msg = error_msg
-				.split_whitespace()
-				.collect::<Vec<&str>>()
-				.join(" ");
-
-			let retry_message = format!("{}...", t!("retry"));
-
-			eprintln!("\n{}\n", retry_message.cyan().bold());
+	match mode.as_str() {
+		"suggestion" => modes::suggestion(),
+		"cnf" => modes::cnf(),
+		_ => {
 		}
 	}
-	eprintln!("{}: {}\n", t!("no-suggestion"), last_command.red());
-	eprintln!(
-		"{}\n{}",
-		t!("contribute"),
-		option_env!("CARGO_PKG_REPOSITORY").unwrap_or("https://github.com/iffse/pay-respects/")
-	);
 }
