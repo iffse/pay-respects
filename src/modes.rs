@@ -1,7 +1,7 @@
 use crate::shell::{command_output, get_shell, PRIVILEGE_LIST};
 use crate::style::highlight_difference;
-use crate::{shell, suggestions};
 use crate::suggestions::{split_command, suggest_typo};
+use crate::{shell, suggestions};
 use colored::Colorize;
 
 pub fn suggestion() {
@@ -72,8 +72,8 @@ pub fn cnf() {
 
 	let best_match = suggest_typo(&[executable.to_owned()], vec!["path".to_string()]);
 	if best_match == executable {
-		eprintln!("{}: no command found", shell);
-		return
+		eprintln!("{}: command not found: {}", shell, executable);
+		return;
 	}
 	match PRIVILEGE_LIST.contains(&split_command[0].as_str()) {
 		true => {

@@ -7,6 +7,7 @@ pub fn handle_args() {
 	}
 	let mut auto_aliasing = String::new();
 	let mut shell = String::new();
+	let mut cnf = true;
 	let mut index = 1;
 	while index < args.len() {
 		match args[index].as_str() {
@@ -29,6 +30,10 @@ pub fn handle_args() {
 				}
 				index += 1;
 			}
+			"--noncf" => {
+				cnf = false;
+				index += 1
+			}
 			_ => {
 				shell = args[index].clone();
 				index += 1
@@ -43,7 +48,7 @@ pub fn handle_args() {
 
 	let binary_path = &args[0];
 
-	initialization(&shell, binary_path, &auto_aliasing);
+	initialization(&shell, binary_path, &auto_aliasing, cnf);
 }
 
 fn print_help() {
