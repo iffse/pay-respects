@@ -2,7 +2,9 @@ use crate::suggestions::find_similar;
 
 pub fn get_path_files() -> Vec<String> {
 	let path = std::env::var("PATH").unwrap();
+	log::debug!("path: {path}");
 	let path = path.split(':').collect::<Vec<&str>>();
+	log::debug!("path list: {path:?}");
 	let mut all_executable = vec![];
 	for p in path {
 		let files = match std::fs::read_dir(p) {
