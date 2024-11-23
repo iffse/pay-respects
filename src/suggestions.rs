@@ -177,24 +177,30 @@ pub fn suggest_typo(typos: &[String], candidates: Vec<String>) -> String {
 					};
 					if let Some(suggest) = find_similar(typo, &path_files) {
 						suggestions.push(suggest);
-					};
+					} else {
+						suggestions.push(typo.to_string());
+					}
 				}
 				"file" => {
 					if let Some(suggest) = get_best_match_file(typo) {
 						suggestions.push(suggest);
+					} else {
+						suggestions.push(typo.to_string());
 					}
 				}
 				_ => {}
 			}
 		} else if let Some(suggest) = find_similar(typo, &candidates) {
 			suggestions.push(suggest);
+		} else {
+			suggestions.push(typo.to_string());
 		}
 	}
 	suggestions.join(" ")
 }
 
 pub fn find_similar(typo: &str, candidates: &[String]) -> Option<String> {
-	let mut min_distance = 10;
+	let mut min_distance = { std::cmp::max(2, typo.chars().count() / 2 + 1) };
 	let mut min_distance_index = None;
 	for (i, candidate) in candidates.iter().enumerate() {
 		if candidate.is_empty() {
