@@ -25,8 +25,10 @@ Please follow the instruction for your shell:
 > eval "$(pay-respects zsh --alias)"
 > pay-respects fish --alias | source
 > ```
+> Additional arguments:
+> - `--nocnf`: Disables `command_not_found` handler
 
-> Manual aliasing (**deprecated**, not recommended):
+> Manual aliasing (**deprecated**, do not use):
 > ```shell
 > alias f="$(pay-respects bash)"
 > alias f="$(pay-respects zsh)"
