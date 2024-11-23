@@ -10,7 +10,8 @@ pub fn get_path_files() -> Vec<String> {
 				.unwrap()
 				.stdout,
 		)
-		.into_owned()
+		.trim()
+		.to_owned()
 	} else {
 		std::env::var("PATH").unwrap()
 	};
@@ -25,21 +26,58 @@ pub fn get_path_files() -> Vec<String> {
 		#[cfg(windows)]
 		let p = msys2_conv_path(p).expect("Failed to convert path for msys");
 
+		if cfg!(debug_assertions) {
+			eprintln!("p={p}");
+		}
+
 		let files = match std::fs::read_dir(p) {
 			Ok(files) => files,
 			Err(_) => continue,
 		};
 		for file in files {
 			let file = file.unwrap();
-			let file_name = file.file_name().into_string().unwrap();
+			#[allow(unused_mut)]
+			let mut file_name = file.file_name().into_string().unwrap();
+
+			#[cfg(windows)]
+			{
+				let mut ok = false;
+				let suffixies = [".exe", ".sh", ".ps1"];
+				for suffix in suffixies {
+					if let Some(file_name_strip) = file_name.strip_suffix(suffix) {
+						file_name = file_name_strip.to_owned();
+						ok = true;
+						break;
+					}
+				}
+
+				if !file_name.contains(".") {
+					ok = true;
+				}
+
+				if !ok {
+					continue;
+				}
+			}
+
 			all_executable.push(file_name);
 		}
 	}
+
+	if cfg!(debug_assertions) {
+		let mut all_executable = all_executable.clone();
+		all_executable.sort_unstable();
+		eprintln!("all_executable={all_executable:?}");
+	}
+
 	all_executable
 }
 
 pub fn get_best_match_file(input: &str) -> Option<String> {
 	let mut input = input.trim_matches(|c| c == '\'' || c == '"').to_owned();
+	if cfg!(debug_assertions) {
+		eprintln!("get_best_match_file input: {input}");
+	}
 	let mut exit_dirs = Vec::new();
 	let mut files = loop {
 		match std::fs::read_dir(&input) {
@@ -85,5 +123,5 @@ fn msys2_conv_path(p: &str) -> std::io::Result<String> {
 		.arg("-w")
 		.arg(p)
 		.output()
-		.map(|output| String::from_utf8_lossy(&output.stdout).into_owned())
+		.map(|output| String::from_utf8_lossy(&output.stdout).trim().to_owned())
 }
