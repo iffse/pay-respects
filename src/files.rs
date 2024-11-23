@@ -3,7 +3,7 @@ use crate::suggestions::find_similar;
 pub fn get_path_files() -> Vec<String> {
 	let path_env = if cfg!(windows) {
 		String::from_utf8_lossy(
-			&std::process::Command::new("/usr/bin/bash")
+			&std::process::Command::new("bash")
 				.arg("-c")
 				.arg("echo $PATH")
 				.output()
