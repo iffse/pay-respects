@@ -19,18 +19,18 @@ Please follow the instruction for your shell:
 <details>
 	<summary>Bash / Zsh / Fish</summary>
 
-> Manual aliasing:
-> ```shell
-> alias f="$(pay-respects bash)"
-> alias f="$(pay-respects zsh)"
-> alias f="$(pay-respects fish)"
-> ```
-
 > Auto aliasing (optional custom alias can be added after `--alias`):
 > ```shell
 > eval "$(pay-respects bash --alias)"
 > eval "$(pay-respects zsh --alias)"
 > pay-respects fish --alias | source
+> ```
+
+> Manual aliasing (**deprecated**, not recommended):
+> ```shell
+> alias f="$(pay-respects bash)"
+> alias f="$(pay-respects zsh)"
+> alias f="$(pay-respects fish)"
 > ```
 
 </details>
