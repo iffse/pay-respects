@@ -105,7 +105,8 @@ curl -sSfL https://raw.githubusercontent.com/iffse/pay-respects/main/install.sh 
 >
 > - `runtime-rules`: Read rules in runtime
 > - `request-ai`: Request AI for suggestion
-> - `libcurl`: Dynamically link `libcurl` for requests
+> - `libcurl`: Dynamically link `libcurl` for requests, which requires openssl at compile time
+> 	- Only matters to package maintainers, as by turning it off gives fewer headaches when cross-compiling
 
 
 </details>
