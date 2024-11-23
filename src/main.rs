@@ -18,11 +18,11 @@ use sys_locale::get_locale;
 
 mod args;
 mod files;
+mod modes;
 mod rules;
 mod shell;
 mod style;
 mod suggestions;
-mod modes;
 
 #[cfg(feature = "runtime-rules")]
 mod replaces;
@@ -60,15 +60,12 @@ fn main() {
 
 	let mode = match std::env::var("_PR_MODE") {
 		Ok(mode) => mode,
-		Err(_) => {
-			"suggestion".to_string()
-		}
+		Err(_) => "suggestion".to_string(),
 	};
 
 	match mode.as_str() {
 		"suggestion" => modes::suggestion(),
 		"cnf" => modes::cnf(),
-		_ => {
-		}
+		_ => {}
 	}
 }

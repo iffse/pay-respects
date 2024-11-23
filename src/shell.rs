@@ -146,7 +146,7 @@ pub fn expand_alias_multiline(shell: &str, full_command: &str) -> String {
 	expanded
 }
 
-pub fn initialization(shell: &str, binary_path: &str, auto_alias: &str) {
+pub fn initialization(shell: &str, binary_path: &str, auto_alias: &str, cnf: bool) {
 	let last_command;
 	let alias;
 
@@ -227,9 +227,55 @@ end
 		}
 	}
 
+	if cnf {
+		match shell {
+			"bash" | "zsh" => {
+				init = format!(
+					r#"
+command_not_found_handler() {{
+	eval $(_PR_LAST_COMMAND="$@" _PR_SHELL="{}" _PR_MODE=cnf "{}")
+}}
+
+{}
+"#,
+					shell, binary_path, init
+				);
+			}
+			"fish" => {
+				init = format!(
+					r#"
+function fish_command_not_found --on-event fish_command_not_found
+	eval $(_PR_LAST_COMMAND="$argv" _PR_SHELL="{}" _PR_MODE=cnf "{}")
+end
+
+{}
+"#,
+					shell, binary_path, init
+				);
+			}
+			_ => {
+				println!("Unsupported shell: {}", shell);
+				exit(1);
+			}
+		}
+	}
+
 	println!("{}", init);
 
 	std::process::exit(0);
+}
+
+pub fn get_shell() -> String {
+	match std::env::var("_PR_SHELL") {
+		Ok(shell) => shell,
+		Err(_) => {
+			eprintln!(
+				"{}",
+				t!("no-env-setup", var = "_PR_SHELL", help = "pay-respects -h")
+			);
+			std::process::exit(1);
+		}
+	}
 }
 
 pub fn shell_syntax(shell: &str, command: &mut String) {
