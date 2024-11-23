@@ -38,9 +38,6 @@ extern crate rust_i18n;
 i18n!("i18n", fallback = "en", minify_key = true);
 
 fn main() {
-	#[cfg(feature = "logging")]
-	pretty_env_logger::init();
-
 	colored::control::set_override(true);
 	// let locale = std::env::var("LANG").unwrap_or("en_US".to_string());
 	let locale = {
