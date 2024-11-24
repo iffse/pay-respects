@@ -164,6 +164,10 @@ pub fn initialization(shell: &str, binary_path: &str, auto_alias: &str, cnf: boo
 			last_command = "(history | last).command";
 			alias = "\"\"";
 		}
+		"pwsh" | "powershell" => {
+			last_command = "Get-History | Select-Object -Last 1 | ForEach-Object {$_.CommandLine}";
+			alias = ";";
+		}
 		_ => {
 			println!("Unknown shell: {}", shell);
 			std::process::exit(1);
@@ -190,15 +194,24 @@ def --env {} [] {{
 		std::process::exit(0);
 	}
 
-	let mut init = format!(
-		"\
+	let mut init = match shell {
+		"bash" | "zsh" | "fish" => format!(
+			"\
 			eval $(_PR_LAST_COMMAND=\"{}\" \
 			_PR_ALIAS=\"{}\" \
 			_PR_SHELL=\"{}\" \
 			\"{}\")",
-		last_command, alias, shell, binary_path
-	);
-
+			last_command, alias, shell, binary_path
+		),
+		"pwsh" | "powershell" => format!(
+			"& {{$env:_PR_LAST_COMMAND='{}'; $env:_PR_SHELL='{}'; &'{}';}}",
+			last_command, shell, binary_path
+		),
+		_ => {
+			println!("Unsupported shell: {}", shell);
+			exit(1);
+		}
+	};
 	if auto_alias.is_empty() {
 		println!("{}", init);
 		std::process::exit(0);
@@ -214,6 +227,15 @@ def --env {} [] {{
 function {} -d "Terminal command correction"
 	eval $({})
 end
+"#,
+				auto_alias, init
+			);
+		}
+		"pwsh" | "powershell" => {
+			init = format!(
+				r#"function {} {{
+	{}
+}}
 "#,
 				auto_alias, init
 			);
@@ -249,6 +271,13 @@ end
 "#,
 					shell, binary_path, init
 				);
+			}
+			"pwsh" | "powershell" => {
+				init = format!(
+					r#"{}
+$ExecutionContext.InvokeCommand.CommandNotFoundAction = {{$env:_PR_MODE='cnf'; {}; $env:_PR_MODE=$null; }}"#,
+					init, auto_alias
+				)
 			}
 			_ => {
 				println!("Unsupported shell: {}", shell);
