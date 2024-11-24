@@ -8,7 +8,15 @@ pub fn suggestion() {
 	let shell = get_shell();
 	let mut last_command = shell::last_command(&shell).trim().to_string();
 	last_command = shell::expand_alias(&shell, &last_command);
-	let mut error_msg = command_output(&shell, &last_command);
+	let mut error_msg = {
+		let error_msg = std::env::var("_PR_ERROR_MSG");
+		if let Ok(error_msg) = error_msg {
+			error_msg
+		} else {
+			command_output(&shell, &last_command)
+		}
+	};
+
 	error_msg = error_msg
 		.split_whitespace()
 		.collect::<Vec<&str>>()
