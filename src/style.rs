@@ -16,6 +16,9 @@ pub fn highlight_difference(
 	if split_suggested_command == split_last_command {
 		return None;
 	}
+	if split_suggested_command.is_empty() {
+		return None;
+	}
 
 	let privileged = PRIVILEGE_LIST.contains(&split_suggested_command[0].as_str());
 

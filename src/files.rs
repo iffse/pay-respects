@@ -1,34 +1,89 @@
 use crate::suggestions::find_similar;
 
 pub fn get_path_files() -> Vec<String> {
-	let path = std::env::var("PATH").unwrap();
-	#[cfg(target_os = "windows")]
-	let path = path.split(';').collect::<Vec<&str>>();
-	#[cfg(not(target_os = "windows"))]
-	let path = path.split(':').collect::<Vec<&str>>();
+	let path_env = if cfg!(windows) {
+		String::from_utf8_lossy(
+			&std::process::Command::new("bash")
+				.arg("-c")
+				.arg("echo $PATH")
+				.output()
+				.unwrap()
+				.stdout,
+		)
+		.trim()
+		.to_owned()
+	} else {
+		std::env::var("PATH").unwrap()
+	};
+
+	if cfg!(debug_assertions) {
+		eprintln!("path_env: {path_env}");
+	}
+
+	let path = path_env.split(':').collect::<Vec<&str>>();
 	let mut all_executable = vec![];
 	for p in path {
+		#[cfg(windows)]
+		let p = msys2_conv_path(p).expect("Failed to convert path for msys");
+
+		if cfg!(debug_assertions) {
+			eprintln!("p={p}");
+		}
+
 		let files = match std::fs::read_dir(p) {
 			Ok(files) => files,
 			Err(_) => continue,
 		};
 		for file in files {
 			let file = file.unwrap();
-			let file_name = file.file_name().into_string().unwrap();
+			#[allow(unused_mut)]
+			let mut file_name = file.file_name().into_string().unwrap();
+
+			#[cfg(windows)]
+			{
+				let mut ok = false;
+				let suffixies = [".exe", ".sh", ".ps1"];
+				for suffix in suffixies {
+					if let Some(file_name_strip) = file_name.strip_suffix(suffix) {
+						file_name = file_name_strip.to_owned();
+						ok = true;
+						break;
+					}
+				}
+
+				if !file_name.contains(".") {
+					ok = true;
+				}
+
+				if !ok {
+					continue;
+				}
+			}
+
 			all_executable.push(file_name);
 		}
 	}
+
+	if cfg!(debug_assertions) {
+		let mut all_executable = all_executable.clone();
+		all_executable.sort_unstable();
+		eprintln!("all_executable={all_executable:?}");
+	}
+
 	all_executable
 }
 
 pub fn get_best_match_file(input: &str) -> Option<String> {
 	let mut input = input.trim_matches(|c| c == '\'' || c == '"').to_owned();
+	if cfg!(debug_assertions) {
+		eprintln!("get_best_match_file input: {input}");
+	}
 	let mut exit_dirs = Vec::new();
 	let mut files = loop {
 		match std::fs::read_dir(&input) {
 			Ok(files) => break files,
 			Err(_) => {
-				if let Some((dirs, exit_dir)) = input.rsplit_once('/') {
+				if let Some((dirs, exit_dir)) = input.rsplit_once(std::path::MAIN_SEPARATOR) {
 					exit_dirs.push(exit_dir.to_owned());
 					input = dirs.to_owned();
 				} else {
@@ -60,4 +115,13 @@ pub fn get_best_match_file(input: &str) -> Option<String> {
 	}
 
 	Some(input)
+}
+
+#[cfg(windows)]
+fn msys2_conv_path(p: &str) -> std::io::Result<String> {
+	std::process::Command::new("cygpath")
+		.arg("-w")
+		.arg(p)
+		.output()
+		.map(|output| String::from_utf8_lossy(&output.stdout).trim().to_owned())
 }
