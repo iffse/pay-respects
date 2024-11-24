@@ -81,6 +81,12 @@ Install from your package manager if available:
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/pay-respects.svg)](https://repology.org/project/pay-respects/versions)
 
+For Arch Linux / Arch Linux ARM users, you can install from [Arch Linux CN Repository](https://github.com/archlinuxcn/repo):
+
+```shell
+sudo pacman -S pay-respects
+```
+
 Or install compiled binaries from [GitHub releases](https://github.com/iffse/pay-respects/releases) with the install script:
 ```
 curl -sSfL https://raw.githubusercontent.com/iffse/pay-respects/main/install.sh | sh
