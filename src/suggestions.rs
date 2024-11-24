@@ -153,6 +153,9 @@ pub fn eval_shell_command(shell: &str, command: &str) -> Vec<String> {
 }
 
 pub fn split_command(command: &str) -> Vec<String> {
+	if cfg!(debug_assertions) {
+		eprintln!("command: {command}")
+	}
 	// this regex splits the command separated by spaces, except when the space
 	// is escaped by a backslash or surrounded by quotes
 	let regex = r#"([^\s"'\\]+|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\\ )+|\\|\n"#;
