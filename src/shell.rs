@@ -204,7 +204,25 @@ def --env {} [] {{
 			last_command, alias, shell, binary_path
 		),
 		"pwsh" | "powershell" => format!(
-			"& {{$env:_PR_LAST_COMMAND='{}'; $env:_PR_SHELL='{}'; &'{}';}}",
+			r#"& {{
+    $pre_PR_LAST_COMMAND = $env:_PR_LAST_COMMAND;
+    $pre_PR_SHELL = $env:_PR_SHELL;
+    $pre_PR_ERROR_MSG = $env:_PR_ERROR_MSG;
+    try {{
+        $env:_PR_LAST_COMMAND = ({});
+        $err = Get-Error;
+        if ($env:_PR_LAST_COMMAND -eq $err.InvocationInfo.Line) {{
+            $env:_PR_ERROR_MSG = $err.Exception.Message
+        }}
+        $env:_PR_SHELL = '{}';
+        &'{}';
+    }}
+    finally {{
+        $env:_PR_LAST_COMMAND = $pre_PR_LAST_COMMAND;
+        $env:_PR_SHELL = $pre_PR_SHELL;
+        $env:_PR_ERROR_MSG = $pre_PR_ERROR_MSG;
+    }}
+}}"#,
 			last_command, shell, binary_path
 		),
 		_ => {
@@ -233,11 +251,9 @@ end
 		}
 		"pwsh" | "powershell" => {
 			init = format!(
-				r#"function {} {{
-	{}
-}}
-"#,
-				auto_alias, init
+				"function {} {{\n{}",
+				auto_alias,
+				init.split_once("\n").unwrap().1,
 			);
 		}
 		_ => {
