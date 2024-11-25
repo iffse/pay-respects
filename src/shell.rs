@@ -205,24 +205,23 @@ def --env {} [] {{
 		),
 		"pwsh" | "powershell" => format!(
 			r#"& {{
-    $pre_PR_LAST_COMMAND = $env:_PR_LAST_COMMAND;
-    $pre_PR_SHELL = $env:_PR_SHELL;
-    $pre_PR_ERROR_MSG = $env:_PR_ERROR_MSG;
-    try {{
-        $env:_PR_LAST_COMMAND = ({});
-        $err = Get-Error;
-        if ($env:_PR_LAST_COMMAND -eq $err.InvocationInfo.Line) {{
-            $env:_PR_ERROR_MSG = $err.Exception.Message
-        }}
-        $env:_PR_SHELL = '{}';
-        &'{}';
+	# fetch command and error from session history only when not in cnf mode
+    if ($env:_PR_MODE -ne 'cnf') {{  
+    	$env:_PR_LAST_COMMAND = ({});
+    	$err = Get-Error;
+    	if ($env:_PR_LAST_COMMAND -eq $err.InvocationInfo.Line) {{
+    		$env:_PR_ERROR_MSG = $err.Exception.Message
+    	}}
     }}
-    finally {{
-        $env:_PR_LAST_COMMAND = $pre_PR_LAST_COMMAND;
-        $env:_PR_SHELL = $pre_PR_SHELL;
-        $env:_PR_ERROR_MSG = $pre_PR_ERROR_MSG;
+    $env:_PR_SHELL = '{}';
+    &'{}';
+    # restore mode from cnf
+    if ($env:_PR_MODE -eq 'cnf') {{
+        $env:_PR_MODE = $env:_PR_PWSH_ORIGIN_MODE;
+        $env:_PR_PWSH_ORIGIN_MODE = $null;
     }}
-}}"#,
+}}
+"#,
 			last_command, shell, binary_path
 		),
 		_ => {
@@ -291,7 +290,24 @@ end
 			"pwsh" | "powershell" => {
 				init = format!(
 					r#"{}
-$ExecutionContext.InvokeCommand.CommandNotFoundAction = {{$env:_PR_MODE='cnf'; {}; $env:_PR_MODE=$null; }}"#,
+$ExecutionContext.InvokeCommand.CommandNotFoundAction = 
+{{
+    param(
+        [string]
+        $commandName,
+        [System.Management.Automation.CommandLookupEventArgs]
+        $eventArgs
+    )
+    # powershell does not support run command with specific environment variables
+    # but you must set global variables. so we are memorizing the current mode and the alias function will reset it later.
+    $env:_PR_PWSH_ORIGIN_MODE=$env:_PR_MODE;
+    $env:_PR_MODE='cnf';
+    # powershell may search command with prefix 'get-' or '.\' first when this hook is hit, strip them
+    $env:_PR_LAST_COMMAND=$commandName -replace '^get-|\.\\','';
+    $eventArgs.Command = (Get-Command {});
+    $eventArgs.StopSearch = $True;
+}}
+"#,
 					init, auto_alias
 				)
 			}
