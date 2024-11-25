@@ -57,6 +57,16 @@ Please follow the instruction for your shell:
 </details>
 
 <details>
+	<summary>PowerShell</summary>
+
+> Append the following to your profile:
+> ```pwsh
+> pay-respects pwsh [--alias <alias>] [--nocnf] [>> $PROFILE] # use the pipe to directly append it to your profile if you like
+> ```
+
+</details>
+
+<details>
 	<summary>Custom initialization for arbitrary shell</summary>
 
 > pay-respects only requires 2 environment variables to function:

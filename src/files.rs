@@ -1,30 +1,56 @@
 use crate::suggestions::find_similar;
 
 pub fn get_path_files() -> Vec<String> {
-	let path_env = if cfg!(windows) {
-		String::from_utf8_lossy(
-			&std::process::Command::new("bash")
-				.arg("-c")
-				.arg("echo $PATH")
-				.output()
-				.unwrap()
-				.stdout,
-		)
-		.trim()
-		.to_owned()
-	} else {
-		std::env::var("PATH").unwrap()
+	let path_env = {
+		#[cfg(windows)]
+		{
+			if is_msystem() {
+				String::from_utf8_lossy(
+					&std::process::Command::new("bash")
+						.arg("-c")
+						.arg("echo $PATH")
+						.output()
+						.unwrap()
+						.stdout,
+				)
+				.trim()
+				.to_owned()
+			} else {
+				std::env::var("PATH").unwrap()
+			}
+		}
+		#[cfg(not(windows))]
+		{
+			std::env::var("PATH").unwrap()
+		}
 	};
 
 	if cfg!(debug_assertions) {
 		eprintln!("path_env: {path_env}");
 	}
 
-	let path = path_env.split(':').collect::<Vec<&str>>();
+	let path_env_sep = {
+		#[cfg(windows)]
+		if is_msystem() {
+			":"
+		} else {
+			";"
+		}
+		#[cfg(not(windows))]
+		{
+			":"
+		}
+	};
+
+	let path = path_env.split(path_env_sep).collect::<Vec<&str>>();
 	let mut all_executable = vec![];
 	for p in path {
 		#[cfg(windows)]
-		let p = msys2_conv_path(p).expect("Failed to convert path for msys");
+		let p = if is_msystem() {
+			msys2_conv_path(p).expect("Failed to convert path for msys")
+		} else {
+			p.to_owned()
+		};
 
 		if cfg!(debug_assertions) {
 			eprintln!("p={p}");
@@ -124,4 +150,8 @@ fn msys2_conv_path(p: &str) -> std::io::Result<String> {
 		.arg(p)
 		.output()
 		.map(|output| String::from_utf8_lossy(&output.stdout).trim().to_owned())
+}
+#[cfg(windows)]
+fn is_msystem() -> bool {
+	std::env::var("MSYSTEM").is_ok()
 }

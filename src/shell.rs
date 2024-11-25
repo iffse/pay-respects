@@ -164,6 +164,10 @@ pub fn initialization(shell: &str, binary_path: &str, auto_alias: &str, cnf: boo
 			last_command = "(history | last).command";
 			alias = "\"\"";
 		}
+		"pwsh" | "powershell" => {
+			last_command = "Get-History | Select-Object -Last 1 | ForEach-Object {$_.CommandLine}";
+			alias = ";";
+		}
 		_ => {
 			println!("Unknown shell: {}", shell);
 			std::process::exit(1);
@@ -190,15 +194,45 @@ def --env {} [] {{
 		std::process::exit(0);
 	}
 
-	let mut init = format!(
-		"\
+	let mut init = match shell {
+		"bash" | "zsh" | "fish" => format!(
+			"\
 			eval $(_PR_LAST_COMMAND=\"{}\" \
 			_PR_ALIAS=\"{}\" \
 			_PR_SHELL=\"{}\" \
 			\"{}\")",
-		last_command, alias, shell, binary_path
-	);
-
+			last_command, alias, shell, binary_path
+		),
+		"pwsh" | "powershell" => format!(
+			r#"& {{
+    try {{
+        # fetch command and error from session history only when not in cnf mode
+        if ($env:_PR_MODE -ne 'cnf') {{  
+            $env:_PR_LAST_COMMAND = ({});
+            $err = Get-Error;
+            if ($env:_PR_LAST_COMMAND -eq $err.InvocationInfo.Line) {{
+                $env:_PR_ERROR_MSG = $err.Exception.Message
+            }}
+        }}
+        $env:_PR_SHELL = '{}';
+        &'{}';
+    }}
+    finally {{
+        # restore mode from cnf
+        if ($env:_PR_MODE -eq 'cnf') {{
+            $env:_PR_MODE = $env:_PR_PWSH_ORIGIN_MODE;
+            $env:_PR_PWSH_ORIGIN_MODE = $null;
+        }}
+    }}
+}}
+"#,
+			last_command, shell, binary_path
+		),
+		_ => {
+			println!("Unsupported shell: {}", shell);
+			exit(1);
+		}
+	};
 	if auto_alias.is_empty() {
 		println!("{}", init);
 		std::process::exit(0);
@@ -216,6 +250,13 @@ function {} -d "Terminal command correction"
 end
 "#,
 				auto_alias, init
+			);
+		}
+		"pwsh" | "powershell" => {
+			init = format!(
+				"function {} {{\n{}",
+				auto_alias,
+				init.split_once("\n").unwrap().1,
 			);
 		}
 		_ => {
@@ -249,6 +290,30 @@ end
 "#,
 					shell, binary_path, init
 				);
+			}
+			"pwsh" | "powershell" => {
+				init = format!(
+					r#"{}
+$ExecutionContext.InvokeCommand.CommandNotFoundAction = 
+{{
+    param(
+        [string]
+        $commandName,
+        [System.Management.Automation.CommandLookupEventArgs]
+        $eventArgs
+    )
+    # powershell does not support run command with specific environment variables
+    # but you must set global variables. so we are memorizing the current mode and the alias function will reset it later.
+    $env:_PR_PWSH_ORIGIN_MODE=$env:_PR_MODE;
+    $env:_PR_MODE='cnf';
+    # powershell may search command with prefix 'get-' or '.\' first when this hook is hit, strip them
+    $env:_PR_LAST_COMMAND=$commandName -replace '^get-|\.\\','';
+    $eventArgs.Command = (Get-Command {});
+    $eventArgs.StopSearch = $True;
+}}
+"#,
+					init, auto_alias
+				)
 			}
 			_ => {
 				println!("Unsupported shell: {}", shell);

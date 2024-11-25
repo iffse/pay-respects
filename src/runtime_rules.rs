@@ -134,8 +134,12 @@ fn eval_suggest(suggest: &str, last_command: &str, error_msg: &str, shell: &str)
 }
 
 fn get_rule(executable: &str) -> Option<String> {
-	let xdg_config_home = std::env::var("XDG_CONFIG_HOME")
-		.unwrap_or_else(|_| std::env::var("HOME").unwrap() + "/.config");
+	let xdg_config_home = if cfg!(windows) {
+		std::env::var("APPDATA").unwrap()
+	} else {
+		std::env::var("XDG_CONFIG_HOME")
+			.unwrap_or_else(|_| std::env::var("HOME").unwrap() + "/.config")
+	};
 
 	let user_rule_dir = format!("{}/pay-respects/rules", xdg_config_home);
 	let user_rule_file = format!("{}/{}.toml", user_rule_dir, executable);
