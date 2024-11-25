@@ -205,20 +205,24 @@ def --env {} [] {{
 		),
 		"pwsh" | "powershell" => format!(
 			r#"& {{
-	# fetch command and error from session history only when not in cnf mode
-    if ($env:_PR_MODE -ne 'cnf') {{  
-    	$env:_PR_LAST_COMMAND = ({});
-    	$err = Get-Error;
-    	if ($env:_PR_LAST_COMMAND -eq $err.InvocationInfo.Line) {{
-    		$env:_PR_ERROR_MSG = $err.Exception.Message
-    	}}
+    try {{
+        # fetch command and error from session history only when not in cnf mode
+        if ($env:_PR_MODE -ne 'cnf') {{  
+            $env:_PR_LAST_COMMAND = ({});
+            $err = Get-Error;
+            if ($env:_PR_LAST_COMMAND -eq $err.InvocationInfo.Line) {{
+                $env:_PR_ERROR_MSG = $err.Exception.Message
+            }}
+        }}
+        $env:_PR_SHELL = '{}';
+        &'{}';
     }}
-    $env:_PR_SHELL = '{}';
-    &'{}';
-    # restore mode from cnf
-    if ($env:_PR_MODE -eq 'cnf') {{
-        $env:_PR_MODE = $env:_PR_PWSH_ORIGIN_MODE;
-        $env:_PR_PWSH_ORIGIN_MODE = $null;
+    finally {{
+        # restore mode from cnf
+        if ($env:_PR_MODE -eq 'cnf') {{
+            $env:_PR_MODE = $env:_PR_PWSH_ORIGIN_MODE;
+            $env:_PR_PWSH_ORIGIN_MODE = $null;
+        }}
     }}
 }}
 "#,
