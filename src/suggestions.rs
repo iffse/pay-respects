@@ -64,7 +64,8 @@ pub fn suggest_command(shell: &str, last_command: &str, error_msg: &str) -> Opti
 		// skip for commands with no arguments,
 		// very likely to be an error showing the usage
 		if PRIVILEGE_LIST.contains(&split_command[0].as_str()) && split_command.len() > 2
-		|| !PRIVILEGE_LIST.contains(&split_command[0].as_str()) && split_command.len() > 1 {
+			|| !PRIVILEGE_LIST.contains(&split_command[0].as_str()) && split_command.len() > 1
+		{
 			let suggest = ai_suggestion(last_command, error_msg);
 			if let Some(suggest) = suggest {
 				let warn = format!("{}:", t!("ai-suggestion")).bold().blue();
@@ -184,7 +185,7 @@ pub fn suggest_typo(typos: &[String], candidates: Vec<String>) -> String {
 					if path_files.is_empty() {
 						path_files = get_path_files();
 					};
-					if let Some(suggest) = find_similar(typo, &path_files) {
+					if let Some(suggest) = find_similar(typo, &path_files, Some(2)) {
 						suggestions.push(suggest);
 					} else {
 						suggestions.push(typo.to_string());
@@ -199,7 +200,7 @@ pub fn suggest_typo(typos: &[String], candidates: Vec<String>) -> String {
 				}
 				_ => {}
 			}
-		} else if let Some(suggest) = find_similar(typo, &candidates) {
+		} else if let Some(suggest) = find_similar(typo, &candidates, Some(2)) {
 			suggestions.push(suggest);
 		} else {
 			suggestions.push(typo.to_string());
@@ -208,8 +209,19 @@ pub fn suggest_typo(typos: &[String], candidates: Vec<String>) -> String {
 	suggestions.join(" ")
 }
 
-pub fn find_similar(typo: &str, candidates: &[String]) -> Option<String> {
-	let mut min_distance = { std::cmp::max(2, typo.chars().count() / 2 + 1) };
+pub fn best_match_path(typo: &str) -> Option<String> {
+	let path_files = get_path_files();
+	find_similar(typo, &path_files, Some(3))
+}
+
+// higher the threshold, the stricter the comparison
+// 1: anything
+// 2: 50% similarity
+// 3: 33% similarity
+// ... etc
+pub fn find_similar(typo: &str, candidates: &[String], threshold: Option<usize>) -> Option<String> {
+	let threshold = threshold.unwrap_or(2);
+	let mut min_distance = typo.chars().count() / threshold + 1;
 	let mut min_distance_index = None;
 	for (i, candidate) in candidates.iter().enumerate() {
 		if candidate.is_empty() {
@@ -344,4 +356,3 @@ fn run_suggestion(shell: &str, command: &str) -> std::process::ExitStatus {
 		.wait()
 		.unwrap()
 }
-

@@ -1,8 +1,10 @@
 use crate::shell::{command_output, get_shell, PRIVILEGE_LIST};
 use crate::style::highlight_difference;
-use crate::suggestions::{split_command, suggest_typo};
+use crate::suggestions::{best_match_path, split_command};
+use crate::system;
 use crate::{shell, suggestions};
 use colored::Colorize;
+use inquire::*;
 
 pub fn suggestion() {
 	let shell = get_shell();
@@ -78,21 +80,51 @@ pub fn cnf() {
 		false => split_command.first().expect(&t!("no-command")).as_str(),
 	};
 
-	let best_match = suggest_typo(&[executable.to_owned()], vec!["path".to_string()]);
-	if best_match == executable {
-		eprintln!("{}: command not found: {}", shell, executable);
-		return;
-	}
-	match PRIVILEGE_LIST.contains(&split_command[0].as_str()) {
-		true => {
-			split_command[1] = best_match;
+	let best_match = best_match_path(executable);
+	if best_match.is_some() {
+		let best_match = best_match.unwrap();
+		match PRIVILEGE_LIST.contains(&split_command[0].as_str()) {
+			true => {
+				split_command[1] = best_match;
+			}
+			false => {
+				split_command[0] = best_match;
+			}
 		}
-		false => {
-			split_command[0] = best_match;
-		}
-	}
-	let suggestion = split_command.join(" ");
+		let suggestion = split_command.join(" ");
 
-	let highlighted_suggestion = highlight_difference(&shell, &suggestion, &last_command).unwrap();
-	let _ = suggestions::confirm_suggestion(&shell, &suggestion, &highlighted_suggestion);
+		let highlighted_suggestion =
+			highlight_difference(&shell, &suggestion, &last_command).unwrap();
+		let _ = suggestions::confirm_suggestion(&shell, &suggestion, &highlighted_suggestion);
+	} else {
+		let package_manager = match system::get_package_manager(&shell) {
+			Some(package_manager) => package_manager,
+			None => {
+				eprintln!("no package manager found");
+				return;
+			}
+		};
+
+		let packages = match system::get_packages(&shell, &package_manager, executable) {
+			Some(packages) => packages,
+			None => {
+				eprintln!("no package found");
+				return;
+			}
+		};
+
+		let ans = Select::new("Select a package to install", packages).prompt();
+		let package = match ans {
+			Ok(package) => package,
+			Err(_) => {
+				eprintln!("no package selected");
+				return;
+			}
+		};
+
+		// retry after installing package
+		if system::install_package(&shell, &package_manager, &package) {
+			let _ = suggestions::confirm_suggestion(&shell, &last_command, &last_command);
+		}
+	}
 }
