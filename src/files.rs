@@ -130,7 +130,7 @@ pub fn get_best_match_file(input: &str) -> Option<String> {
 			})
 			.collect::<Vec<String>>();
 
-		let best_match = find_similar(&exit_dir, &dir_files);
+		let best_match = find_similar(&exit_dir, &dir_files, Some(1));
 		best_match.as_ref()?;
 
 		input = format!("{}/{}", input, best_match.unwrap());

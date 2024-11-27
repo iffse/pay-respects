@@ -23,6 +23,7 @@ mod rules;
 mod shell;
 mod style;
 mod suggestions;
+mod system;
 
 #[cfg(feature = "runtime-rules")]
 mod replaces;

@@ -25,6 +25,8 @@ serde = { version = "1.0", features = ["derive"], optional = true }
 curl = { version = "0.4", optional = true }
 textwrap = { version = "0.16", features = ["terminal_size"], optional = true }
 
+inquire = "0.7.5"
+
 pay-respects-parser = "0.2.6"
 # pay-respects-parser = { path = "../pay-respects-parser" }
 
