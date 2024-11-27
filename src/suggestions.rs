@@ -313,14 +313,12 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 	}
 }
 
-#[cfg(not(target_os = "windows"))]
 fn run_suggestion_p(shell: &str, p: &str, command: &str) -> std::process::ExitStatus {
-	use std::os::fd::AsFd;
 	std::process::Command::new(p)
 		.arg(shell)
 		.arg("-c")
 		.arg(command)
-		.stdout(stderr().as_fd().try_clone_to_owned().unwrap())
+		.stdout(stderr())
 		.stderr(Stdio::inherit())
 		.spawn()
 		.expect("failed to execute process")
@@ -328,14 +326,12 @@ fn run_suggestion_p(shell: &str, p: &str, command: &str) -> std::process::ExitSt
 		.unwrap()
 }
 
-#[cfg(not(target_os = "windows"))]
 fn run_suggestion(shell: &str, command: &str) -> std::process::ExitStatus {
-	use std::os::fd::AsFd;
 	std::process::Command::new(shell)
 		.arg("-c")
 		.arg(command)
 		// .stdout(Stdio::inherit())
-		.stdout(stderr().as_fd().try_clone_to_owned().unwrap())
+		.stdout(stderr())
 		.stderr(Stdio::inherit())
 		.spawn()
 		.expect("failed to execute process")
@@ -343,31 +339,3 @@ fn run_suggestion(shell: &str, command: &str) -> std::process::ExitStatus {
 		.unwrap()
 }
 
-#[cfg(target_os = "windows")]
-fn run_suggestion_p(shell: &str, p: &str, command: &str) -> std::process::ExitStatus {
-	use std::os::windows::io::AsHandle;
-	std::process::Command::new(p)
-		.arg(shell)
-		.arg("-c")
-		.arg(command)
-		.stdout(stderr().as_handle().try_clone_to_owned().unwrap())
-		.stderr(Stdio::inherit())
-		.spawn()
-		.expect("failed to execute process")
-		.wait()
-		.unwrap()
-}
-
-#[cfg(target_os = "windows")]
-fn run_suggestion(shell: &str, command: &str) -> std::process::ExitStatus {
-	use std::os::windows::io::AsHandle;
-	std::process::Command::new(shell)
-		.arg("-c")
-		.arg(command)
-		.stdout(stderr().as_handle().try_clone_to_owned().unwrap())
-		.stderr(Stdio::inherit())
-		.spawn()
-		.expect("failed to execute process")
-		.wait()
-		.unwrap()
-}
