@@ -60,18 +60,24 @@ pub fn suggest_command(shell: &str, last_command: &str, error_msg: &str) -> Opti
 	{
 		use crate::requests::ai_suggestion;
 		use textwrap::{fill, termwidth};
-		let suggest = ai_suggestion(last_command, error_msg);
-		if let Some(suggest) = suggest {
-			let warn = format!("{}:", t!("ai-suggestion")).bold().blue();
-			let note = fill(&suggest.note, termwidth());
 
-			eprintln!("{}\n{}\n", warn, note);
-			let command = suggest.command;
-			if command != "None" {
-				if PRIVILEGE_LIST.contains(&split_command[0].as_str()) {
-					return Some(format!("{} {}", split_command[0], command));
+		// skip for commands with no arguments,
+		// very likely to be an error showing the usage
+		if PRIVILEGE_LIST.contains(&split_command[0].as_str()) && split_command.len() > 2
+		|| !PRIVILEGE_LIST.contains(&split_command[0].as_str()) && split_command.len() > 1 {
+			let suggest = ai_suggestion(last_command, error_msg);
+			if let Some(suggest) = suggest {
+				let warn = format!("{}:", t!("ai-suggestion")).bold().blue();
+				let note = fill(&suggest.note, termwidth());
+
+				eprintln!("{}\n{}\n", warn, note);
+				let command = suggest.command;
+				if command != "None" {
+					if PRIVILEGE_LIST.contains(&split_command[0].as_str()) {
+						return Some(format!("{} {}", split_command[0], command));
+					}
+					return Some(command);
 				}
-				return Some(command);
 			}
 		}
 	}
