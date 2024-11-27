@@ -270,11 +270,23 @@ end
 
 	if cnf {
 		match shell {
-			"bash" | "zsh" => {
+			"bash" => {
 				init = format!(
 					r#"
 command_not_found_handler() {{
-	eval $(_PR_LAST_COMMAND="$@" _PR_SHELL="{}" _PR_MODE=cnf "{}")
+	eval $(_PR_LAST_COMMAND="_ $@" _PR_SHELL="{}" _PR_MODE="cnf" "{}")
+}}
+
+{}
+"#,
+					shell, binary_path, init
+				);
+			}
+			"zsh" => {
+				init = format!(
+					r#"
+command_not_found_handler() {{
+	eval $(_PR_LAST_COMMAND="$@" _PR_SHELL="{}" _PR_MODE="cnf" "{}")
 }}
 
 {}
@@ -286,7 +298,7 @@ command_not_found_handler() {{
 				init = format!(
 					r#"
 function fish_command_not_found --on-event fish_command_not_found
-	eval $(_PR_LAST_COMMAND="$argv" _PR_SHELL="{}" _PR_MODE=cnf "{}")
+	eval $(_PR_LAST_COMMAND="$argv" _PR_SHELL="{}" _PR_MODE="cnf" "{}")
 end
 
 {}
