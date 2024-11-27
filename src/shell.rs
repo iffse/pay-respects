@@ -54,7 +54,10 @@ pub fn last_command(shell: &str) -> String {
 	};
 
 	match shell {
-		"bash" => last_command,
+		"bash" => {
+			let first_line = last_command.lines().next().unwrap().trim();
+			first_line.split_once(' ').unwrap().1.to_string()
+		}
 		"zsh" => last_command,
 		"fish" => last_command,
 		"nu" => last_command,
@@ -149,7 +152,7 @@ pub fn initialization(shell: &str, binary_path: &str, auto_alias: &str, cnf: boo
 
 	match shell {
 		"bash" => {
-			last_command = r"$(history 2 | head -n 1 | sed 's/^\s*[0-9]*//')";
+			last_command = "$(history 2)";
 			alias = "$(alias)"
 		}
 		"zsh" => {
