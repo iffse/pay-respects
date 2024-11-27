@@ -273,7 +273,7 @@ end
 			"bash" => {
 				init = format!(
 					r#"
-command_not_found_handler() {{
+command_not_found_handle() {{
 	eval $(_PR_LAST_COMMAND="_ $@" _PR_SHELL="{}" _PR_MODE="cnf" "{}")
 }}
 
