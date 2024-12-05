@@ -76,7 +76,7 @@ pub fn expand_alias(shell: &str, full_command: &str) -> String {
 	}
 
 	let split_command = full_command.split_whitespace().collect::<Vec<&str>>();
-	let (command, pure_command) = if PRIVILEGE_LIST.contains(&split_command[0]) {
+	let (command, pure_command) = if PRIVILEGE_LIST.contains(&split_command[0]) && split_command.len() > 1 {
 		(split_command[1], Some(split_command[1..].join(" ")))
 	} else {
 		(split_command[0], None)

@@ -273,8 +273,14 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 		if !command.starts_with(&_p) {
 			continue;
 		}
-		let mut command = command.replacen(&_p, "", 1);
-		command = expand_alias_multiline(shell, &command);
+
+		let command = {
+			let mut command = command.replacen(&_p, "", 1);
+			if command != " " {
+				command = expand_alias_multiline(shell, &command);
+			}
+			command
+		};
 
 		let now = Instant::now();
 		let process = run_suggestion_p(shell, p, &command);
