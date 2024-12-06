@@ -1,5 +1,6 @@
 use crate::replaces;
 use crate::suggestions::*;
+use crate::shell::Data;
 
 #[derive(serde::Deserialize)]
 struct Rule {
@@ -14,16 +15,19 @@ struct MatchError {
 
 pub fn runtime_match(
 	executable: &str,
-	last_command: &str,
-	error_msg: &str,
-	shell: &str,
-) -> Option<String> {
+	data: &mut Data,
+) {
 	let file = get_rule(executable);
-	file.as_ref()?;
+	if file.is_none() {
+		return;
+	}
 
 	let file = std::fs::read_to_string(file.unwrap()).unwrap();
 	let rule: Rule = toml::from_str(&file).unwrap();
-	let split_command = split_command(last_command);
+	let split_command = &data.split.clone();
+	let shell = &data.shell.clone();
+	let last_command = &data.command.clone();
+	let error_msg = &data.error.clone();
 
 	let mut pure_suggest;
 
@@ -79,13 +83,11 @@ pub fn runtime_match(
 					if pure_suggest.contains("{{command}}") {
 						pure_suggest = pure_suggest.replace("{{command}}", last_command);
 					}
-					return eval_suggest(&pure_suggest, last_command, error_msg, shell);
+					data.add_candidate(&eval_suggest(&pure_suggest, last_command, error_msg, shell));
 				}
 			}
 		}
 	}
-
-	None
 }
 
 fn eval_condition(
@@ -108,7 +110,7 @@ fn eval_condition(
 	}
 }
 
-fn eval_suggest(suggest: &str, last_command: &str, error_msg: &str, shell: &str) -> Option<String> {
+fn eval_suggest(suggest: &str, last_command: &str, error_msg: &str, shell: &str) -> String {
 	let mut suggest = suggest.to_owned();
 	if suggest.contains("{{command}}") {
 		suggest = suggest.replace("{{command}}", "{last_command}");
@@ -130,7 +132,7 @@ fn eval_suggest(suggest: &str, last_command: &str, error_msg: &str, shell: &str)
 		suggest = suggest.replace(&tag, &value);
 	}
 
-	Some(suggest)
+	suggest
 }
 
 fn get_rule(executable: &str) -> Option<String> {

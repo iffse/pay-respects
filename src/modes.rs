@@ -1,6 +1,5 @@
 use crate::shell::Data;
-use crate::style::highlight_difference;
-use crate::suggestions::{best_match_path, suggest_command};
+use crate::suggestions::{best_match_path, suggest_candidates};
 use crate::system;
 use crate::{shell, suggestions};
 use colored::Colorize;
@@ -12,32 +11,22 @@ pub fn suggestion(data: &mut Data) {
 
 	loop {
 		last_command = data.command.clone();
-		let suggestion = {
-			let command = suggest_command(data);
-			if command.is_none() {
-				break;
-			};
-
-			let mut command = command.unwrap();
-			shell::shell_syntax(&shell, &mut command);
-			command
-		};
-		data.update_suggest(&suggestion);
-		data.expand_suggest();
-
-		let highlighted_suggestion = {
-			let difference = highlight_difference(&shell, &suggestion, &last_command);
-			if difference.is_none() {
-				break;
-			};
-			difference.unwrap()
+		suggest_candidates(data);
+		if data.candidates.is_empty() {
+			break;
 		};
 
-		let execution = suggestions::confirm_suggestion(data, &highlighted_suggestion);
+		for candidate in &mut data.candidates {
+			shell::shell_syntax(&shell, candidate);
+		}
+
+		suggestions::select_candidate(data);
+
+		let execution = suggestions::confirm_suggestion(data);
 		if execution.is_ok() {
 			return;
 		} else {
-			data.update_command(&suggestion);
+			data.update_command(&data.suggest.clone().unwrap());
 			let msg = Some(
 				execution
 					.err()
@@ -63,7 +52,6 @@ pub fn suggestion(data: &mut Data) {
 
 pub fn cnf(data: &mut Data) {
 	let shell = data.shell.clone();
-	let last_command = data.command.clone();
 	let mut split_command = data.split.clone();
 
 	let executable = split_command[0].as_str();
@@ -73,12 +61,11 @@ pub fn cnf(data: &mut Data) {
 		let best_match = best_match.unwrap();
 		split_command[0] = best_match;
 		let suggest = split_command.join(" ");
-		data.update_suggest(&suggest);
-		data.expand_suggest();
 
-		let highlighted_suggestion =
-			highlight_difference(&shell, &suggest, &last_command).unwrap();
-		let status = suggestions::confirm_suggestion(data, &highlighted_suggestion);
+		data.candidates.push(suggest.clone());
+		suggestions::select_candidate(data);
+
+		let status = suggestions::confirm_suggestion(data);
 		if status.is_err() {
 			data.update_command(&suggest);
 			let msg = Some(
@@ -96,7 +83,6 @@ pub fn cnf(data: &mut Data) {
 		let package_manager = match system::get_package_manager(&shell) {
 			Some(package_manager) => package_manager,
 			None => {
-				eprintln!("no package manager found");
 				return;
 			}
 		};
@@ -120,7 +106,7 @@ pub fn cnf(data: &mut Data) {
 
 		// retry after installing package
 		if system::install_package(&shell, &package_manager, &package) {
-			let _ = suggestions::confirm_suggestion(data, &last_command);
+			let _ = suggestions::confirm_suggestion(data);
 		}
 	}
 }

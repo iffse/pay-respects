@@ -8,6 +8,7 @@ pub fn highlight_difference(
 	shell: &str,
 	suggested_command: &str,
 	last_command: &str,
+	difference_only: bool,
 ) -> Option<String> {
 	// let replaced_newline = suggested_command.replace('\n', r" {{newline}} ");
 	let mut split_suggested_command = split_command(suggested_command);
@@ -42,7 +43,9 @@ pub fn highlight_difference(
 		}
 		for old in &old_entries {
 			if old == entry {
-				*entry = entry.blue().to_string();
+				if !difference_only {
+					*entry = entry.blue().to_string();
+				}
 				continue 'next;
 			}
 		}
