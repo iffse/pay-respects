@@ -60,7 +60,7 @@ pub fn select_candidate(data: &mut Data) {
 	let candidates = &data.candidates;
 	if candidates.len() == 1 {
 		let suggestion = candidates[0].to_string();
-		let highlighted = highlight_difference(&data.shell, &suggestion, &data.command, false).unwrap();
+		let highlighted = highlight_difference(&data.shell, &suggestion, &data.command).unwrap();
 		eprintln!("{}\n", highlighted);
 		let confirm = format!("[{}]", t!("confirm-yes")).green();
 		eprintln!("{}: {} {}", t!("confirm"), confirm, "[Ctrl+C]".red());
@@ -70,7 +70,7 @@ pub fn select_candidate(data: &mut Data) {
 	} else {
 		let mut highlight_candidates = candidates
 			.iter()
-			.map(|candidate| highlight_difference(&data.shell, candidate, &data.command, true).unwrap())
+			.map(|candidate| highlight_difference(&data.shell, candidate, &data.command).unwrap())
 			.collect::<Vec<String>>();
 
 		for candidate in highlight_candidates.iter_mut() {
@@ -80,13 +80,31 @@ pub fn select_candidate(data: &mut Data) {
 				if j == 0 {
 					formated = line.to_string();
 				} else {
-					formated = format!("{}\n  {}", formated, line);
+					formated = format!("{}\n {}", formated, line);
 				}
 			}
 			*candidate = formated;
 		}
 
-		let ans = Select::new("Select a suggestion:", highlight_candidates.clone())
+		let style = ui::Styled::default();
+		let render_config = ui::RenderConfig::default()
+			.with_prompt_prefix(style)
+			.with_answered_prompt_prefix(style)
+			.with_highlighted_option_prefix(style);
+
+		let msg = format!("{} suggestions found:", candidates.len()).bold().blue();
+		let hint = format!("{} {} {}",
+			"[↑/↓]".blue(),
+			t!("confirm-yes").green(),
+			"[Ctrl+C]".red());
+		eprintln!("{}", msg);
+		eprintln!("{}", hint);
+
+		let ans = Select::new("\n", highlight_candidates.clone())
+			.with_page_size(1)
+			.without_filtering()
+			.without_help_message()
+			.with_render_config(render_config)
 			.prompt()
 			.unwrap();
 		let pos = highlight_candidates.iter().position(|x| x == &ans).unwrap();
