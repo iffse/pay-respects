@@ -198,8 +198,8 @@ pub fn best_match_path(typo: &str) -> Option<String> {
 
 // higher the threshold, the stricter the comparison
 // 1: anything
-// 2: 50% similarity
-// 3: 33% similarity
+// 2: 50%
+// 3: 33%
 // ... etc
 pub fn find_similar(typo: &str, candidates: &[String], threshold: Option<usize>) -> Option<String> {
 	let threshold = threshold.unwrap_or(2);
@@ -266,17 +266,7 @@ pub fn confirm_suggestion(data: &Data, highlighted: &str) -> Result<(), String> 
 		if now.elapsed() > Duration::from_secs(3) {
 			exit(1);
 		}
-		let process = std::process::Command::new(shell)
-			.arg("-c")
-			.arg(command)
-			.env("LC_ALL", "C")
-			.output()
-			.expect("failed to execute process");
-		let error_msg = match process.stderr.is_empty() {
-			true => String::from_utf8_lossy(&process.stdout).to_lowercase(),
-			false => String::from_utf8_lossy(&process.stderr).to_lowercase(),
-		};
-		Err(error_msg.to_string())
+		suggestion_err(data, command)
 	}
 }
 
@@ -304,4 +294,29 @@ fn run_suggestion(data: &Data, command: &str) -> std::process::ExitStatus {
 			.wait()
 			.unwrap(),
 	}
+}
+
+fn suggestion_err(data: &Data, command: &str) -> Result<(), String> {
+	let shell = &data.shell;
+	let privilege = &data.privilege;
+	let process = match privilege {
+		Some(sudo) => std::process::Command::new(sudo)
+			.arg(shell)
+			.arg("-c")
+			.arg(command)
+			.env("LC_ALL", "C")
+			.output()
+			.expect("failed to execute process"),
+		None => std::process::Command::new(shell)
+			.arg("-c")
+			.arg(command)
+			.env("LC_ALL", "C")
+			.output()
+			.expect("failed to execute process"),
+	};
+	let error_msg = match process.stderr.is_empty() {
+		true => String::from_utf8_lossy(&process.stdout).to_lowercase(),
+		false => String::from_utf8_lossy(&process.stderr).to_lowercase(),
+	};
+	Err(error_msg.to_string())
 }
