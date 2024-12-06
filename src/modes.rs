@@ -8,9 +8,10 @@ use inquire::*;
 
 pub fn suggestion(data: &mut Data) {
 	let shell = data.shell.clone();
-	let last_command = data.command.clone();
+	let mut last_command ;
 
 	loop {
+		last_command = data.command.clone();
 		let suggestion = {
 			let command = suggest_command(data);
 			if command.is_none() {
@@ -71,13 +72,26 @@ pub fn cnf(data: &mut Data) {
 	if best_match.is_some() {
 		let best_match = best_match.unwrap();
 		split_command[0] = best_match;
-		let suggestion = split_command.join(" ");
-		data.update_suggest(&suggestion);
+		let suggest = split_command.join(" ");
+		data.update_suggest(&suggest);
 		data.expand_suggest();
 
 		let highlighted_suggestion =
-			highlight_difference(&shell, &suggestion, &last_command).unwrap();
-		let _ = suggestions::confirm_suggestion(data, &highlighted_suggestion);
+			highlight_difference(&shell, &suggest, &last_command).unwrap();
+		let status = suggestions::confirm_suggestion(data, &highlighted_suggestion);
+		if status.is_err() {
+			data.update_command(&suggest);
+			let msg = Some(
+				status
+					.err()
+					.unwrap()
+					.split_whitespace()
+					.collect::<Vec<&str>>()
+					.join(" "),
+			);
+			data.update_error(msg);
+		}
+		suggestion(data);
 	} else {
 		let package_manager = match system::get_package_manager(&shell) {
 			Some(package_manager) => package_manager,

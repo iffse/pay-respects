@@ -252,6 +252,8 @@ pub fn confirm_suggestion(data: &Data, highlighted: &str) -> Result<(), String> 
 
 	let shell = &data.shell;
 	let command = &data.suggest.clone().unwrap();
+	#[cfg(debug_assertions)]
+	eprintln!("running command: {command}");
 
 	let now = Instant::now();
 	let process = run_suggestion(data, command);
