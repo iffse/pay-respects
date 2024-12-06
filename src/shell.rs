@@ -61,6 +61,8 @@ impl Data {
 		}
 		let alias = self.alias.as_ref().unwrap();
 		if let Some(command) = expand_alias_multiline(alias, &self.command) {
+			#[cfg(debug_assertions)]
+			eprintln!("expand_command: {}", command);
 			self.update_command(&command);
 		}
 	}
@@ -71,6 +73,8 @@ impl Data {
 		}
 		let alias = self.alias.as_ref().unwrap();
 		if let Some(suggest) = expand_alias_multiline(alias, self.suggest.as_ref().unwrap()) {
+			#[cfg(debug_assertions)]
+			eprintln!("expand_suggest: {}", suggest);
 			self.update_suggest(&suggest);
 		}
 	}
@@ -109,9 +113,8 @@ impl Data {
 }
 
 pub fn split_command(command: &str) -> Vec<String> {
-	if cfg!(debug_assertions) {
-		eprintln!("command: {command}")
-	}
+	#[cfg(debug_assertions)]
+	eprintln!("command: {command}");
 	// this regex splits the command separated by spaces, except when the space
 	// is escaped by a backslash or surrounded by quotes
 	let regex = r#"([^\s"'\\]+|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\\ )+|\\|\n"#;
@@ -120,6 +123,8 @@ pub fn split_command(command: &str) -> Vec<String> {
 		.find_iter(command)
 		.map(|cap| cap.as_str().to_owned())
 		.collect::<Vec<String>>();
+	#[cfg(debug_assertions)]
+	eprintln!("split_command: {:?}", split_command);
 	split_command
 }
 
@@ -247,15 +252,16 @@ pub fn alias_map(shell: &str) -> Option<HashMap<String, String>> {
 }
 
 pub fn expand_alias(map: &HashMap<String, String>, command: &str) -> Option<String> {
-	#[cfg(debug_assertions)]
-	eprintln!("expand_alias: command: {}", command);
-	let command = if let Some(split) = command.split_once(' ') {
-		split.0
+	let (command, args) = if let Some(split) = command.split_once(' ') {
+		(split.0, split.1)
 	} else {
-		command
+		(command, "")
 	};
-	map.get(command)
-		.map(|expand| command.replacen(command, expand, 1))
+	if let Some(expand) = map.get(command) {
+		Some(format!("{} {}", expand, args))
+	} else {
+		None
+	}
 }
 
 pub fn expand_alias_multiline(map: &HashMap<String, String>, command: &str) -> Option<String> {
