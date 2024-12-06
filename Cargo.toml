@@ -27,7 +27,7 @@ textwrap = { version = "0.16", features = ["terminal_size"], optional = true }
 
 inquire = "0.7.5"
 
-pay-respects-parser = "0.2.6"
+pay-respects-parser = "0.3"
 # pay-respects-parser = { path = "../pay-respects-parser" }
 
 [features]
