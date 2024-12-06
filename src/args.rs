@@ -1,10 +1,17 @@
 use crate::shell::initialization;
 
+pub enum Status {
+	Continue,
+	Exit, // version, help, etc.
+	Error,
+}
+
 // returns true if should exit
-pub fn handle_args() -> bool {
+pub fn handle_args() -> Status {
+	use Status::*;
 	let args = std::env::args().collect::<Vec<String>>();
 	if args.len() <= 1 {
-		return false;
+		return Continue;
 	}
 	let mut auto_aliasing = String::new();
 	let mut shell = String::new();
@@ -14,11 +21,11 @@ pub fn handle_args() -> bool {
 		match args[index].as_str() {
 			"-h" | "--help" => {
 				print_help();
-				return true;
+				return Exit;
 			}
 			"-v" | "--version" => {
 				print_version();
-				return true;
+				return Exit;
 			}
 			"-a" | "--alias" => {
 				if args.len() > index + 1 {
@@ -46,13 +53,13 @@ pub fn handle_args() -> bool {
 
 	if shell.is_empty() {
 		eprintln!("{}", t!("no-shell"));
-		return true;
+		return Error;
 	}
 
 	let binary_path = &args[0];
 
 	initialization(&shell, binary_path, &auto_aliasing, cnf);
-	return true;
+	Exit
 }
 
 fn print_help() {

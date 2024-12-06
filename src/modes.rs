@@ -12,7 +12,7 @@ pub fn suggestion(data: &mut Data) {
 
 	loop {
 		let suggestion = {
-			let command = suggest_command(&data);
+			let command = suggest_command(data);
 			if command.is_none() {
 				break;
 			};
@@ -32,13 +32,19 @@ pub fn suggestion(data: &mut Data) {
 			difference.unwrap()
 		};
 
-		let execution =
-			suggestions::confirm_suggestion(&data, &highlighted_suggestion);
+		let execution = suggestions::confirm_suggestion(data, &highlighted_suggestion);
 		if execution.is_ok() {
 			return;
 		} else {
 			data.update_command(&suggestion);
-			let msg = Some(execution.err().unwrap().split_whitespace().collect::<Vec<&str>>().join(" "));
+			let msg = Some(
+				execution
+					.err()
+					.unwrap()
+					.split_whitespace()
+					.collect::<Vec<&str>>()
+					.join(" "),
+			);
 			data.update_error(msg);
 
 			let retry_message = format!("{}...", t!("retry"));
@@ -71,7 +77,7 @@ pub fn cnf(data: &mut Data) {
 
 		let highlighted_suggestion =
 			highlight_difference(&shell, &suggestion, &last_command).unwrap();
-		let _ = suggestions::confirm_suggestion(&data, &highlighted_suggestion);
+		let _ = suggestions::confirm_suggestion(data, &highlighted_suggestion);
 	} else {
 		let package_manager = match system::get_package_manager(&shell) {
 			Some(package_manager) => package_manager,
@@ -100,7 +106,7 @@ pub fn cnf(data: &mut Data) {
 
 		// retry after installing package
 		if system::install_package(&shell, &package_manager, &package) {
-			let _ = suggestions::confirm_suggestion(&data, &last_command);
+			let _ = suggestions::confirm_suggestion(data, &last_command);
 		}
 	}
 }
