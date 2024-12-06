@@ -7,52 +7,39 @@ use regex_lite::Regex;
 
 use crate::files::{get_best_match_file, get_path_files};
 use crate::rules::match_pattern;
-use crate::shell::{expand_alias_multiline, shell_evaluated_commands, PRIVILEGE_LIST};
+use crate::shell::{Data, shell_evaluated_commands};
 
-pub fn suggest_command(shell: &str, last_command: &str, error_msg: &str) -> Option<String> {
-	let split_command = split_command(last_command);
-	let executable = match PRIVILEGE_LIST.contains(&split_command[0].as_str()) {
-		true => split_command.get(1).expect(&t!("no-command")).as_str(),
-		false => split_command.first().expect(&t!("no-command")).as_str(),
-	};
+pub fn suggest_command(data: &Data) -> Option<String> {
+	let shell = &data.shell;
+	let command = &data.command;
+	let split_command = &data.split;
+	let executable = data.split[0].as_str();
+	let error = &data.error;
+	let privilege = &data.privilege;
 
-	if !PRIVILEGE_LIST.contains(&executable) {
-		let suggest = match_pattern("_PR_privilege", last_command, error_msg, shell);
+	if privilege.is_none() {
+		let suggest = match_pattern("_PR_privilege", command, error, shell);
 		if suggest.is_some() {
 			return suggest;
 		}
 	}
 
-	let last_command = match PRIVILEGE_LIST.contains(&split_command[0].as_str()) {
-		true => &last_command[split_command[0].len() + 1..],
-		false => last_command,
-	};
-
-	let suggest = match_pattern(executable, last_command, error_msg, shell);
-	if let Some(suggest) = suggest {
-		if PRIVILEGE_LIST.contains(&split_command[0].as_str()) {
-			return Some(format!("{} {}", split_command[0], suggest));
-		}
-		return Some(suggest);
+	let suggest = match_pattern(executable, command, error, shell);
+	if suggest.is_some() {
+		return suggest;
 	}
 
-	let suggest = match_pattern("_PR_general", last_command, error_msg, shell);
-	if let Some(suggest) = suggest {
-		if PRIVILEGE_LIST.contains(&split_command[0].as_str()) {
-			return Some(format!("{} {}", split_command[0], suggest));
-		}
-		return Some(suggest);
+	let suggest = match_pattern("_PR_general", command, error, shell);
+	if suggest.is_some() {
+		return suggest;
 	}
 
 	#[cfg(feature = "runtime-rules")]
 	{
 		use crate::runtime_rules::runtime_match;
-		let suggest = runtime_match(executable, last_command, error_msg, shell);
-		if let Some(suggest) = suggest {
-			if PRIVILEGE_LIST.contains(&split_command[0].as_str()) {
-				return Some(format!("{} {}", split_command[0], suggest));
-			}
-			return Some(suggest);
+		let suggest = runtime_match(executable, command, error, shell);
+		if suggest.is_some() {
+			return suggest;
 		}
 	}
 
@@ -63,22 +50,17 @@ pub fn suggest_command(shell: &str, last_command: &str, error_msg: &str) -> Opti
 
 		// skip for commands with no arguments,
 		// very likely to be an error showing the usage
-		if PRIVILEGE_LIST.contains(&split_command[0].as_str()) && split_command.len() > 2
-			|| !PRIVILEGE_LIST.contains(&split_command[0].as_str()) && split_command.len() > 1
+		if privilege.is_some() && split_command.len() > 2 ||
+			privilege.is_none() && split_command.len() > 1
 		{
-			let suggest = ai_suggestion(last_command, error_msg);
+			let suggest = ai_suggestion(command, error);
 			if let Some(suggest) = suggest {
 				let warn = format!("{}:", t!("ai-suggestion")).bold().blue();
 				let note = fill(&suggest.note, termwidth());
 
 				eprintln!("{}\n{}\n", warn, note);
 				let command = suggest.command;
-				if command != "None" {
-					if PRIVILEGE_LIST.contains(&split_command[0].as_str()) {
-						return Some(format!("{} {}", split_command[0], command));
-					}
-					return Some(command);
-				}
+				return Some(command);
 			}
 		}
 	}
@@ -262,56 +244,17 @@ pub fn compare_string(a: &str, b: &str) -> usize {
 	matrix[a.chars().count()][b.chars().count()]
 }
 
-pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Result<(), String> {
+pub fn confirm_suggestion(data: &Data, highlighted: &str) -> Result<(), String> {
 	eprintln!("{}\n", highlighted);
 	let confirm = format!("[{}]", t!("confirm-yes")).green();
 	eprintln!("{}: {} {}", t!("confirm"), confirm, "[Ctrl+C]".red());
 	std::io::stdin().read_line(&mut String::new()).unwrap();
 
-	for p in PRIVILEGE_LIST {
-		let _p = p.to_owned() + " ";
-		if !command.starts_with(&_p) {
-			continue;
-		}
+	let shell = &data.shell;
+	let command = &data.suggest.clone().unwrap();
 
-		let command = {
-			let mut command = command.replacen(&_p, "", 1);
-			if command != " " {
-				command = expand_alias_multiline(shell, &command);
-			}
-			command
-		};
-
-		let now = Instant::now();
-		let process = run_suggestion_p(shell, p, &command);
-
-		if process.success() {
-			let cd = shell_evaluated_commands(shell, &command);
-			if let Some(cd) = cd {
-				println!("{}", cd);
-			}
-		} else {
-			if now.elapsed() > Duration::from_secs(3) {
-				exit(1);
-			}
-			let process = std::process::Command::new(p)
-				.arg(shell)
-				.arg("-c")
-				.arg(command)
-				.env("LC_ALL", "C")
-				.output()
-				.expect("failed to execute process");
-			let error_msg = match process.stderr.is_empty() {
-				true => String::from_utf8_lossy(&process.stdout),
-				false => String::from_utf8_lossy(&process.stderr),
-			};
-			return Err(error_msg.to_string());
-		}
-	}
-
-	let command = expand_alias_multiline(shell, command);
 	let now = Instant::now();
-	let process = run_suggestion(shell, &command);
+	let process = run_suggestion(data, &command);
 
 	if process.success() {
 		let cd = shell_evaluated_commands(shell, &command);
@@ -337,28 +280,32 @@ pub fn confirm_suggestion(shell: &str, command: &str, highlighted: &str) -> Resu
 	}
 }
 
-fn run_suggestion_p(shell: &str, p: &str, command: &str) -> std::process::ExitStatus {
-	std::process::Command::new(p)
-		.arg(shell)
-		.arg("-c")
-		.arg(command)
-		.stdout(stderr())
-		.stderr(Stdio::inherit())
-		.spawn()
-		.expect("failed to execute process")
-		.wait()
-		.unwrap()
-}
-
-fn run_suggestion(shell: &str, command: &str) -> std::process::ExitStatus {
-	std::process::Command::new(shell)
-		.arg("-c")
-		.arg(command)
-		// .stdout(Stdio::inherit())
-		.stdout(stderr())
-		.stderr(Stdio::inherit())
-		.spawn()
-		.expect("failed to execute process")
-		.wait()
-		.unwrap()
+fn run_suggestion(data: &Data, command: &str) -> std::process::ExitStatus {
+	let shell = &data.shell;
+	let privilege = &data.privilege;
+	match privilege {
+		Some(sudo) => {
+			std::process::Command::new(sudo)
+				.arg(shell)
+				.arg("-c")
+				.arg(command)
+				.stdout(stderr())
+				.stderr(Stdio::inherit())
+				.spawn()
+				.expect("failed to execute process")
+				.wait()
+				.unwrap()
+		}
+		None => {
+			std::process::Command::new(shell)
+				.arg("-c")
+				.arg(command)
+				.stdout(stderr())
+				.stderr(Stdio::inherit())
+				.spawn()
+				.expect("failed to execute process")
+				.wait()
+				.unwrap()
+		}
+	}
 }

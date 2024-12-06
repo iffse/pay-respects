@@ -1,9 +1,10 @@
 use crate::shell::initialization;
 
-pub fn handle_args() {
+// returns true if should exit
+pub fn handle_args() -> bool {
 	let args = std::env::args().collect::<Vec<String>>();
 	if args.len() <= 1 {
-		return;
+		return false;
 	}
 	let mut auto_aliasing = String::new();
 	let mut shell = String::new();
@@ -13,9 +14,11 @@ pub fn handle_args() {
 		match args[index].as_str() {
 			"-h" | "--help" => {
 				print_help();
+				return true;
 			}
 			"-v" | "--version" => {
 				print_version();
+				return true;
 			}
 			"-a" | "--alias" => {
 				if args.len() > index + 1 {
@@ -43,12 +46,13 @@ pub fn handle_args() {
 
 	if shell.is_empty() {
 		eprintln!("{}", t!("no-shell"));
-		std::process::exit(1);
+		return true;
 	}
 
 	let binary_path = &args[0];
 
 	initialization(&shell, binary_path, &auto_aliasing, cnf);
+	return true;
 }
 
 fn print_help() {
@@ -63,7 +67,6 @@ fn print_help() {
 			auto_example_fish = "pay-respects fish --alias | source",
 		)
 	);
-	std::process::exit(0);
 }
 
 fn print_version() {
@@ -84,5 +87,4 @@ fn print_version() {
 	{
 		println!("  - libcurl");
 	}
-	std::process::exit(0);
 }
