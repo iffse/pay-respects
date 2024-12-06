@@ -3,50 +3,40 @@ use std::process::{exit, Stdio};
 use std::time::{Duration, Instant};
 
 use colored::Colorize;
+use inquire::*;
 use regex_lite::Regex;
 
 use crate::files::{get_best_match_file, get_path_files};
 use crate::rules::match_pattern;
 use crate::shell::{shell_evaluated_commands, Data};
+use crate::style::highlight_difference;
 
-pub fn suggest_command(data: &Data) -> Option<String> {
-	let shell = &data.shell;
-	let command = &data.command;
-	let split_command = &data.split;
-	let executable = data.split[0].as_str();
-	let error = &data.error;
-	let privilege = &data.privilege;
+pub fn suggest_candidates(data: &mut Data) {
+	let executable = &data.split[0].to_string();
+	let privilege = &data.privilege.clone();
 
 	if privilege.is_none() {
-		let suggest = match_pattern("_PR_privilege", command, error, shell);
-		if suggest.is_some() {
-			return suggest;
-		}
+		match_pattern("_PR_privilege", data);
 	}
-
-	let suggest = match_pattern(executable, command, error, shell);
-	if suggest.is_some() {
-		return suggest;
-	}
-
-	let suggest = match_pattern("_PR_general", command, error, shell);
-	if suggest.is_some() {
-		return suggest;
-	}
+	match_pattern(executable, data);
+	match_pattern("_PR_general", data);
 
 	#[cfg(feature = "runtime-rules")]
 	{
 		use crate::runtime_rules::runtime_match;
-		let suggest = runtime_match(executable, command, error, shell);
-		if suggest.is_some() {
-			return suggest;
-		}
+		runtime_match(executable, data);
 	}
 
 	#[cfg(feature = "request-ai")]
 	{
+		if !data.candidates.is_empty() {
+			return;
+		}
 		use crate::requests::ai_suggestion;
 		use textwrap::{fill, termwidth};
+		let command = &data.command;
+		let split_command = &data.split;
+		let error = &data.error.clone();
 
 		// skip for commands with no arguments,
 		// very likely to be an error showing the usage
@@ -60,12 +50,52 @@ pub fn suggest_command(data: &Data) -> Option<String> {
 
 				eprintln!("{}\n{}\n", warn, note);
 				let command = suggest.command;
-				return Some(command);
+				data.add_candidate(&command);
 			}
 		}
 	}
+}
 
-	None
+pub fn select_candidate(data: &mut Data) {
+	let candidates = &data.candidates;
+	if candidates.len() == 1 {
+		let suggestion = candidates[0].to_string();
+		let highlighted = highlight_difference(&data.shell, &suggestion, &data.command, false).unwrap();
+		eprintln!("{}\n", highlighted);
+		let confirm = format!("[{}]", t!("confirm-yes")).green();
+		eprintln!("{}: {} {}", t!("confirm"), confirm, "[Ctrl+C]".red());
+		std::io::stdin().read_line(&mut String::new()).unwrap();
+		data.update_suggest(&suggestion);
+		data.expand_suggest();
+	} else {
+		let mut highlight_candidates = candidates
+			.iter()
+			.map(|candidate| highlight_difference(&data.shell, candidate, &data.command, true).unwrap())
+			.collect::<Vec<String>>();
+
+		for candidate in highlight_candidates.iter_mut() {
+			let lines = candidate.lines().collect::<Vec<&str>>();
+			let mut formated = String::new();
+			for (j, line) in lines.iter().enumerate() {
+				if j == 0 {
+					formated = line.to_string();
+				} else {
+					formated = format!("{}\n  {}", formated, line);
+				}
+			}
+			*candidate = formated;
+		}
+
+		let ans = Select::new("Select a suggestion:", highlight_candidates.clone())
+			.prompt()
+			.unwrap();
+		let pos = highlight_candidates.iter().position(|x| x == &ans).unwrap();
+		let suggestion = candidates[pos].to_string();
+		data.update_suggest(&suggestion);
+		data.expand_suggest();
+	}
+
+	data.candidates.clear();
 }
 
 pub fn check_executable(shell: &str, executable: &str) -> bool {
@@ -244,12 +274,7 @@ pub fn compare_string(a: &str, b: &str) -> usize {
 	matrix[a.chars().count()][b.chars().count()]
 }
 
-pub fn confirm_suggestion(data: &Data, highlighted: &str) -> Result<(), String> {
-	eprintln!("{}\n", highlighted);
-	let confirm = format!("[{}]", t!("confirm-yes")).green();
-	eprintln!("{}: {} {}", t!("confirm"), confirm, "[Ctrl+C]".red());
-	std::io::stdin().read_line(&mut String::new()).unwrap();
-
+pub fn confirm_suggestion(data: &Data) -> Result<(), String> {
 	let shell = &data.shell;
 	let command = &data.suggest.clone().unwrap();
 	#[cfg(debug_assertions)]

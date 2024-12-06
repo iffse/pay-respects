@@ -3,7 +3,7 @@ use std::process::Command;
 use std::process::Stdio;
 
 pub fn get_package_manager(shell: &str) -> Option<String> {
-	let package_managers = vec!["pacman", "apt", "dnf"];
+	let package_managers = vec!["pacman"];
 
 	for package_manager in package_managers {
 		let success = Command::new(shell)

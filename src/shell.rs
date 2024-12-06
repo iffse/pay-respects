@@ -18,6 +18,7 @@ pub struct Data {
 	pub shell: String,
 	pub command: String,
 	pub suggest: Option<String>,
+	pub candidates: Vec<String>,
 	pub split: Vec<String>,
 	pub alias: Option<HashMap<String, String>>,
 	pub privilege: Option<String>,
@@ -43,6 +44,7 @@ impl Data {
 			shell,
 			command,
 			suggest: None,
+			candidates: vec![],
 			alias,
 			split: vec![],
 			privilege: None,
@@ -109,6 +111,13 @@ impl Data {
 		} else {
 			self.suggest = Some(suggest.to_string());
 		};
+	}
+
+	pub fn add_candidate(&mut self, candidate: &str) {
+		let candidate = candidate.trim();
+		if candidate != self.command {
+			self.candidates.push(candidate.to_string());
+		}
 	}
 }
 
