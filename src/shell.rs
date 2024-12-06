@@ -1,9 +1,9 @@
 use std::process::exit;
 
+use std::collections::HashMap;
 use std::sync::mpsc::channel;
 use std::thread;
 use std::time::Duration;
-use std::collections::HashMap;
 
 use regex_lite::Regex;
 
@@ -11,7 +11,7 @@ pub const PRIVILEGE_LIST: [&str; 2] = ["sudo", "doas"];
 
 pub enum Mode {
 	Suggestion,
-	CNF,
+	Cnf,
 }
 
 pub struct Data {
@@ -70,7 +70,7 @@ impl Data {
 			return;
 		}
 		let alias = self.alias.as_ref().unwrap();
-		if let Some(suggest) = expand_alias_multiline(alias, &self.suggest.as_ref().unwrap()) {
+		if let Some(suggest) = expand_alias_multiline(alias, self.suggest.as_ref().unwrap()) {
 			self.update_suggest(&suggest);
 		}
 	}
@@ -98,7 +98,7 @@ impl Data {
 	}
 
 	pub fn update_suggest(&mut self, suggest: &str) {
-		let split = split_command(&suggest);
+		let split = split_command(suggest);
 		if PRIVILEGE_LIST.contains(&split[0].as_str()) {
 			self.suggest = Some(suggest.replacen(&split[0], "", 1));
 			self.privilege = Some(split[0].clone())
@@ -195,13 +195,11 @@ pub fn last_command(shell: &str) -> String {
 
 pub fn run_mode() -> Mode {
 	match std::env::var("_PR_MODE") {
-		Ok(mode) => {
-			match mode.as_str() {
-				"suggestion" => Mode::Suggestion,
-				"cnf" => Mode::CNF,
-				_ => Mode::Suggestion,
-			}
-		}
+		Ok(mode) => match mode.as_str() {
+			"suggestion" => Mode::Suggestion,
+			"cnf" => Mode::Cnf,
+			_ => Mode::Suggestion,
+		},
 		Err(_) => Mode::Suggestion,
 	}
 }
@@ -256,11 +254,8 @@ pub fn expand_alias(map: &HashMap<String, String>, command: &str) -> Option<Stri
 	} else {
 		command
 	};
-	if let Some(expand) = map.get(command) {
-		Some(command.replacen(&command, expand, 1))
-	} else {
-		None
-	}
+	map.get(command)
+		.map(|expand| command.replacen(command, expand, 1))
 }
 
 pub fn expand_alias_multiline(map: &HashMap<String, String>, command: &str) -> Option<String> {
@@ -268,7 +263,7 @@ pub fn expand_alias_multiline(map: &HashMap<String, String>, command: &str) -> O
 	let mut expanded = String::new();
 	let mut expansion = false;
 	for line in lines {
-		if let Some(expand) = expand_alias(&map, line){
+		if let Some(expand) = expand_alias(map, line) {
 			expanded = format!("{}\n{}", expanded, expand);
 			expansion = true;
 		} else {

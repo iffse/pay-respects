@@ -7,7 +7,7 @@ use regex_lite::Regex;
 
 use crate::files::{get_best_match_file, get_path_files};
 use crate::rules::match_pattern;
-use crate::shell::{Data, shell_evaluated_commands};
+use crate::shell::{shell_evaluated_commands, Data};
 
 pub fn suggest_command(data: &Data) -> Option<String> {
 	let shell = &data.shell;
@@ -50,8 +50,8 @@ pub fn suggest_command(data: &Data) -> Option<String> {
 
 		// skip for commands with no arguments,
 		// very likely to be an error showing the usage
-		if privilege.is_some() && split_command.len() > 2 ||
-			privilege.is_none() && split_command.len() > 1
+		if privilege.is_some() && split_command.len() > 2
+			|| privilege.is_none() && split_command.len() > 1
 		{
 			let suggest = ai_suggestion(command, error);
 			if let Some(suggest) = suggest {
@@ -254,10 +254,10 @@ pub fn confirm_suggestion(data: &Data, highlighted: &str) -> Result<(), String> 
 	let command = &data.suggest.clone().unwrap();
 
 	let now = Instant::now();
-	let process = run_suggestion(data, &command);
+	let process = run_suggestion(data, command);
 
 	if process.success() {
-		let cd = shell_evaluated_commands(shell, &command);
+		let cd = shell_evaluated_commands(shell, command);
 		if let Some(cd) = cd {
 			println!("{}", cd);
 		}
@@ -284,28 +284,24 @@ fn run_suggestion(data: &Data, command: &str) -> std::process::ExitStatus {
 	let shell = &data.shell;
 	let privilege = &data.privilege;
 	match privilege {
-		Some(sudo) => {
-			std::process::Command::new(sudo)
-				.arg(shell)
-				.arg("-c")
-				.arg(command)
-				.stdout(stderr())
-				.stderr(Stdio::inherit())
-				.spawn()
-				.expect("failed to execute process")
-				.wait()
-				.unwrap()
-		}
-		None => {
-			std::process::Command::new(shell)
-				.arg("-c")
-				.arg(command)
-				.stdout(stderr())
-				.stderr(Stdio::inherit())
-				.spawn()
-				.expect("failed to execute process")
-				.wait()
-				.unwrap()
-		}
+		Some(sudo) => std::process::Command::new(sudo)
+			.arg(shell)
+			.arg("-c")
+			.arg(command)
+			.stdout(stderr())
+			.stderr(Stdio::inherit())
+			.spawn()
+			.expect("failed to execute process")
+			.wait()
+			.unwrap(),
+		None => std::process::Command::new(shell)
+			.arg("-c")
+			.arg(command)
+			.stdout(stderr())
+			.stderr(Stdio::inherit())
+			.spawn()
+			.expect("failed to execute process")
+			.wait()
+			.unwrap(),
 	}
 }
