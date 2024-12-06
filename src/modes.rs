@@ -1,32 +1,18 @@
-use crate::shell::{command_output, get_shell, PRIVILEGE_LIST};
+use crate::shell::Data;
 use crate::style::highlight_difference;
-use crate::suggestions::{best_match_path, split_command};
+use crate::suggestions::{best_match_path, suggest_command};
 use crate::system;
 use crate::{shell, suggestions};
 use colored::Colorize;
 use inquire::*;
 
-pub fn suggestion() {
-	let shell = get_shell();
-	let mut last_command = shell::last_command(&shell).trim().to_string();
-	last_command = shell::expand_alias(&shell, &last_command);
-	let mut error_msg = {
-		let error_msg = std::env::var("_PR_ERROR_MSG");
-		if let Ok(error_msg) = error_msg {
-			error_msg
-		} else {
-			command_output(&shell, &last_command)
-		}
-	};
-
-	error_msg = error_msg
-		.split_whitespace()
-		.collect::<Vec<&str>>()
-		.join(" ");
+pub fn suggestion(data: &mut Data) {
+	let shell = data.shell.clone();
+	let last_command = data.command.clone();
 
 	loop {
 		let suggestion = {
-			let command = suggestions::suggest_command(&shell, &last_command, &error_msg);
+			let command = suggest_command(&data);
 			if command.is_none() {
 				break;
 			};
@@ -35,6 +21,8 @@ pub fn suggestion() {
 			shell::shell_syntax(&shell, &mut command);
 			command
 		};
+		data.update_suggest(&suggestion);
+		data.expand_suggest();
 
 		let highlighted_suggestion = {
 			let difference = highlight_difference(&shell, &suggestion, &last_command);
@@ -45,16 +33,13 @@ pub fn suggestion() {
 		};
 
 		let execution =
-			suggestions::confirm_suggestion(&shell, &suggestion, &highlighted_suggestion);
+			suggestions::confirm_suggestion(&data, &highlighted_suggestion);
 		if execution.is_ok() {
 			return;
 		} else {
-			last_command = suggestion;
-			error_msg = execution.err().unwrap();
-			error_msg = error_msg
-				.split_whitespace()
-				.collect::<Vec<&str>>()
-				.join(" ");
+			data.update_command(&suggestion);
+			let msg = Some(execution.err().unwrap().split_whitespace().collect::<Vec<&str>>().join(" "));
+			data.update_error(msg);
 
 			let retry_message = format!("{}...", t!("retry"));
 
@@ -69,33 +54,24 @@ pub fn suggestion() {
 	);
 }
 
-pub fn cnf() {
-	let shell = get_shell();
-	let mut last_command = shell::last_command(&shell).trim().to_string();
-	last_command = shell::expand_alias(&shell, &last_command);
+pub fn cnf(data: &mut Data) {
+	let shell = data.shell.clone();
+	let last_command = data.command.clone();
+	let mut split_command = data.split.clone();
 
-	let mut split_command = split_command(&last_command);
-	let executable = match PRIVILEGE_LIST.contains(&split_command[0].as_str()) {
-		true => split_command.get(1).expect(&t!("no-command")).as_str(),
-		false => split_command.first().expect(&t!("no-command")).as_str(),
-	};
+	let executable = split_command[0].as_str();
 
 	let best_match = best_match_path(executable);
 	if best_match.is_some() {
 		let best_match = best_match.unwrap();
-		match PRIVILEGE_LIST.contains(&split_command[0].as_str()) {
-			true => {
-				split_command[1] = best_match;
-			}
-			false => {
-				split_command[0] = best_match;
-			}
-		}
+		split_command[0] = best_match;
 		let suggestion = split_command.join(" ");
+		data.update_suggest(&suggestion);
+		data.expand_suggest();
 
 		let highlighted_suggestion =
 			highlight_difference(&shell, &suggestion, &last_command).unwrap();
-		let _ = suggestions::confirm_suggestion(&shell, &suggestion, &highlighted_suggestion);
+		let _ = suggestions::confirm_suggestion(&data, &highlighted_suggestion);
 	} else {
 		let package_manager = match system::get_package_manager(&shell) {
 			Some(package_manager) => package_manager,
@@ -124,7 +100,7 @@ pub fn cnf() {
 
 		// retry after installing package
 		if system::install_package(&shell, &package_manager, &package) {
-			let _ = suggestions::confirm_suggestion(&shell, &last_command, &last_command);
+			let _ = suggestions::confirm_suggestion(&data, &last_command);
 		}
 	}
 }

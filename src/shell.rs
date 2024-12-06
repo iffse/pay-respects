@@ -3,8 +3,136 @@ use std::process::exit;
 use std::sync::mpsc::channel;
 use std::thread;
 use std::time::Duration;
+use std::collections::HashMap;
+
+use regex_lite::Regex;
 
 pub const PRIVILEGE_LIST: [&str; 2] = ["sudo", "doas"];
+
+pub enum Mode {
+	Suggestion,
+	CNF,
+}
+
+pub struct Data {
+	pub shell: String,
+	pub command: String,
+	pub suggest: Option<String>,
+	pub split: Vec<String>,
+	pub alias: Option<HashMap<String, String>>,
+	pub privilege: Option<String>,
+	pub error: String,
+	pub mode: Mode,
+}
+
+pub struct Init {
+	pub shell: String,
+	pub binary_path: String,
+	pub auto_alias: String,
+	pub cnf: bool,
+}
+
+impl Data {
+	pub fn init() -> Data {
+		let shell = get_shell();
+		let command = last_command(&shell).trim().to_string();
+		let alias = alias_map(&shell);
+		let mode = run_mode();
+
+		let mut init = Data {
+			shell,
+			command,
+			suggest: None,
+			alias,
+			split: vec![],
+			privilege: None,
+			error: "".to_string(),
+			mode,
+		};
+
+		init.split();
+		init.update_error(None);
+		init
+	}
+
+	pub fn expand_command(&mut self) {
+		if self.alias.is_none() {
+			return;
+		}
+		let alias = self.alias.as_ref().unwrap();
+		if let Some(command) = expand_alias_multiline(alias, &self.command) {
+			self.update_command(&command);
+		}
+	}
+
+	pub fn expand_suggest(&mut self) {
+		if self.alias.is_none() {
+			return;
+		}
+		let alias = self.alias.as_ref().unwrap();
+		if let Some(suggest) = expand_alias_multiline(alias, &self.suggest.as_ref().unwrap()) {
+			self.update_suggest(&suggest);
+		}
+	}
+
+	pub fn split(&mut self) {
+		let mut split = split_command(&self.command);
+		if PRIVILEGE_LIST.contains(&split[0].as_str()) {
+			self.command = self.command.replacen(&split[0], "", 1);
+			self.privilege = Some(split.remove(0))
+		}
+		self.split = split;
+	}
+
+	pub fn update_error(&mut self, error: Option<String>) {
+		if let Some(error) = error {
+			self.error = error;
+		} else {
+			self.error = get_error(&self.shell, &self.command);
+		}
+	}
+
+	pub fn update_command(&mut self, command: &str) {
+		self.command = command.to_string();
+		self.split();
+	}
+
+	pub fn update_suggest(&mut self, suggest: &str) {
+		let split = split_command(&suggest);
+		if PRIVILEGE_LIST.contains(&split[0].as_str()) {
+			self.suggest = Some(suggest.replacen(&split[0], "", 1));
+			self.privilege = Some(split[0].clone())
+		} else {
+			self.suggest = Some(suggest.to_string());
+		};
+	}
+}
+
+pub fn split_command(command: &str) -> Vec<String> {
+	if cfg!(debug_assertions) {
+		eprintln!("command: {command}")
+	}
+	// this regex splits the command separated by spaces, except when the space
+	// is escaped by a backslash or surrounded by quotes
+	let regex = r#"([^\s"'\\]+|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\\ )+|\\|\n"#;
+	let regex = Regex::new(regex).unwrap();
+	let split_command = regex
+		.find_iter(command)
+		.map(|cap| cap.as_str().to_owned())
+		.collect::<Vec<String>>();
+	split_command
+}
+
+pub fn get_error(shell: &str, command: &str) -> String {
+	let error_msg = std::env::var("_PR_ERROR_MSG");
+	let error = if let Ok(error_msg) = error_msg {
+		std::env::remove_var("_PR_ERROR_MSG");
+		error_msg
+	} else {
+		command_output(shell, command)
+	};
+	error.split_whitespace().collect::<Vec<&str>>().join(" ")
+}
 
 pub fn command_output(shell: &str, command: &str) -> String {
 	let (sender, receiver) = channel();
@@ -65,85 +193,93 @@ pub fn last_command(shell: &str) -> String {
 	}
 }
 
-pub fn expand_alias(shell: &str, full_command: &str) -> String {
-	let alias_env = std::env::var("_PR_ALIAS");
-	if alias_env.is_err() {
-		return full_command.to_string();
+pub fn run_mode() -> Mode {
+	match std::env::var("_PR_MODE") {
+		Ok(mode) => {
+			match mode.as_str() {
+				"suggestion" => Mode::Suggestion,
+				"cnf" => Mode::CNF,
+				_ => Mode::Suggestion,
+			}
+		}
+		Err(_) => Mode::Suggestion,
 	}
-	let alias = alias_env.unwrap();
-	if alias.is_empty() {
-		return full_command.to_string();
+}
+
+pub fn alias_map(shell: &str) -> Option<HashMap<String, String>> {
+	let env = std::env::var("_PR_ALIAS");
+	if env.is_err() {
+		return None;
+	}
+	let env = env.unwrap();
+	if env.is_empty() {
+		return None;
 	}
 
-	let split_command = full_command.split_whitespace().collect::<Vec<&str>>();
-	let (command, pure_command) = if PRIVILEGE_LIST.contains(&split_command[0]) && split_command.len() > 1 {
-		(split_command[1], Some(split_command[1..].join(" ")))
-	} else {
-		(split_command[0], None)
-	};
-
-	let mut expanded_command = Option::None;
-
+	let mut alias_map = HashMap::new();
 	match shell {
 		"bash" => {
-			for line in alias.lines() {
-				if line.starts_with(format!("alias {}=", command).as_str()) {
-					let alias = line.replace(format!("alias {}='", command).as_str(), "");
-					let alias = alias.trim_end_matches('\'').trim_start_matches('\'');
-
-					expanded_command = Some(alias.to_string());
-				}
+			for line in env.lines() {
+				let alias = line.replace("alias ", "");
+				let (alias, command) = alias.split_once('=').unwrap();
+				let command = command.trim().trim_matches('\'');
+				alias_map.insert(alias.to_string(), command.to_string());
 			}
 		}
 		"zsh" => {
-			for line in alias.lines() {
-				if line.starts_with(format!("{}=", command).as_str()) {
-					let alias = line.replace(format!("{}=", command).as_str(), "");
-					let alias = alias.trim_start_matches('\'').trim_end_matches('\'');
-
-					expanded_command = Some(alias.to_string());
-				}
+			for line in env.lines() {
+				let (alias, command) = line.split_once('=').unwrap();
+				let command = command.trim().trim_matches('\'');
+				alias_map.insert(alias.to_string(), command.to_string());
 			}
 		}
 		"fish" => {
-			for line in alias.lines() {
-				if line.starts_with(format!("alias {} ", command).as_str()) {
-					let alias = line.replace(format!("alias {} ", command).as_str(), "");
-					let alias = alias.trim_start_matches('\'').trim_end_matches('\'');
-
-					expanded_command = Some(alias.to_string());
-				}
+			for line in env.lines() {
+				let alias = line.replace("alias ", "");
+				let (alias, command) = alias.split_once(' ').unwrap();
+				let command = command.trim().trim_matches('\'');
+				alias_map.insert(alias.to_string(), command.to_string());
 			}
 		}
 		_ => {
-			eprintln!("Unsupported shell: {}", shell);
-			exit(1);
-		}
-	};
-
-	if expanded_command.is_none() {
-		return full_command.to_string();
-	};
-
-	let expanded_command = expanded_command.unwrap();
-
-	if pure_command.is_some() {
-		let pure_command = pure_command.unwrap();
-		if pure_command.starts_with(&expanded_command) {
-			return full_command.to_string();
+			unreachable!("Unsupported shell: {}", shell);
 		}
 	}
-
-	full_command.replacen(command, &expanded_command, 1)
+	Some(alias_map)
 }
 
-pub fn expand_alias_multiline(shell: &str, full_command: &str) -> String {
-	let lines = full_command.lines().collect::<Vec<&str>>();
-	let mut expanded = String::new();
-	for line in lines {
-		expanded = format!("{}\n{}", expanded, expand_alias(shell, line));
+pub fn expand_alias(map: &HashMap<String, String>, command: &str) -> Option<String> {
+	#[cfg(debug_assertions)]
+	eprintln!("expand_alias: command: {}", command);
+	let command = if let Some(split) = command.split_once(' ') {
+		split.0
+	} else {
+		command
+	};
+	if let Some(expand) = map.get(command) {
+		Some(command.replacen(&command, expand, 1))
+	} else {
+		None
 	}
-	expanded
+}
+
+pub fn expand_alias_multiline(map: &HashMap<String, String>, command: &str) -> Option<String> {
+	let lines = command.lines().collect::<Vec<&str>>();
+	let mut expanded = String::new();
+	let mut expansion = false;
+	for line in lines {
+		if let Some(expand) = expand_alias(&map, line){
+			expanded = format!("{}\n{}", expanded, expand);
+			expansion = true;
+		} else {
+			expanded = format!("{}\n{}", expanded, line);
+		}
+	}
+	if expansion {
+		Some(expanded)
+	} else {
+		None
+	}
 }
 
 pub fn initialization(shell: &str, binary_path: &str, auto_alias: &str, cnf: bool) {
@@ -173,7 +309,7 @@ pub fn initialization(shell: &str, binary_path: &str, auto_alias: &str, cnf: boo
 		}
 		_ => {
 			println!("Unknown shell: {}", shell);
-			std::process::exit(1);
+			return;
 		}
 	}
 
@@ -194,7 +330,7 @@ def --env {} [] {{
 			pr_alias, last_command, binary_path
 		);
 		println!("{}", init);
-		std::process::exit(0);
+		return;
 	}
 
 	let mut init = match shell {
@@ -233,12 +369,12 @@ def --env {} [] {{
 		),
 		_ => {
 			println!("Unsupported shell: {}", shell);
-			exit(1);
+			return;
 		}
 	};
 	if auto_alias.is_empty() {
 		println!("{}", init);
-		std::process::exit(0);
+		return;
 	}
 
 	match shell {
@@ -264,7 +400,7 @@ end
 		}
 		_ => {
 			println!("Unsupported shell: {}", shell);
-			exit(1);
+			return;
 		}
 	}
 
@@ -332,14 +468,12 @@ $ExecutionContext.InvokeCommand.CommandNotFoundAction =
 			}
 			_ => {
 				println!("Unsupported shell: {}", shell);
-				exit(1);
+				return;
 			}
 		}
 	}
 
 	println!("{}", init);
-
-	std::process::exit(0);
 }
 
 pub fn get_shell() -> String {
