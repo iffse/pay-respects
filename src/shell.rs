@@ -266,11 +266,7 @@ pub fn expand_alias(map: &HashMap<String, String>, command: &str) -> Option<Stri
 	} else {
 		(command, "")
 	};
-	if let Some(expand) = map.get(command) {
-		Some(format!("{} {}", expand, args))
-	} else {
-		None
-	}
+	map.get(command).map(|expand| format!("{} {}", expand, args))
 }
 
 pub fn expand_alias_multiline(map: &HashMap<String, String>, command: &str) -> Option<String> {

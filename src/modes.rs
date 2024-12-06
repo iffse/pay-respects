@@ -7,7 +7,7 @@ use inquire::*;
 
 pub fn suggestion(data: &mut Data) {
 	let shell = data.shell.clone();
-	let mut last_command ;
+	let mut last_command;
 
 	loop {
 		last_command = data.command.clone();

@@ -92,11 +92,15 @@ pub fn select_candidate(data: &mut Data) {
 			.with_answered_prompt_prefix(style)
 			.with_highlighted_option_prefix(style);
 
-		let msg = format!("{} suggestions found:", candidates.len()).bold().blue();
-		let hint = format!("{} {} {}",
+		let msg = format!("{} suggestions found:", candidates.len())
+			.bold()
+			.blue();
+		let hint = format!(
+			"{} {} {}",
 			"[↑/↓]".blue(),
 			t!("confirm-yes").green(),
-			"[Ctrl+C]".red());
+			"[Ctrl+C]".red()
+		);
 		eprintln!("{}", msg);
 		eprintln!("{}", hint);
 

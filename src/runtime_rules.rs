@@ -1,6 +1,6 @@
 use crate::replaces;
-use crate::suggestions::*;
 use crate::shell::Data;
+use crate::suggestions::*;
 
 #[derive(serde::Deserialize)]
 struct Rule {
@@ -13,10 +13,7 @@ struct MatchError {
 	suggest: Vec<String>,
 }
 
-pub fn runtime_match(
-	executable: &str,
-	data: &mut Data,
-) {
+pub fn runtime_match(executable: &str, data: &mut Data) {
 	let file = get_rule(executable);
 	if file.is_none() {
 		return;
@@ -68,7 +65,7 @@ pub fn runtime_match(
 								shell,
 								last_command,
 								error_msg,
-								&split_command,
+								split_command,
 							) == reverse
 							{
 								continue 'suggest;
@@ -83,7 +80,12 @@ pub fn runtime_match(
 					if pure_suggest.contains("{{command}}") {
 						pure_suggest = pure_suggest.replace("{{command}}", last_command);
 					}
-					data.add_candidate(&eval_suggest(&pure_suggest, last_command, error_msg, shell));
+					data.add_candidate(&eval_suggest(
+						&pure_suggest,
+						last_command,
+						error_msg,
+						shell,
+					));
 				}
 			}
 		}
