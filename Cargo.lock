@@ -485,9 +485,9 @@ dependencies = [
 
 [[package]]
 name = "pay-respects-parser"
-version = "0.3.1"
+version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a5d494017aca21a2231e685b0d495a0f1b17ebcc81d6e43f7dd5fe7761cd73fb"
+checksum = "0c6304475497712e6fbcbb0f947c4958ae336f1dcc3d7c8f470664a20e9ef175"
 dependencies = [
  "proc-macro2",
  "quote",
