@@ -162,11 +162,11 @@ The command `{last_command}` returns the following error message: `{error_msg}`.
 	}
 	let json: Value = {
 		let json = serde_json::from_str(&res);
-		if json.is_err() {
+		if let Ok(json) = json {
+			json
+		} else {
 			eprintln!("Failed to parse JSON response: {}", res);
 			return None;
-		} else {
-			json.unwrap()
 		}
 	};
 

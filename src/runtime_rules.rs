@@ -102,7 +102,7 @@ fn eval_condition(
 	last_command: &str,
 	error_msg: &str,
 	split_command: &[String],
-	data: &mut Data
+	data: &mut Data,
 ) -> bool {
 	match condition {
 		"executable" => data.has_executable(arg),
@@ -116,7 +116,13 @@ fn eval_condition(
 	}
 }
 
-fn eval_suggest(suggest: &str, last_command: &str, error_msg: &str, executables: &[String], shell: &str) -> String {
+fn eval_suggest(
+	suggest: &str,
+	last_command: &str,
+	error_msg: &str,
+	executables: &[String],
+	shell: &str,
+) -> String {
 	let mut suggest = suggest.to_owned();
 	if suggest.contains("{{command}}") {
 		suggest = suggest.replace("{{command}}", "{last_command}");
