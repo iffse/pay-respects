@@ -60,10 +60,10 @@ fn main() -> Result<(), std::io::Error> {
 	};
 
 	data.expand_command();
-	use shell::Mode;
+	use shell::Mode::*;
 	match data.mode {
-		Mode::Suggestion => modes::suggestion(&mut data),
-		Mode::Cnf => modes::cnf(&mut data),
+		Suggestion => modes::suggestion(&mut data),
+		Cnf => modes::cnf(&mut data),
 	}
 
 	Ok(())

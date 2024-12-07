@@ -1,5 +1,6 @@
-use crate::shell::initialization;
+use crate::shell::{initialization, Init};
 use colored::Colorize;
+
 
 pub enum Status {
 	Continue,
@@ -7,16 +8,13 @@ pub enum Status {
 	Error,
 }
 
-// returns true if should exit
 pub fn handle_args() -> Status {
 	use Status::*;
 	let args = std::env::args().collect::<Vec<String>>();
 	if args.len() <= 1 {
 		return Continue;
 	}
-	let mut auto_aliasing = String::new();
-	let mut shell = String::new();
-	let mut cnf = true;
+	let mut init = Init::new();
 	let mut index = 1;
 	while index < args.len() {
 		match args[index].as_str() {
@@ -31,35 +29,36 @@ pub fn handle_args() -> Status {
 			"-a" | "--alias" => {
 				if args.len() > index + 1 {
 					if args[index + 1].starts_with('-') {
-						auto_aliasing = String::from("f");
+						init.alias = String::from("f");
 					} else {
-						auto_aliasing = args[index + 1].clone();
+						init.alias = args[index + 1].clone();
 						index += 1;
 					}
 				} else {
-					auto_aliasing = String::from("f");
+					init.alias = String::from("f");
 				}
+				init.auto_alias = true;
 				index += 1;
 			}
 			"--noncf" => {
-				cnf = false;
+				init.cnf = false;
 				index += 1
 			}
 			_ => {
-				shell = args[index].clone();
+				init.shell = args[index].clone();
 				index += 1
 			}
 		}
 	}
 
-	if shell.is_empty() {
+	if init.shell.is_empty() {
 		eprintln!("{}", t!("no-shell"));
 		return Error;
 	}
 
-	let binary_path = &args[0];
+	init.binary_path = args[0].clone();
 
-	initialization(&shell, binary_path, &auto_aliasing, cnf);
+	initialization(&mut init);
 	Exit
 }
 

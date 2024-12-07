@@ -15,6 +15,25 @@ pub enum Mode {
 	Suggestion,
 	Cnf,
 }
+pub struct Init {
+	pub shell: String,
+	pub binary_path: String,
+	pub alias: String,
+	pub auto_alias: bool,
+	pub cnf: bool,
+}
+
+impl Init {
+	pub fn new() -> Init {
+		Init {
+			shell: String::from(""),
+			binary_path: String::from(""),
+			alias: String::from("f"),
+			auto_alias: false,
+			cnf: true,
+		}
+	}
+}
 
 pub struct Data {
 	pub shell: String,
@@ -27,13 +46,6 @@ pub struct Data {
 	pub error: String,
 	pub executables: Vec<String>,
 	pub mode: Mode,
-}
-
-pub struct Init {
-	pub shell: String,
-	pub binary_path: String,
-	pub auto_alias: String,
-	pub cnf: bool,
 }
 
 impl Data {
@@ -307,44 +319,46 @@ pub fn expand_alias_multiline(map: &HashMap<String, String>, command: &str) -> O
 	}
 }
 
-pub fn initialization(shell: &str, binary_path: &str, auto_alias: &str, cnf: bool) {
+pub fn initialization(init: &mut Init) {
 	let last_command;
-	let alias;
+	let shell_alias;
+	let alias = &init.alias;
+	let auto_alias = init.auto_alias;
+	let cnf = init.cnf;
+	let binary_path = &init.binary_path;
 
-	match shell {
+	match init.shell.as_str() {
 		"bash" => {
 			last_command = "$(history 2)";
-			alias = "$(alias)"
+			shell_alias = "$(alias)"
 		}
 		"zsh" => {
 			last_command = "$(fc -ln -1)";
-			alias = "$(alias)"
+			shell_alias = "$(alias)"
 		}
 		"fish" => {
 			last_command = "$(history | head -n 1)";
-			alias = "$(alias)";
+			shell_alias = "$(alias)";
 		}
 		"nu" | "nush" | "nushell" => {
 			last_command = "(history | last).command";
-			alias = "\"\"";
+			shell_alias = "\"\"";
+			init.shell = "nu".to_string();
 		}
 		"pwsh" | "powershell" => {
 			last_command = "Get-History | Select-Object -Last 1 | ForEach-Object {$_.CommandLine}";
-			alias = ";";
+			shell_alias = ";";
+			init.shell = "pwsh".to_string();
 		}
 		_ => {
-			println!("Unknown shell: {}", shell);
+			println!("Unknown shell: {}", init.shell);
 			return;
 		}
 	}
 
-	if shell == "nu" || shell == "nush" || shell == "nushell" {
-		let pr_alias = if auto_alias.is_empty() {
-			"f"
-		} else {
-			auto_alias
-		};
+	let shell = &init.shell;
 
+	if init.shell == "nu" {
 		let init = format!(
 			r#"
 def --env {} [] {{
@@ -352,20 +366,20 @@ def --env {} [] {{
 	cd $dir
 }}
 "#,
-			pr_alias, last_command, binary_path
+			init.alias, last_command, init.binary_path
 		);
 		println!("{}", init);
 		return;
 	}
 
-	let mut init = match shell {
+	let mut initialize = match shell.as_str() {
 		"bash" | "zsh" | "fish" => format!(
 			"\
 			eval $(_PR_LAST_COMMAND=\"{}\" \
 			_PR_ALIAS=\"{}\" \
 			_PR_SHELL=\"{}\" \
 			\"{}\")",
-			last_command, alias, shell, binary_path
+			last_command, shell_alias, shell, binary_path
 		),
 		"pwsh" | "powershell" => format!(
 			r#"& {{
@@ -397,30 +411,30 @@ def --env {} [] {{
 			return;
 		}
 	};
-	if auto_alias.is_empty() {
-		println!("{}", init);
+	if !auto_alias {
+		println!("{}", initialize);
 		return;
 	}
 
-	match shell {
+	match shell.as_str() {
 		"bash" | "zsh" => {
-			init = format!(r#"alias {}='{}'"#, auto_alias, init);
+			initialize = format!(r#"alias {}='{}'"#, alias, initialize);
 		}
 		"fish" => {
-			init = format!(
+			initialize = format!(
 				r#"
 function {} -d "Terminal command correction"
 	eval $({})
 end
 "#,
-				auto_alias, init
+				alias, initialize
 			);
 		}
-		"pwsh" | "powershell" => {
-			init = format!(
+		"pwsh" => {
+			initialize = format!(
 				"function {} {{\n{}",
-				auto_alias,
-				init.split_once("\n").unwrap().1,
+				alias,
+				initialize.split_once("\n").unwrap().1,
 			);
 		}
 		_ => {
@@ -430,9 +444,9 @@ end
 	}
 
 	if cnf {
-		match shell {
+		match shell.as_str() {
 			"bash" => {
-				init = format!(
+				initialize = format!(
 					r#"
 command_not_found_handle() {{
 	eval $(_PR_LAST_COMMAND="_ $@" _PR_SHELL="{}" _PR_MODE="cnf" "{}")
@@ -440,11 +454,11 @@ command_not_found_handle() {{
 
 {}
 "#,
-					shell, binary_path, init
+					shell, binary_path, initialize
 				);
 			}
 			"zsh" => {
-				init = format!(
+				initialize = format!(
 					r#"
 command_not_found_handler() {{
 	eval $(_PR_LAST_COMMAND="$@" _PR_SHELL="{}" _PR_MODE="cnf" "{}")
@@ -452,11 +466,11 @@ command_not_found_handler() {{
 
 {}
 "#,
-					shell, binary_path, init
+					shell, binary_path, initialize
 				);
 			}
 			"fish" => {
-				init = format!(
+				initialize = format!(
 					r#"
 function fish_command_not_found --on-event fish_command_not_found
 	eval $(_PR_LAST_COMMAND="$argv" _PR_SHELL="{}" _PR_MODE="cnf" "{}")
@@ -464,11 +478,11 @@ end
 
 {}
 "#,
-					shell, binary_path, init
+					shell, binary_path, initialize
 				);
 			}
-			"pwsh" | "powershell" => {
-				init = format!(
+			"pwsh" => {
+				initialize = format!(
 					r#"{}
 $ExecutionContext.InvokeCommand.CommandNotFoundAction =
 {{
@@ -488,7 +502,7 @@ $ExecutionContext.InvokeCommand.CommandNotFoundAction =
 	$eventArgs.StopSearch = $True;
 }}
 "#,
-					init, auto_alias
+					initialize, alias
 				)
 			}
 			_ => {
@@ -498,7 +512,7 @@ $ExecutionContext.InvokeCommand.CommandNotFoundAction =
 		}
 	}
 
-	println!("{}", init);
+	println!("{}", initialize);
 }
 
 pub fn get_shell() -> String {
