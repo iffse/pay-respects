@@ -25,6 +25,7 @@ pub fn runtime_match(executable: &str, data: &mut Data) {
 	let shell = &data.shell.clone();
 	let last_command = &data.command.clone();
 	let error_msg = &data.error.clone();
+	let executables = &data.get_executables().clone();
 
 	let mut pure_suggest;
 
@@ -66,6 +67,7 @@ pub fn runtime_match(executable: &str, data: &mut Data) {
 								last_command,
 								error_msg,
 								split_command,
+								data,
 							) == reverse
 							{
 								continue 'suggest;
@@ -84,6 +86,7 @@ pub fn runtime_match(executable: &str, data: &mut Data) {
 						&pure_suggest,
 						last_command,
 						error_msg,
+						executables,
 						shell,
 					));
 				}
@@ -99,9 +102,10 @@ fn eval_condition(
 	last_command: &str,
 	error_msg: &str,
 	split_command: &[String],
+	data: &mut Data
 ) -> bool {
 	match condition {
-		"executable" => check_executable(shell, arg),
+		"executable" => data.has_executable(arg),
 		"err_contains" => error_msg.contains(arg),
 		"cmd_contains" => last_command.contains(arg),
 		"min_length" => split_command.len() >= arg.parse::<usize>().unwrap(),
@@ -112,7 +116,7 @@ fn eval_condition(
 	}
 }
 
-fn eval_suggest(suggest: &str, last_command: &str, error_msg: &str, shell: &str) -> String {
+fn eval_suggest(suggest: &str, last_command: &str, error_msg: &str, executables: &[String], shell: &str) -> String {
 	let mut suggest = suggest.to_owned();
 	if suggest.contains("{{command}}") {
 		suggest = suggest.replace("{{command}}", "{last_command}");
@@ -128,7 +132,7 @@ fn eval_suggest(suggest: &str, last_command: &str, error_msg: &str, shell: &str)
 	replaces::err(&mut suggest, error_msg);
 	replaces::command(&mut suggest, &split_command);
 	replaces::shell(&mut suggest, shell);
-	replaces::typo(&mut suggest, &split_command, shell);
+	replaces::typo(&mut suggest, &split_command, executables, shell);
 
 	for (tag, value) in opt_list {
 		suggest = suggest.replace(&tag, &value);

@@ -94,7 +94,7 @@ pub fn command(suggest: &mut String, split_command: &[String]) {
 	}
 }
 
-pub fn typo(suggest: &mut String, split_command: &[String], shell: &str) {
+pub fn typo(suggest: &mut String, split_command: &[String], executables: &[String], shell: &str) {
 	while suggest.contains("{{typo") {
 		let (placeholder, args) = eval_placeholder(suggest, "{{typo", "}}");
 
@@ -160,9 +160,9 @@ pub fn typo(suggest: &mut String, split_command: &[String], shell: &str) {
 			let function = match_list.join(",");
 			let (_, args) = eval_placeholder(&function, "{{shell", "}}");
 			let function = &function[args.to_owned()].trim_matches(|c| c == '(' || c == ')');
-			suggest_typo(&split_command[index], eval_shell_command(shell, function))
+			suggest_typo(&split_command[index], eval_shell_command(shell, function), executables)
 		} else {
-			suggest_typo(&split_command[index], match_list)
+			suggest_typo(&split_command[index], match_list, executables)
 		};
 
 		suggest.replace_range(placeholder, &command);

@@ -86,7 +86,7 @@ pub fn cnf(data: &mut Data) {
 			suggestion(data);
 		}
 	} else {
-		let package_manager = match system::get_package_manager(&shell) {
+		let package_manager = match system::get_package_manager(data) {
 			Some(package_manager) => package_manager,
 			None => {
 				return;
