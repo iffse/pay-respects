@@ -226,7 +226,7 @@ pub fn command_output(shell: &str, command: &str) -> String {
 		.output()
 		.expect("failed to execute process");
 
-		String::from_utf8_lossy(&output.stdout).to_string()
+	String::from_utf8_lossy(&output.stdout).to_string()
 }
 
 pub fn last_command(shell: &str) -> String {

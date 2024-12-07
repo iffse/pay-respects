@@ -1,7 +1,6 @@
 use crate::shell::{initialization, Init};
 use colored::Colorize;
 
-
 pub enum Status {
 	Continue,
 	Exit, // version, help, etc.
