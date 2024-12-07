@@ -31,6 +31,9 @@ pub fn get_packages(data: &mut Data, package_manager: &str, executable: &str) ->
 				return None;
 			}
 			let result = command_output(shell, &format!("dpkg -S '*/bin/{}'", executable));
+			if result.is_empty() {
+				return None
+			}
 			let packages: Vec<String> = result
 				.lines()
 				.map(|line| line[..line.find(':').unwrap()].to_string())
@@ -44,6 +47,9 @@ pub fn get_packages(data: &mut Data, package_manager: &str, executable: &str) ->
 		},
 		"dnf" => {
 			let result = command_output(shell, &format!("dnf provides {}", executable));
+			if result.is_empty() {
+				return None
+			}
 			let packages: Vec<String> = result
 				.lines()
 				.map(|line| line.split_whitespace().next().unwrap().to_string())
@@ -59,6 +65,9 @@ pub fn get_packages(data: &mut Data, package_manager: &str, executable: &str) ->
 				return None;
 			}
 			let result = command_output(shell, &format!("e-file /usr/bin/{}", executable));
+			if result.is_empty() {
+				return None
+			}
 			let mut packages = vec![];
 			for line in result.lines() {
 				if !line.starts_with(" ") {
@@ -75,10 +84,13 @@ pub fn get_packages(data: &mut Data, package_manager: &str, executable: &str) ->
 			if !data.has_executable("nix-locate") {
 				return None;
 			}
-			let result = command_output(shell, &format!("nix-locate /usr/bin/{}", executable));
+			let result = command_output(shell, &format!("nix-locate 'bin/{}'", executable));
+			if result.is_empty() {
+				return None
+			}
 			let packages: Vec<String> = result
 				.lines()
-				.map(|line| line.split_whitespace().next().unwrap().trim_end_matches(".out").to_string())
+				.map(|line| line.split_whitespace().next().unwrap().to_string())
 				.collect();
 			if packages.is_empty() {
 				None
@@ -91,6 +103,9 @@ pub fn get_packages(data: &mut Data, package_manager: &str, executable: &str) ->
 			// let result = if data.has_executable("pkgfile") {
 			// 	command_output(shell, &format!("pkgfile -b {}", executable))
 			let result = command_output(shell, &format!("pacman -Fq /usr/bin/{}", executable));
+			if result.is_empty() {
+				return None
+			}
 			let packages: Vec<String> = result
 				.lines()
 				.map(|line| line.split_whitespace().next().unwrap().to_string())
@@ -111,7 +126,7 @@ pub fn install_package(data: &mut Data, package_manager: &str, package: &str) ->
 		"apt" => format!("apt install {}", package),
 		"dnf" => format!("dnf install {}", package),
 		"emerge" => format!("emerge {}", package),
-		"nix-env" => format!("nix-env -iA {}", package),
+		"nix-env" => format!("nix-env -iA nixpkgs.{}", package),
 		"pacman" => format!("pacman -S {}", package),
 		"pkg" => format!("pkg install {}", package),
 		"yum" => format!("yum install {}", package),
