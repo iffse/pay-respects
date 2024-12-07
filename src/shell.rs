@@ -167,6 +167,15 @@ pub fn split_command(command: &str) -> Vec<String> {
 	split_command
 }
 
+pub fn elevate(data: &mut Data, command: &mut String) {
+	for privilege in PRIVILEGE_LIST.iter() {
+		if data.has_executable(privilege) {
+			*command = format!("{} {}", privilege, command);
+			break;
+		}
+	}
+}
+
 pub fn get_error(shell: &str, command: &str) -> String {
 	let error_msg = std::env::var("_PR_ERROR_MSG");
 	let error = if let Ok(error_msg) = error_msg {
