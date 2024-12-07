@@ -58,6 +58,8 @@ pub fn suggest_candidates(data: &mut Data) {
 
 pub fn select_candidate(data: &mut Data) {
 	let candidates = &data.candidates;
+	#[cfg(debug_assertions)]
+	eprintln!("candidates: {candidates:?}");
 	if candidates.len() == 1 {
 		let suggestion = candidates[0].to_string();
 		let highlighted = highlight_difference(&data.shell, &suggestion, &data.command).unwrap();
