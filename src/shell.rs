@@ -7,6 +7,8 @@ use std::time::Duration;
 
 use regex_lite::Regex;
 
+use crate::files::get_path_files;
+
 pub const PRIVILEGE_LIST: [&str; 2] = ["sudo", "doas"];
 
 pub enum Mode {
@@ -23,6 +25,7 @@ pub struct Data {
 	pub alias: Option<HashMap<String, String>>,
 	pub privilege: Option<String>,
 	pub error: String,
+	pub executables: Vec<String>,
 	pub mode: Mode,
 }
 
@@ -49,6 +52,7 @@ impl Data {
 			split: vec![],
 			privilege: None,
 			error: "".to_string(),
+			executables: vec![],
 			mode,
 		};
 
@@ -118,6 +122,20 @@ impl Data {
 		if candidate != self.command {
 			self.candidates.push(candidate.to_string());
 		}
+	}
+
+	pub fn get_executables(&mut self) -> &Vec<String> {
+		if self.executables.is_empty() {
+			self.executables = get_path_files();
+		}
+		&self.executables
+	}
+
+	pub fn has_executable(&mut self, executable: &str) -> bool {
+		if self.executables.is_empty() {
+			self.executables = get_path_files();
+		}
+		self.executables.contains(&executable.to_string())
 	}
 }
 

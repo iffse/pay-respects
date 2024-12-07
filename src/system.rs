@@ -1,20 +1,13 @@
 use std::io::stderr;
 use std::process::Command;
 use std::process::Stdio;
+use crate::shell::Data;
 
-pub fn get_package_manager(shell: &str) -> Option<String> {
+pub fn get_package_manager(data: &mut Data) -> Option<String> {
 	let package_managers = vec!["pacman"];
 
 	for package_manager in package_managers {
-		let success = Command::new(shell)
-			.arg("-c")
-			.arg(format!("command -v {}", package_manager))
-			.output()
-			.expect("failed to execute process")
-			.status
-			.success();
-
-		if success {
+		if data.has_executable(package_manager) {
 			return Some(package_manager.to_string());
 		}
 	}

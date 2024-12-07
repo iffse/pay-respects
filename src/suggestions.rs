@@ -124,25 +124,6 @@ pub fn select_candidate(data: &mut Data) {
 	data.candidates.clear();
 }
 
-pub fn check_executable(shell: &str, executable: &str) -> bool {
-	match shell {
-		"nu" => std::process::Command::new(shell)
-			.arg("-c")
-			.arg(format!("if (which {} | is-empty) {{ exit 1 }}", executable))
-			.output()
-			.expect("failed to execute process")
-			.status
-			.success(),
-		_ => std::process::Command::new(shell)
-			.arg("-c")
-			.arg(format!("command -v {}", executable))
-			.output()
-			.expect("failed to execute process")
-			.status
-			.success(),
-	}
-}
-
 pub fn opt_regex(regex: &str, command: &mut String) -> String {
 	let regex = Regex::new(regex).unwrap();
 
@@ -212,18 +193,14 @@ pub fn split_command(command: &str) -> Vec<String> {
 	split_command
 }
 
-pub fn suggest_typo(typos: &[String], candidates: Vec<String>) -> String {
-	let mut path_files = Vec::new();
+pub fn suggest_typo(typos: &[String], candidates: Vec<String>, executables: &[String]) -> String {
 	let mut suggestions = Vec::new();
 	for typo in typos {
 		let typo = typo.as_str();
 		if candidates.len() == 1 {
 			match candidates[0].as_str() {
 				"path" => {
-					if path_files.is_empty() {
-						path_files = get_path_files();
-					};
-					if let Some(suggest) = find_similar(typo, &path_files, Some(2)) {
+					if let Some(suggest) = find_similar(typo, executables, Some(2)) {
 						suggestions.push(suggest);
 					} else {
 						suggestions.push(typo.to_string());
