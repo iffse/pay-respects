@@ -8,7 +8,7 @@ pub fn get_package_manager(data: &mut Data) -> Option<String> {
 		"apt",
 		"dnf",
 		"emerge",
-		// "nix-env",
+		"nix-env",
 		"pacman",
 		// "pkg",
 		// "yum",
@@ -71,6 +71,21 @@ pub fn get_packages(data: &mut Data, package_manager: &str, executable: &str) ->
 				Some(packages)
 			}
 		},
+		"nix-env" => {
+			if !data.has_executable("nix-locate") {
+				return None;
+			}
+			let result = command_output(shell, &format!("nix-locate /usr/bin/{}", executable));
+			let packages: Vec<String> = result
+				.lines()
+				.map(|line| line.split_whitespace().next().unwrap().trim_end_matches(".out").to_string())
+				.collect();
+			if packages.is_empty() {
+				None
+			} else {
+				Some(packages)
+			}
+		}
 		"pacman" => {
 			let result = if data.has_executable("pkgfile") {
 				command_output(shell, &format!("pkgfile -b {}", executable))
