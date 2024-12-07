@@ -83,8 +83,8 @@ pub fn cnf(data: &mut Data) {
 					.join(" "),
 			);
 			data.update_error(msg);
+			suggestion(data);
 		}
-		suggestion(data);
 	} else {
 		let package_manager = match system::get_package_manager(&shell) {
 			Some(package_manager) => package_manager,
