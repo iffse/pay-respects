@@ -40,10 +40,8 @@ pub fn ai_suggestion(last_command: &str, error_msg: &str) -> Option<AISuggest> {
 		Ok(key) => Some(key),
 		Err(_) => {
 			let env_key = option_env!("_DEF_PR_AI_API_KEY").map(|key| key.to_string());
-			// I am keeping the key so anyone can use it out of the box
-			// Please, don't abuse the key and try to use your own key
 			if env_key.is_none() {
-				Some("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".to_string())
+				Some("Y29uZ3JhdHVsYXRpb25zLCB5b3UgZm91bmQgdGhlIHNlY3JldCE=".to_string())
 			} else if env_key.as_ref().unwrap().is_empty() {
 				None
 			} else {
@@ -66,7 +64,7 @@ pub fn ai_suggestion(last_command: &str, error_msg: &str) -> Option<AISuggest> {
 
 	let request_url = match std::env::var("_PR_AI_URL") {
 		Ok(url) => url,
-		Err(_) => "https://api.groq.com/openai/v1/chat/completions".to_string(),
+		Err(_) => "https://iff.envs.net/completions.py".to_string(),
 	};
 	let model = match std::env::var("_PR_AI_MODEL") {
 		Ok(model) => model,
@@ -162,7 +160,15 @@ The command `{last_command}` returns the following error message: `{error_msg}`.
 		};
 		res = String::from_utf8(out).unwrap();
 	}
-	let json: Value = serde_json::from_str(&res).unwrap();
+	let json: Value = {
+		let json = serde_json::from_str(&res);
+		if json.is_err() {
+			eprintln!("Failed to parse JSON response: {}", res);
+			return None;
+		} else {
+			json.unwrap()
+		}
+	};
 
 	let content = &json["choices"][0]["message"]["content"];
 
