@@ -100,7 +100,7 @@ pub fn select_candidate(data: &mut Data) {
 		let confirm = format!("[{}]", t!("confirm-yes")).green();
 		let hint = format!(
 			"{} {} {}",
-			"[↑/↓]".blue(),
+			"[↓/↑] / [j/k]".blue(),
 			confirm,
 			"[Ctrl+C]".red()
 		);
@@ -109,6 +109,7 @@ pub fn select_candidate(data: &mut Data) {
 
 		let ans = Select::new("\n", highlight_candidates.clone())
 			.with_page_size(1)
+			.with_vim_mode(true)
 			.without_filtering()
 			.without_help_message()
 			.with_render_config(render_config)

@@ -121,6 +121,7 @@ pub fn cnf(data: &mut Data) {
 		eprintln!("{}", msg);
 		eprintln!("{}", hint);
 		let package = Select::new("\n", packages)
+			.with_vim_mode(true)
 			.without_help_message()
 			.with_render_config(render_config)
 			.without_filtering()
