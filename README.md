@@ -8,9 +8,7 @@ Typed a wrong command or don't know what to do? Pay Respects will suggest a fix 
 - 🤖 **AI Support**: AI comes in aid when there is no rule for your error!
 - 🪶 **Tiny binary size**: Not even 1MB! Approximately 1MB with all optional features!
 
-![pacman-fix](img/pacman-fix.png)
-
-![cd-fix](img/cd-fix.png)
+![showcase](./img/showcase.gif)
 
 ## How to Pay Respects
 
