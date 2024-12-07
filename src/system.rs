@@ -14,14 +14,23 @@ pub fn get_package_manager(data: &mut Data) -> Option<String> {
 	None
 }
 
-pub fn get_packages(shell: &str, package_manager: &str, executable: &str) -> Option<Vec<String>> {
+pub fn get_packages(data: &mut Data, package_manager: &str, executable: &str) -> Option<Vec<String>> {
+	let shell = &data.shell.clone();
 	match package_manager {
 		"pacman" => {
-			let result = Command::new(shell)
-				.arg("-c")
-				.arg(format!("pacman -Fq /usr/bin/{}", executable))
-				.output()
-				.expect("failed to execute process");
+			let result = if data.has_executable("pkgfile") {
+				Command::new(shell)
+					.arg("-c")
+					.arg(format!("pkgfile -b {}", executable))
+					.output()
+					.expect("failed to execute process")
+			} else {
+				Command::new(shell)
+					.arg("-c")
+					.arg(format!("pacman -Fq /usr/bin/{}", executable))
+					.output()
+					.expect("failed to execute process")
+			};
 			if result.status.success() {
 				let output = String::from_utf8_lossy(&result.stdout)
 					.lines()
