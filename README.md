@@ -6,7 +6,7 @@ Typed a wrong command or don't know what to do? Pay Respects will suggest a fix 
 - ✏️ **Easy to write rules**: You don't need to know Rust. The rules are written in a TOML file!
 - 🎯 **Accurate results**: Suggestions are verified before being prompted to the user, no `sudo` suggestions when you are using `doas`!
 - 🤖 **AI Support**: AI comes in aid when there is no rule for your error!
-- 🪶 **Tiny binary size**: Not even 1MB! Approximately 1MB with all optional features!
+- 🪶 **Tiny binary size**: Not even 1MB for core features!
 
 ![showcase](./img/showcase.gif)
 
@@ -17,13 +17,14 @@ Please follow the instruction for your shell:
 <details>
 	<summary>Bash / Zsh / Fish</summary>
 
-> Auto aliasing (optional custom alias can be added after `--alias`):
+> Append the following line to your configuration file:
 > ```shell
 > eval "$(pay-respects bash --alias)"
 > eval "$(pay-respects zsh --alias)"
 > pay-respects fish --alias | source
 > ```
-> Additional arguments:
+> Arguments:
+> - `--alias [alias]`: Alias to a custom key, defaults to `f`
 > - `--nocnf`: Disables `command_not_found` handler
 
 > Manual aliasing (**deprecated**, do not use):
@@ -185,7 +186,7 @@ If it's useful to you, **please share this project and spread the word**. Also c
 > Configuration is done via environment variables:
 >
 > - `_PR_AI_API_KEY`: Your own API key
-> - `_PR_AI_URL`: URL used. Defaults to `https://iff.envs.net/completions.py`
+> - `_PR_AI_URL`: URL used. Defaults to pay-respects' own URL
 >	- Any OpenAI compatible URL can be used, e.g.:
 >		- `https://api.openai.com/v1/chat/completions` (Note: OpenAI's ChatGPT is very slow)
 >		- `https://api.groq.com/openai/v1/chat/completions`
