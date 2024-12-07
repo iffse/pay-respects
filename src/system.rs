@@ -27,16 +27,16 @@ pub fn get_packages(
 	let shell = &data.shell.clone();
 	match package_manager {
 		"apt" => {
-			if !data.has_executable("dpkg") {
+			if !data.has_executable("apt-file") {
 				return None;
 			}
-			let result = command_output(shell, &format!("dpkg -S '*/bin/{}'", executable));
+			let result = command_output(shell, &format!("apt-file find --regexp '.*/bin/{}$'", executable));
 			if result.is_empty() {
 				return None;
 			}
 			let packages: Vec<String> = result
 				.lines()
-				.map(|line| line[..line.find(':').unwrap()].to_string())
+				.map(|line| line.split_once(':').unwrap().0.to_string())
 				.collect();
 
 			if packages.is_empty() {
