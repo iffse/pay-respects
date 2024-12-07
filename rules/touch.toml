@@ -1,7 +1,7 @@
 command = "touch"
 
 [[match_err]]
-pattern = [ "cannot touch" ]
+pattern = [ "no such file or directory" ]
 suggest = [
 '''
 mkdir --parents {{cmd::(?:\s)+(.*[\\\/])(?:\s)*}} && \
