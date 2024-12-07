@@ -23,8 +23,8 @@ pub fn opts(suggest: &mut String, last_command: &mut String, opt_list: &mut Vec<
 	let mut replace_tag = 0;
 	let tag_name = "opts";
 
-	while suggest.contains("{{opt::") {
-		let (placeholder, args) = eval_placeholder(suggest, "{{opt::", "}}");
+	while suggest.contains(" {{opt::") {
+		let (placeholder, args) = eval_placeholder(suggest, " {{opt::", "}}");
 
 		let opt = &suggest[args.to_owned()];
 		let regex = opt.trim();
