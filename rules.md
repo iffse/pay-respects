@@ -1,4 +1,4 @@
-## Writing Rules
+# Writing Rules
 
 Rule files placed under [rules](./rules) in the project directory are parsed at compilation, everything is parsed to Rust code before compiling. You don't have to know the project structure nor Rust to write blazing fast rules!
 
