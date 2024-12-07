@@ -8,7 +8,7 @@ pub fn get_package_manager(data: &mut Data) -> Option<String> {
 		"apt",
 		"dnf",
 		"emerge",
-		"nix-env",
+		"nix",
 		"pacman",
 		// "pkg",
 		// "yum",
@@ -80,7 +80,7 @@ pub fn get_packages(data: &mut Data, package_manager: &str, executable: &str) ->
 				Some(packages)
 			}
 		},
-		"nix-env" => {
+		"nix" => {
 			if !data.has_executable("nix-locate") {
 				return None;
 			}
@@ -90,7 +90,11 @@ pub fn get_packages(data: &mut Data, package_manager: &str, executable: &str) ->
 			}
 			let packages: Vec<String> = result
 				.lines()
-				.map(|line| line.split_whitespace().next().unwrap().to_string())
+				.map(|line| line
+					.split_whitespace()
+					.next().unwrap()
+					.rsplit_once('.')
+					.unwrap().0.to_string())
 				.collect();
 			if packages.is_empty() {
 				None
@@ -127,7 +131,7 @@ pub fn install_package(data: &mut Data, package_manager: &str, package: &str) ->
 		"apt" => format!("apt install {}", package),
 		"dnf" => format!("dnf install {}", package),
 		"emerge" => format!("emerge {}", package),
-		"nix-env" => format!("nix-env -iA nixpkgs.{}", package),
+		"nix" => format!("nix profile install nixpkgs#{}", package),
 		"pacman" => format!("pacman -S {}", package),
 		"pkg" => format!("pkg install {}", package),
 		"yum" => format!("yum install {}", package),
