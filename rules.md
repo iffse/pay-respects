@@ -23,7 +23,7 @@ command = "world"
 # you can add as many `[[match_err]]` section as you want
 [[match_err]]
 # the suggestion of this section will be used for the following patterns of the error output
-# note that the error is formatted to lowercase
+# patterns should be in lowercase
 pattern = [
 	"pattern 1",
 	"pattern 2"
@@ -61,7 +61,7 @@ The placeholder is evaluated as following:
 
 Suggestions can have additional conditions to check. To specify conditions, add a `#[...]` at the first line (just like derive macros in Rust). Available conditions:
 
-- `executable`: Check whether the argument can be found as executable (`command -v arg`).
+- `executable`: Check whether the argument can be found in path.
 - `cmd_contains`: Check whether the last user input contains the argument.
 - `err_contains`: Check whether the error of the command contains the argument.
 - `length`: Check whether the given command has the length of the argument.
