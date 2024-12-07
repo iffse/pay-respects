@@ -123,6 +123,7 @@ pub fn cnf(data: &mut Data) {
 		let package = Select::new("\n", packages)
 			.without_help_message()
 			.with_render_config(render_config)
+			.without_filtering()
 			.prompt().unwrap();
 
 		// retry after installing package
