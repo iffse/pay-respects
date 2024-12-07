@@ -1,4 +1,4 @@
-use crate::shell::{Data, command_output};
+use crate::shell::{Data, command_output, elevate};
 use std::io::stderr;
 use std::process::Command;
 use std::process::Stdio;
@@ -87,11 +87,10 @@ pub fn get_packages(data: &mut Data, package_manager: &str, executable: &str) ->
 			}
 		}
 		"pacman" => {
-			let result = if data.has_executable("pkgfile") {
-				command_output(shell, &format!("pkgfile -b {}", executable))
-			} else {
-				command_output(shell, &format!("pacman -Fq /usr/bin/{}", executable))
-			};
+			// somehow it tries to always update, so very slow
+			// let result = if data.has_executable("pkgfile") {
+			// 	command_output(shell, &format!("pkgfile -b {}", executable))
+			let result = command_output(shell, &format!("pacman -Fq /usr/bin/{}", executable));
 			let packages: Vec<String> = result
 				.lines()
 				.map(|line| line.split_whitespace().next().unwrap().to_string())
@@ -106,24 +105,26 @@ pub fn get_packages(data: &mut Data, package_manager: &str, executable: &str) ->
 	}
 }
 
-pub fn install_package(shell: &str, package_manager: &str, package: &str) -> bool {
-	let install = match package_manager {
-		"apt" => format!("sudo apt install {}", package),
-		"dnf" => format!("sudo dnf install {}", package),
-		"emerge" => format!("sudo emerge {}", package),
+pub fn install_package(data: &mut Data, package_manager: &str, package: &str) -> bool {
+	let shell = &data.shell.clone();
+	let mut install = match package_manager {
+		"apt" => format!("apt install {}", package),
+		"dnf" => format!("dnf install {}", package),
+		"emerge" => format!("emerge {}", package),
 		"nix-env" => format!("nix-env -iA {}", package),
-		"pacman" => format!("sudo pacman -S {}", package),
-		"pkg" => format!("sudo pkg install {}", package),
-		"yum" => format!("sudo yum install {}", package),
-		"zypper" => format!("sudo zypper install {}", package),
+		"pacman" => format!("pacman -S {}", package),
+		"pkg" => format!("pkg install {}", package),
+		"yum" => format!("yum install {}", package),
+		"zypper" => format!("zypper install {}", package),
 		_ => unreachable!("Unsupported package manager"),
 	};
+	elevate(data, &mut install);
 
 	let result = Command::new(shell)
 		.arg("-c")
 		.arg(install)
-		.stdout(Stdio::null())
-		.stderr(Stdio::null())
+		.stdout(stderr())
+		.stderr(Stdio::inherit())
 		.status()
 		.expect("failed to execute process");
 
