@@ -93,25 +93,17 @@ pub fn cnf(data: &mut Data) {
 			}
 		};
 
-		let packages = match system::get_packages(&shell, &package_manager, executable)
-		{
+		let packages = match system::get_packages(&shell, &package_manager, executable) {
 			Some(packages) => packages,
 			None => {
-				eprintln!(
-					"{}: {}",
-					"pay-respects".red(),
-					t!("package-not-found")
-				);
+				eprintln!("{}: {}", "pay-respects".red(), t!("package-not-found"));
 				return;
 			}
 		};
 
 		let style = ui::Styled::default();
-		let render_config = ui::RenderConfig::default()
-			.with_prompt_prefix(style);
-		let msg = format!("{}", t!("install-package"))
-			.bold()
-			.blue();
+		let render_config = ui::RenderConfig::default().with_prompt_prefix(style);
+		let msg = format!("{}", t!("install-package")).bold().blue();
 		let hint = format!(
 			"{} {} {}",
 			"[↑/↓]".blue(),
@@ -125,7 +117,8 @@ pub fn cnf(data: &mut Data) {
 			.without_help_message()
 			.with_render_config(render_config)
 			.without_filtering()
-			.prompt().unwrap();
+			.prompt()
+			.unwrap();
 
 		// retry after installing package
 		if system::install_package(&shell, &package_manager, &package) {

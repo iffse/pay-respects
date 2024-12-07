@@ -1,7 +1,7 @@
+use crate::shell::Data;
 use std::io::stderr;
 use std::process::Command;
 use std::process::Stdio;
-use crate::shell::Data;
 
 pub fn get_package_manager(data: &mut Data) -> Option<String> {
 	let package_managers = vec!["pacman"];
