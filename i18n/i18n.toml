@@ -2,7 +2,7 @@ _version = 2
 
 [help]
 en = '''
-Usage:
+Usage: %{usage}
 
 %{eval}: Add the following line to your configuration file:
 	%{eval_examples}
@@ -11,7 +11,7 @@ Usage:
 	%{manual_examples}
 '''
 es = '''
-Uso:
+Uso: %{usage}
 
 %{eval}: Agrega la siguiente línea a tu archivo de configuración:
 	%{eval_examples}
@@ -20,7 +20,7 @@ Uso:
 	%{manual_examples}
 '''
 de = '''
-Verwendung:
+Verwendung: %{usage}
 
 %{eval}: Fügen Sie die folgende Zeile zu Ihrer Konfigurationsdatei hinzu:
 	%{eval_examples}
@@ -29,17 +29,17 @@ Verwendung:
 	%{manual_examples}
 '''
 fr = '''
-Utilisation :
+Utilisation: %{usage}
 
-%{eval} : Ajoutez la ligne suivante à votre fichier de configuration :
+%{eval}: Ajoutez la ligne suivante à votre fichier de configuration :
 	%{eval_examples}
 
-%{manual} : Ajoutez la sortie suivante à votre fichier de configuration :
+%{manual}: Ajoutez la sortie suivante à votre fichier de configuration :
 
 	%{manual_examples}
 '''
 it = '''
-Utilizzo:
+Utilizzo: %{usage}
 
 %{eval}: Aggiungi la seguente riga al tuo file di configurazione:
 	%{eval_examples}
@@ -48,7 +48,7 @@ Utilizzo:
 	%{manual_examples}
 '''
 pt = '''
-Uso:
+Uso: %{usage}
 
 %{eval}: Adicione a seguinte linha ao seu arquivo de configuração:
 	%{eval_examples}
@@ -57,7 +57,7 @@ Uso:
 	%{manual_examples}
 '''
 ru = '''
-Использование:
+Использование: %{usage}
 
 %{eval}: Добавьте следующую строку в ваш файл конфигурации:
 	%{eval_examples}
@@ -66,7 +66,7 @@ ru = '''
 	%{manual_examples}
 '''
 ja = '''
-使い方:
+使い方: %{usage}
 
 %{eval}: 次の行を設定ファイルに追加してください:
 	%{eval_examples}
@@ -75,7 +75,7 @@ ja = '''
 	%{manual_examples}
 '''
 ko = '''
-사용법:
+사용법: %{usage}
 
 %{eval}: 다음 줄을 설정 파일에 추가하십시오:
 	%{eval_examples}
@@ -84,7 +84,7 @@ ko = '''
 	%{manual_examples}
 '''
 zh = '''
-使用方法:
+使用方法: %{usage}
 
 %{eval}: 将以下行添加到您的配置文件中：
 	%{eval_examples}
