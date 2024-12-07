@@ -320,7 +320,7 @@ pub fn confirm_suggestion(data: &Data) -> Result<(), String> {
 	}
 }
 
-fn run_suggestion(data: &Data, command: &str) -> std::process::ExitStatus {
+pub fn run_suggestion(data: &Data, command: &str) -> std::process::ExitStatus {
 	let shell = &data.shell;
 	let privilege = &data.privilege;
 	match privilege {

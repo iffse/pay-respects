@@ -128,7 +128,7 @@ pub fn cnf(data: &mut Data) {
 
 		// retry after installing package
 		if system::install_package(&shell, &package_manager, &package) {
-			let _ = suggestions::confirm_suggestion(data);
+			let _ = suggestions::run_suggestion(data, &data.command);
 		}
 	}
 }
