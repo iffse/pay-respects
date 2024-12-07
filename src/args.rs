@@ -1,4 +1,5 @@
 use crate::shell::initialization;
+use colored::Colorize;
 
 pub enum Status {
 	Continue,
@@ -67,11 +68,17 @@ fn print_help() {
 		"{}",
 		t!(
 			"help",
-			manual = "pay-respects bash",
-			manual_example = "alias f=$(pay-respects bash)",
-			auto = "pay-respects bash --alias f",
-			auto_example = "eval $(pay-respects bash --alias f)",
-			auto_example_fish = "pay-respects fish --alias | source",
+			eval = "Bash / Zsh / Fish".bold(),
+			eval_examples = r#"
+eval "$(pay-respects bash --alias)"
+eval "$(pay-respects zsh --alias)"
+pay-respects fish --alias | source
+"#,
+			manual = "Nushell / PowerShell".bold(),
+			manual_examples = r#"
+pay-respects nushell [--alias <alias>]
+pay-respects pwsh [--alias <alias>] [--nocnf]
+"#
 		)
 	);
 }
