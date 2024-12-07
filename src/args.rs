@@ -67,6 +67,7 @@ fn print_help() {
 		"{}",
 		t!(
 			"help",
+			usage = "pay-respects <shell> [--alias [<alias>]] [--noncf]",
 			eval = "Bash / Zsh / Fish".bold(),
 			eval_examples = r#"
 eval "$(pay-respects bash --alias)"
