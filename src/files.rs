@@ -1,60 +1,22 @@
 use crate::suggestions::find_similar;
 
 pub fn get_path_files() -> Vec<String> {
-	let path_env = {
-		#[cfg(windows)]
-		{
-			if is_msystem() {
-				String::from_utf8_lossy(
-					&std::process::Command::new("bash")
-						.arg("-c")
-						.arg("echo $PATH")
-						.output()
-						.unwrap()
-						.stdout,
-				)
-				.trim()
-				.to_owned()
-			} else {
-				std::env::var("PATH").unwrap()
-			}
-		}
-		#[cfg(not(windows))]
-		{
-			std::env::var("PATH").unwrap()
-		}
-	};
+	let path_env = path_env();
 
 	if cfg!(debug_assertions) {
 		eprintln!("path_env: {path_env}");
 	}
 
-	let path_env_sep = {
-		#[cfg(windows)]
-		if is_msystem() {
-			":"
-		} else {
-			";"
-		}
-		#[cfg(not(windows))]
-		{
-			":"
-		}
-	};
+	let path_env_sep = path_env_sep();
 
 	let path = path_env.split(path_env_sep).collect::<Vec<&str>>();
 	let mut all_executable = vec![];
 	for p in path {
 		#[cfg(windows)]
-		let p = if is_msystem() {
-			msys2_conv_path(p).expect("Failed to convert path for msys")
-		} else {
-			p.to_owned()
-		};
+		let p = path_convert(p);
 
-		if cfg!(debug_assertions) {
-			eprintln!("p={p}");
-		}
+		#[cfg(debug_assertions)]
+		eprintln!("p={p}");
 
 		let files = match std::fs::read_dir(p) {
 			Ok(files) => files,
@@ -66,31 +28,14 @@ pub fn get_path_files() -> Vec<String> {
 			let mut file_name = file.file_name().into_string().unwrap();
 
 			#[cfg(windows)]
-			{
-				let mut ok = false;
-				let suffixies = [".exe", ".sh", ".ps1"];
-				for suffix in suffixies {
-					if let Some(file_name_strip) = file_name.strip_suffix(suffix) {
-						file_name = file_name_strip.to_owned();
-						ok = true;
-						break;
-					}
-				}
-
-				if !file_name.contains(".") {
-					ok = true;
-				}
-
-				if !ok {
-					continue;
-				}
-			}
+			strip_extension(&mut file_name);
 
 			all_executable.push(file_name);
 		}
 	}
 
-	if cfg!(debug_assertions) {
+	#[cfg(debug_assertions)]
+	{
 		let mut all_executable = all_executable.clone();
 		all_executable.sort_unstable();
 		eprintln!("all_executable={all_executable:?}");
@@ -154,4 +99,68 @@ fn msys2_conv_path(p: &str) -> std::io::Result<String> {
 #[cfg(windows)]
 fn is_msystem() -> bool {
 	std::env::var("MSYSTEM").is_ok()
+}
+
+#[cfg(windows)]
+fn path_env() -> String {
+	if is_msystem() {
+		String::from_utf8_lossy(
+			&std::process::Command::new("bash")
+				.arg("-c")
+				.arg("echo $PATH")
+				.output()
+				.unwrap()
+				.stdout,
+		)
+		.trim()
+		.to_owned()
+	} else {
+		std::env::var("PATH").unwrap()
+	}
+}
+
+#[cfg(windows)]
+fn path_env_sep() -> &'static str {
+	if is_msystem() {
+		":"
+	} else {
+		";"
+	}
+}
+
+#[cfg(windows)]
+fn path_convert(path: &str) -> String {
+	if is_msystem() {
+		msys2_conv_path(path).expect("Failed to convert path for msys")
+	} else {
+		path.to_owned()
+	}
+}
+
+#[cfg(windows)]
+fn strip_extension(file_name: &str) -> String {
+	let mut file_name = file_name.to_owned();
+	let suffixies = [".exe", ".sh", ".ps1"];
+	for suffix in suffixies {
+		if let Some(file_name_strip) = file_name.strip_suffix(suffix) {
+			file_name = file_name_strip.to_owned();
+			break;
+		}
+	}
+
+	if !file_name.contains(".") {
+		file_name = file_name.to_owned();
+	}
+
+	file_name
+}
+
+#[cfg(not(windows))]
+fn path_env() -> String {
+	std::env::var("PATH").unwrap()
+}
+
+#[cfg(not(windows))]
+fn path_env_sep() -> &'static str {
+	":"
 }
