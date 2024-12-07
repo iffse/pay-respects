@@ -173,12 +173,12 @@ pub fn get_error(shell: &str, command: &str) -> String {
 		std::env::remove_var("_PR_ERROR_MSG");
 		error_msg
 	} else {
-		command_output(shell, command)
+		command_output_threaded(shell, command)
 	};
 	error.split_whitespace().collect::<Vec<&str>>().join(" ")
 }
 
-pub fn command_output(shell: &str, command: &str) -> String {
+pub fn command_output_threaded(shell: &str, command: &str) -> String {
 	let (sender, receiver) = channel();
 
 	let _shell = shell.to_owned();
@@ -207,6 +207,17 @@ pub fn command_output(shell: &str, command: &str) -> String {
 			exit(1);
 		}
 	}
+}
+
+pub fn command_output(shell: &str, command: &str) -> String {
+	let output = std::process::Command::new(shell)
+		.arg("-c")
+		.arg(command)
+		.env("LC_ALL", "C")
+		.output()
+		.expect("failed to execute process");
+
+		String::from_utf8_lossy(&output.stdout).to_string()
 }
 
 pub fn last_command(shell: &str) -> String {
