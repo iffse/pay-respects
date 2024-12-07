@@ -99,10 +99,11 @@ pub fn get_packages(data: &mut Data, package_manager: &str, executable: &str) ->
 			}
 		}
 		"pacman" => {
-			// somehow it tries to always update, so very slow
-			// let result = if data.has_executable("pkgfile") {
-			// 	command_output(shell, &format!("pkgfile -b {}", executable))
-			let result = command_output(shell, &format!("pacman -Fq /usr/bin/{}", executable));
+			let result = if data.has_executable("pkgfile") {
+				command_output(shell, &format!("pkgfile -b {}", executable))
+			} else{
+				command_output(shell, &format!("pacman -Fq /usr/bin/{}", executable))
+			};
 			if result.is_empty() {
 				return None
 			}
