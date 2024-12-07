@@ -55,6 +55,12 @@ pub fn cnf(data: &mut Data) {
 	let mut split_command = data.split.clone();
 
 	let executable = split_command[0].as_str();
+	eprintln!(
+		"{}: {}: {}\n",
+		shell.red(),
+		t!("command-not-found"),
+		executable
+	);
 
 	let best_match = best_match_path(executable);
 	if best_match.is_some() {
@@ -87,22 +93,37 @@ pub fn cnf(data: &mut Data) {
 			}
 		};
 
-		let packages = match system::get_packages(&shell, &package_manager, executable) {
+		let packages = match system::get_packages(&shell, &package_manager, executable)
+		{
 			Some(packages) => packages,
 			None => {
-				eprintln!("no package found");
+				eprintln!(
+					"{}: {}",
+					"pay-respects".red(),
+					t!("package-not-found")
+				);
 				return;
 			}
 		};
 
-		let ans = Select::new("Select a package to install", packages).prompt();
-		let package = match ans {
-			Ok(package) => package,
-			Err(_) => {
-				eprintln!("no package selected");
-				return;
-			}
-		};
+		let style = ui::Styled::default();
+		let render_config = ui::RenderConfig::default()
+			.with_prompt_prefix(style);
+		let msg = format!("{}", t!("install-package"))
+			.bold()
+			.blue();
+		let hint = format!(
+			"{} {} {}",
+			"[↑/↓]".blue(),
+			t!("confirm-yes").green(),
+			"[Ctrl+C]".red()
+		);
+		eprintln!("{}", msg);
+		eprintln!("{}", hint);
+		let package = Select::new("\n", packages)
+			.without_help_message()
+			.with_render_config(render_config)
+			.prompt().unwrap();
 
 		// retry after installing package
 		if system::install_package(&shell, &package_manager, &package) {

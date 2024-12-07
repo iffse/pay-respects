@@ -2,149 +2,97 @@ _version = 2
 
 [help]
 en = '''
-Usage: pay-respects [your shell] [--alias [alias]]
+Usage:
 
-Example 1, manual aliasing: `%{manual}`
+%{eval}: Add the following line to your configuration file:
+	%{eval_examples}
 
-The command will output the command that you can use to execute the binary with
-the correct environment. You can alias such output to a shorter key. Such as
-`%{manual_example}`)
-
-Example 2, auto aliasing: `%{auto}`
-
-The command will output a declaration that can be directly embedded in your
-config file with `%{auto_example}`. For fish, use
-`%{auto_example_fish}` instead.
+%{manual}: Add the following output to your configuration file
+	%{manual_examples}
 '''
 es = '''
-Uso: pay-respects [tu shell] [--alias [alias]]
+Uso:
 
-Ejemplo 1, alias manual: `%{manual}`
+%{eval}: Agrega la siguiente línea a tu archivo de configuración:
+	%{eval_examples}
 
-El comando mostrará el comando que puedes usar para ejecutar el binario con el
-entorno correcto. Puedes asociar dicho comando a una tecla más corta. Por ejemplo
-`%{manual_example}`)
-
-Ejemplo 2, alias automático: `%{auto}`
-
-El comando mostrará una declaración que puede ser incrustada directamente en tu
-archivo de configuración con `%{auto_example}`. Para fish, usa
-`%{auto_example_fish}` en su lugar.
+%{manual}: Agrega la siguiente salida a tu archivo de configuración
+	%{manual_examples}
 '''
 de = '''
-Verwendung: pay-respects [deine Shell] [--alias [alias]]
+Verwendung:
 
-Beispiel 1, manuelles Alias: `%{manual}`
+%{eval}: Fügen Sie die folgende Zeile zu Ihrer Konfigurationsdatei hinzu:
+	%{eval_examples}
 
-Der Befehl gibt den Befehl aus, den du verwenden kannst, um das Binär mit der
-richtigen Umgebung auszuführen. Du kannst ein solches Ergebnis einem kürzeren
-Schlüssel zuordnen. Zum Beispiel `%{manual_example}`)
-
-Beispiel 2, automatisches Alias: `%{auto}`
-
-Der Befehl gibt eine Deklaration aus, die direkt in deine Konfigurationsdatei
-mit `%{auto_example}` eingebettet werden kann. Für fish, verwende
-`%{auto_example_fish}` stattdessen.
+%{manual}: Fügen Sie die folgende Ausgabe zu Ihrer Konfigurationsdatei hinzu:
+	%{manual_examples}
 '''
 fr = '''
-Utilisation: pay-respects [votre shell] [--alias [alias]]
+Utilisation :
 
-Exemple 1, alias manuel: `%{manual}`
+%{eval} : Ajoutez la ligne suivante à votre fichier de configuration :
+	%{eval_examples}
 
-La commande affichera la commande que vous pouvez utiliser pour exécuter le
-binaire avec l'environnement correct. Vous pouvez associer une telle sortie à
-une touche plus courte. Par exemple `%{manual_example}`)
+%{manual} : Ajoutez la sortie suivante à votre fichier de configuration :
 
-Exemple 2, alias automatique: `%{auto}`
-
-La commande affichera une déclaration qui peut être directement intégrée dans
-votre fichier de configuration avec `%{auto_example}`. Pour fish, utilisez
-`%{auto_example_fish}` à la place.
+	%{manual_examples}
 '''
 it = '''
-Utilizzo: pay-respects [la tua shell] [--alias [alias]]
+Utilizzo:
 
-Esempio 1, alias manuale: `%{manual}`
+%{eval}: Aggiungi la seguente riga al tuo file di configurazione:
+	%{eval_examples}
 
-Il comando restituirà il comando che puoi utilizzare per eseguire il binario con
-l'ambiente corretto. Puoi associare tale output a una chiave più corta. Ad
-esempio `%{manual_example}`)
-
-Esempio 2, alias automatico: `%{auto}`
-
-Il comando restituirà una dichiarazione che può essere incorporata direttamente
-nel tuo file di configurazione con `%{auto_example}`. Per fish, utilizza
-`%{auto_example_fish}` invece.
+%{manual}: Aggiungi l'output seguente al tuo file di configurazione:
+	%{manual_examples}
 '''
 pt = '''
-Uso: pay-respects [seu shell] [--alias [alias]]
+Uso:
 
-Exemplo 1, alias manual: `%{manual}`
+%{eval}: Adicione a seguinte linha ao seu arquivo de configuração:
+	%{eval_examples}
 
-O comando exibirá o comando que você pode usar para executar o binário com o
-ambiente correto. Você pode associar tal saída a uma tecla mais curta. Por
-exemplo `%{manual_example}`)
-
-Exemplo 2, alias automático: `%{auto}`
-
-O comando exibirá uma declaração que pode ser incorporada diretamente em seu
-arquivo de configuração com `%{auto_example}`. Para fish, use
-`%{auto_example_fish}` em vez disso.
+%{manual}: Adicione a seguinte saída ao seu arquivo de configuração:
+	%{manual_examples}
 '''
 ru = '''
-Использование: pay-respects [ваш shell] [--alias [alias]]
+Использование:
 
-Пример 1, ручное создание псевдонима: `%{manual}`
+%{eval}: Добавьте следующую строку в ваш файл конфигурации:
+	%{eval_examples}
 
-Команда выведет команду, которую вы можете использовать для выполнения бинарного
-файла с правильной средой. Вы можете создать псевдоним для такого вывода с
-помощью более короткого ключа. Например, `%{manual_example}`)
-
-Пример 2, автоматическое создание псевдонима: `%{auto}`
-
-Команда выведет декларацию, которую можно непосредственно встроить в ваш файл
-конфигурации с помощью `%{auto_example}`. Для fish используйте
-`%{auto_example_fish}` вместо этого.
+%{manual}: Добавьте следующий вывод в ваш файл конфигурации:
+	%{manual_examples}
 '''
 ja = '''
-使用法: pay-respects [あなたのシェル] [--alias [alias]]
+使い方:
 
-例1、手動エイリアス: `%{manual}`
+%{eval}: 次の行を設定ファイルに追加してください:
+	%{eval_examples}
 
-正しい環境で実行するコマンドを出力します。
-短いキーにエイリアスすることができます。例えば、`%{manual_example}`)
-
-例2、自動エイリアス: `%{auto}`
-
-コンフィグに直接埋め込むことができる宣言を出力します：`%{auto_example}`。
-fishの場合は、`%{auto_example_fish}`を使用してください。
+%{manual}: 次の出力を設定ファイルに追加してください:
+	%{manual_examples}
 '''
 ko = '''
-사용법: pay-respects [당신의 쉘] [--alias [alias]]
+사용법:
 
-예 1, 수동 별칭: `%{manual}`
+%{eval}: 다음 줄을 설정 파일에 추가하십시오:
+	%{eval_examples}
 
-명령은 올바른 환경에서 바이너리를 실행하는 데 사용할 수 있는 명령을 출력합니다.
-이러한 출력을 더 짧은 키에 별칭 지정할 수 있습니다. 예를 들어 `%{manual_example}`)
-
-예 2, 자동 별칭: `%{auto}`
-
-명령은 `%{auto_example}`로 직접 구성 파일에 포함할 수 있는 선언을 출력합니다. fish의 경우
-대신 `%{auto_example_fish}`를 사용하십시오.
+%{manual}: 다음 출력을 설정 파일에 추가하십시오:
+	%{manual_examples}
 '''
 zh = '''
-用法: pay-respects [你的 shell] [--alias [alias]]
+使用方法:
 
-示例 1，手动别名: `%{manual}`
+%{eval}: 将以下行添加到您的配置文件中：
+	%{eval_examples}
 
-该命令将输出使用正确环境执行二进制文件的命令。您可以将此类输出别名为更短的键。
-例如 `%{manual_example}`)
-
-示例 2，自动别名: `%{auto}`
-
-该命令将输出一个声明，可以直接嵌入到您的配置文件中，示例 `%{auto_example}`。
-对于 fish， 请使用`%{auto_example_fish}`。
+%{manual}: 将以下输出添加到您的配置文件中：
+	%{manual_examples}
 '''
+
 
 [no-env-setup]
 en = "No %{var} in environment. Have you aliased the command with the correct argument?\n\nUse `%{help}` for help."
@@ -170,17 +118,29 @@ ja = "シェルが指定されていません。シェルを指定してくだ�
 ko = "쉘이 지정되지 않았습니다. 쉘을 지정하십시오."
 zh = "未指定 shell。请指定一个 shell。"
 
-[no-command]
-en = "No command found."
-es = "No se encontró ningún comando."
-de = "Kein Befehl gefunden."
-fr = "Aucune commande trouvée."
-it = "Nessun comando trovato."
-pt = "Nenhum comando encontrado."
-ru = "Команда не найдена."
-ja = "コマンドが見つかりません。"
-ko = "명령을 찾을 수 없습니다."
-zh = "找不到命令。"
+[multi-suggest]
+en = "%{num} suggestions found"
+es = "%{num} sugerencias encontradas"
+de = "%{num} Vorschläge gefunden"
+fr = "%{num} suggestions trouvées"
+it = "%{num} proposte trovate"
+pt = "%{num} sugestões encontradas"
+ru = "Найдено %{num} предложений"
+ja = "%{num} 件の提案が見つかりました"
+ko = "%{num} 개의 제안이 발견되었습니다"
+zh = "找到 %{num} 个建议"
+
+[install-package]
+en = "Install one of the following package?"
+es = "¿Instalar uno de los siguientes paquetes?"
+de = "Eines der folgenden Pakete installieren?"
+fr = "Installer l'un des paquets suivants ?"
+it = "Installare uno dei seguenti pacchetti?"
+pt = "Instalar um dos seguintes pacotes?"
+ru = "Установить один из следующих пакетов?"
+ja = "次のパッケージのいずれかをインストールしますか？"
+ko = "다음 패키지 중 하나를 설치하시겠습니까?"
+zh = "安装以下包之一？"
 
 [ai-suggestion]
 en = "Suggestion from AI"
@@ -241,6 +201,30 @@ ru = "Предложение для команды не найдено"
 ja = "コマンドの提案が見つかりません"
 ko = "명령에 대한 제안을 찾을 수 없습니다"
 zh = "找不到命令的建议"
+
+[command-not-found]
+en = "Command not found"
+es = "Comando no encontrado"
+de = "Befehl nicht gefunden"
+fr = "Commande introuvable"
+it = "Comando non trovato"
+pt = "Comando não encontrado"
+ru = "Команда не найдена"
+ja = "コマンドが見つかりません"
+ko = "명령을 찾을 수 없습니다"
+zh = "找不到命令"
+
+[package-not-found]
+en = "No matching package found"
+es = "No se encontró ningún paquete coincidente"
+de = "Kein passendes Paket gefunden"
+fr = "Aucun paquet correspondant trouvé"
+it = "Nessun pacchetto corrispondente trovato"
+pt = "Nenhum pacote correspondente encontrado"
+ru = "Совпадающий пакет не найден"
+ja = "一致するパッケージが見つかりません"
+ko = "일치하는 패키지를 찾을 수 없습니다"
+zh = "找不到匹配的包"
 
 [contribute]
 en = "If you think there should be a suggestion, please open an issue or send a pull request!"
