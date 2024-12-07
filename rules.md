@@ -7,7 +7,7 @@ For compile-time rules, if only rules are changed, cargo won't recompile the pro
 touch src/rules.rs && cargo build
 ```
 
-Runtime rules directories are searched, by the order or priority:
+Runtime rules directories are searched with the following priority:
 
 - `XDG_CONFIG_HOME`, defaults to `$HOME/.config`.
 - `XDG_CONFIG_DIRS`, defaults to `/etc/xdg`.
