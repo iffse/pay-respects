@@ -2,9 +2,11 @@ use crate::shell::{command_output, elevate, Data};
 use std::io::stderr;
 use std::process::Command;
 use std::process::Stdio;
+use colored::Colorize;
 
 pub fn get_package_manager(data: &mut Data) -> Option<String> {
 	let package_managers = vec![
+		"command-not-found", // not actually a package manager
 		"apt", "dnf", "emerge", "nix", "pacman",
 		// "pkg",
 		// "yum",
@@ -26,8 +28,24 @@ pub fn get_packages(
 ) -> Option<Vec<String>> {
 	let shell = &data.shell.clone();
 	match package_manager {
+		"command-not-found" => {
+			let result = command_output(shell, &format!("command-not-found {}", executable));
+			if result.is_empty() {
+				return None;
+			}
+			if result.contains("did you mean") || result.contains("is not installed") {
+				let packages = result
+					.lines()
+					.skip(1)
+					.map(|line| line.to_string())
+					.collect();
+				return Some(packages);
+			}
+			return None;
+		}
 		"apt" => {
 			if !data.has_executable("apt-file") {
+				eprintln!("{}: apt-file is required to find packages", "pay-respects".yellow());
 				return None;
 			}
 			let result = command_output(
@@ -65,6 +83,7 @@ pub fn get_packages(
 		}
 		"emerge" => {
 			if !data.has_executable("e-file") {
+				eprintln!("{}: pfl is required to find packages", "pay-respects".yellow());
 				return None;
 			}
 			let result = command_output(shell, &format!("e-file /usr/bin/{}", executable));
@@ -85,6 +104,7 @@ pub fn get_packages(
 		}
 		"nix" => {
 			if !data.has_executable("nix-locate") {
+				eprintln!("{}: nix-index is required to find packages", "pay-respects".yellow());
 				return None;
 			}
 			let result = command_output(shell, &format!("nix-locate 'bin/{}'", executable));
@@ -135,6 +155,19 @@ pub fn get_packages(
 pub fn install_package(data: &mut Data, package_manager: &str, package: &str) -> bool {
 	let shell = &data.shell.clone();
 	let mut install = match package_manager {
+		"command-not-found" => {
+			match package.starts_with("Command") {
+				false => package.to_string(),
+				true => {
+					let split = package.split_whitespace().collect::<Vec<&str>>();
+					let command = split[1];
+					let package = split[split.len() - 1];
+					let new_command = data.command.clone().replacen(command, package, 1);
+					data.update_command(&new_command);
+					format!("apt install {}", package)
+				}
+			}
+		}
 		"apt" => format!("apt install {}", package),
 		"dnf" => format!("dnf install {}", package),
 		"emerge" => format!("emerge {}", package),
