@@ -57,9 +57,10 @@ pub fn cnf(data: &mut Data) {
 	let mut split_command = data.split.clone();
 
 	let executable = split_command[0].as_str();
+	let shell_msg = format!("{}:", shell);
 	eprintln!(
-		"{}: {}: {}\n",
-		shell.red(),
+		"{} {}: {}\n",
+		shell_msg.bold().red(),
 		t!("command-not-found"),
 		executable
 	);
@@ -127,7 +128,7 @@ pub fn cnf(data: &mut Data) {
 
 		let style = ui::Styled::default();
 		let render_config = ui::RenderConfig::default().with_prompt_prefix(style);
-		let msg = format!("{}", t!("install-package")).bold().blue();
+		let msg = format!("{}:", t!("install-package")).bold().blue();
 		let confirm = format!("[{}]", t!("confirm-yes")).green();
 		let hint = format!("{} {} {}", "[↑/↓]".blue(), confirm, "[Ctrl+C]".red());
 		eprintln!("{}", msg);
