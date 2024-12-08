@@ -1,4 +1,4 @@
-use crate::suggestions::find_similar;
+use crate::evals::find_similar;
 
 pub fn get_path_files() -> Vec<String> {
 	let path_env = path_env();
@@ -164,3 +164,4 @@ fn path_env() -> String {
 fn path_env_sep() -> &'static str {
 	":"
 }
+

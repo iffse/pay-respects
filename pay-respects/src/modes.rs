@@ -1,11 +1,13 @@
 use crate::shell::Data;
-use crate::suggestions::{best_match_path, suggest_candidates};
+use crate::suggestions::suggest_candidates;
 use crate::system;
 use crate::{shell, suggestions};
+use pay_respects_utils::evals::best_match_path;
 use colored::Colorize;
 use inquire::*;
 
 use std::path::Path;
+
 
 pub fn suggestion(data: &mut Data) {
 	let shell = data.shell.clone();
@@ -65,7 +67,7 @@ pub fn cnf(data: &mut Data) {
 		executable
 	);
 
-	let best_match = best_match_path(executable);
+	let best_match = best_match_path(executable, &data.executables);
 	if best_match.is_some() {
 		let best_match = best_match.unwrap();
 		split_command[0] = best_match;

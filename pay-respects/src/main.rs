@@ -17,18 +17,12 @@
 use sys_locale::get_locale;
 
 mod args;
-mod files;
 mod modes;
 mod rules;
 mod shell;
 mod style;
 mod suggestions;
 mod system;
-
-#[cfg(feature = "runtime-rules")]
-mod replaces;
-#[cfg(feature = "runtime-rules")]
-mod runtime_rules;
 
 #[cfg(feature = "request-ai")]
 mod requests;

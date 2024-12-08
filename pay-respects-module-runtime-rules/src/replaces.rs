@@ -183,3 +183,4 @@ pub fn shell(suggest: &mut String, shell: &str) {
 		suggest.replace_range(placeholder, &command.join("\n"));
 	}
 }
+

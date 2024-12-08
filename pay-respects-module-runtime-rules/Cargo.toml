@@ -1,0 +1,11 @@
+[package]
+name = "pay-respects-module-runtime-rules"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+regex-lite = "0.1"
+
+toml = { version = "0.8" }
+serde = { version = "1.0", features = ["derive"] }
+pay-respects-utils = {version = "0.1.0", path = "../pay-respects-utils"}

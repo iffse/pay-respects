@@ -1,13 +1,11 @@
+use pay_respects_utils::evals::split_command;
+use pay_respects_utils::files::get_path_files;
 use std::process::exit;
 
 use std::collections::HashMap;
 use std::sync::mpsc::channel;
 use std::thread;
 use std::time::Duration;
-
-use regex_lite::Regex;
-
-use crate::files::get_path_files;
 
 pub const PRIVILEGE_LIST: [&str; 2] = ["sudo", "doas"];
 
@@ -45,6 +43,8 @@ pub struct Data {
 	pub privilege: Option<String>,
 	pub error: String,
 	pub executables: Vec<String>,
+	pub modules: Vec<String>,
+	pub fallbacks: Vec<String>,
 	pub mode: Mode,
 }
 
@@ -54,6 +54,32 @@ impl Data {
 		let command = last_command(&shell).trim().to_string();
 		let alias = alias_map(&shell);
 		let mode = run_mode();
+		let (executables, modules, fallbacks) = {
+			let path_executables = get_path_files();
+			let mut executables = vec![];
+			let mut modules = vec![];
+			let mut fallbacks = vec![];
+			for exe in path_executables {
+				if exe.starts_with("pay-respects-module-") {
+					modules.push(exe.to_string());
+				} else if exe.starts_with("pay-respects-fallback-") {
+					fallbacks.push(exe.to_string());
+				} else {
+					executables.push(exe.to_string());
+				}
+			}
+			if alias.is_some() {
+				let alias = alias.as_ref().unwrap();
+				for command in alias.keys() {
+					if executables.contains(command) {
+						continue;
+					}
+					executables.push(command.to_string());
+				}
+			}
+
+			(executables, modules, fallbacks)
+		};
 
 		let mut init = Data {
 			shell,
@@ -64,7 +90,9 @@ impl Data {
 			split: vec![],
 			privilege: None,
 			error: "".to_string(),
-			executables: vec![],
+			executables,
+			modules,
+			fallbacks,
 			mode,
 		};
 
@@ -135,50 +163,19 @@ impl Data {
 			self.candidates.push(candidate.to_string());
 		}
 	}
-
-	pub fn get_executables(&mut self) -> &Vec<String> {
-		if self.executables.is_empty() {
-			self.executables = get_path_files();
-			if self.alias.is_some() {
-				let alias = self.alias.as_ref().unwrap();
-				for command in alias.keys() {
-					if self.executables.contains(command) {
-						continue;
-					}
-					self.executables.push(command.to_string());
-				}
+	pub fn add_candidates(&mut self, candidates: &Vec<String>) {
+		for candidate in candidates {
+			let candidate = candidate.trim();
+			if candidate != self.command {
+				self.candidates.push(candidate.to_string());
 			}
 		}
-		&self.executables
 	}
-
-	pub fn has_executable(&mut self, executable: &str) -> bool {
-		if self.executables.is_empty() {
-			self.executables = get_path_files();
-		}
-		self.executables.contains(&executable.to_string())
-	}
-}
-
-pub fn split_command(command: &str) -> Vec<String> {
-	#[cfg(debug_assertions)]
-	eprintln!("command: {command}");
-	// this regex splits the command separated by spaces, except when the space
-	// is escaped by a backslash or surrounded by quotes
-	let regex = r#"([^\s"'\\]+|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\\ )+|\\|\n"#;
-	let regex = Regex::new(regex).unwrap();
-	let split_command = regex
-		.find_iter(command)
-		.map(|cap| cap.as_str().to_owned())
-		.collect::<Vec<String>>();
-	#[cfg(debug_assertions)]
-	eprintln!("split_command: {:?}", split_command);
-	split_command
 }
 
 pub fn elevate(data: &mut Data, command: &mut String) {
 	for privilege in PRIVILEGE_LIST.iter() {
-		if data.has_executable(privilege) {
+		if data.executables.contains(&privilege.to_string()) {
 			*command = format!("{} {}", privilege, command);
 			break;
 		}
@@ -239,6 +236,28 @@ pub fn command_output(shell: &str, command: &str) -> String {
 		false => String::from_utf8_lossy(&output.stdout).to_lowercase(),
 		true => String::from_utf8_lossy(&output.stderr).to_lowercase(),
 	}
+}
+
+pub fn module_output(data: &Data, module: &str) -> Vec<String> {
+	let shell = &data.shell;
+	let executable = &data.split[0];
+	let last_command = &data.command;
+	let error_msg = &data.error;
+	let executables = data.executables.clone().join(",");
+	let output = std::process::Command::new(shell)
+		.arg("-c")
+		.arg(module)
+		.env("_PR_COMMAND", executable)
+		.env("_PR_LAST_COMMAND", last_command)
+		.env("_PR_ERROR_MSG", error_msg)
+		.env("_PR_EXECUTABLES", executables)
+		.output()
+		.expect("failed to execute process");
+
+	String::from_utf8_lossy(&output.stderr)
+		.split("<_PR_BR>")
+		.map(|s| s.trim().to_string())
+		.collect::<Vec<String>>()
 }
 
 pub fn last_command(shell: &str) -> String {
