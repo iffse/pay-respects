@@ -142,18 +142,6 @@ ja = "不足しているコマンドのパッケージが見つかりました"
 ko = "누락된 명령에 대한 패키지가 발견되었습니다"
 zh = "找到缺失命令的包"
 
-[ai-suggestion]
-en = "Suggestion from AI"
-es = "Sugerencia de la IA"
-de = "Vorschlag von KI"
-fr = "Suggestion de l'IA"
-it = "Proposta dall'IA"
-pt = "Sugestão da IA"
-ru = "Предложение от ИИ"
-ja = "AIからの提案"
-ko = "AI 제안"
-zh = "AI 建议"
-
 [confirm]
 en = "Execute suggestion?"
 es = "¿Ejecutar sugerencia?"

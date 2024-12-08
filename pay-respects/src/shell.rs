@@ -156,21 +156,6 @@ impl Data {
 			self.suggest = Some(suggest.to_string());
 		};
 	}
-
-	pub fn add_candidate(&mut self, candidate: &str) {
-		let candidate = candidate.trim();
-		if candidate != self.command {
-			self.candidates.push(candidate.to_string());
-		}
-	}
-	pub fn add_candidates(&mut self, candidates: &Vec<String>) {
-		for candidate in candidates {
-			let candidate = candidate.trim();
-			if candidate != self.command {
-				self.candidates.push(candidate.to_string());
-			}
-		}
-	}
 }
 
 pub fn elevate(data: &mut Data, command: &mut String) {
@@ -178,6 +163,19 @@ pub fn elevate(data: &mut Data, command: &mut String) {
 		if data.executables.contains(&privilege.to_string()) {
 			*command = format!("{} {}", privilege, command);
 			break;
+		}
+	}
+}
+
+pub fn add_candidates_no_dup(
+	command: &str,
+	candidates: &mut Vec<String>,
+	new_candidates: &Vec<String>,
+) {
+	for candidate in new_candidates {
+		let candidate = candidate.trim();
+		if candidate != command && !candidates.contains(&candidate.to_string()) {
+			candidates.push(candidate.to_string());
 		}
 	}
 }
@@ -254,6 +252,10 @@ pub fn module_output(data: &Data, module: &str) -> Option<Vec<String>> {
 		.env("_PR_EXECUTABLES", executables)
 		.output()
 		.expect("failed to execute process");
+
+	if !output.stderr.is_empty() {
+		eprintln!("{}", String::from_utf8_lossy(&output.stderr));
+	}
 
 	if output.stdout.is_empty() {
 		return None;

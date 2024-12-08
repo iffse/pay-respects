@@ -471,17 +471,25 @@ name = "pay-respects"
 version = "0.5.15"
 dependencies = [
  "colored",
- "curl",
  "inquire",
  "pay-respects-parser",
  "pay-respects-utils",
  "regex-lite",
  "rust-i18n",
+ "sys-locale",
+]
+
+[[package]]
+name = "pay-respects-fallback-request-ai"
+version = "0.1.0"
+dependencies = [
+ "colored",
+ "curl",
+ "rust-i18n",
  "serde",
  "serde_json",
  "sys-locale",
  "textwrap",
- "toml 0.8.19",
 ]
 
 [[package]]

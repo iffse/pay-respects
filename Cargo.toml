@@ -6,7 +6,7 @@ members = [
 	"pay-respects-utils",
 	# optional modules
 	"pay-respects-module-runtime-rules",
-	# "pay-respects-module-request-ai",
+	"pay-respects-fallback-request-ai",
 	]
 
 [profile.release]

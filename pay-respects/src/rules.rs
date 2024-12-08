@@ -2,11 +2,16 @@ use crate::shell::Data;
 use pay_respects_parser::parse_rules;
 use pay_respects_utils::evals::*;
 
-pub fn match_pattern(executable: &str, data: &mut Data) {
+pub fn match_pattern(executable: &str, data: &Data) -> Option<Vec<String>> {
 	let error_msg = &data.error;
 	let shell = &data.shell;
 	let last_command = &data.command;
 	let executables = &data.executables;
-	let candidates = &mut data.candidates;
+	let mut candidates = vec![];
 	parse_rules!("rules");
+	if candidates.is_empty() {
+		None
+	} else {
+		Some(candidates)
+	}
 }
