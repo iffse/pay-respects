@@ -7,7 +7,7 @@ For compile-time rules, if only rules are changed, cargo won't recompile the pro
 touch core/src/rules.rs && cargo build
 ```
 
-Runtime rules directories are searched with the following priority:
+Runtime-rules support is provided by `runtime-rules` module. Directories are searched with the following priority:
 
 - `XDG_CONFIG_HOME`, defaults to `$HOME/.config`.
 - `XDG_CONFIG_DIRS`, defaults to `/etc/xdg`.
@@ -15,20 +15,23 @@ Runtime rules directories are searched with the following priority:
 
 The actual rule file should be placed under `pay-respects/rules/`, for example: `~/.config/pay-respects/rules/cargo.toml`. Note that for runtime rules, the name of the file **MUST** match the command name.
 
+## Syntax
+
 Syntax of a rule file:
 ```toml
-# this field should be the name of the command
-command = "world"
+# the name of the command
+command = "helloworld"
 
 # you can add as many `[[match_err]]` section as you want
 [[match_err]]
-# the suggestion of this section will be used for the following patterns of the error output
-# patterns should be in lowercase
+# Note:
+# - patterns must be in lowercase
+# - patterns should be the output with `LC_ALL=C` environment variable
 pattern = [
 	"pattern 1",
 	"pattern 2"
 ]
-# this will change the first argument to `fix`, while keeping the rest intact
+# if pattern is matched, suggest changing the first argument to fix:
 suggest = [
 '''
 {{command[0]}} fix {{command[2:]}} '''
@@ -68,6 +71,4 @@ Suggestions can have additional conditions to check. To specify conditions, add 
 - `min_length`: Check whether the given command has at least the length of the argument.
 - `max_length`: Check whether the given command has at most the length of the argument.
 - `shell`: Check if the current running shell is the argument.
-
-For locale other than English, be aware that patterns should be the output having `LC_ALL=C` environment variable.
 
