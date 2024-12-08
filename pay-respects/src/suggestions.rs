@@ -30,8 +30,11 @@ pub fn suggest_candidates(data: &mut Data) {
 		add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
 	}
 
-	eprintln!("modules: {modules:?}");
-	eprintln!("fallbacks: {fallbacks:?}");
+	#[cfg(debug_assertions)]
+	{
+		eprintln!("modules: {modules:?}");
+		eprintln!("fallbacks: {fallbacks:?}");
+	}
 
 	for module in modules {
 		let new_candidates = module_output(data, module);
