@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use sys_locale::get_locale;
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -71,7 +72,16 @@ pub fn ai_suggestion(last_command: &str, error_msg: &str) -> Option<AISuggest> {
 		Err(_) => "llama3-8b-8192".to_string(),
 	};
 
-	let user_locale = std::env::var("_PR_AI_LOCALE").unwrap_or("en-US".to_string());
+	let user_locale = {
+		let locale = std::env::var("_PR_AI_LOCALE")
+			.unwrap_or_else(|_| get_locale().unwrap_or("en".to_string()));
+		if locale.len() < 2 {
+			"en-US".to_string()
+		} else {
+			locale
+		}
+	};
+
 	let set_locale = if !user_locale.starts_with("en") {
 		format!(". Use language for locale {}", user_locale)
 	} else {

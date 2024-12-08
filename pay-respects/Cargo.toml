@@ -19,21 +19,7 @@ sys-locale = "0.3"
 rust-i18n = "3"
 regex-lite = "0.1"
 
-toml = { version = "0.8", optional = true }
-serde_json = { version = "1.0", optional = true }
-serde = { version = "1.0", features = ["derive"], optional = true }
-curl = { version = "0.4", optional = true }
-textwrap = { version = "0.16", features = ["terminal_size"], optional = true }
-
 inquire = "0.7.5"
 
 pay-respects-parser = { version = "0.3.2", path = "../pay-respects-parser" }
 pay-respects-utils = {version = "0.1.0", path = "../pay-respects-utils"}
-
-[features]
-runtime-rules = ["dep:serde", "dep:toml"]
-request-ai = ["dep:serde", "dep:serde_json", "dep:textwrap"]
-
-# linking to libcurl dynamically requires openssl when compiling and
-# complicates cross compilation
-libcurl = ["dep:curl"]

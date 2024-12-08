@@ -87,17 +87,4 @@ fn print_version() {
 		"version: {}",
 		option_env!("CARGO_PKG_VERSION").unwrap_or("unknown")
 	);
-	println!("compile features:");
-	#[cfg(feature = "runtime-rules")]
-	{
-		println!("  - runtime-rules");
-	}
-	#[cfg(feature = "request-ai")]
-	{
-		println!("  - request-ai");
-	}
-	#[cfg(feature = "libcurl")]
-	{
-		println!("  - libcurl");
-	}
 }

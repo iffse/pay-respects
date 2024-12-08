@@ -6,54 +6,52 @@ use colored::Colorize;
 use inquire::*;
 
 use crate::rules::match_pattern;
-use crate::shell::{module_output, shell_evaluated_commands, Data};
+use crate::shell::{add_candidates_no_dup, module_output, shell_evaluated_commands, Data};
 use crate::style::highlight_difference;
 
 pub fn suggest_candidates(data: &mut Data) {
-	let executable = &data.split[0].to_string();
-	let privilege = &data.privilege.clone();
+	let executable = &data.split[0];
+	let command = &data.command;
+	let privilege = &data.privilege;
+	let mut suggest_candidates = vec![];
+
+	let modules = &data.modules;
+	let fallbacks = &data.fallbacks;
 
 	if privilege.is_none() {
-		match_pattern("_PR_privilege", data);
+		if let Some(candidates) = match_pattern("_PR_privilege", data) {
+			add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
+		}
 	}
-	match_pattern(executable, data);
-	match_pattern("_PR_general", data);
+	if let Some(candidates) = match_pattern(executable, data) {
+		add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
+	}
+	if let Some(candidates) = match_pattern("_PR_general", data) {
+		add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
+	}
 
-	let modules = &data.modules.clone();
 	eprintln!("modules: {modules:?}");
+	eprintln!("fallbacks: {fallbacks:?}");
+
 	for module in modules {
-		let candidates = module_output(data, module);
-		eprintln!("runtime: {candidates:?}");
-		if candidates.is_some() {
-			data.add_candidates(&candidates.unwrap());
+		let new_candidates = module_output(data, module);
+
+		if let Some(candidates) = new_candidates {
+			add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
 		}
 	}
 
-	#[cfg(feature = "request-ai")]
-	{
-		if !data.candidates.is_empty() {
+	if !suggest_candidates.is_empty() {
+		data.candidates = suggest_candidates;
+		return;
+	}
+	for fallback in fallbacks {
+		let candidates = module_output(data, fallback);
+		eprintln!("fallback: {candidates:?}");
+		if candidates.is_some() {
+			add_candidates_no_dup(command, &mut suggest_candidates, &candidates.unwrap());
+			data.candidates = suggest_candidates;
 			return;
-		}
-		use crate::requests::ai_suggestion;
-		use textwrap::{fill, termwidth};
-		let command = &data.command;
-		let split_command = &data.split;
-		let error = &data.error.clone();
-
-		// skip for commands with no arguments,
-		// very likely to be an error showing the usage
-		if privilege.is_some() && split_command.len() > 2
-			|| privilege.is_none() && split_command.len() > 1
-		{
-			let suggest = ai_suggestion(command, error);
-			if let Some(suggest) = suggest {
-				let warn = format!("{}:", t!("ai-suggestion")).bold().blue();
-				let note = fill(&suggest.note, termwidth());
-
-				eprintln!("{}\n{}\n", warn, note);
-				let command = suggest.command;
-				data.add_candidate(&command);
-			}
 		}
 	}
 }

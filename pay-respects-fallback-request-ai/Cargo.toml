@@ -1,0 +1,21 @@
+[package]
+name = "pay-respects-fallback-request-ai"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+colored = "2"
+sys-locale = "0.3"
+rust-i18n = "3"
+serde_json = { version = "1.0" }
+serde = { version = "1.0", features = ["derive"]}
+textwrap = { version = "0.16", features = ["terminal_size"] }
+
+
+curl = { version = "0.4", optional = true }
+
+[features]
+# linking to libcurl dynamically requires openssl when compiling and
+# complicates cross compilation
+libcurl = ["dep:curl"]
+

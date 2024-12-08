@@ -24,9 +24,6 @@ mod style;
 mod suggestions;
 mod system;
 
-#[cfg(feature = "request-ai")]
-mod requests;
-
 #[macro_use]
 extern crate rust_i18n;
 i18n!("i18n", fallback = "en", minify_key = true);
@@ -67,7 +64,7 @@ fn init() -> Result<shell::Data, args::Status> {
 	let locale = {
 		let sys_locale = get_locale().unwrap_or("en-US".to_string());
 		if sys_locale.len() < 2 {
-			"en_US".to_string()
+			"en-US".to_string()
 		} else {
 			sys_locale
 		}
@@ -83,13 +80,6 @@ fn init() -> Result<shell::Data, args::Status> {
 			return Err(status);
 		}
 		_ => {}
-	}
-
-	#[cfg(feature = "request-ai")]
-	{
-		if std::env::var("_PR_AI_LOCALE").is_err() {
-			std::env::set_var("_PR_AI_LOCALE", &locale);
-		}
 	}
 
 	Ok(shell::Data::init())
