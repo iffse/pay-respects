@@ -107,16 +107,20 @@ curl -sSfL https://raw.githubusercontent.com/iffse/pay-respects/main/install.sh 
 
 > This installation requires you to have Cargo (the Rust package manager) installed.
 
-> Install from [crates.io](https://crates.io/), features are optional
+> Install from [crates.io](https://crates.io/), modules are optional
 > ```shell
-> cargo install pay-respects --all-features
+> cargo install pay-respects
+> cargo install pay-respects-module-runtime-rules
+> cargo install pay-respects-module-request-ai
 > ```
 
 > Clone from git and install, suitable for adding custom compile-time rules:
 > ```
 > git clone --depth 1 https://github.com/iffse/pay-respects
 > cd pay-respects
-> cargo install --path .
+> cargo install --path core
+> cargo install --path module-runtime-rules
+> cargo install --path module-request-ai
 > ```
 
 

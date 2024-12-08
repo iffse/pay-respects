@@ -1,5 +1,5 @@
 [package]
-name = "pay-respects-fallback-request-ai"
+name = "pay-respects-module-request-ai"
 version = "0.1.0"
 edition = "2021"
 
@@ -19,3 +19,6 @@ curl = { version = "0.4", optional = true }
 # complicates cross compilation
 libcurl = ["dep:curl"]
 
+[[bin]]
+name = "pay-respects-fallback-request-ai"
+path = "src/main.rs"
