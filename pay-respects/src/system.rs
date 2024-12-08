@@ -52,7 +52,10 @@ pub fn get_packages(
 			}
 		}
 		"dnf" | "yum" => {
-			let result = command_output(shell, &format!("{} provides '/usr/bin/{}'", package_manager, executable));
+			let result = command_output(
+				shell,
+				&format!("{} provides '/usr/bin/{}'", package_manager, executable),
+			);
 			if result.is_empty() {
 				return None;
 			}
@@ -163,7 +166,9 @@ pub fn get_packages(
 pub fn install_package(data: &mut Data, package_manager: &str, package: &str) -> bool {
 	let shell = &data.shell.clone();
 	let mut install = match package_manager {
-		"apt" | "dnf" | "pkg" | "yum" | "zypper" => format!("{} install {}", package_manager, package),
+		"apt" | "dnf" | "pkg" | "yum" | "zypper" => {
+			format!("{} install {}", package_manager, package)
+		}
 		"emerge" => format!("emerge {}", package),
 		"nix" => format!("nix profile install nixpkgs#{}", package),
 		"pacman" => format!("pacman -S {}", package),

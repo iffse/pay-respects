@@ -164,4 +164,3 @@ fn path_env() -> String {
 fn path_env_sep() -> &'static str {
 	":"
 }
-

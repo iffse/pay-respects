@@ -1,6 +1,6 @@
 use crate::shell::Data;
-use pay_respects_utils::evals::*;
 use pay_respects_parser::parse_rules;
+use pay_respects_utils::evals::*;
 
 pub fn match_pattern(executable: &str, data: &mut Data) {
 	let error_msg = &data.error;
