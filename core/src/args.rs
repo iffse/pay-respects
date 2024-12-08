@@ -39,7 +39,7 @@ pub fn handle_args() -> Status {
 				init.auto_alias = true;
 				index += 1;
 			}
-			"--noncf" => {
+			"--nocnf" => {
 				init.cnf = false;
 				index += 1
 			}
@@ -66,7 +66,7 @@ fn print_help() {
 		"{}",
 		t!(
 			"help",
-			usage = "pay-respects <shell> [--alias [<alias>]] [--noncf]",
+			usage = "pay-respects <shell> [--alias [<alias>]] [--nocnf]",
 			eval = "Bash / Zsh / Fish".bold(),
 			eval_examples = r#"
 eval "$(pay-respects bash --alias)"
@@ -76,7 +76,7 @@ pay-respects fish --alias | source
 			manual = "Nushell / PowerShell".bold(),
 			manual_examples = r#"
 pay-respects nushell [--alias <alias>]
-pay-respects pwsh [--alias <alias>] [--nocnf]
+pay-respects pwsh [--alias <alias>]
 "#
 		)
 	);
