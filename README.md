@@ -124,15 +124,18 @@ curl -sSfL https://raw.githubusercontent.com/iffse/pay-respects/main/install.sh 
 
 ## Rules & Modules
 
-See [writing rules](./rules.md) for how to write rules.
+See the following pages:
+
+- [Writing rules (TOML)](./rules.md)
+- [Custom modules](./modules.md)
 
 ## AI Integration
 
 > **Disclaimer**: You are using AI generated content on your own risk. Please double-check its suggestions before accepting.
 
-AI suggestions should work out of the box unless rate limit has reached. Bring your own API keys to avoid it.
+AI suggestions should work out of the box with `request-ai` module installed.
 
-If it's useful to you, **please share this project and spread the word**. Also consider making a donation to keep its public usage alive:
+An API key is included with the source. It should always work unless I can no longer afford this public service or rate limits are reached. If it's useful to you, **please share this project and spread the word**. Also consider making a donation to keep its public usage alive:
 
 <div>
 	<a
