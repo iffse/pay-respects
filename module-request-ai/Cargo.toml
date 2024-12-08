@@ -3,6 +3,12 @@ name = "pay-respects-module-request-ai"
 version = "0.1.0"
 edition = "2021"
 
+description = "AI request module for the pay-respects CLI tool"
+homepage = "https://codeberg.org/iff/pay-respects"
+repository = "https://github.com/iffse/pay-respects"
+license = "AGPL-3.0"
+include = ["**/*.rs"]
+
 [dependencies]
 colored = "2"
 sys-locale = "0.3"

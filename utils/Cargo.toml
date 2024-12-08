@@ -3,6 +3,13 @@ name = "pay-respects-utils"
 version = "0.1.0"
 edition = "2021"
 
+# for crates.io
+description = "Utilities for the pay-respects CLI tool"
+homepage = "https://codeberg.org/iff/pay-respects"
+repository = "https://github.com/iffse/pay-respects"
+license = "AGPL-3.0"
+include = ["**/*.rs"]
+
 [dependencies]
 regex-lite = "0.1"
 
