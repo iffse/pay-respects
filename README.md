@@ -97,7 +97,7 @@ For Arch Linux / Arch Linux ARM users, you can install from [Arch Linux CN Repos
 sudo pacman -S pay-respects
 ```
 
-Or install compiled binaries from [GitHub releases](https://github.com/iffse/pay-respects/releases) with the install script:
+Or install compiled binaries from [GitHub releases](https://github.com/iffse/pay-respects/releases) with the install script (all modules included):
 ```
 curl -sSfL https://raw.githubusercontent.com/iffse/pay-respects/main/install.sh | sh
 ```
