@@ -25,3 +25,10 @@ pay-respects-parser = "0.3.3"
 pay-respects-utils = "0.1.0"
 # pay-respects-parser = { path = "../parser" }
 # pay-respects-utils = { path = "../utils"}
+
+[package.metadata.deb]
+assets = [
+	["target/release/pay-respects", "usr/bin/", "755"],
+	["target/release/_pay-respects-module-runtime-rules", "usr/bin/", "755"],
+	["target/release/_pay-respects-fallback-request-ai", "usr/bin/", "755"],
+]
