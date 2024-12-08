@@ -1,14 +1,12 @@
 use crate::shell::{command_output, elevate, Data};
+use colored::Colorize;
 use std::io::stderr;
 use std::process::Command;
 use std::process::Stdio;
-use colored::Colorize;
 
 pub fn get_package_manager(data: &mut Data) -> Option<String> {
 	let package_managers = vec![
-		"apt", "dnf", "emerge", "nix", "pacman",
-		// "pkg",
-		// "yum",
+		"apt", "dnf", "emerge", "nix", "pacman", "yum",
 		// "zypper",
 	];
 
@@ -29,7 +27,10 @@ pub fn get_packages(
 	match package_manager {
 		"apt" => {
 			if !data.has_executable("apt-file") {
-				eprintln!("{}: apt-file is required to find packages", "pay-respects".yellow());
+				eprintln!(
+					"{}: apt-file is required to find packages",
+					"pay-respects".yellow()
+				);
 				return None;
 			}
 			let result = command_output(
@@ -67,7 +68,10 @@ pub fn get_packages(
 		}
 		"emerge" => {
 			if !data.has_executable("e-file") {
-				eprintln!("{}: pfl is required to find packages", "pay-respects".yellow());
+				eprintln!(
+					"{}: pfl is required to find packages",
+					"pay-respects".yellow()
+				);
 				return None;
 			}
 			let result = command_output(shell, &format!("e-file /usr/bin/{}", executable));
@@ -88,7 +92,10 @@ pub fn get_packages(
 		}
 		"nix" => {
 			if !data.has_executable("nix-locate") {
-				eprintln!("{}: nix-index is required to find packages", "pay-respects".yellow());
+				eprintln!(
+					"{}: nix-index is required to find packages",
+					"pay-respects".yellow()
+				);
 				return None;
 			}
 			let result = command_output(shell, &format!("nix-locate 'bin/{}'", executable));
@@ -132,26 +139,39 @@ pub fn get_packages(
 				Some(packages)
 			}
 		}
-		_ => {
-			match package_manager.ends_with("command-not-found") {
-				true => {
-					let result = command_output(shell, &format!("{} {}", package_manager, executable));
-					if result.is_empty() {
-						return None;
-					}
-					if result.contains("did you mean") || result.contains("is not installed") {
-						let packages = result
-							.lines()
-							.skip(1)
-							.map(|line| line.to_string())
-							.collect();
-						return Some(packages);
-					}
-					return None;
-				},
-				false => unreachable!("Unsupported package manager"),
+		"yum" => {
+			let result = command_output(shell, &format!("yum provides {}", executable));
+			if result.is_empty() {
+				return None;
+			}
+			let packages: Vec<String> = result
+				.lines()
+				.map(|line| line.split_whitespace().next().unwrap().to_string())
+				.collect();
+			if packages.is_empty() {
+				None
+			} else {
+				Some(packages)
 			}
 		}
+		_ => match package_manager.ends_with("command-not-found") {
+			true => {
+				let result = command_output(shell, &format!("{} {}", package_manager, executable));
+				if result.is_empty() {
+					return None;
+				}
+				if result.contains("did you mean") || result.contains("is not installed") {
+					let packages = result
+						.lines()
+						.skip(1)
+						.map(|line| line.to_string())
+						.collect();
+					return Some(packages);
+				}
+				None
+			}
+			false => unreachable!("Unsupported package manager"),
+		},
 	}
 }
 
@@ -166,23 +186,19 @@ pub fn install_package(data: &mut Data, package_manager: &str, package: &str) ->
 		"pkg" => format!("pkg install {}", package),
 		"yum" => format!("yum install {}", package),
 		"zypper" => format!("zypper install {}", package),
-		_ => {
-			match package_manager.ends_with("command-not-found") {
+		_ => match package_manager.ends_with("command-not-found") {
+			true => match package.starts_with("Command") {
+				false => package.to_string(),
 				true => {
-					match package.starts_with("Command") {
-						false => package.to_string(),
-						true => {
-							let split = package.split_whitespace().collect::<Vec<&str>>();
-							let command = split[1];
-							let package = split[split.len() - 1];
-							let new_command = data.command.clone().replacen(command, package, 1);
-							data.update_command(&new_command);
-							format!("apt install {}", package)
-						}
-					}
-				},
-				false => unreachable!("Unsupported package manager"),
-			}
+					let split = package.split_whitespace().collect::<Vec<&str>>();
+					let command = split[1];
+					let package = split[split.len() - 1];
+					let new_command = data.command.clone().replacen(command, package, 1);
+					data.update_command(&new_command);
+					format!("apt install {}", package)
+				}
+			},
+			false => unreachable!("Unsupported package manager"),
 		},
 	};
 	elevate(data, &mut install);

@@ -235,9 +235,9 @@ pub fn command_output(shell: &str, command: &str) -> String {
 		.output()
 		.expect("failed to execute process");
 
-		match output.stdout.is_empty() {
-			false => String::from_utf8_lossy(&output.stdout).to_lowercase(),
-			true => String::from_utf8_lossy(&output.stderr).to_lowercase(),
+	match output.stdout.is_empty() {
+		false => String::from_utf8_lossy(&output.stdout).to_lowercase(),
+		true => String::from_utf8_lossy(&output.stderr).to_lowercase(),
 	}
 }
 
