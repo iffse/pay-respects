@@ -1,44 +1,15 @@
-[package]
-name = "pay-respects"
-authors = ["iff <iff@ik.me>"]
-version = "0.5.15"
-edition = "2021"
-
-# for crates.io
-description = "Terminal command suggestion, alternative to thefuck written in Rust with AI support"
-homepage = "https://codeberg.org/iff/pay-respects"
-repository = "https://github.com/iffse/pay-respects"
-keywords = ["cli", "terminal", "utility", "shell"]
-categories = ["command-line-utilities"]
-license = "AGPL-3.0"
-include = ["**/*.rs", "**/*.toml"]
-
-[dependencies]
-colored = "2"
-sys-locale = "0.3"
-rust-i18n = "3"
-regex-lite = "0.1"
-
-toml = { version = "0.8", optional = true }
-serde_json = { version = "1.0", optional = true }
-serde = { version = "1.0", features = ["derive"], optional = true }
-curl = { version = "0.4", optional = true }
-textwrap = { version = "0.16", features = ["terminal_size"], optional = true }
-
-inquire = "0.7.5"
-
-pay-respects-parser = "0.3.2"
-# pay-respects-parser = { path = "../pay-respects-parser" }
-
-[features]
-runtime-rules = ["dep:serde", "dep:toml"]
-request-ai = ["dep:serde", "dep:serde_json", "dep:textwrap"]
-
-# linking to libcurl dynamically requires openssl when compiling and
-# complicates cross compilation
-libcurl = ["dep:curl"]
+[workspace]
+resolver = "2"
+members = [
+	"pay-respects",
+	"pay-respects-parser",
+	# optional modules
+	# "pay-respects-module-runtime-rules",
+	# "pay-respects-module-request-ai"
+]
 
 [profile.release]
 strip = true
 codegen-units = 1
 lto = true
+
