@@ -142,6 +142,9 @@ impl Data {
 			if self.alias.is_some() {
 				let alias = self.alias.as_ref().unwrap();
 				for command in alias.keys() {
+					if self.executables.contains(command) {
+						continue;
+					}
 					self.executables.push(command.to_string());
 				}
 			}
