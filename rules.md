@@ -1,10 +1,10 @@
 # Writing Rules
 
-Rule files placed under [rules](./rules) in the project directory are parsed at compilation, everything is parsed to Rust code before compiling. You don't have to know the project structure nor Rust to write blazing fast rules!
+Rule files placed under [rules](./core/rules) in the project directory are parsed at compilation, everything is parsed to Rust code before compiling. You don't have to know the project structure nor Rust to write blazing fast rules!
 
 For compile-time rules, if only rules are changed, cargo won't recompile the project because Rust code were intact. You will have to notify it manually by:
 ```shell
-touch src/rules.rs && cargo build
+touch core/src/rules.rs && cargo build
 ```
 
 Runtime rules directories are searched with the following priority:
