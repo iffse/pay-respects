@@ -102,6 +102,7 @@ pub fn cnf(data: &mut Data) {
 						let bin = format!("{}{}", bin_dir, "command-not-found");
 						if Path::new(&bin).exists() {
 							package_manager = bin;
+							break;
 						}
 					}
 					package_manager
