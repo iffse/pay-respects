@@ -139,6 +139,12 @@ impl Data {
 	pub fn get_executables(&mut self) -> &Vec<String> {
 		if self.executables.is_empty() {
 			self.executables = get_path_files();
+			if self.alias.is_some() {
+				let alias = self.alias.as_ref().unwrap();
+				for command in alias.keys() {
+					self.executables.push(command.to_string());
+				}
+			}
 		}
 		&self.executables
 	}
