@@ -17,10 +17,10 @@
 There are 2 types of modules:
 
 - **Standard module**: Will always run to retrieve suggestions
-	- Naming convention: `pay-respects-module-<your module name>`
+	- Naming convention: `_pay-respects-module-<your module name>`
 - **Fallback module**: Will only be run if no previous suggestion were found
 	- **CAUTION**: Will immediately return if a suggestion is obtained, and there is no guaranteed the modules are executed in a specific order.
-	- Naming convention: `pay-respects-fallback-<your module name>`
+	- Naming convention: `_pay-respects-fallback-<your module name>`
 
 When running your module, you will get the following environment variables:
 
