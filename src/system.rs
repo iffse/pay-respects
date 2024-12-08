@@ -51,8 +51,8 @@ pub fn get_packages(
 				Some(packages)
 			}
 		}
-		"dnf" => {
-			let result = command_output(shell, &format!("dnf provides {}", executable));
+		"dnf" | "yum" => {
+			let result = command_output(shell, &format!("{} provides '/usr/bin/{}'", package_manager, executable));
 			if result.is_empty() {
 				return None;
 			}
@@ -139,21 +139,6 @@ pub fn get_packages(
 				Some(packages)
 			}
 		}
-		"yum" => {
-			let result = command_output(shell, &format!("yum provides {}", executable));
-			if result.is_empty() {
-				return None;
-			}
-			let packages: Vec<String> = result
-				.lines()
-				.map(|line| line.split_whitespace().next().unwrap().to_string())
-				.collect();
-			if packages.is_empty() {
-				None
-			} else {
-				Some(packages)
-			}
-		}
 		_ => match package_manager.ends_with("command-not-found") {
 			true => {
 				let result = command_output(shell, &format!("{} {}", package_manager, executable));
@@ -178,14 +163,10 @@ pub fn get_packages(
 pub fn install_package(data: &mut Data, package_manager: &str, package: &str) -> bool {
 	let shell = &data.shell.clone();
 	let mut install = match package_manager {
-		"apt" => format!("apt install {}", package),
-		"dnf" => format!("dnf install {}", package),
+		"apt" | "dnf" | "pkg" | "yum" | "zypper" => format!("{} install {}", package_manager, package),
 		"emerge" => format!("emerge {}", package),
 		"nix" => format!("nix profile install nixpkgs#{}", package),
 		"pacman" => format!("pacman -S {}", package),
-		"pkg" => format!("pkg install {}", package),
-		"yum" => format!("yum install {}", package),
-		"zypper" => format!("zypper install {}", package),
 		_ => match package_manager.ends_with("command-not-found") {
 			true => match package.starts_with("Command") {
 				false => package.to_string(),
