@@ -5,6 +5,8 @@ use crate::{shell, suggestions};
 use colored::Colorize;
 use inquire::*;
 
+use std::path::Path;
+
 pub fn suggestion(data: &mut Data) {
 	let shell = data.shell.clone();
 	let mut last_command;
@@ -87,11 +89,30 @@ pub fn cnf(data: &mut Data) {
 		}
 	} else {
 		let package_manager = match system::get_package_manager(data) {
-			Some(package_manager) => package_manager,
+			Some(package_manager) => match package_manager.as_str() {
+				"apt" => {
+					let cnf_dirs = [
+						"/usr/lib/",
+						"/data/data/com.termux/files/usr/libexec/termux/",
+					];
+					let mut package_manager = package_manager;
+					for bin_dir in &cnf_dirs {
+						let bin = format!("{}{}", bin_dir, "command-not-found");
+						if Path::new(&bin).exists() {
+							package_manager = bin;
+						}
+					}
+					package_manager
+				}
+				_ => package_manager,
+			},
 			None => {
 				return;
 			}
 		};
+
+		#[cfg(debug_assertions)]
+		eprintln!("package_manager: {}", package_manager);
 
 		let packages = match system::get_packages(data, &package_manager, executable) {
 			Some(packages) => packages,
@@ -100,6 +121,9 @@ pub fn cnf(data: &mut Data) {
 				return;
 			}
 		};
+
+		#[cfg(debug_assertions)]
+		eprintln!("packages: {:?}", packages);
 
 		let style = ui::Styled::default();
 		let render_config = ui::RenderConfig::default().with_prompt_prefix(style);

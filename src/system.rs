@@ -6,7 +6,6 @@ use colored::Colorize;
 
 pub fn get_package_manager(data: &mut Data) -> Option<String> {
 	let package_managers = vec![
-		"command-not-found", // not actually a package manager
 		"apt", "dnf", "emerge", "nix", "pacman",
 		// "pkg",
 		// "yum",
@@ -28,21 +27,6 @@ pub fn get_packages(
 ) -> Option<Vec<String>> {
 	let shell = &data.shell.clone();
 	match package_manager {
-		"command-not-found" => {
-			let result = command_output(shell, &format!("command-not-found {}", executable));
-			if result.is_empty() {
-				return None;
-			}
-			if result.contains("did you mean") || result.contains("is not installed") {
-				let packages = result
-					.lines()
-					.skip(1)
-					.map(|line| line.to_string())
-					.collect();
-				return Some(packages);
-			}
-			return None;
-		}
 		"apt" => {
 			if !data.has_executable("apt-file") {
 				eprintln!("{}: apt-file is required to find packages", "pay-respects".yellow());
@@ -148,26 +132,32 @@ pub fn get_packages(
 				Some(packages)
 			}
 		}
-		_ => unreachable!("Unsupported package manager"),
+		_ => {
+			match package_manager.ends_with("command-not-found") {
+				true => {
+					let result = command_output(shell, &format!("command-not-found {}", executable));
+					if result.is_empty() {
+						return None;
+					}
+					if result.contains("did you mean") || result.contains("is not installed") {
+						let packages = result
+							.lines()
+							.skip(1)
+							.map(|line| line.to_string())
+							.collect();
+						return Some(packages);
+					}
+					return None;
+				},
+				false => unreachable!("Unsupported package manager"),
+			}
+		}
 	}
 }
 
 pub fn install_package(data: &mut Data, package_manager: &str, package: &str) -> bool {
 	let shell = &data.shell.clone();
 	let mut install = match package_manager {
-		"command-not-found" => {
-			match package.starts_with("Command") {
-				false => package.to_string(),
-				true => {
-					let split = package.split_whitespace().collect::<Vec<&str>>();
-					let command = split[1];
-					let package = split[split.len() - 1];
-					let new_command = data.command.clone().replacen(command, package, 1);
-					data.update_command(&new_command);
-					format!("apt install {}", package)
-				}
-			}
-		}
 		"apt" => format!("apt install {}", package),
 		"dnf" => format!("dnf install {}", package),
 		"emerge" => format!("emerge {}", package),
@@ -176,9 +166,29 @@ pub fn install_package(data: &mut Data, package_manager: &str, package: &str) ->
 		"pkg" => format!("pkg install {}", package),
 		"yum" => format!("yum install {}", package),
 		"zypper" => format!("zypper install {}", package),
-		_ => unreachable!("Unsupported package manager"),
+		_ => {
+			match package_manager.ends_with("command-not-found") {
+				true => {
+					match package.starts_with("Command") {
+						false => package.to_string(),
+						true => {
+							let split = package.split_whitespace().collect::<Vec<&str>>();
+							let command = split[1];
+							let package = split[split.len() - 1];
+							let new_command = data.command.clone().replacen(command, package, 1);
+							data.update_command(&new_command);
+							format!("apt install {}", package)
+						}
+					}
+				},
+				false => unreachable!("Unsupported package manager"),
+			}
+		},
 	};
 	elevate(data, &mut install);
+
+	#[cfg(debug_assertions)]
+	eprintln!("install: {}", install);
 
 	let result = Command::new(shell)
 		.arg("-c")
