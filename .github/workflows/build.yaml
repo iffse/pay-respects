@@ -88,8 +88,8 @@ jobs:
         run: >
           7z a pay-respects-${{ steps.version.outputs.VERSION }}-${{ matrix.target }}.zip
           ./target/${{ matrix.target }}/release/pay-respects.exe
-          ./target/${{ matrix.target }}/release/pay-respects-module-runtime-rules.exe
-          ./target/${{ matrix.target }}/release/pay-respects-fallback-request-ai.exe
+          ./target/${{ matrix.target }}/release/_pay-respects-module-runtime-rules.exe
+          ./target/${{ matrix.target }}/release/_pay-respects-fallback-request-ai.exe
 
       - name: zipping files (unix)
         if: runner.os != 'Windows'
@@ -97,8 +97,8 @@ jobs:
           tar -czf pay-respects-${{ steps.version.outputs.VERSION }}-${{ matrix.target }}.tar.gz
           -C target/${{ matrix.target }}/release
           pay-respects
-          pay-respects-module-runtime-rules
-          pay-respects-fallback-request-ai
+          _pay-respects-module-runtime-rules
+          _pay-respects-fallback-request-ai
 
       - name: uploading to release
         uses: ncipollo/release-action@v1

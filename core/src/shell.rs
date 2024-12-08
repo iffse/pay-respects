@@ -60,9 +60,9 @@ impl Data {
 			let mut modules = vec![];
 			let mut fallbacks = vec![];
 			for exe in path_executables {
-				if exe.starts_with("pay-respects-module-") {
+				if exe.starts_with("_pay-respects-module-") {
 					modules.push(exe.to_string());
-				} else if exe.starts_with("pay-respects-fallback-") {
+				} else if exe.starts_with("_pay-respects-fallback-") {
 					fallbacks.push(exe.to_string());
 				} else {
 					executables.push(exe.to_string());

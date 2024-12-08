@@ -50,7 +50,6 @@ pub fn suggest_candidates(data: &mut Data) {
 	}
 	for fallback in fallbacks {
 		let candidates = module_output(data, fallback);
-		eprintln!("fallback: {candidates:?}");
 		if candidates.is_some() {
 			add_candidates_no_dup(command, &mut suggest_candidates, &candidates.unwrap());
 			data.candidates = suggest_candidates;
