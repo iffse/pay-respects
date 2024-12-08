@@ -19,7 +19,7 @@ main() {
 	echo "Detected architecture: ${_arch}"
 
 	local _bin_name="pay-respects"
-	local _modules="_pay-respects-module-runtime-rules _pay-respects-fallback-request-ai"
+	local _modules="_pay-respects-module-100-runtime-rules _pay-respects-fallback-100-request-ai"
 	case "${_arch}" in
 	*windows*)
 		_bin_name="${_bin_name}.exe"

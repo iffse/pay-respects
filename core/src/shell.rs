@@ -68,6 +68,8 @@ impl Data {
 					executables.push(exe.to_string());
 				}
 			}
+			modules.sort_unstable();
+			fallbacks.sort_unstable();
 			if alias.is_some() {
 				let alias = alias.as_ref().unwrap();
 				for command in alias.keys() {
