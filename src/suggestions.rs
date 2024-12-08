@@ -100,7 +100,7 @@ pub fn select_candidate(data: &mut Data) {
 		let confirm = format!("[{}]", t!("confirm-yes")).green();
 		let hint = format!(
 			"{} {} {}",
-			"[↓/↑] / [j/k]".blue(),
+			"[↓/↑]".blue(),
 			confirm,
 			"[Ctrl+C]".red()
 		);

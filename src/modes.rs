@@ -104,10 +104,11 @@ pub fn cnf(data: &mut Data) {
 		let style = ui::Styled::default();
 		let render_config = ui::RenderConfig::default().with_prompt_prefix(style);
 		let msg = format!("{}", t!("install-package")).bold().blue();
+		let confirm = format!("[{}]", t!("confirm-yes")).green();
 		let hint = format!(
 			"{} {} {}",
 			"[↑/↓]".blue(),
-			t!("confirm-yes").green(),
+			confirm,
 			"[Ctrl+C]".red()
 		);
 		eprintln!("{}", msg);
