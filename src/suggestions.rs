@@ -305,19 +305,15 @@ pub fn run_suggestion(data: &Data, command: &str) -> std::process::ExitStatus {
 			.arg(command)
 			.stdout(stderr())
 			.stderr(Stdio::inherit())
-			.spawn()
-			.expect("failed to execute process")
-			.wait()
-			.unwrap(),
+			.status()
+			.expect("failed to execute process"),
 		None => std::process::Command::new(shell)
 			.arg("-c")
 			.arg(command)
 			.stdout(stderr())
 			.stderr(Stdio::inherit())
-			.spawn()
-			.expect("failed to execute process")
-			.wait()
-			.unwrap(),
+			.status()
+			.expect("failed to execute process"),
 	}
 }
 
