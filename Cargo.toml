@@ -1,12 +1,12 @@
 [workspace]
 resolver = "2"
 members = [
-	"pay-respects",
-	"pay-respects-parser",
-	"pay-respects-utils",
+	"core",
+	"parser",
+	"utils",
 	# optional modules
-	"pay-respects-module-runtime-rules",
-	"pay-respects-fallback-request-ai",
+	"module-runtime-rules",
+	"module-request-ai",
 	]
 
 [profile.release]

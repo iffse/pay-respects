@@ -3,9 +3,9 @@
 Typed a wrong command or don't know what to do? Pay Respects will suggest a fix to your console command by simply pressing `F`!
 
 - 🚀 **Blazing fast suggestion**: You won't notice any delay for asking suggestions!
+- 🎯 **Accurate results**: Suggestions are verified before being prompted to the user, no `sudo` suggestions when you are using `doas`!
 - ✏️ **Easy to write rules**: You don't need to know Rust. The rules are written in a TOML file!
 - 🔩 **Modular**: TOML not your taste? Add sources with your favorite language with a custom module!
-- 🎯 **Accurate results**: Suggestions are verified before being prompted to the user, no `sudo` suggestions when you are using `doas`!
 - 🤖 **AI Support**: AI module comes in aid when there is no rule for your error!
 - 🪶 **Tiny binary size**: Not even 1MB for core features!
 
@@ -119,17 +119,10 @@ curl -sSfL https://raw.githubusercontent.com/iffse/pay-respects/main/install.sh 
 > cargo install --path .
 > ```
 
-> Features:
->
-> - `runtime-rules`: Read rules in runtime
-> - `request-ai`: Request AI for suggestion
-> - `libcurl`: Dynamically link `libcurl` for requests, which requires openssl at compile time
-> 	- Only matters to package maintainers, as by turning it off gives fewer headaches when cross-compiling
-
 
 </details>
 
-## Rule Files
+## Rules & Modules
 
 See [writing rules](./rules.md) for how to write rules.
 
