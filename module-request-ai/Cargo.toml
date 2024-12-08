@@ -1,6 +1,6 @@
 [package]
 name = "pay-respects-module-request-ai"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 
 description = "AI request module for the pay-respects CLI tool"
@@ -27,5 +27,5 @@ default = ["libcurl"]
 libcurl = ["dep:curl"]
 
 [[bin]]
-name = "_pay-respects-fallback-request-ai"
+name = "_pay-respects-fallback-100-request-ai"
 path = "src/main.rs"
