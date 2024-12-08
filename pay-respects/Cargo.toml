@@ -28,6 +28,7 @@ textwrap = { version = "0.16", features = ["terminal_size"], optional = true }
 inquire = "0.7.5"
 
 pay-respects-parser = { version = "0.3.2", path = "../pay-respects-parser" }
+pay-respects-utils = {version = "0.1.0", path = "../pay-respects-utils"}
 
 [features]
 runtime-rules = ["dep:serde", "dep:toml"]

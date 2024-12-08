@@ -1,11 +1,12 @@
 use crate::shell::Data;
-use crate::suggestions::*;
+use pay_respects_utils::evals::*;
 use pay_respects_parser::parse_rules;
 
 pub fn match_pattern(executable: &str, data: &mut Data) {
-	let error_msg = &data.error.clone();
-	let shell = &data.shell.clone();
-	let last_command = &data.command.clone();
-	let executables = &data.get_executables().clone();
+	let error_msg = &data.error;
+	let shell = &data.shell;
+	let last_command = &data.command;
+	let executables = &data.executables;
+	let candidates = &mut data.candidates;
 	parse_rules!("rules");
 }

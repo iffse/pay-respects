@@ -1,0 +1,8 @@
+[package]
+name = "pay-respects-utils"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+regex-lite = "0.1"
+

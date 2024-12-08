@@ -1,6 +1,5 @@
 use crate::replaces;
-use crate::shell::Data;
-use crate::suggestions::*;
+use pay_respects_utils::evals::*;
 
 #[derive(serde::Deserialize)]
 struct Rule {
@@ -13,7 +12,13 @@ struct MatchError {
 	suggest: Vec<String>,
 }
 
-pub fn runtime_match(executable: &str, data: &mut Data) {
+pub fn runtime_match(
+	executable: &str, 
+	shell: &str,
+	last_command: &str,
+	error_msg: &str,
+	executables: &[String],
+) {
 	let file = get_rule(executable);
 	if file.is_none() {
 		return;
@@ -21,11 +26,7 @@ pub fn runtime_match(executable: &str, data: &mut Data) {
 
 	let file = std::fs::read_to_string(file.unwrap()).unwrap();
 	let rule: Rule = toml::from_str(&file).unwrap();
-	let split_command = &data.split.clone();
-	let shell = &data.shell.clone();
-	let last_command = &data.command.clone();
-	let error_msg = &data.error.clone();
-	let executables = &data.get_executables().clone();
+	let split_command = split_command(last_command);
 
 	let mut pure_suggest;
 
@@ -66,8 +67,8 @@ pub fn runtime_match(executable: &str, data: &mut Data) {
 								shell,
 								last_command,
 								error_msg,
-								split_command,
-								data,
+								&split_command,
+								executables,
 							) == reverse
 							{
 								continue 'suggest;
@@ -82,13 +83,16 @@ pub fn runtime_match(executable: &str, data: &mut Data) {
 					if pure_suggest.contains("{{command}}") {
 						pure_suggest = pure_suggest.replace("{{command}}", last_command);
 					}
-					data.add_candidate(&eval_suggest(
-						&pure_suggest,
-						last_command,
-						error_msg,
-						executables,
-						shell,
-					));
+					print!("{}",
+						eval_suggest(
+							&pure_suggest,
+							last_command,
+							error_msg,
+							executables,
+							shell,
+						)
+					);
+					print!("{}", "<_PR_BR>");
 				}
 			}
 		}
@@ -102,10 +106,10 @@ fn eval_condition(
 	last_command: &str,
 	error_msg: &str,
 	split_command: &[String],
-	data: &mut Data,
+	executables: &[String],
 ) -> bool {
 	match condition {
-		"executable" => data.has_executable(arg),
+		"executable" => executables.contains(&arg.to_string()),
 		"err_contains" => error_msg.contains(arg),
 		"cmd_contains" => last_command.contains(arg),
 		"min_length" => split_command.len() >= arg.parse::<usize>().unwrap(),
@@ -190,3 +194,4 @@ fn get_rule(executable: &str) -> Option<String> {
 
 	None
 }
+

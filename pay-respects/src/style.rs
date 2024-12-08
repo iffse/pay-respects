@@ -1,5 +1,5 @@
+use pay_respects_utils::evals::split_command;
 use crate::shell::PRIVILEGE_LIST;
-use crate::suggestions::split_command;
 use colored::*;
 
 // to_string() is necessary here, otherwise there won't be color in the output

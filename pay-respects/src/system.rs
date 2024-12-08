@@ -11,7 +11,7 @@ pub fn get_package_manager(data: &mut Data) -> Option<String> {
 	];
 
 	for package_manager in package_managers {
-		if data.has_executable(package_manager) {
+		if data.executables.contains(&package_manager.to_string()) {
 			return Some(package_manager.to_string());
 		}
 	}
@@ -26,7 +26,7 @@ pub fn get_packages(
 	let shell = &data.shell.clone();
 	match package_manager {
 		"apt" => {
-			if !data.has_executable("apt-file") {
+			if !data.executables.contains(&"apt-file".to_string()) {
 				eprintln!(
 					"{}: apt-file is required to find packages",
 					"pay-respects".yellow()
@@ -67,7 +67,7 @@ pub fn get_packages(
 			}
 		}
 		"emerge" => {
-			if !data.has_executable("e-file") {
+			if !data.executables.contains(&"e-file".to_string()) {
 				eprintln!(
 					"{}: pfl is required to find packages",
 					"pay-respects".yellow()
@@ -91,7 +91,7 @@ pub fn get_packages(
 			}
 		}
 		"nix" => {
-			if !data.has_executable("nix-locate") {
+			if !data.executables.contains(&"nix-locate".to_string()) {
 				eprintln!(
 					"{}: nix-index is required to find packages",
 					"pay-respects".yellow()
@@ -121,7 +121,7 @@ pub fn get_packages(
 			}
 		}
 		"pacman" => {
-			let result = if data.has_executable("pkgfile") {
+			let result = if data.executables.contains(&"pkgfile".to_string()) {
 				command_output(shell, &format!("pkgfile -b {}", executable))
 			} else {
 				command_output(shell, &format!("pacman -Fq /usr/bin/{}", executable))
