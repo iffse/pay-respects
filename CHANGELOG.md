@@ -5,12 +5,18 @@ All notable changes to components of this project since 0.5.14 will be documente
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.6.0]
+## [Unreleased]
+
+### Changed
+
+- `--nocnf` option in docs wasn't the same as in the code `--noncf`. They are normalized to `--nocnf`
+
+## [0.6.0] - 2024-12-08
 
 ### Added
 
 - Modular system
-- Package manager integration for `apt` (also `snap` and `pkg` by `command-not-found`), `dnf`, `emerge`, `nix`, `yum`
+- Package manager integration for `apt` (also `snap` and `pkg` via `command-not-found`), `dnf`, `portage`, `nix`, `yum`
 - Adding aliases to executable match
 
 ### Changed
@@ -18,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Heavy project refactoring
 - `runtime-rules` and `request-ai` are now modules instead of features
 
-## [0.5.15]
+## [0.5.15] - 2024-12-07
 
 ### Added
 
@@ -35,7 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Default request-AI API
 - i18n updates
 
-## [0.5.14]
+## [0.5.14] - 2024-11-23
 
 History start.
 
