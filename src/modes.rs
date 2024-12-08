@@ -105,12 +105,7 @@ pub fn cnf(data: &mut Data) {
 		let render_config = ui::RenderConfig::default().with_prompt_prefix(style);
 		let msg = format!("{}", t!("install-package")).bold().blue();
 		let confirm = format!("[{}]", t!("confirm-yes")).green();
-		let hint = format!(
-			"{} {} {}",
-			"[↑/↓]".blue(),
-			confirm,
-			"[Ctrl+C]".red()
-		);
+		let hint = format!("{} {} {}", "[↑/↓]".blue(), confirm, "[Ctrl+C]".red());
 		eprintln!("{}", msg);
 		eprintln!("{}", hint);
 		let package = Select::new("\n", packages)

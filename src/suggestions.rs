@@ -98,12 +98,7 @@ pub fn select_candidate(data: &mut Data) {
 			.bold()
 			.blue();
 		let confirm = format!("[{}]", t!("confirm-yes")).green();
-		let hint = format!(
-			"{} {} {}",
-			"[↓/↑]".blue(),
-			confirm,
-			"[Ctrl+C]".red()
-		);
+		let hint = format!("{} {} {}", "[↑/↓]".blue(), confirm, "[Ctrl+C]".red());
 		eprintln!("{}", msg);
 		eprintln!("{}", hint);
 

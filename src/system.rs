@@ -30,7 +30,10 @@ pub fn get_packages(
 			if !data.has_executable("apt-file") {
 				return None;
 			}
-			let result = command_output(shell, &format!("apt-file find --regexp '.*/bin/{}$'", executable));
+			let result = command_output(
+				shell,
+				&format!("apt-file find --regexp '.*/bin/{}$'", executable),
+			);
 			if result.is_empty() {
 				return None;
 			}
