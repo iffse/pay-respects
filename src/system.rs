@@ -149,7 +149,7 @@ pub fn get_packages(
 					let packages = result
 						.lines()
 						.skip(1)
-						.map(|line| line.to_string())
+						.map(|line| line.trim().to_string())
 						.collect();
 					return Some(packages);
 				}
