@@ -2,12 +2,11 @@ use crate::shell::Data;
 use crate::suggestions::suggest_candidates;
 use crate::system;
 use crate::{shell, suggestions};
-use pay_respects_utils::evals::best_match_path;
 use colored::Colorize;
 use inquire::*;
+use pay_respects_utils::evals::best_match_path;
 
 use std::path::Path;
-
 
 pub fn suggestion(data: &mut Data) {
 	let shell = data.shell.clone();

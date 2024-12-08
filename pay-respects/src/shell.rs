@@ -238,7 +238,7 @@ pub fn command_output(shell: &str, command: &str) -> String {
 	}
 }
 
-pub fn module_output(data: &Data, module: &str) -> Vec<String> {
+pub fn module_output(data: &Data, module: &str) -> Option<Vec<String>> {
 	let shell = &data.shell;
 	let executable = &data.split[0];
 	let last_command = &data.command;
@@ -248,16 +248,23 @@ pub fn module_output(data: &Data, module: &str) -> Vec<String> {
 		.arg("-c")
 		.arg(module)
 		.env("_PR_COMMAND", executable)
+		.env("_PR_SHELL", shell)
 		.env("_PR_LAST_COMMAND", last_command)
 		.env("_PR_ERROR_MSG", error_msg)
 		.env("_PR_EXECUTABLES", executables)
 		.output()
 		.expect("failed to execute process");
 
-	String::from_utf8_lossy(&output.stderr)
-		.split("<_PR_BR>")
-		.map(|s| s.trim().to_string())
-		.collect::<Vec<String>>()
+	if output.stdout.is_empty() {
+		return None;
+	}
+	let break_holder = "<_PR_BR>";
+	Some(
+		String::from_utf8_lossy(&output.stdout)[..output.stdout.len() - break_holder.len()]
+			.split("<_PR_BR>")
+			.map(|s| s.trim().to_string())
+			.collect::<Vec<String>>(),
+	)
 }
 
 pub fn last_command(shell: &str) -> String {

@@ -1,6 +1,6 @@
-use pay_respects_utils::evals::split_command;
 use crate::shell::PRIVILEGE_LIST;
 use colored::*;
+use pay_respects_utils::evals::split_command;
 
 // to_string() is necessary here, otherwise there won't be color in the output
 #[warn(clippy::unnecessary_to_owned)]

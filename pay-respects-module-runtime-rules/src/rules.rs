@@ -13,7 +13,7 @@ struct MatchError {
 }
 
 pub fn runtime_match(
-	executable: &str, 
+	executable: &str,
 	shell: &str,
 	last_command: &str,
 	error_msg: &str,
@@ -83,16 +83,11 @@ pub fn runtime_match(
 					if pure_suggest.contains("{{command}}") {
 						pure_suggest = pure_suggest.replace("{{command}}", last_command);
 					}
-					print!("{}",
-						eval_suggest(
-							&pure_suggest,
-							last_command,
-							error_msg,
-							executables,
-							shell,
-						)
+					print!(
+						"{}",
+						eval_suggest(&pure_suggest, last_command, error_msg, executables, shell,)
 					);
-					print!("{}", "<_PR_BR>");
+					print!("<_PR_BR>");
 				}
 			}
 		}
@@ -194,4 +189,3 @@ fn get_rule(executable: &str) -> Option<String> {
 
 	None
 }
-

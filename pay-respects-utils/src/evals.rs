@@ -1,5 +1,5 @@
-use regex_lite::Regex;
 use crate::files::*;
+use regex_lite::Regex;
 
 pub fn opt_regex(regex: &str, command: &mut String) -> String {
 	let regex = Regex::new(regex).unwrap();
@@ -56,9 +56,8 @@ pub fn eval_shell_command(shell: &str, command: &str) -> Vec<String> {
 }
 
 pub fn split_command(command: &str) -> Vec<String> {
-	if cfg!(debug_assertions) {
-		eprintln!("command: {command}")
-	}
+	#[cfg(debug_assertions)]
+	eprintln!("command: {command}");
 	// this regex splits the command separated by spaces, except when the space
 	// is escaped by a backslash or surrounded by quotes
 	let regex = r#"([^\s"'\\]+|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\\ )+|\\|\n"#;
@@ -152,4 +151,3 @@ pub fn compare_string(a: &str, b: &str) -> usize {
 	}
 	matrix[a.chars().count()][b.chars().count()]
 }
-

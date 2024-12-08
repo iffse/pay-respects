@@ -6,7 +6,7 @@ use colored::Colorize;
 use inquire::*;
 
 use crate::rules::match_pattern;
-use crate::shell::{shell_evaluated_commands, Data, module_output};
+use crate::shell::{module_output, shell_evaluated_commands, Data};
 use crate::style::highlight_difference;
 
 pub fn suggest_candidates(data: &mut Data) {
@@ -20,10 +20,12 @@ pub fn suggest_candidates(data: &mut Data) {
 	match_pattern("_PR_general", data);
 
 	let modules = &data.modules.clone();
+	eprintln!("modules: {modules:?}");
 	for module in modules {
 		let candidates = module_output(data, module);
-		if !candidates.is_empty() {
-			data.add_candidates(&candidates);
+		eprintln!("runtime: {candidates:?}");
+		if candidates.is_some() {
+			data.add_candidates(&candidates.unwrap());
 		}
 	}
 
