@@ -9,8 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Modular system
 - Package manager integration for `apt` (also `snap` and `pkg` by `command-not-found`), `dnf`, `emerge`, `nix`, `yum`
 - Adding aliases to executable match
+
+### Changed
+
+- Heavy project refactoring
+- `runtime-rules` and `request-ai` are now modules instead of features
 
 ## [0.5.15]
 
