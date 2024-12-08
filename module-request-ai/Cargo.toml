@@ -21,6 +21,7 @@ textwrap = { version = "0.16", features = ["terminal_size"] }
 curl = { version = "0.4", optional = true }
 
 [features]
+default = ["libcurl"]
 # linking to libcurl dynamically requires openssl when compiling and
 # complicates cross compilation
 libcurl = ["dep:curl"]

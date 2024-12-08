@@ -68,14 +68,14 @@ jobs:
       - name: build
         if: ${{ matrix.cross != true}}
         run:
-          cargo build --release --all-features --locked --target ${{ matrix.target }}
+          cargo build --release --locked --target ${{ matrix.target }}
 
       - name: build (cross)
         if: ${{ matrix.cross == true}}
         # cross 0.2.5 broken for android
         run: |
           cargo install cross --locked --git https://github.com/cross-rs/cross --rev 99b8069c0d977a14cd421ad8a3ef3255dc5802be
-          cross build --release --locked --target ${{ matrix.target }}
+          cross build --release --no-default-features --locked --target ${{ matrix.target }}
 
       - name: package deb
         if: ${{ matrix.deb == true }}
