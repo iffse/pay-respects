@@ -135,7 +135,7 @@ pub fn get_packages(
 		_ => {
 			match package_manager.ends_with("command-not-found") {
 				true => {
-					let result = command_output(shell, &format!("command-not-found {}", executable));
+					let result = command_output(shell, &format!("{} {}", package_manager, executable));
 					if result.is_empty() {
 						return None;
 					}
