@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Package manager integration for `apt`, `dnf`, `emerge`, `nix`
+- Adding aliases to executable match
 
 ## [0.5.15]
 
