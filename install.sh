@@ -18,10 +18,16 @@ main() {
 	assert_nz "${_arch}" "arch"
 	echo "Detected architecture: ${_arch}"
 
-	local _bin_name
+	local _bin_name="pay-respects"
+	local _modules="pay-respects-module-runtime-rules pay-respects-fallback-request-ai"
 	case "${_arch}" in
-	*windows*) _bin_name="pay-respects.exe" ;;
-	*) _bin_name="pay-respects" ;;
+	*windows*)
+		_bin_name="${_bin_name}.exe"
+		for _module in ${_modules}; do
+			_module="${_module}.exe"
+		done
+		;;
+	*) ;;
 	esac
 
 	# Create and enter a temporary directory.
@@ -52,6 +58,10 @@ main() {
 	ensure try_sudo mkdir -p -- "${BIN_DIR}"
 	ensure try_sudo cp -- "${_bin_name}" "${BIN_DIR}/${_bin_name}"
 	ensure try_sudo chmod +x "${BIN_DIR}/${_bin_name}"
+	for _module in ${_modules}; do
+		ensure try_sudo cp -- "${_module}" "${BIN_DIR}/${_module}"
+		ensure try_sudo chmod +x "${BIN_DIR}/${_module}"
+	done
 	echo "Installed pay-respects to ${BIN_DIR}"
 
 	# Print success message and check $PATH.
