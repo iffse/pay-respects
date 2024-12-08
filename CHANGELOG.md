@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Package manager integration for `apt`, `dnf`, `emerge`, `nix`
+- Package manager integration for `apt` (also `snap` and `pkg` by `command-not-found`), `dnf`, `emerge`, `nix`, `yum`
 - Adding aliases to executable match
 
 ## [0.5.15]
@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - MSYS2 fix by [mokurin000](https://github.com/iffse/pay-respects/pull/12)
 - Command not found mode: Run `pay-respects` automatically by shell
 	- Suggest command if a good match is found
-	- If no good match is found, search if package manager has a binary with the same name and prompt to install
+	- If no good match is found, search if package manager (`pacman` only) has a binary with the same name and prompt to install
 - Multiple suggestions
 
 ### Changed
