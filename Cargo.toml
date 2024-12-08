@@ -4,10 +4,10 @@ members = [
 	"core",
 	"parser",
 	"utils",
-	# optional modules
+# optional modules
 	"module-runtime-rules",
 	"module-request-ai",
-	]
+]
 
 [profile.release]
 strip = true
