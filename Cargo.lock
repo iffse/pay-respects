@@ -192,9 +192,9 @@ dependencies = [
 
 [[package]]
 name = "fastrand"
-version = "2.2.0"
+version = "2.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "486f806e73c5707928240ddc295403b1b93c96a02038563881c4a2fd84b81ac4"
+checksum = "37909eebbb50d72f9059c3b6d82c0463f2ff062c9e95845c43a6c9c0355411be"
 
 [[package]]
 name = "fuzzy-matcher"
@@ -468,12 +468,12 @@ dependencies = [
 
 [[package]]
 name = "pay-respects"
-version = "0.5.15"
+version = "0.6.0"
 dependencies = [
  "colored",
  "inquire",
- "pay-respects-parser",
- "pay-respects-utils",
+ "pay-respects-parser 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pay-respects-utils 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "regex-lite",
  "rust-i18n",
  "sys-locale",
@@ -496,7 +496,7 @@ dependencies = [
 name = "pay-respects-module-runtime-rules"
 version = "0.1.0"
 dependencies = [
- "pay-respects-utils",
+ "pay-respects-utils 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "regex-lite",
  "serde",
  "toml 0.8.19",
@@ -514,8 +514,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "pay-respects-parser"
+version = "0.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ba0454515360fcce0ab87f045f7736b25fc6c5d8a1785f5d8aa208486dce67a8"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "serde",
+ "syn 1.0.109",
+ "toml 0.8.19",
+]
+
+[[package]]
 name = "pay-respects-utils"
 version = "0.1.0"
+dependencies = [
+ "regex-lite",
+]
+
+[[package]]
+name = "pay-respects-utils"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e01bc5b41ef9368d5c9d928e4462943083f178146089e4eccefbd09c142170d1"
 dependencies = [
  "regex-lite",
 ]
