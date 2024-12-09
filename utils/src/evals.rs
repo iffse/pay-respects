@@ -76,6 +76,14 @@ pub fn suggest_typo(typos: &[String], candidates: Vec<String>, executables: &[St
 		if candidates.len() == 1 {
 			match candidates[0].as_str() {
 				"path" => {
+					if typo.contains(std::path::MAIN_SEPARATOR) {
+						if let Some(suggest) = best_match_file(typo) {
+							suggestions.push(suggest);
+						} else {
+							suggestions.push(typo.to_string());
+						}
+						continue;
+					}
 					if let Some(suggest) = find_similar(typo, executables, Some(2)) {
 						suggestions.push(suggest);
 					} else {
@@ -89,7 +97,9 @@ pub fn suggest_typo(typos: &[String], candidates: Vec<String>, executables: &[St
 						suggestions.push(typo.to_string());
 					}
 				}
-				_ => {}
+				_ => {
+					unreachable!("suggest_typo: must have at least two candidates")
+				}
 			}
 		} else if let Some(suggest) = find_similar(typo, &candidates, Some(2)) {
 			suggestions.push(suggest);

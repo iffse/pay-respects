@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Aliases matching to command-not-found
 - Relative path command fixes
+	- Does not work in `bash` and `zsh`: Not considered a command
 
 ### Changed
 
