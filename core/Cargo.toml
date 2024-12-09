@@ -5,7 +5,7 @@ version = "0.6.1"
 edition = "2021"
 
 # for crates.io
-description = "Terminal command suggestion, alternative to thefuck written in Rust with AI support"
+description = "Command suggestions, command-not-found and thefuck replacement written in Rust"
 homepage = "https://codeberg.org/iff/pay-respects"
 repository = "https://github.com/iffse/pay-respects"
 keywords = ["cli", "terminal", "utility", "shell"]
