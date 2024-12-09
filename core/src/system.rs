@@ -187,7 +187,13 @@ pub fn install_package(data: &mut Data, package_manager: &str, package: &str) ->
 			false => unreachable!("Unsupported package manager"),
 		},
 	};
-	elevate(data, &mut install);
+
+	// nix does not require privilege escalation
+	#[allow(clippy::single_match)]
+	match package_manager {
+		"nix" => {}
+		_ => elevate(data, &mut install),
+	}
 
 	#[cfg(debug_assertions)]
 	eprintln!("install: {}", install);
