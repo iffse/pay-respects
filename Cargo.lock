@@ -468,12 +468,12 @@ dependencies = [
 
 [[package]]
 name = "pay-respects"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "colored",
  "inquire",
  "pay-respects-parser 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "pay-respects-utils 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pay-respects-utils 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "regex-lite",
  "rust-i18n",
  "sys-locale",
@@ -496,7 +496,7 @@ dependencies = [
 name = "pay-respects-module-runtime-rules"
 version = "0.1.3"
 dependencies = [
- "pay-respects-utils 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pay-respects-utils 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "regex-lite",
  "serde",
  "toml 0.8.19",
@@ -528,16 +528,16 @@ dependencies = [
 
 [[package]]
 name = "pay-respects-utils"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "regex-lite",
 ]
 
 [[package]]
 name = "pay-respects-utils"
-version = "0.1.1"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bf4faa3caa777077a3260ad64dd6dec18d8f5d5e6c6c72c0c1b03dfd3ab4880d"
+checksum = "7ad6e7e598ddfdf6ed22d137033eb8633cda8a6f44213a06e56076c34ff944ea"
 dependencies = [
  "regex-lite",
 ]
