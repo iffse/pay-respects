@@ -22,7 +22,7 @@ regex-lite = "0.1"
 inquire = "0.7.5"
 
 pay-respects-parser = "0.3.3"
-pay-respects-utils = "0.1.0"
+pay-respects-utils = "0.1.1"
 # pay-respects-parser = { path = "../parser" }
 # pay-respects-utils = { path = "../utils"}
 
