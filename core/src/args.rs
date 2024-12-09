@@ -75,8 +75,8 @@ pay-respects fish --alias | source
 "#,
 			manual = "Nushell / PowerShell".bold(),
 			manual_examples = r#"
-pay-respects nushell [--alias <alias>]
-pay-respects pwsh [--alias <alias>]
+pay-respects nushell
+pay-respects pwsh --alias
 "#
 		)
 	);
