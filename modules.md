@@ -32,7 +32,7 @@ When running your module, you will get the following environment variables:
 - `_PR_ERROR_MSG`: Error message from the command
 - `_PR_EXECUTABLES`: A space (` `) separated list of executables in `PATH`
 
-Your module should return:
+Your module should print:
 
 - **To `stdout`**: Only suggestions.
 	- At the end of each suggestion, append `<_PR_BR>` so pay-respects knows you are either done or adding another suggestion
