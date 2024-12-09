@@ -5,6 +5,7 @@ use crate::{shell, suggestions};
 use colored::Colorize;
 use inquire::*;
 use pay_respects_utils::evals::best_match_path;
+use pay_respects_utils::files::get_best_match_file;
 
 use std::path::Path;
 
@@ -66,7 +67,13 @@ pub fn cnf(data: &mut Data) {
 		executable
 	);
 
-	let best_match = best_match_path(executable, &data.executables);
+	let best_match = {
+		if executable.contains(std::path::MAIN_SEPARATOR) {
+			get_best_match_file(executable)
+		} else {
+			best_match_path(executable, &data.executables)
+		}
+	};
 	if best_match.is_some() {
 		let best_match = best_match.unwrap();
 		split_command[0] = best_match;
@@ -149,6 +156,7 @@ pub fn cnf(data: &mut Data) {
 			if !status.success() {
 				data.update_error(None);
 				suggestion(data);
+			}
 		}
 	}
 }
