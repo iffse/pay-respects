@@ -494,7 +494,7 @@ dependencies = [
 
 [[package]]
 name = "pay-respects-module-runtime-rules"
-version = "0.1.2"
+version = "0.1.3"
 dependencies = [
  "pay-respects-utils 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "regex-lite",

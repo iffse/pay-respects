@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **BREAKING:** Executable list passed to modules is now a space ` ` instead of a comma `,`
 - Skip privilege elevation for `nix`
 
 ## [0.6.1] - 2024-12-09

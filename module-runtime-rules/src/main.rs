@@ -8,7 +8,7 @@ fn main() -> Result<(), std::io::Error> {
 	let error_msg = std::env::var("_PR_ERROR_MSG").expect("_PR_ERROR_MSG not set");
 	let executables: Vec<String> = {
 		let executables = std::env::var("_PR_EXECUTABLES").expect("_PR_EXECUTABLES not set");
-		executables.split(",").map(|s| s.to_string()).collect()
+		executables.split(" ").map(|s| s.to_string()).collect()
 	};
 
 	#[cfg(debug_assertions)]
