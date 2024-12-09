@@ -28,7 +28,7 @@ Please follow the instruction for your shell:
 > - `--alias [alias]`: Alias to a custom key, defaults to `f`
 > - `--nocnf`: Disables `command_not_found` handler
 
-> Manual aliasing (**deprecated**, do not use):
+> Manual aliasing (**DEPRECATED**, do not use):
 > ```shell
 > alias f="$(pay-respects bash)"
 > alias f="$(pay-respects zsh)"
@@ -61,7 +61,7 @@ Please follow the instruction for your shell:
 
 > Append the following to your profile:
 > ```pwsh
-> pay-respects pwsh [--alias <alias>] [--nocnf] [>> $PROFILE] # use the pipe to directly append it to your profile if you like
+> pay-respects pwsh --alias [<alias>] [--nocnf] [>> $PROFILE] # use the pipe to directly append it to your profile if you like
 > ```
 
 </details>
