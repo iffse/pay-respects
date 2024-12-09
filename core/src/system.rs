@@ -179,7 +179,7 @@ pub fn install_package(data: &mut Data, package_manager: &str, package: &str) ->
 					let split = package.split_whitespace().collect::<Vec<&str>>();
 					let command = split[1];
 					let package = split[split.len() - 1];
-					let new_command = data.command.clone().replacen(command, package, 1);
+					let new_command = data.command.clone().replacen(&data.split[0], command, 1);
 					data.update_command(&new_command);
 					format!("apt install {}", package)
 				}
