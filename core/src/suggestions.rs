@@ -10,7 +10,7 @@ use crate::shell::{add_candidates_no_dup, module_output, shell_evaluated_command
 use crate::style::highlight_difference;
 
 pub fn suggest_candidates(data: &mut Data) {
-	let executable = &data.split[0];
+	let executable = &data.split[0].rsplit(std::path::MAIN_SEPARATOR).next().unwrap();
 	let command = &data.command;
 	let privilege = &data.privilege;
 	let mut suggest_candidates = vec![];
