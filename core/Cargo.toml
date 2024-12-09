@@ -1,7 +1,7 @@
 [package]
 name = "pay-respects"
 authors = ["iff <iff@ik.me>"]
-version = "0.6.1"
+version = "0.6.2"
 edition = "2021"
 
 # for crates.io
@@ -22,7 +22,7 @@ regex-lite = "0.1"
 inquire = "0.7.5"
 
 pay-respects-parser = "0.3.3"
-pay-respects-utils = "0.1.1"
+pay-respects-utils = "0.1.2"
 # pay-respects-parser = { path = "../parser" }
 # pay-respects-utils = { path = "../utils"}
 

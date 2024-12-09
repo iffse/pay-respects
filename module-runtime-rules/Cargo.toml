@@ -16,7 +16,7 @@ regex-lite = "0.1"
 
 toml = { version = "0.8" }
 serde = { version = "1.0", features = ["derive"] }
-pay-respects-utils = "0.1.1"
+pay-respects-utils = "0.1.2"
 # pay-respects-utils = { path = "../utils" }
 
 [[bin]]
