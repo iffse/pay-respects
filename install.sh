@@ -23,9 +23,11 @@ main() {
 	case "${_arch}" in
 	*windows*)
 		_bin_name="${_bin_name}.exe"
+		local _modules_win=""
 		for _module in ${_modules}; do
-			_module="${_module}.exe"
+			_modules_win="${_modules_win} ${_module}.exe"
 		done
+		_modules="${_modules_win}"
 		;;
 	*) ;;
 	esac
