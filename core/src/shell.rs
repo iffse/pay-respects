@@ -243,7 +243,7 @@ pub fn module_output(data: &Data, module: &str) -> Option<Vec<String>> {
 	let executable = &data.split[0];
 	let last_command = &data.command;
 	let error_msg = &data.error;
-	let executables = data.executables.clone().join(",");
+	let executables = data.executables.clone().join(" ");
 	let output = std::process::Command::new(shell)
 		.arg("-c")
 		.arg(module)

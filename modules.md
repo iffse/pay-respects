@@ -30,7 +30,7 @@ When running your module, you will get the following environment variables:
 - `_PR_COMMAND`: The command, without arguments
 - `_PR_LAST_COMMAND`: Full command with arguments
 - `_PR_ERROR_MSG`: Error message from the command
-- `_PR_EXECUTABLES`: A comma (`,`) separated list of executables in `PATH`
+- `_PR_EXECUTABLES`: A space (` `) separated list of executables in `PATH`
 
 Your module should return:
 
