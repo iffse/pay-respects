@@ -312,6 +312,7 @@ pub fn run_mode() -> Mode {
 
 pub fn alias_map(shell: &str) -> Option<HashMap<String, String>> {
 	let env = std::env::var("_PR_ALIAS");
+
 	if env.is_err() {
 		return None;
 	}
@@ -392,11 +393,11 @@ pub fn initialization(init: &mut Init) {
 	match init.shell.as_str() {
 		"bash" => {
 			last_command = "$(history 2)";
-			shell_alias = "$(alias)"
+			shell_alias = "`alias`";
 		}
 		"zsh" => {
 			last_command = "$(fc -ln -1)";
-			shell_alias = "$(alias)"
+			shell_alias = "`alias`";
 		}
 		"fish" => {
 			last_command = "$(history | head -n 1)";
@@ -511,36 +512,36 @@ end
 				initialize = format!(
 					r#"
 command_not_found_handle() {{
-	eval $(_PR_LAST_COMMAND="_ $@" _PR_SHELL="{}" _PR_MODE="cnf" "{}")
+	eval $(_PR_LAST_COMMAND="_ $@" _PR_SHELL="{}" _PR_ALIAS="{}" _PR_MODE="cnf" "{}")
 }}
 
 {}
 "#,
-					shell, binary_path, initialize
+					shell, shell_alias, binary_path, initialize
 				);
 			}
 			"zsh" => {
 				initialize = format!(
 					r#"
 command_not_found_handler() {{
-	eval $(_PR_LAST_COMMAND="$@" _PR_SHELL="{}" _PR_MODE="cnf" "{}")
+	eval $(_PR_LAST_COMMAND="$@" _PR_SHELL="{}" _PR_ALIAS="{}" _PR_MODE="cnf" "{}")
 }}
 
 {}
 "#,
-					shell, binary_path, initialize
+					shell, shell_alias, binary_path, initialize
 				);
 			}
 			"fish" => {
 				initialize = format!(
 					r#"
 function fish_command_not_found --on-event fish_command_not_found
-	eval $(_PR_LAST_COMMAND="$argv" _PR_SHELL="{}" _PR_MODE="cnf" "{}")
+	eval $(_PR_LAST_COMMAND="$argv" _PR_SHELL="{}" _PR_ALIAS="{}" _PR_MODE="cnf" "{}")
 end
 
 {}
 "#,
-					shell, binary_path, initialize
+					shell, shell_alias, binary_path, initialize
 				);
 			}
 			"pwsh" => {
