@@ -44,10 +44,10 @@ pub fn get_path_files() -> Vec<String> {
 	all_executable
 }
 
-pub fn get_best_match_file(input: &str) -> Option<String> {
+pub fn best_match_file(input: &str) -> Option<String> {
 	let mut input = input.trim_matches(|c| c == '\'' || c == '"').to_owned();
 	if cfg!(debug_assertions) {
-		eprintln!("get_best_match_file input: {input}");
+		eprintln!("best_match_file input: {input}");
 	}
 	let mut exit_dirs = Vec::new();
 	let mut files = loop {

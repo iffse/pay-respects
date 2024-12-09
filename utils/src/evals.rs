@@ -83,7 +83,7 @@ pub fn suggest_typo(typos: &[String], candidates: Vec<String>, executables: &[St
 					}
 				}
 				"file" => {
-					if let Some(suggest) = get_best_match_file(typo) {
+					if let Some(suggest) = best_match_file(typo) {
 						suggestions.push(suggest);
 					} else {
 						suggestions.push(typo.to_string());

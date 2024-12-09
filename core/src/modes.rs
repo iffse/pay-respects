@@ -5,7 +5,7 @@ use crate::{shell, suggestions};
 use colored::Colorize;
 use inquire::*;
 use pay_respects_utils::evals::best_match_path;
-use pay_respects_utils::files::get_best_match_file;
+use pay_respects_utils::files::best_match_file;
 
 use std::path::Path;
 
@@ -69,7 +69,7 @@ pub fn cnf(data: &mut Data) {
 
 	let best_match = {
 		if executable.contains(std::path::MAIN_SEPARATOR) {
-			get_best_match_file(executable)
+			best_match_file(executable)
 		} else {
 			best_match_path(executable, &data.executables)
 		}
