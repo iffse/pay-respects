@@ -1,6 +1,6 @@
 use pay_respects_utils::evals::split_command;
 use pay_respects_utils::files::get_path_files;
-use std::process::exit;
+use std::process::{exit, Stdio};
 
 use std::collections::HashMap;
 use std::sync::mpsc::channel;
@@ -248,12 +248,12 @@ pub fn get_error(shell: &str, command: &str) -> String {
 		std::env::remove_var("_PR_ERROR_MSG");
 		error_msg
 	} else {
-		command_output_threaded(shell, command)
+		error_output_threaded(shell, command)
 	};
 	error.split_whitespace().collect::<Vec<&str>>().join(" ")
 }
 
-pub fn command_output_threaded(shell: &str, command: &str) -> String {
+pub fn error_output_threaded(shell: &str, command: &str) -> String {
 	let (sender, receiver) = channel();
 
 	let _shell = shell.to_owned();
@@ -289,12 +289,13 @@ pub fn command_output(shell: &str, command: &str) -> String {
 		.arg("-c")
 		.arg(command)
 		.env("LC_ALL", "C")
+		.stderr(Stdio::inherit())
 		.output()
 		.expect("failed to execute process");
 
 	match output.stdout.is_empty() {
-		false => String::from_utf8_lossy(&output.stdout).to_lowercase(),
-		true => String::from_utf8_lossy(&output.stderr).to_lowercase(),
+		false => String::from_utf8_lossy(&output.stdout).to_string(),
+		true => String::from_utf8_lossy(&output.stderr).to_string(),
 	}
 }
 
@@ -312,13 +313,9 @@ pub fn module_output(data: &Data, module: &str) -> Option<Vec<String>> {
 		.env("_PR_LAST_COMMAND", last_command)
 		.env("_PR_ERROR_MSG", error_msg)
 		.env("_PR_EXECUTABLES", executables)
-		.stderr(std::process::Stdio::inherit())
+		.stderr(Stdio::inherit())
 		.output()
 		.expect("failed to execute process");
-
-	if !output.stderr.is_empty() {
-		eprintln!("{}", String::from_utf8_lossy(&output.stderr));
-	}
 
 	if output.stdout.is_empty() {
 		return None;
