@@ -87,4 +87,8 @@ fn print_version() {
 		"version: {}",
 		option_env!("CARGO_PKG_VERSION").unwrap_or("unknown")
 	);
+	let lib = option_env!("_PR_LIB").map(|dir| dir.to_string());
+	if lib.is_some() {
+		println!("lib: {}", lib.unwrap());
+	}
 }

@@ -9,8 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Compile-time and runtime environment variable `_PR_LIB` specifying `lib` directories for storing modules, separated by `:`
-	- When not provided, it will search in `PATH`
+- FHS 3.0 compliance: Compile-time and runtime environment variable `_PR_LIB` specifying `lib` directories for storing modules, separated by `:`
+	- Search in `PATH` if not provided
 
 ## [0.6.2] - 2024-12-10
 
