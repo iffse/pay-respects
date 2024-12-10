@@ -33,3 +33,5 @@ assets = [
 	["target/release/_pay-respects-fallback-100-request-ai", "usr/bin/", "755"],
 	["LICENSE", "usr/share/doc/pay-respects/", "644"],
 ]
+priority = "optional"
+section = "utils"
