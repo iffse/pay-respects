@@ -31,4 +31,5 @@ assets = [
 	["target/release/pay-respects", "usr/bin/", "755"],
 	["target/release/_pay-respects-module-100-runtime-rules", "usr/bin/", "755"],
 	["target/release/_pay-respects-fallback-100-request-ai", "usr/bin/", "755"],
+	["LICENSE", "usr/share/doc/pay-respects/", "644"],
 ]
