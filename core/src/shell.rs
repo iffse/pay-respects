@@ -312,6 +312,7 @@ pub fn module_output(data: &Data, module: &str) -> Option<Vec<String>> {
 		.env("_PR_LAST_COMMAND", last_command)
 		.env("_PR_ERROR_MSG", error_msg)
 		.env("_PR_EXECUTABLES", executables)
+		.stderr(std::process::Stdio::inherit())
 		.output()
 		.expect("failed to execute process");
 

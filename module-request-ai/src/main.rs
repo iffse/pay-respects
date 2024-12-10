@@ -1,6 +1,6 @@
 use crate::requests::ai_suggestion;
 use colored::Colorize;
-use textwrap::{fill, termwidth};
+use textwrap::fill;
 mod requests;
 
 #[macro_use]
@@ -28,9 +28,19 @@ fn main() -> Result<(), std::io::Error> {
 		let warn = format!("{}:", t!("ai-suggestion")).bold().blue();
 		let note = fill(&suggest.note, termwidth());
 
-		eprintln!("{}\n{}", warn, note);
+		eprintln!("{}\n{}\n", warn, note);
 		let command = suggest.command;
 		print!("{}<_PR_BR>", command);
 	}
 	Ok(())
+}
+
+fn termwidth() -> usize {
+	use terminal_size::{terminal_size, Height, Width};
+	let size = terminal_size();
+	if let Some((Width(w), Height(_))) = size {
+		std::cmp::min(w as usize, 80)
+	} else {
+		80
+	}
 }

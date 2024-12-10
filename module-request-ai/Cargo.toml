@@ -15,7 +15,8 @@ sys-locale = "0.3"
 rust-i18n = "3"
 serde_json = { version = "1.0" }
 serde = { version = "1.0", features = ["derive"]}
-textwrap = { version = "0.16", features = ["terminal_size"] }
+textwrap = "0.16"
+terminal_size = "0.4"
 
 
 curl = { version = "0.4", optional = true }
