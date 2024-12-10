@@ -81,6 +81,7 @@ jobs:
         if: ${{ matrix.deb == true }}
         run: |
           cargo install cargo-deb --locked
+          cp LICENSE target/${{ matrix.target }}/release
           cargo deb -p pay-respects --no-build --no-strip --output . --target ${{ matrix.target }}
 
       - name: zipping files (unix)

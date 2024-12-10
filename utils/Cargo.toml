@@ -7,7 +7,7 @@ edition = "2021"
 description = "Utilities for the pay-respects CLI tool"
 homepage = "https://codeberg.org/iff/pay-respects"
 repository = "https://github.com/iffse/pay-respects"
-license = "AGPL-3.0"
+license = "AGPL-3.0-or-later"
 include = ["**/*.rs"]
 
 [dependencies]

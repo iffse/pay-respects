@@ -6,7 +6,7 @@ edition = "2021"
 # for crates.io
 description = "Compile time rule parser for the pay-respects CLI tool"
 repository = "https://github.com/iffse/pay-respects"
-license = "AGPL-3.0"
+license = "AGPL-3.0-or-later"
 include = [
 	"**/*.rs",
 	"**/*.toml",
