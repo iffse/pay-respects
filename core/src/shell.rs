@@ -54,34 +54,94 @@ impl Data {
 		let command = last_command(&shell).trim().to_string();
 		let alias = alias_map(&shell);
 		let mode = run_mode();
-		let (executables, modules, fallbacks) = {
-			let path_executables = get_path_files();
-			let mut executables = vec![];
-			let mut modules = vec![];
-			let mut fallbacks = vec![];
-			for exe in path_executables {
-				if exe.starts_with("_pay-respects-module-") {
-					modules.push(exe.to_string());
-				} else if exe.starts_with("_pay-respects-fallback-") {
-					fallbacks.push(exe.to_string());
-				} else {
-					executables.push(exe.to_string());
-				}
+		let (executables, modules, fallbacks);
+		let lib_dir = {
+			if let Ok(lib_dir) = std::env::var("_PR_LIB") {
+				Some(lib_dir)
+			} else {
+				option_env!("_PR_LIB").map(|dir| dir.to_string())
 			}
-			modules.sort_unstable();
-			fallbacks.sort_unstable();
-			if alias.is_some() {
-				let alias = alias.as_ref().unwrap();
-				for command in alias.keys() {
-					if executables.contains(command) {
-						continue;
-					}
-					executables.push(command.to_string());
-				}
-			}
-
-			(executables, modules, fallbacks)
 		};
+
+		#[cfg(debug_assertions)]
+		eprintln!("lib_dir: {:?}", lib_dir);
+
+		if lib_dir.is_none() {
+			(executables, modules, fallbacks) = {
+				let path_executables = get_path_files();
+				let mut executables = vec![];
+				let mut modules = vec![];
+				let mut fallbacks = vec![];
+				for exe in path_executables {
+					if exe.starts_with("_pay-respects-module-") {
+						modules.push(exe.to_string());
+					} else if exe.starts_with("_pay-respects-fallback-") {
+						fallbacks.push(exe.to_string());
+					} else {
+						executables.push(exe.to_string());
+					}
+				}
+				modules.sort_unstable();
+				fallbacks.sort_unstable();
+				if alias.is_some() {
+					let alias = alias.as_ref().unwrap();
+					for command in alias.keys() {
+						if executables.contains(command) {
+							continue;
+						}
+						executables.push(command.to_string());
+					}
+				}
+
+				(executables, modules, fallbacks)
+			};
+		} else {
+			(executables, modules, fallbacks) = {
+				let mut modules = vec![];
+				let mut fallbacks = vec![];
+				let lib_dir = lib_dir.unwrap();
+				let mut executables = get_path_files();
+				if alias.is_some() {
+					let alias = alias.as_ref().unwrap();
+					for command in alias.keys() {
+						if executables.contains(command) {
+							continue;
+						}
+						executables.push(command.to_string());
+					}
+				}
+
+				let path = lib_dir.split(':').collect::<Vec<&str>>();
+				for p in path {
+					let files = match std::fs::read_dir(p) {
+						Ok(files) => files,
+						Err(_) => continue,
+					};
+					for file in files {
+						let file = file.unwrap();
+						let file_name = file.file_name().into_string().unwrap();
+						let file_path = file.path();
+
+						if file_name.starts_with("_pay-respects-module-") {
+							modules.push(file_path.to_string_lossy().to_string());
+						} else if file_name.starts_with("_pay-respects-fallback-") {
+							fallbacks.push(file_path.to_string_lossy().to_string());
+						}
+					}
+				}
+
+				modules.sort_unstable();
+				fallbacks.sort_unstable();
+
+				(executables, modules, fallbacks)
+			};
+		}
+
+		#[cfg(debug_assertions)]
+		{
+			eprintln!("modules: {:?}", modules);
+			eprintln!("fallbacks: {:?}", fallbacks);
+		}
 
 		let mut init = Data {
 			shell,
