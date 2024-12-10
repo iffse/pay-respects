@@ -2,8 +2,6 @@
 resolver = "2"
 members = [
 	"core",
-	"parser",
-	"utils",
 # optional modules
 	"module-runtime-rules",
 	"module-request-ai",
