@@ -83,22 +83,24 @@ jobs:
           cargo install cargo-deb --locked
           cargo deb -p pay-respects --no-build --no-strip --output . --target ${{ matrix.target }}
 
-      - name: zipping files (exe)
-        if: runner.os == 'Windows'
-        run: >
-          7z a pay-respects-${{ steps.version.outputs.VERSION }}-${{ matrix.target }}.zip
-          ./target/${{ matrix.target }}/release/pay-respects.exe
-          ./target/${{ matrix.target }}/release/_pay-respects-module-100-runtime-rules.exe
-          ./target/${{ matrix.target }}/release/_pay-respects-fallback-100-request-ai.exe
-
       - name: zipping files (unix)
         if: runner.os != 'Windows'
         run: >
-          tar -czf pay-respects-${{ steps.version.outputs.VERSION }}-${{ matrix.target }}.tar.gz
+          tar --zstd -cf pay-respects-${{ steps.version.outputs.VERSION }}-${{ matrix.target }}.tar.zst
+          LICENSE
           -C target/${{ matrix.target }}/release
           pay-respects
           _pay-respects-module-100-runtime-rules
           _pay-respects-fallback-100-request-ai
+
+      - name: zipping files (exe)
+        if: runner.os == 'Windows'
+        run: >
+          7z a pay-respects-${{ steps.version.outputs.VERSION }}-${{ matrix.target }}.zip
+          ./LICENSE
+          ./target/${{ matrix.target }}/release/pay-respects.exe
+          ./target/${{ matrix.target }}/release/_pay-respects-module-100-runtime-rules.exe
+          ./target/${{ matrix.target }}/release/_pay-respects-fallback-100-request-ai.exe
 
       - name: uploading to release
         uses: ncipollo/release-action@v1
