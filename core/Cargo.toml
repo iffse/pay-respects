@@ -10,7 +10,7 @@ homepage = "https://codeberg.org/iff/pay-respects"
 repository = "https://github.com/iffse/pay-respects"
 keywords = ["cli", "terminal", "utility", "shell"]
 categories = ["command-line-utilities"]
-license = "AGPL-3.0"
+license = "AGPL-3.0-or-later"
 include = ["**/*.rs", "**/*.toml"]
 
 [dependencies]
@@ -31,7 +31,7 @@ assets = [
 	["target/release/pay-respects", "usr/bin/", "755"],
 	["target/release/_pay-respects-module-100-runtime-rules", "usr/bin/", "755"],
 	["target/release/_pay-respects-fallback-100-request-ai", "usr/bin/", "755"],
-	["LICENSE", "usr/share/doc/pay-respects/", "644"],
+	["target/release/LICENSE", "usr/share/doc/pay-respects/", "644"],
 ]
 priority = "optional"
 section = "utils"
