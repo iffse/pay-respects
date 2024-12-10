@@ -46,10 +46,10 @@ Expose your module as executable (`chmod u+x`) in `PATH`, and done!
 
 If exposing modules in `PATH` annoys you, you can set the `_PR_LIB` environment variable to specify directories to find the modules, separated by `:` (analogous to `PATH`). The variable can be set either runtime or compile-time.
 
-Example would be:
+Example in a [FHS 3.0 compliant system](https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch04s06.html):
 ```shell
-export _PR_LIB_DIR="/usr/lib:$HOME/.local/bin"
+export _PR_LIB_DIR="/usr/lib:$HOME/.local/lib"
 ```
-This is not the default as there is no general standard about where the `lib` directories are located and depends on distribution (`/usr/lib`, `/usr/libexec`, `/data/data/com.termux/files/usr/libexec`, etc.). Programs usually have a hard-coded path looking for `lib`. If you are a package maintainer for a distribution, setting this value when compiling, so it fits into your distribution standard.
+This is not the default as there is no general way to know its value and depends on distribution (`/usr/lib`, `/usr/libexec`, `/data/data/com.termux/files/usr/libexec`, etc.). System programs usually have a hard-coded path looking for `lib`. If you are a package maintainer for a distribution, setting this value when compiling, so it fits into your distribution standard.
 
-If you installed the module with `cargo install`, the binary will be placed in `~/.cargo/bin` which should be in the `PATH` anyway.
+If you installed the module with `cargo install`, the binary will be placed in `bin` subdirectory under Cargo's home which should be in the `PATH` anyway. Cargo has no option to place in subdirectories with other names.
