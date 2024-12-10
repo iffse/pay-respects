@@ -173,7 +173,7 @@ pub fn install_package(data: &mut Data, package_manager: &str, package: &str) ->
 		"nix" => format!("nix profile install nixpkgs#{}", package),
 		"pacman" => format!("pacman -S {}", package),
 		_ => match package_manager.ends_with("command-not-found") {
-			true => match package.starts_with("command ") {
+			true => match package.starts_with("Command ") {
 				false => package.to_string(),
 				true => {
 					let split = package.split_whitespace().collect::<Vec<&str>>();
