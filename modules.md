@@ -48,8 +48,24 @@ If exposing modules in `PATH` annoys you, you can set the `_PR_LIB` environment 
 
 Example in a [FHS 3.0 compliant system](https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch04s06.html):
 ```shell
-export _PR_LIB_DIR="/usr/lib:$HOME/.local/lib"
+export _PR_LIB="/usr/lib:$HOME/.local/lib"
 ```
 This is not the default as there is no general way to know its value and depends on distribution (`/usr/lib`, `/usr/libexec`, `/data/data/com.termux/files/usr/libexec`, etc.). System programs usually have a hard-coded path looking for `lib`. If you are a package maintainer for a distribution, setting this value when compiling, so it fits into your distribution standard.
 
 If you installed the module with `cargo install`, the binary will be placed in `bin` subdirectory under Cargo's home which should be in the `PATH` anyway. Cargo has no option to place in subdirectories with other names.
+
+The following snippet is what I used to package for Arch Linux package, adding a `_PR_LIB` declaration along with initialization. The script is `/usr/bin/pay-respects` and the actual executable is located somewhere else.
+```sh
+#!/bin/sh
+if [ "$#" -gt 1 ]; then
+	SHELL=$(basename $SHELL)
+	if [ "$SHELL" = "fish" ]; then
+		echo "set -x _PR_LIB /usr/lib/pay-respects:$HOME/.local/lib/pay-respects"
+	elif [ "$SHELL" = "nu" ]; then
+		echo "env:_PR_LIB=/usr/lib/pay-respects:$HOME/.local/lib/pay-respects"
+	else
+		echo "_PR_LIB=/usr/lib/pay-respects:$HOME/.local/lib/pay-respects"
+	fi
+fi
+/opt/pay-respects/bin/pay-respects "$@"
+```
