@@ -43,7 +43,7 @@ main() {
 	assert_nz "${_package}" "package"
 	echo "Downloaded package: ${_package}"
 	case "${_package}" in
-	*.tar.gz)
+	*.tar.zst)
 		need_cmd tar
 		ensure tar -xf "${_package}"
 		;;
@@ -154,7 +154,7 @@ download_pay_respects() {
 
 	local _ext
 	case "${_package_url}" in
-	*.tar.gz) _ext="tar.gz" ;;
+	*.tar.zst) _ext="tar.zst" ;;
 	*.zip) _ext="zip" ;;
 	*) err "unsupported package format: ${_package_url}" ;;
 	esac
