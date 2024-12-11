@@ -54,18 +54,21 @@ This is not the default as there is no general way to know its value and depends
 
 If you installed the module with `cargo install`, the binary will be placed in `bin` subdirectory under Cargo's home which should be in the `PATH` anyway. Cargo has no option to place in subdirectories with other names.
 
-The following snippet is what I used to package for Arch Linux package, adding a `_PR_LIB` declaration along with initialization. The script is `/usr/bin/pay-respects` and the actual executable is located somewhere else.
+The following snippet is what I have included into Arch Linux package's with workflows binaries, adding a `_PR_LIB` declaration along with initialization. The script is `/usr/bin/pay-respects` and the actual executable is located somewhere else.
 ```sh
-#!/bin/sh
+``#!/bin/sh
 if [ "$#" -gt 1 ]; then
-	SHELL=$(basename $SHELL)
-	if [ "$SHELL" = "fish" ]; then
-		echo "set -x _PR_LIB /usr/lib/pay-respects:$HOME/.local/lib/pay-respects"
-	elif [ "$SHELL" = "nu" ]; then
-		echo "env:_PR_LIB=/usr/lib/pay-respects:$HOME/.local/lib/pay-respects"
-	else
-		echo "_PR_LIB=/usr/lib/pay-respects:$HOME/.local/lib/pay-respects"
+	if [ -z "$_PR_LIB" ]; then
+		SHELL=$(basename $SHELL)
+		LIB="/usr/lib/pay-respects"
+		if [ "$SHELL" = "nu" ]; then
+			echo "env:_PR_LIB=$LIB"
+		elif [[ "$SHELL" = "pwsh" ]]; then
+			echo "\$env:_PR_LIB=\"$LIB\""
+		else
+			echo "export _PR_LIB=$LIB"
+		fi
 	fi
 fi
 /opt/pay-respects/bin/pay-respects "$@"
-```
+`
