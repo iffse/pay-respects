@@ -5,6 +5,10 @@ use std::process::Command;
 use std::process::Stdio;
 
 pub fn get_package_manager(data: &mut Data) -> Option<String> {
+	if let Ok(package_manager) = std::env::var("_PR_PACKAGE_MANAGER") {
+		return Some(package_manager);
+	}
+
 	let package_managers = vec![
 		"apt", "dnf", "emerge", "nix", "pacman", "yum",
 		// "zypper",
