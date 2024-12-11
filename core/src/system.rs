@@ -6,6 +6,9 @@ use std::process::Stdio;
 
 pub fn get_package_manager(data: &mut Data) -> Option<String> {
 	if let Ok(package_manager) = std::env::var("_PR_PACKAGE_MANAGER") {
+		if package_manager.is_empty() {
+			return None;
+		}
 		return Some(package_manager);
 	}
 
@@ -32,8 +35,8 @@ pub fn get_packages(
 		"apt" => {
 			if !data.executables.contains(&"apt-file".to_string()) {
 				eprintln!(
-					"{}: apt-file is required to find packages",
-					"pay-respects".yellow()
+					"{} apt-file is required to find packages",
+					"pay-respects:".yellow()
 				);
 				return None;
 			}
@@ -76,8 +79,8 @@ pub fn get_packages(
 		"emerge" => {
 			if !data.executables.contains(&"e-file".to_string()) {
 				eprintln!(
-					"{}: pfl is required to find packages",
-					"pay-respects".yellow()
+					"{} pfl is required to find packages",
+					"pay-respects:".yellow()
 				);
 				return None;
 			}
@@ -100,8 +103,8 @@ pub fn get_packages(
 		"nix" => {
 			if !data.executables.contains(&"nix-locate".to_string()) {
 				eprintln!(
-					"{}: nix-index is required to find packages",
-					"pay-respects".yellow()
+					"{} nix-index is required to find packages",
+					"pay-respects:".yellow()
 				);
 				return None;
 			}
@@ -162,7 +165,10 @@ pub fn get_packages(
 				}
 				None
 			}
-			false => unreachable!("Unsupported package manager"),
+			false => {
+				eprintln!("{} Unsupported package manager", ":pay-respects".yellow());
+				return None;
+			},
 		},
 	}
 }
