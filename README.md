@@ -83,6 +83,14 @@ Please follow the instruction for your shell:
 
 </details>
 
+<details>
+	<summary>Environment variable configurations</summary>
+
+> - `_PR_LIB`: Directory of modules, analogous to `PATH`. If not provided, search in `PATH` or compile-time provided value.
+> - `_PR_PACKAGE_MANAGER`: Use defined package manager instead of auto-detecting alphabetically
+
+</details>
+
 You can now **press `F` to Pay Respects**!
 
 ## Installing
