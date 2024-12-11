@@ -42,12 +42,12 @@ Please follow the instruction for your shell:
 
 > Add the following output to your configuration file:
 > ```shell
-> pay-respects nushell [--alias <alias>]
+> pay-respects nushell --alias [<alias>]
 > ```
 
 > Or save it as a file:
 > ```shell
-> pay-respects nushell [--alias <alias>] | save -f ~/.pay-respects.nu
+> pay-respects nushell --alias [<alias>] | save -f ~/.pay-respects.nu
 > ```
 > and source from your config file:
 > ```shell
