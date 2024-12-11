@@ -1,69 +1,71 @@
 {
-	inputs = {
-		nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-	};
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+  };
 
-	outputs = { self, nixpkgs }:
-		let
-			inherit (nixpkgs.lib)
-			genAttrs
-			importTOML
-			licenses
-			maintainers
-			sourceByRegex
-			;
+  outputs =
+    { self, nixpkgs }:
+    let
+      inherit (nixpkgs.lib)
+        genAttrs
+        importTOML
+        licenses
+        maintainers
+        sourceByRegex
+        ;
 
-			eachSystem = f: genAttrs
-				[
-					"aarch64-darwin"
-					"aarch64-linux"
-					"x86_64-darwin"
-					"x86_64-linux"
-				]
-				(system: f nixpkgs.legacyPackages.${system});
-		in
-			{
-			formatter = eachSystem (pkgs: pkgs.nixpkgs-fmt);
+      eachSystem =
+        f:
+        genAttrs [
+          "aarch64-darwin"
+          "aarch64-linux"
+          "x86_64-darwin"
+          "x86_64-linux"
+        ] (system: f nixpkgs.legacyPackages.${system});
+    in
+    {
+      formatter = eachSystem (pkgs: pkgs.nixfmt-rfc-style);
 
-			packages = eachSystem (pkgs:
-				let
-					src = sourceByRegex self [
-						"(core)(/.*)?"
-						"(module-runtime-rules)(/.*)?"
-						"(module-request-ai)(/.*)?"
-						"(rules)(/.*)?"
-						''Cargo\.(toml|lock)''
-					];
+      packages = eachSystem (
+        pkgs:
+        let
+          src = sourceByRegex self [
+            "(core)(/.*)?"
+            "(module-runtime-rules)(/.*)?"
+            "(module-request-ai)(/.*)?"
+            "(rules)(/.*)?"
+            ''Cargo\.(toml|lock)''
+          ];
 
-					inherit (pkgs)
-					rustPlatform
-					openssl
-					pkg-config
-					;
-				in
-					{
-					default = 
-						rustPlatform.buildRustPackage {
-							pname = "pay-respects";
-							inherit ((importTOML (src + "/core/Cargo.toml")).package) version;
+          inherit (pkgs)
+            rustPlatform
+            openssl
+            pkg-config
+            ;
+        in
+        {
+          default = rustPlatform.buildRustPackage {
+            pname = "pay-respects";
+            inherit ((importTOML (src + "/core/Cargo.toml")).package) version;
 
-							inherit src;
+            inherit src;
 
-							cargoLock = {
-								lockFile = src + "/Cargo.lock";
-							};
+            cargoLock = {
+              lockFile = src + "/Cargo.lock";
+            };
 
-							nativeBuildInputs = [ pkg-config ];
-							buildInputs = [ openssl ];
+            nativeBuildInputs = [ pkg-config ];
+            buildInputs = [ openssl ];
 
-							meta = {
-								description = "Command suggestions, command-not-found and thefuck replacement written in Rust";
-								license = licenses.agpl3Plus;
-								homepage = "https://github.com/iffse/pay-respects";
-								maintainers = with maintainers; [ iff ];
-								mainProgram = "pay-respects";
-							};
-						};
-				});
-		};
+            meta = {
+              description = "Command suggestions, command-not-found and thefuck replacement written in Rust";
+              license = licenses.agpl3Plus;
+              homepage = "https://github.com/iffse/pay-respects";
+              maintainers = with maintainers; [ iff ];
+              mainProgram = "pay-respects";
+            };
+          };
+        }
+      );
+    };
 }
