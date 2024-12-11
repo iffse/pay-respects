@@ -127,7 +127,7 @@ pub fn cnf(data: &mut Data) {
 		let packages = match system::get_packages(data, &package_manager, executable) {
 			Some(packages) => packages,
 			None => {
-				eprintln!("{}: {}", "pay-respects".red(), t!("package-not-found"));
+				eprintln!("{} {}", "pay-respects:".red(), t!("package-not-found"));
 				return;
 			}
 		};
