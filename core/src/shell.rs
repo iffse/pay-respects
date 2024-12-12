@@ -59,7 +59,7 @@ impl Data {
 			if let Ok(lib_dir) = std::env::var("_PR_LIB") {
 				Some(lib_dir)
 			} else {
-				option_env!("_PR_LIB").map(|dir| dir.to_string())
+				option_env!("_DEF_PR_LIB").map(|dir| dir.to_string())
 			}
 		};
 
