@@ -24,7 +24,7 @@ struct Messages {
 
 #[derive(Serialize, Deserialize)]
 pub struct AISuggest {
-	pub command: String,
+	pub commands: Vec<String>,
 	pub note: String,
 }
 
@@ -52,7 +52,7 @@ pub fn ai_suggestion(last_command: &str, error_msg: &str) -> Option<AISuggest> {
 
 	let user_locale = {
 		let locale = std::env::var("_PR_AI_LOCALE")
-			.unwrap_or_else(|_| get_locale().unwrap_or("en".to_string()));
+			.unwrap_or_else(|_| get_locale().unwrap_or("en-us".to_string()));
 		if locale.len() < 2 {
 			"en-US".to_string()
 		} else {
