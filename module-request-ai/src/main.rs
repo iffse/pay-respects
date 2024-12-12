@@ -29,8 +29,10 @@ fn main() -> Result<(), std::io::Error> {
 		let note = fill(&suggest.note, termwidth());
 
 		eprintln!("{}\n{}\n", warn, note);
-		let command = suggest.command;
-		print!("{}<_PR_BR>", command);
+		let suggestions = suggest.commands;
+		for suggestion in suggestions {
+			print!("{}<_PR_BR>", suggestion);
+		}
 	}
 	Ok(())
 }
