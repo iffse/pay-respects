@@ -7,10 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.4] 2024-12-12
+
 ### Added
 
 - Flakes install in `nix`
 - Override package manager using `_PR_PACKAGE_MANAGER`
+- AI module:
+	- Allow multiple suggestions
+	- More default values
+- Compile-time `_PR_LIB` changed to `_DEF_PR_LIB` to be explicit
 
 ## [0.6.3] 2024-12-11
 
