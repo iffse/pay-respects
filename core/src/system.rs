@@ -167,7 +167,7 @@ pub fn get_packages(
 			}
 			false => {
 				eprintln!("{} Unsupported package manager", ":pay-respects".yellow());
-				return None;
+				None
 			}
 		},
 	}

@@ -16,6 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - AI module:
 	- Allow multiple suggestions
 	- More default values
+
+### Changed
+
 - Compile-time `_PR_LIB` changed to `_DEF_PR_LIB` to be explicit
 
 ## [0.6.3] 2024-12-11
