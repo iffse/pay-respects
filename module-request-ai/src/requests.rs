@@ -153,7 +153,7 @@ The command `{last_command}` returns the following error message: `{error_msg}`.
 		if let Ok(json) = json {
 			json
 		} else {
-			eprintln!("Failed to parse JSON response: {}", res);
+			eprintln!("AI module: Failed to parse JSON response: {}", res);
 			return None;
 		}
 	};
@@ -164,12 +164,13 @@ The command `{last_command}` returns the following error message: `{error_msg}`.
 		let str = {
 			let str = content.as_str();
 			str?;
-			str.expect("Failed to get content from response")
+			str.expect("AI module: Failed to get content from response")
 				.trim_start_matches("```")
 				.trim_end_matches("```")
 		};
 		let json = serde_json::from_str(str);
 		if json.is_err() {
+			eprintln!("AI module: Failed to parse JSON content: {}", str);
 			return None;
 		}
 		json.unwrap()
