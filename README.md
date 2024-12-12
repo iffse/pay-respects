@@ -208,9 +208,9 @@ An API key is included with the source. It should always work unless I can no lo
 > - `_DEF_PR_AI_URL`
 > - `_DEF_PR_AI_MODEL`
 >
->  If the default values were not provided, pay-respects' own values will be used. Your request will be filtered to avoid abuse usages. Request will then be forwarded to a LLM provider that will not use your data for training.
->
-> </details>
+>  If default values were not provided, pay-respects' own values will be used. Your request will be filtered to avoid abuse usages. Request will then be forwarded to a LLM provider that will not use your data for training.
+
+</details>
 
 ## Contributing
 
