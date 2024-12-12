@@ -4,6 +4,12 @@ use sys_locale::get_locale;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+struct Conf {
+	key: String,
+	url: String,
+	model: String,
+}
+
 #[derive(Serialize, Deserialize)]
 struct Input {
 	role: String,
@@ -27,6 +33,13 @@ pub fn ai_suggestion(last_command: &str, error_msg: &str) -> Option<AISuggest> {
 		return None;
 	}
 
+	let conf = match Conf::new() {
+		Some(conf) => conf,
+		None => {
+			return None;
+		}
+	};
+
 	let error_msg = if error_msg.len() > 300 {
 		&error_msg[..300]
 	} else {
@@ -36,53 +49,6 @@ pub fn ai_suggestion(last_command: &str, error_msg: &str) -> Option<AISuggest> {
 	let mut map = HashMap::new();
 	map.insert("last_command", last_command);
 	map.insert("error_msg", error_msg);
-
-	let api_key = match std::env::var("_PR_AI_API_KEY") {
-		Ok(key) => Some(key),
-		Err(_) => {
-			let env_key = option_env!("_DEF_PR_AI_API_KEY").map(|key| key.to_string());
-			if env_key.is_none() {
-				Some("Y29uZ3JhdHVsYXRpb25zLCB5b3UgZm91bmQgdGhlIHNlY3JldCE=".to_string())
-			} else if env_key.as_ref().unwrap().is_empty() {
-				None
-			} else {
-				env_key
-			}
-		}
-	};
-
-	let api_key = match api_key {
-		Some(key) => {
-			if key.is_empty() {
-				return None;
-			}
-			key
-		}
-		None => {
-			return None;
-		}
-	};
-
-	let request_url = match std::env::var("_PR_AI_URL") {
-		Ok(url) => url,
-		Err(_) => {
-			if let Some(url) = option_env!("_DEF_PR_AI_URL") {
-				url.to_string()
-			} else {
-				"https://iff.envs.net/completions.py".to_string()
-			}
-		}
-	};
-	let model = match std::env::var("_PR_AI_MODEL") {
-		Ok(model) => model,
-		Err(_) => {
-			if let Some(model) = option_env!("_DEF_PR_AI_MODEL") {
-				model.to_string()
-			} else {
-				"llama3-8b-8192".to_string()
-			}
-		}
-	};
 
 	let user_locale = {
 		let locale = std::env::var("_PR_AI_LOCALE")
@@ -102,9 +68,9 @@ pub fn ai_suggestion(last_command: &str, error_msg: &str) -> Option<AISuggest> {
 
 	let ai_prompt = format!(
 		r#"
-The command `{last_command}` returns the following error message: `{error_msg}`. Provide a command to fix it. Answer in the following JSON format without any extra text:
+The command `{last_command}` returns the following error message: `{error_msg}`. Provide possible commands to fix it. Answer in the following excact JSON template without any extra text:
 ```
-{{"command":"suggestion","note":"why it may fix the error{set_locale}"}}
+{{"commands":["command 1", "command 2"],"note":"why they may fix the error{set_locale}"}}
 ```
 "#
 	);
@@ -115,7 +81,7 @@ The command `{last_command}` returns the following error message: `{error_msg}`.
 			role: "user".to_string(),
 			content: ai_prompt.to_string(),
 		}],
-		model,
+		model: conf.model,
 	};
 
 	#[cfg(feature = "libcurl")]
@@ -130,13 +96,13 @@ The command `{last_command}` returns the following error message: `{error_msg}`.
 		let mut dst = Vec::new();
 		let mut handle = Curl::new();
 
-		handle.url(&request_url).unwrap();
+		handle.url(&conf.url).unwrap();
 		handle.post(true).unwrap();
 		handle.post_field_size(data.len() as u64).unwrap();
 
 		let mut headers = List::new();
 		headers
-			.append(&format!("Authorization: Bearer {}", api_key))
+			.append(&format!("Authorization: Bearer {}", conf.key))
 			.unwrap();
 		headers.append("Content-Type: application/json").unwrap();
 		handle.http_headers(headers).unwrap();
@@ -166,12 +132,12 @@ The command `{last_command}` returns the following error message: `{error_msg}`.
 			.arg("-X")
 			.arg("POST")
 			.arg("-H")
-			.arg(format!("Authorization: Bearer {}", api_key))
+			.arg(format!("Authorization: Bearer {}", conf.key))
 			.arg("-H")
 			.arg("Content-Type: application/json")
 			.arg("-d")
 			.arg(serde_json::to_string(&messages).unwrap())
-			.arg(request_url)
+			.arg(conf.url)
 			.output();
 
 		let out = match proc {
@@ -209,4 +175,52 @@ The command `{last_command}` returns the following error message: `{error_msg}`.
 		json.unwrap()
 	};
 	Some(suggestion)
+}
+
+impl Conf {
+	pub fn new() -> Option<Self> {
+		let key = match std::env::var("_PR_AI_API_KEY") {
+			Ok(key) => key,
+			Err(_) => {
+				if let Some(key) = option_env!("_DEF_PR_AI_API_KEY") {
+					key.to_string()
+				} else {
+					"Y29uZ3JhdHVsYXRpb25zLCB5b3UgZm91bmQgdGhlIHNlY3JldCE=".to_string()
+				}
+			}
+		};
+		if key.is_empty() {
+			return None;
+		}
+
+		let url = match std::env::var("_PR_AI_URL") {
+			Ok(url) => url,
+			Err(_) => {
+				if let Some(url) = option_env!("_DEF_PR_AI_URL") {
+					url.to_string()
+				} else {
+					"https://iff.envs.net/completions.py".to_string()
+				}
+			}
+		};
+		if url.is_empty() {
+			return None;
+		}
+
+		let model = match std::env::var("_PR_AI_MODEL") {
+			Ok(model) => model,
+			Err(_) => {
+				if let Some(model) = option_env!("_DEF_PR_AI_MODEL") {
+					model.to_string()
+				} else {
+					"llama3-8b-8192".to_string()
+				}
+			}
+		};
+		if model.is_empty() {
+			return None;
+		}
+
+		Some(Conf { key, url, model })
+	}
 }
