@@ -65,11 +65,23 @@ pub fn ai_suggestion(last_command: &str, error_msg: &str) -> Option<AISuggest> {
 
 	let request_url = match std::env::var("_PR_AI_URL") {
 		Ok(url) => url,
-		Err(_) => "https://iff.envs.net/completions.py".to_string(),
+		Err(_) => {
+			if let Some(url) = option_env!("_DEF_PR_AI_URL") {
+				url.to_string()
+			} else {
+				"https://iff.envs.net/completions.py".to_string()
+			}
+		}
 	};
 	let model = match std::env::var("_PR_AI_MODEL") {
 		Ok(model) => model,
-		Err(_) => "llama3-8b-8192".to_string(),
+		Err(_) => {
+			if let Some(model) = option_env!("_DEF_PR_AI_MODEL") {
+				model.to_string()
+			} else {
+				"llama3-8b-8192".to_string()
+			}
+		}
 	};
 
 	let user_locale = {
