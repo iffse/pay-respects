@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- AI module: Show raw body on parse failure (sometime the AI forgets a bracket)
+
+### Fixed
+
+- Not getting `stderr` from command-not-found
+
 ## [0.6.4] 2024-12-12
 
 ### Added
