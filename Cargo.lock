@@ -445,7 +445,7 @@ dependencies = [
 
 [[package]]
 name = "pay-respects"
-version = "0.6.4"
+version = "0.6.5"
 dependencies = [
  "colored",
  "inquire",
@@ -458,7 +458,7 @@ dependencies = [
 
 [[package]]
 name = "pay-respects-module-request-ai"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "colored",
  "curl",
