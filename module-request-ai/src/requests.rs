@@ -68,7 +68,7 @@ pub fn ai_suggestion(last_command: &str, error_msg: &str) -> Option<AISuggest> {
 
 	let ai_prompt = format!(
 		r#"
-The command `{last_command}` returns the following error message: `{error_msg}`. Provide possible commands to fix it. Answer in the following excact JSON template without any extra text:
+The command `{last_command}` returns the following error message: `{error_msg}`. Provide possible commands to fix it. Answer in the following exact JSON template without any extra text:
 ```
 {{"commands":["command 1", "command 2"],"note":"why they may fix the error{set_locale}"}}
 ```
