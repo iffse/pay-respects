@@ -289,7 +289,6 @@ pub fn command_output(shell: &str, command: &str) -> String {
 		.arg("-c")
 		.arg(command)
 		.env("LC_ALL", "C")
-		.stderr(Stdio::inherit())
 		.output()
 		.expect("failed to execute process");
 
