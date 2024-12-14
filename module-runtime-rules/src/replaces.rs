@@ -162,11 +162,11 @@ pub fn typo(suggest: &mut String, split_command: &[String], executables: &[Strin
 			let function = &function[args.to_owned()].trim_matches(|c| c == '(' || c == ')');
 			suggest_typo(
 				&split_command[index],
-				eval_shell_command(shell, function),
+				&eval_shell_command(shell, function),
 				executables,
 			)
 		} else {
-			suggest_typo(&split_command[index], match_list, executables)
+			suggest_typo(&split_command[index], &match_list, executables)
 		};
 
 		suggest.replace_range(placeholder, &command);
