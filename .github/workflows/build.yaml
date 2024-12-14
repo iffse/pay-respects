@@ -4,10 +4,13 @@ on:
   push:
     tags:
       - v*
+
 permissions:
   contents: write
+
 env:
   CARGO_INCREMENTAL: 0
+
 jobs:
   build:
     name: ${{ matrix.target }}
