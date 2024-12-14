@@ -208,14 +208,14 @@ pub fn typo(suggest: &mut String, replace_list: &mut Vec<TokenStream2>) {
 				"\")"
 			);
 			format!(
-				"suggest_typo(&split[{}], {}, executables)",
+				"suggest_typo(&split[{}], &{}, executables)",
 				string_index, function
 			)
 		} else {
 			let string_match_list = match_list.join("\".to_string(), \"");
 			let string_match_list = format!("\"{}\".to_string()", string_match_list);
 			format!(
-				"suggest_typo(&split[{}], vec![{}], executables)",
+				"suggest_typo(&split[{}], &[{}], executables)",
 				string_index, string_match_list
 			)
 		};
@@ -243,8 +243,8 @@ pub fn shell_tag(suggest: &mut String, replace_list: &mut Vec<TokenStream2>, cmd
 	let tag_name = "shell";
 
 	for command in cmd_list {
-		if suggest.contains(&command) {
-			*suggest = suggest.replace(&command, &tag(tag_name, replace_tag));
+		if suggest.contains(command) {
+			*suggest = suggest.replace(command, &tag(tag_name, replace_tag));
 
 			let split = command.split_once(',').unwrap();
 			let argument = split.1.trim_end_matches(')').trim();
