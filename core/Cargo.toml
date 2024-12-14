@@ -21,10 +21,10 @@ regex-lite = "0.1"
 
 inquire = "0.7.5"
 
-pay-respects-parser = "0.3.3"
-pay-respects-utils = "0.1.2"
-# pay-respects-parser = { path = "../parser" }
-# pay-respects-utils = { path = "../utils"}
+# pay-respects-parser = "0.3.3"
+# pay-respects-utils = "0.1.2"
+pay-respects-parser = { version = "0.3.3", path = "../parser" }
+pay-respects-utils = { version ="0.1.2", path = "../utils"}
 
 [package.metadata.deb]
 assets = [
