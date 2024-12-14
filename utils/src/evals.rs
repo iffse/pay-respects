@@ -101,7 +101,7 @@ pub fn suggest_typo(typos: &[String], candidates: &[String], executables: &[Stri
 					unreachable!("suggest_typo: must have at least two candidates")
 				}
 			}
-		} else if let Some(suggest) = find_similar(typo, &candidates, Some(2)) {
+		} else if let Some(suggest) = find_similar(typo, candidates, Some(2)) {
 			suggestions.push(suggest);
 		} else {
 			suggestions.push(typo.to_string());
