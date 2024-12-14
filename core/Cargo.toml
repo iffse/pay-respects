@@ -31,7 +31,13 @@ assets = [
 	["target/release/pay-respects", "usr/bin/", "755"],
 	["target/release/_pay-respects-module-100-runtime-rules", "usr/bin/", "755"],
 	["target/release/_pay-respects-fallback-100-request-ai", "usr/bin/", "755"],
-	["target/release/LICENSE", "usr/share/doc/pay-respects/", "644"],
 ]
 priority = "optional"
 section = "utils"
+
+[package.metadata.generate-rpm]
+assets = [
+	{ source = "target/release/pay-respects", dest = "/usr/bin/", mode = "755"},
+	{ source = "target/release/_pay-respects-module-100-runtime-rules", dest = "/usr/bin/", mode = "755"},
+	{ source = "target/release/_pay-respects-fallback-100-request-ai", dest = "/usr/bin/", mode = "755"},
+]
