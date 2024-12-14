@@ -27,7 +27,7 @@ pub fn parse_rules(input: TokenStream) -> TokenStream {
 	let directory = input.to_string().trim_matches('"').to_owned();
 	let rules = get_rules(directory);
 
-	gen_match_rules(rules)
+	gen_match_rules(&rules)
 }
 
 #[derive(serde::Deserialize)]
@@ -211,7 +211,7 @@ fn eval_suggest(suggest: &str) -> TokenStream2 {
 	replaces::command(&mut suggest, &mut replace_list);
 	replaces::shell(&mut suggest, &mut cmd_list);
 	replaces::typo(&mut suggest, &mut replace_list);
-	replaces::shell_tag(&mut suggest, &mut replace_list, cmd_list);
+	replaces::shell_tag(&mut suggest, &mut replace_list, &cmd_list);
 
 	quote! {
 		#(#opt_list)*
