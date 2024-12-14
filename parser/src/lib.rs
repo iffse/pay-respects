@@ -24,9 +24,7 @@ mod replaces;
 
 #[proc_macro]
 pub fn parse_rules(input: TokenStream) -> TokenStream {
-	let directory = input.to_string().trim_matches('"').to_owned();
-	let rules = get_rules(directory);
-
+	let rules = get_rules(input.to_string().trim_matches('"'));
 	gen_match_rules(&rules)
 }
 
@@ -42,7 +40,7 @@ struct MatchError {
 	suggest: Vec<String>,
 }
 
-fn get_rules(directory: String) -> Vec<Rule> {
+fn get_rules(directory: &str) -> Vec<Rule> {
 	let files = std::fs::read_dir(directory).expect("Failed to read directory.");
 
 	let mut rules = Vec::new();

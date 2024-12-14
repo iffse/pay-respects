@@ -1,7 +1,7 @@
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
 
-fn rtag(name: &str, x: i32, y: String) -> TokenStream2 {
+fn rtag(name: &str, x: i32, y: &str) -> TokenStream2 {
 	format!("{}{} = {}", name, x, y).parse().unwrap()
 }
 
@@ -43,7 +43,7 @@ pub fn opts(
 		};
 		opt_list.push(command);
 
-		replace_list.push(rtag(tag_name, replace_tag, current_tag.to_owned()));
+		replace_list.push(rtag(tag_name, replace_tag, &current_tag));
 		suggest.replace_range(placeholder, &current_tag);
 		replace_tag += 1;
 	}
@@ -66,7 +66,7 @@ pub fn cmd_reg(suggest: &mut String, replace_list: &mut Vec<TokenStream2>) {
 
 		let command = format!("cmd_regex(r###\"{}\"###, &last_command)", regex);
 
-		replace_list.push(rtag(tag_name, replace_tag, command));
+		replace_list.push(rtag(tag_name, replace_tag, &command));
 		suggest.replace_range(placeholder, &tag(tag_name, replace_tag));
 		replace_tag += 1;
 	}
@@ -83,7 +83,7 @@ pub fn err(suggest: &mut String, replace_list: &mut Vec<TokenStream2>) {
 
 		let command = format!("err_regex(r###\"{}\"###, error_msg)", regex);
 
-		replace_list.push(rtag(tag_name, replace_tag, command));
+		replace_list.push(rtag(tag_name, replace_tag, &command));
 		suggest.replace_range(placeholder, &tag(tag_name, replace_tag));
 		replace_tag += 1;
 	}
@@ -117,7 +117,7 @@ pub fn command(suggest: &mut String, replace_list: &mut Vec<TokenStream2>) {
 
 			let command = format! {r#"split[{}..{}].join(" ")"#, start_string, end_string};
 
-			replace_list.push(rtag(tag_name, replace_tag, command));
+			replace_list.push(rtag(tag_name, replace_tag, &command));
 			suggest.replace_range(placeholder, &tag(tag_name, replace_tag));
 		} else {
 			let range = range.parse::<i32>().unwrap_or(0);
@@ -127,7 +127,7 @@ pub fn command(suggest: &mut String, replace_list: &mut Vec<TokenStream2>) {
 				format!("split[{}]", range)
 			};
 
-			replace_list.push(rtag(tag_name, replace_tag, command));
+			replace_list.push(rtag(tag_name, replace_tag, &command));
 			suggest.replace_range(placeholder, &tag(tag_name, replace_tag));
 		}
 		replace_tag += 1;
@@ -220,7 +220,7 @@ pub fn typo(suggest: &mut String, replace_list: &mut Vec<TokenStream2>) {
 			)
 		};
 
-		replace_list.push(rtag(tag_name, replace_tag, command));
+		replace_list.push(rtag(tag_name, replace_tag, &command));
 		suggest.replace_range(placeholder, &tag(tag_name, replace_tag));
 		replace_tag += 1;
 	}
@@ -251,7 +251,7 @@ pub fn shell_tag(suggest: &mut String, replace_list: &mut Vec<TokenStream2>, cmd
 			let argument = format!("\"{}\"", argument);
 			let function = format!("{}, {}).join(\"\")", split.0, argument);
 			// let function = format!("\"{}, {}\"", split.0, split.1);
-			replace_list.push(rtag(tag_name, replace_tag, function));
+			replace_list.push(rtag(tag_name, replace_tag, &function));
 			replace_tag += 1;
 		}
 	}
