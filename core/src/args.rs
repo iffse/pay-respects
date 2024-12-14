@@ -8,15 +8,18 @@ pub enum Status {
 }
 
 pub fn handle_args(args: impl IntoIterator<Item = String>) -> Status {
-	let args: Vec<_> = args.into_iter().collect();
-	if args.len() <= 1 {
+	let mut iter = args.into_iter().peekable();
+	let mut init = Init::new();
+	if let Some(binary_path) = iter.next() {
+		init.binary_path = binary_path;
+	}
+
+	if iter.peek().is_none() {
 		return Status::Continue;
 	}
 
-	let mut init = Init::new();
-	let mut index = 1;
-	while index < args.len() {
-		match args[index].as_str() {
+	while let Some(arg) = iter.next() {
+		match arg.as_str() {
 			"-h" | "--help" => {
 				print_help();
 				return Status::Exit;
@@ -26,27 +29,18 @@ pub fn handle_args(args: impl IntoIterator<Item = String>) -> Status {
 				return Status::Exit;
 			}
 			"-a" | "--alias" => {
-				if args.len() > index + 1 {
-					if args[index + 1].starts_with('-') {
-						init.alias = String::from("f");
-					} else {
-						init.alias = args[index + 1].clone();
-						index += 1;
+				match iter.peek() {
+					Some(next_arg) if !next_arg.starts_with('-') => {
+						init.alias = next_arg.to_string();
+						iter.next();
 					}
-				} else {
-					init.alias = String::from("f");
+					_ => init.alias = String::from("f"),
 				}
+
 				init.auto_alias = true;
-				index += 1;
 			}
-			"--nocnf" => {
-				init.cnf = false;
-				index += 1
-			}
-			_ => {
-				init.shell = args[index].clone();
-				index += 1
-			}
+			"--nocnf" => init.cnf = false,
+			_ => init.shell = arg,
 		}
 	}
 
@@ -54,8 +48,6 @@ pub fn handle_args(args: impl IntoIterator<Item = String>) -> Status {
 		eprintln!("{}", t!("no-shell"));
 		return Status::Error;
 	}
-
-	init.binary_path = args[0].clone();
 
 	initialization(&mut init);
 	Status::Exit
