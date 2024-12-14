@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+use std::env;
 use sys_locale::get_locale;
 
 mod args;
@@ -71,7 +72,7 @@ fn init() -> Result<shell::Data, args::Status> {
 	};
 	rust_i18n::set_locale(&locale[0..2]);
 
-	let status = args::handle_args();
+	let status = args::handle_args(env::args());
 	match status {
 		args::Status::Exit => {
 			return Err(status);

@@ -7,23 +7,23 @@ pub enum Status {
 	Error,
 }
 
-pub fn handle_args() -> Status {
-	use Status::*;
-	let args = std::env::args().collect::<Vec<String>>();
+pub fn handle_args(args: impl IntoIterator<Item = String>) -> Status {
+	let args: Vec<_> = args.into_iter().collect();
 	if args.len() <= 1 {
-		return Continue;
+		return Status::Continue;
 	}
+
 	let mut init = Init::new();
 	let mut index = 1;
 	while index < args.len() {
 		match args[index].as_str() {
 			"-h" | "--help" => {
 				print_help();
-				return Exit;
+				return Status::Exit;
 			}
 			"-v" | "--version" => {
 				print_version();
-				return Exit;
+				return Status::Exit;
 			}
 			"-a" | "--alias" => {
 				if args.len() > index + 1 {
@@ -52,13 +52,13 @@ pub fn handle_args() -> Status {
 
 	if init.shell.is_empty() {
 		eprintln!("{}", t!("no-shell"));
-		return Error;
+		return Status::Error;
 	}
 
 	init.binary_path = args[0].clone();
 
 	initialization(&mut init);
-	Exit
+	Status::Exit
 }
 
 fn print_help() {
@@ -90,5 +90,58 @@ fn print_version() {
 	let lib = option_env!("_DEF_PR_LIB").map(|dir| dir.to_string());
 	if lib.is_some() {
 		println!("Default lib directory: {}", lib.unwrap());
+	}
+}
+
+#[cfg(test)]
+mod tests {
+	use super::{handle_args, Status};
+
+	#[test]
+	fn test_handle_args() {
+		assert!(matches!(
+			handle_args([String::from("pay-respects")]),
+			Status::Continue
+		));
+
+		for args in [
+			[String::new(), String::from("-h")],
+			[String::new(), String::from("--help")],
+			[String::new(), String::from("-v")],
+			[String::new(), String::from("--version")],
+			[String::new(), String::from("zsh")],
+		] {
+			println!("Arguments {:?} should return Exit", args);
+			assert!(matches!(handle_args(args), Status::Exit));
+		}
+
+		for args in [
+			[String::new(), String::from("fish"), String::from("--alias")],
+			[String::new(), String::from("bash"), String::from("--nocnf")],
+		] {
+			println!("Arguments {:?} should return Exit", args);
+			assert!(matches!(handle_args(args), Status::Exit));
+		}
+
+		for args in [
+			[String::new(), String::from("-a")],
+			[String::new(), String::from("--alias")],
+			[String::new(), String::from("--nocnf")],
+		] {
+			println!("Arguments {:?} should return Error", args);
+			assert!(matches!(handle_args(args), Status::Error));
+		}
+
+		for args in [
+			[String::new(), String::from("-a"), String::from("--nocnf")],
+			[
+				String::new(),
+				String::from("--alias"),
+				String::from("--nocnf"),
+			],
+		] {
+			println!("Argument {:?} should return Error", args);
+			assert!(matches!(handle_args(args), Status::Error));
+		}
 	}
 }
