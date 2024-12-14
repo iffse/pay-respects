@@ -161,7 +161,7 @@ fn get_rule(executable: &str) -> Option<String> {
 		return Some(user_rule_file);
 	}
 
-	let check_dirs = |dirs: Vec<&str>| -> Option<String> {
+	let check_dirs = |dirs: &[&str]| -> Option<String> {
 		for dir in dirs {
 			let rule_dir = format!("{}/pay-respects/rules", dir);
 			let rule_file = format!("{}/{}.toml", rule_dir, executable);
@@ -175,7 +175,7 @@ fn get_rule(executable: &str) -> Option<String> {
 	let xdg_config_dirs = std::env::var("XDG_CONFIG_DIRS").unwrap_or("/etc/xdg".to_owned());
 	let xdg_config_dirs = xdg_config_dirs.split(':').collect::<Vec<&str>>();
 
-	if let Some(file) = check_dirs(xdg_config_dirs) {
+	if let Some(file) = check_dirs(&xdg_config_dirs) {
 		return Some(file);
 	}
 
@@ -183,7 +183,7 @@ fn get_rule(executable: &str) -> Option<String> {
 		std::env::var("XDG_DATA_DIRS").unwrap_or("/usr/local/share:/usr/share".to_owned());
 	let xdg_data_dirs = xdg_data_dirs.split(':').collect::<Vec<&str>>();
 
-	if let Some(file) = check_dirs(xdg_data_dirs) {
+	if let Some(file) = check_dirs(&xdg_data_dirs) {
 		return Some(file);
 	}
 

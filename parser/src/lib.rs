@@ -57,7 +57,7 @@ fn get_rules(directory: String) -> Vec<Rule> {
 	rules
 }
 
-fn gen_match_rules(rules: Vec<Rule>) -> TokenStream {
+fn gen_match_rules(rules: &[Rule]) -> TokenStream {
 	let command = rules
 		.iter()
 		.map(|x| x.command.to_owned())

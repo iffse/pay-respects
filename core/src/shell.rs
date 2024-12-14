@@ -232,7 +232,7 @@ pub fn elevate(data: &mut Data, command: &mut String) {
 pub fn add_candidates_no_dup(
 	command: &str,
 	candidates: &mut Vec<String>,
-	new_candidates: &Vec<String>,
+	new_candidates: &[String],
 ) {
 	for candidate in new_candidates {
 		let candidate = candidate.trim();

@@ -69,7 +69,7 @@ pub fn split_command(command: &str) -> Vec<String> {
 	split_command
 }
 
-pub fn suggest_typo(typos: &[String], candidates: Vec<String>, executables: &[String]) -> String {
+pub fn suggest_typo(typos: &[String], candidates: &[String], executables: &[String]) -> String {
 	let mut suggestions = Vec::new();
 	for typo in typos {
 		let typo = typo.as_str();
