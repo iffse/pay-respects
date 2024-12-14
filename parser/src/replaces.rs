@@ -238,11 +238,7 @@ pub fn shell(suggest: &mut String, cmd_list: &mut Vec<String>) {
 	}
 }
 
-pub fn shell_tag(
-	suggest: &mut String,
-	replace_list: &mut Vec<TokenStream2>,
-	cmd_list: Vec<String>,
-) {
+pub fn shell_tag(suggest: &mut String, replace_list: &mut Vec<TokenStream2>, cmd_list: &[String]) {
 	let mut replace_tag = 0;
 	let tag_name = "shell";
 
