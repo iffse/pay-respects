@@ -15,8 +15,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Caching
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: build-and-test
+
       - name: Build
         run: cargo build --verbose
+
       - name: Run tests
         run: cargo test --verbose
 
