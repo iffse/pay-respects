@@ -55,11 +55,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: get version
+      - name: Get version
         id: version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
-      - name: setup Rust toolchain
+      - name: Setup Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
@@ -67,36 +67,36 @@ jobs:
           target: ${{ matrix.target }}
           profile: minimal
 
-      - name: caching
+      - name: Caching
         uses: Swatinem/rust-cache@v2
         with:
           key: ${{ matrix.target }}
 
-      - name: build
+      - name: Build
         if: ${{ matrix.cross == false}}
         run:
           cargo build --release --locked --target ${{ matrix.target }}
 
-      - name: build (cross)
+      - name: Build (cross)
         if: ${{ matrix.cross == true}}
         # cross 0.2.5 broken for android
         run: |
           cargo install cross --locked --git https://github.com/cross-rs/cross --rev 99b8069c0d977a14cd421ad8a3ef3255dc5802be
           cross build --release --no-default-features --locked --target ${{ matrix.target }}
 
-      - name: package deb
+      - name: Package deb
         if: ${{ matrix.deb == true }}
         run: |
           cargo install cargo-deb --locked
           cargo deb -p pay-respects --no-build --no-strip --output . --target ${{ matrix.target }}
 
-      - name: package rpm
+      - name: Package rpm
         if: ${{ matrix.rpm == true }}
         run: |
           cargo install cargo-generate-rpm --locked
           cargo rpm -p pay-respects -o . --target ${{ matrix.target }}
 
-      - name: zipping files (unix)
+      - name: Zipping files (unix)
         if: runner.os != 'Windows'
         run: >
           tar --zstd -cf pay-respects-${{ steps.version.outputs.VERSION }}-${{ matrix.target }}.tar.zst
@@ -106,7 +106,7 @@ jobs:
           _pay-respects-module-100-runtime-rules
           _pay-respects-fallback-100-request-ai
 
-      - name: zipping files (exe)
+      - name: Zipping files (exe)
         if: runner.os == 'Windows'
         run: >
           7z a pay-respects-${{ steps.version.outputs.VERSION }}-${{ matrix.target }}.zip
@@ -115,7 +115,7 @@ jobs:
           ./target/${{ matrix.target }}/release/_pay-respects-module-100-runtime-rules.exe
           ./target/${{ matrix.target }}/release/_pay-respects-fallback-100-request-ai.exe
 
-      - name: uploading to release
+      - name: Uploading to release
         uses: ncipollo/release-action@v1
         with:
           artifacts: |
