@@ -137,12 +137,6 @@ impl Data {
 			};
 		}
 
-		#[cfg(debug_assertions)]
-		{
-			eprintln!("modules: {:?}", modules);
-			eprintln!("fallbacks: {:?}", fallbacks);
-		}
-
 		let mut init = Data {
 			shell,
 			command,
@@ -160,6 +154,15 @@ impl Data {
 
 		init.split();
 		init.update_error(None);
+
+		#[cfg(debug_assertions)] {
+			eprintln!("shell: {}", init.shell);
+			eprintln!("command: {}", init.command);
+			eprintln!("error: {}", init.error);
+			eprintln!("modules: {:?}", init.modules);
+			eprintln!("fallbacks: {:?}", init.fallbacks);
+		}
+
 		init
 	}
 
@@ -190,7 +193,7 @@ impl Data {
 	pub fn split(&mut self) {
 		let mut split = split_command(&self.command);
 		if PRIVILEGE_LIST.contains(&split[0].as_str()) {
-			self.command = self.command.replacen(&split[0], "", 1);
+			self.command = self.command.replacen(&split[0], "", 1).trim().to_string();
 			self.privilege = Some(split.remove(0))
 		}
 		self.split = split;
