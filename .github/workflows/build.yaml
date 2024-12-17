@@ -94,7 +94,7 @@ jobs:
         if: ${{ matrix.rpm == true }}
         run: |
           cargo install cargo-generate-rpm --locked
-          cargo rpm -p pay-respects -o . --target ${{ matrix.target }}
+          cargo-generate-rpm -p core -o . --target ${{ matrix.target }}
 
       - name: Zipping files (unix)
         if: runner.os != 'Windows'
