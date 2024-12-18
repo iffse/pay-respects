@@ -10,7 +10,7 @@
         genAttrs
         importTOML
         licenses
-        sourceByRegex
+        cleanSource
         ;
 
       eachSystem =
@@ -28,14 +28,9 @@
       packages = eachSystem (
         pkgs:
         let
-          src = sourceByRegex self [
-            "(core)(/.*)?"
-            "(module-runtime-rules)(/.*)?"
-            "(module-request-ai)(/.*)?"
-            "(rules)(/.*)?"
-            ''Cargo\.(toml|lock)''
-          ];
-
+        
+        src = cleanSource self
+        
           inherit (pkgs)
             rustPlatform
             openssl
