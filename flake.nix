@@ -28,9 +28,10 @@
       packages = eachSystem (
         pkgs:
         let
-        
-        src = cleanSource self
-        
+          cargoPackage = (importTOML (src + "/core/Cargo.toml")).package;
+
+          src = cleanSource self;
+
           inherit (pkgs)
             rustPlatform
             openssl
@@ -39,8 +40,8 @@
         in
         {
           default = rustPlatform.buildRustPackage {
-            pname = "pay-respects";
-            inherit ((importTOML (src + "/core/Cargo.toml")).package) version;
+            pname = cargoPackage.name;
+            inherit (cargoPackage) version;
 
             inherit src;
 
@@ -52,9 +53,8 @@
             buildInputs = [ openssl ];
 
             meta = {
-              description = "Command suggestions, command-not-found and thefuck replacement written in Rust";
+              inherit (cargoPackage) description homepage;
               license = licenses.agpl3Plus;
-              homepage = "https://github.com/iffse/pay-respects";
               mainProgram = "pay-respects";
             };
           };
