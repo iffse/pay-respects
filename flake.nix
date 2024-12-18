@@ -10,7 +10,6 @@
         genAttrs
         importTOML
         licenses
-        maintainers
         sourceByRegex
         ;
 
@@ -61,7 +60,6 @@
               description = "Command suggestions, command-not-found and thefuck replacement written in Rust";
               license = licenses.agpl3Plus;
               homepage = "https://github.com/iffse/pay-respects";
-              maintainers = with maintainers; [ iff ];
               mainProgram = "pay-respects";
             };
           };
