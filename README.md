@@ -99,19 +99,28 @@ Install from your package manager if available:
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/pay-respects.svg)](https://repology.org/project/pay-respects/versions)
 
-For Arch Linux / Arch Linux ARM users, you can install from [Arch Linux CN Repository](https://github.com/archlinuxcn/repo):
+<details>
+	<summary>Instructions for package managers</summary>
 
-```shell
-sudo pacman -S pay-respects
-```
+> | OS / Distribution | Repository      | Instructions                     |
+> |-------------------|-----------------|----------------------------------|
+> | Arch Linux        | [AUR]           | `paru -S pay-respects` (`-bin`)  |
+> | Arch Linux        | [Arch Linux CN] | `sudo pacman -S pay-respects`    |
+> | NixOS / *Any*     | [nixpkgs]       | `nix-env -iA nixos.pay-respects` |
 
-Or install compiled binaries from [GitHub releases](https://github.com/iffse/pay-respects/releases) with the install script (all modules included):
+[AUR]: https://aur.archlinux.org/
+[Arch Linux CN]: https://github.com/archlinuxcn/repo
+[nixpkgs]: https://github.com/NixOS/nixpkgs
+
+</details>
+
+Alternatively, install pre-built binaries from [GitHub releases](https://github.com/iffse/pay-respects/releases). An [install script](./install.sh) is available:
 ```
 curl -sSfL https://raw.githubusercontent.com/iffse/pay-respects/main/install.sh | sh
 ```
 
 <details>
-	<summary>Compile from source (any OS/architecture)</summary>
+	<summary>Cargo / Compile from source (any OS/architecture supported by Rust)</summary>
 
 > This installation requires you to have Cargo (the Rust package manager) installed.
 
@@ -130,7 +139,6 @@ curl -sSfL https://raw.githubusercontent.com/iffse/pay-respects/main/install.sh 
 > cargo install --path module-runtime-rules
 > cargo install --path module-request-ai
 > ```
-
 
 </details>
 
