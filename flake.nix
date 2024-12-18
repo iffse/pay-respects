@@ -36,6 +36,7 @@
             rustPlatform
             openssl
             pkg-config
+            versionCheckHook
             ;
         in
         {
@@ -45,12 +46,12 @@
 
             inherit src;
 
-            cargoLock = {
-              lockFile = src + "/Cargo.lock";
-            };
+            cargoLock.lockFile = src + "/Cargo.lock";
 
             nativeBuildInputs = [ pkg-config ];
             buildInputs = [ openssl ];
+
+            nativeInstallCheckInputs = [ versionCheckHook ];
 
             meta = {
               inherit (cargoPackage) description homepage;
