@@ -10,8 +10,7 @@
         genAttrs
         importTOML
         licenses
-        maintainers
-        sourceByRegex
+        cleanSource
         ;
 
       eachSystem =
@@ -29,39 +28,34 @@
       packages = eachSystem (
         pkgs:
         let
-          src = sourceByRegex self [
-            "(core)(/.*)?"
-            "(module-runtime-rules)(/.*)?"
-            "(module-request-ai)(/.*)?"
-            "(rules)(/.*)?"
-            ''Cargo\.(toml|lock)''
-          ];
+          cargoPackage = (importTOML (src + "/core/Cargo.toml")).package;
+
+          src = cleanSource self;
 
           inherit (pkgs)
             rustPlatform
             openssl
             pkg-config
+            versionCheckHook
             ;
         in
         {
           default = rustPlatform.buildRustPackage {
-            pname = "pay-respects";
-            inherit ((importTOML (src + "/core/Cargo.toml")).package) version;
+            pname = cargoPackage.name;
+            inherit (cargoPackage) version;
 
             inherit src;
 
-            cargoLock = {
-              lockFile = src + "/Cargo.lock";
-            };
+            cargoLock.lockFile = src + "/Cargo.lock";
 
             nativeBuildInputs = [ pkg-config ];
             buildInputs = [ openssl ];
 
+            nativeInstallCheckInputs = [ versionCheckHook ];
+
             meta = {
-              description = "Command suggestions, command-not-found and thefuck replacement written in Rust";
+              inherit (cargoPackage) description homepage;
               license = licenses.agpl3Plus;
-              homepage = "https://github.com/iffse/pay-respects";
-              maintainers = with maintainers; [ iff ];
               mainProgram = "pay-respects";
             };
           };
