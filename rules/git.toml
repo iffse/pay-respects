@@ -69,7 +69,6 @@ replace,
 pattern = [
 	"did not match any file"
 ]
-# alternatively `git checkout {{typo[2]({{shell(git branch | sed 's/^*//')}})}}`
 suggest = [
 '''
 #[cmd_contains(checkout)]
@@ -108,4 +107,29 @@ suggest = [
 '''
 #[cmd_contains(branch)]
 git checkout {{command[2]}} '''
+]
+
+[[match_err]]
+pattern = [
+	"updates were rejected"
+]
+suggest = [
+'''
+#[cmd_contains(push)]
+git pull && \
+{{command}} ''',
+'''
+#[cmd_contains(push)]
+{{command}} --force '''
+]
+
+[[match_err]]
+pattern = [
+	"you have unstaged changes"
+]
+suggest = [
+'''
+git stash && \
+{{command}} && \
+git stash pop '''
 ]
