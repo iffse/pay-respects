@@ -232,3 +232,9 @@ This project is hosted at various sites, choose the one that suits you best:
 - [GitHub](https://github.com/iffse/pay-respects)
 - [GitLab](https://gitlab.com/iffse/pay-respects)
 
+## Licenses
+
+- **Binaries**: AGPL-3.0
+	- Core and modules
+- **Libraries**: MPL-2.0
+	- Parser and utils
