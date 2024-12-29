@@ -67,7 +67,7 @@ pub fn select_candidate(data: &mut Data) {
 	eprintln!("candidates: {candidates:?}");
 	if candidates.len() == 1 {
 		let suggestion = candidates[0].to_string();
-		let highlighted = highlight_difference(&data.shell, &suggestion, &data.command).unwrap();
+		let highlighted = highlight_difference(data, &suggestion).unwrap();
 		eprintln!("{}\n", highlighted);
 		let confirm = format!("[{}]", t!("confirm-yes")).green();
 		eprintln!("{}: {} {}", t!("confirm"), confirm, "[Ctrl+C]".red());
@@ -77,7 +77,7 @@ pub fn select_candidate(data: &mut Data) {
 	} else {
 		let mut highlight_candidates = candidates
 			.iter()
-			.map(|candidate| highlight_difference(&data.shell, candidate, &data.command).unwrap())
+			.map(|candidate| highlight_difference(data, candidate).unwrap())
 			.collect::<Vec<String>>();
 
 		for candidate in highlight_candidates.iter_mut() {

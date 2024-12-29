@@ -155,7 +155,8 @@ impl Data {
 		init.split();
 		init.update_error(None);
 
-		#[cfg(debug_assertions)] {
+		#[cfg(debug_assertions)]
+		{
 			eprintln!("shell: {}", init.shell);
 			eprintln!("command: {}", init.command);
 			eprintln!("error: {}", init.error);
