@@ -19,7 +19,7 @@ Please follow the instruction for your shell:
 	<summary>Bash / Zsh / Fish</summary>
 
 > Append the following line to your configuration file:
-> ```shell
+> ```sh
 > eval "$(pay-respects bash --alias)"
 > eval "$(pay-respects zsh --alias)"
 > pay-respects fish --alias | source
@@ -29,7 +29,7 @@ Please follow the instruction for your shell:
 > - `--nocnf`: Disables `command_not_found` handler
 
 > Manual aliasing (**DEPRECATED**, do not use):
-> ```shell
+> ```sh
 > alias f="$(pay-respects bash)"
 > alias f="$(pay-respects zsh)"
 > alias f="$(pay-respects fish)"
@@ -41,16 +41,16 @@ Please follow the instruction for your shell:
 	<summary>Nushell</summary>
 
 > Add the following output to your configuration file:
-> ```shell
+> ```sh
 > pay-respects nushell --alias [<alias>]
 > ```
 
 > Or save it as a file:
-> ```shell
+> ```sh
 > pay-respects nushell --alias [<alias>] | save -f ~/.pay-respects.nu
 > ```
 > and source from your config file:
-> ```shell
+> ```sh
 > source ~/.pay-respects.nu
 > ```
 
@@ -59,9 +59,14 @@ Please follow the instruction for your shell:
 <details>
 	<summary>PowerShell</summary>
 
-> Append the following to your profile:
+> Append the following output to your profile:
 > ```pwsh
-> pay-respects pwsh --alias [<alias>] [--nocnf] [>> $PROFILE] # use the pipe to directly append it to your profile if you like
+> pay-respects pwsh --alias [<alias>] [--nocnf]
+> ```
+
+> Or directly pipe the output to your profile:
+> ```pwsh
+> pay-respects pwsh --alias [<alias>] [--nocnf] >> $PROFILE
 > ```
 
 </details>
@@ -77,7 +82,7 @@ Please follow the instruction for your shell:
 > pay-respects echos back, if applicable, a `cd` command that can be evaluated by the current working shell.
 
 > General example:
-> ```shell
+> ```sh
 > eval $(_PR_SHELL=sh _PR_LAST_COMMAND="git comit" pay-respects)
 > ```
 
@@ -105,7 +110,7 @@ Install from your package manager if available:
 > | OS / Distribution | Repository      | Instructions                     |
 > |-------------------|-----------------|----------------------------------|
 > | Arch Linux        | [AUR]           | `paru -S pay-respects` (`-bin`)  |
-> | Arch Linux        | [Arch Linux CN] | `sudo pacman -S pay-respects`    |
+> | Arch Linux (ARM)  | [Arch Linux CN] | `sudo pacman -S pay-respects`    |
 > | NixOS / *Any*     | [nixpkgs]       | `nix-env -iA nixos.pay-respects` |
 
 [AUR]: https://aur.archlinux.org/
@@ -115,7 +120,7 @@ Install from your package manager if available:
 </details>
 
 Alternatively, install pre-built binaries from [GitHub releases](https://github.com/iffse/pay-respects/releases). An [install script](./install.sh) is available:
-```
+```sh
 curl -sSfL https://raw.githubusercontent.com/iffse/pay-respects/main/install.sh | sh
 ```
 
@@ -125,14 +130,14 @@ curl -sSfL https://raw.githubusercontent.com/iffse/pay-respects/main/install.sh 
 > This installation requires you to have Cargo (the Rust package manager) installed.
 
 > Install from [crates.io](https://crates.io/), modules are optional
-> ```shell
+> ```sh
 > cargo install pay-respects
 > cargo install pay-respects-module-runtime-rules
 > cargo install pay-respects-module-request-ai
 > ```
 
 > Clone from git and install, suitable for adding custom compile-time rules:
-> ```
+> ```sh
 > git clone --depth 1 https://github.com/iffse/pay-respects
 > cd pay-respects
 > cargo install --path core

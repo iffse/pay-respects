@@ -1,6 +1,6 @@
 # Modules
 
-`pay-respects` followed a very stupid approach ---or better said, *Keep It Simple, Stupid*--- when it comes to implementing the module / plugin system:
+`pay-respects` followed a very stupid approach &mdash;or better said, *Keep It Simple, Stupid*&mdash; when it comes to implementing the module / plugin system:
 
 - Modules interacts with core program by passing **messages through processes**. In other words, we are sending necessary information to the module, so it can return the required suggestion.
 - This approach is the most extendable way, as it has the least amount of limitations compared to:
@@ -49,11 +49,11 @@ If exposing modules in `PATH` annoys you, you can set the `_PR_LIB` environment 
 Example in a [FHS 3.0 compliant system](https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch04s06.html):
 ```shell
 # compile-time
-export _DEF_PR_LIB="/usr/lib:$HOME/.local/share"
+export _DEF_PR_LIB="/usr/lib"
 # runtime
 export _PR_LIB="/usr/lib:$HOME/.local/share"
 ```
-This is not the default as there is no general way to know its value and depends on distribution (`/usr/lib`, `/usr/libexec`, `/data/data/com.termux/files/usr/libexec`, etc.). System programs usually have a hard-coded path looking for `lib`. If you are a package maintainer for a distribution, setting this value when compiling, so it fits into your distribution standard.
+This is not the default as there is no general way to know its value and depends on distribution (`/usr/lib`, `/usr/libexec`, or NixOS which isn't FHS compliant at all). System programs usually have a hard-coded path looking for `lib`. If you are a package maintainer for a distribution, setting this value when compiling, so it fits into your distribution standard.
 
 If you installed the module with `cargo install`, the binary will be placed in `bin` subdirectory under Cargo's home which should be in the `PATH` anyway. Cargo has no option to place in subdirectories with other names.
 
