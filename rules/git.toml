@@ -6,6 +6,10 @@ pattern = [
 ]
 suggest = [
 '''
+#[err_contains(the most similar command is)]
+{{command[0]}} {{err::(?:the most similar command is )(\S+)}} ''',
+'''
+#[!err_contains(the most similar command is)]
 {{command[0]}} {{typo[1](
 add,
 am,
