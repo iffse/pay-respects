@@ -129,7 +129,8 @@ git pull && \
 
 [[match_err]]
 pattern = [
-	"you have unstaged changes"
+	"you have unstaged changes",
+	"stash them"
 ]
 suggest = [
 '''
