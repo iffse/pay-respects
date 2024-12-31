@@ -63,9 +63,10 @@ pub fn highlight_difference(data: &Data, suggested_command: &str) -> Option<Stri
 	if let Some(sudo) = data.privilege.clone() {
 		if suggested_command.contains("&&")
 			|| suggested_command.contains("||")
-			|| suggested_command.contains('>') {
-			split_suggested_command[0] = format!("{} -c \"", shell).blue().to_string()
-				+ &split_suggested_command[0];
+			|| suggested_command.contains('>')
+		{
+			split_suggested_command[0] =
+				format!("{} -c \"", shell).blue().to_string() + &split_suggested_command[0];
 			let len = split_suggested_command.len() - 1;
 			split_suggested_command[len] =
 				split_suggested_command[len].clone() + "\"".blue().to_string().as_str();
