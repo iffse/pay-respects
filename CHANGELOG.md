@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.7] 2024-12-31
+
+### Fixed
+
+- No longer running `get_error` in CNF mode (makes PowerShell hang with recursive calls)
+- Not showing `sudo` in successive suggestions (although they were applied)
+
+### Changed
+
+- Licenses for libraries changed to MPL-2.0 from AGPL-3.0
+
 ## [0.6.6] 2024-12-18
 
 ### Added
@@ -105,7 +116,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 History start.
 
-[unreleased]: https://github.com/iffse/pay-respects/compare/v0.6.6..HEAD
+[unreleased]: https://github.com/iffse/pay-respects/compare/v0.6.7..HEAD
+[0.6.7]: https://github.com/iffse/pay-respects/compare/v0.6.6..v0.6.7
 [0.6.6]: https://github.com/iffse/pay-respects/compare/v0.6.5..v0.6.6
 [0.6.5]: https://github.com/iffse/pay-respects/compare/v0.6.4..v0.6.5
 [0.6.4]: https://github.com/iffse/pay-respects/compare/v0.6.3..v0.6.4
