@@ -42,7 +42,6 @@ pub fn suggestion(data: &mut Data) {
 			data.update_error(msg);
 
 			let retry_message = format!("{}...", t!("retry"));
-
 			eprintln!("\n{}\n", retry_message.cyan().bold());
 		}
 	}
@@ -94,6 +93,8 @@ pub fn cnf(data: &mut Data) {
 					.join(" "),
 			);
 			data.update_error(msg);
+			let retry_message = format!("{}...", t!("retry"));
+			eprintln!("\n{}\n", retry_message.cyan().bold());
 			suggestion(data);
 		}
 	} else {
