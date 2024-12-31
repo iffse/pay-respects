@@ -4,7 +4,8 @@ command = "_PR_general"
 pattern = [
 	"command not found",
 	"unknown command",
-	"nu::shell::external_command"
+	"nu::shell::external_command",
+	"is not recognized as a name of a cmdlet, function, script file, or executable program"
 ]
 suggest = [
 '''
