@@ -9,6 +9,7 @@ use std::time::Duration;
 
 pub const PRIVILEGE_LIST: [&str; 2] = ["sudo", "doas"];
 
+#[derive(PartialEq)]
 pub enum Mode {
 	Suggestion,
 	Cnf,
@@ -153,7 +154,9 @@ impl Data {
 		};
 
 		init.split();
-		init.update_error(None);
+		if init.mode != Mode::Cnf {
+			init.update_error(None);
+		}
 
 		#[cfg(debug_assertions)]
 		{
