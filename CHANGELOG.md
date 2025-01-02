@@ -7,7 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.6.7] 2024-12-31
+## [0.6.8] - 2025-01-02
+
+### Fixed
+
+- Broken rule for `git` in the last version
+
+### Removed
+
+- Removed binary files from history. Hash of all relevant commits will change
+
+## [0.6.7] - 2024-12-31
 
 ### Fixed
 
@@ -18,7 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Licenses for libraries changed to MPL-2.0 from AGPL-3.0
 
-## [0.6.6] 2024-12-18
+## [0.6.6] - 2024-12-18
 
 ### Added
 
@@ -28,7 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Panic on `sudo` input command
 
-## [0.6.5] 2024-12-13
+## [0.6.5] - 2024-12-13
 
 ### Added
 
@@ -38,7 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Not getting `stderr` from command-not-found
 
-## [0.6.4] 2024-12-12
+## [0.6.4] - 2024-12-12
 
 ### Added
 
@@ -52,7 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Compile-time `_PR_LIB` changed to `_DEF_PR_LIB` to be explicit
 
-## [0.6.3] 2024-12-11
+## [0.6.3] - 2024-12-11
 
 ### Added
 
@@ -116,7 +126,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 History start.
 
-[unreleased]: https://github.com/iffse/pay-respects/compare/v0.6.7..HEAD
+[unreleased]: https://github.com/iffse/pay-respects/compare/v0.6.8..HEAD
+[0.6.8]: https://github.com/iffse/pay-respects/compare/v0.6.8..HEAD
 [0.6.7]: https://github.com/iffse/pay-respects/compare/v0.6.6..v0.6.7
 [0.6.6]: https://github.com/iffse/pay-respects/compare/v0.6.5..v0.6.6
 [0.6.5]: https://github.com/iffse/pay-respects/compare/v0.6.4..v0.6.5

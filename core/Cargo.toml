@@ -1,7 +1,7 @@
 [package]
 name = "pay-respects"
 authors = ["iff <iff@ik.me>"]
-version = "0.6.7"
+version = "0.6.8"
 edition = "2021"
 
 # for crates.io
