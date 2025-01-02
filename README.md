@@ -9,7 +9,7 @@ Typed a wrong command or don't know what to do? Pay Respects will suggest a fix 
 - 🤖 **AI Support**: AI module comes in aid when there is no rule for your error!
 - 🪶 **Tiny binary size**: Not even 1MB for core features!
 
-![showcase](./img/showcase.gif)
+![showcase](https://raw.githubusercontent.com/iffse/static-assets/refs/heads/main/pay-respects/showcase.gif)
 
 ## How to Pay Respects
 
