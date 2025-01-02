@@ -7,7 +7,7 @@ pattern = [
 suggest = [
 '''
 #[err_contains(the most similar command is)]
-{{command[0]}} {{err::(?:the most similar command is )(\S+)}} ''',
+{{command[0]}} {{err::(?:the most similar command is )(\S+)}} {{command[2:]}}''',
 '''
 #[!err_contains(the most similar command is)]
 {{command[0]}} {{typo[1](
