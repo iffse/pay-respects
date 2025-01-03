@@ -22,7 +22,7 @@ There are 2 types of modules:
 	- **CAUTION**: Will immediately return if a suggestion is obtained
 	- Naming convention: `_pay-respects-fallback-<priority>-<your module name>`
 
-Priority is used to retrieve suggestions in a specific order by an [unstable sort](https://doc.rust-lang.org/std/primitive.slice.html#method.sort_unstable) (although they will always be after compile-time matches). Default modules have a priority of `100`.
+Priority is used to retrieve suggestions in a specific order by an [unstable sort](https://doc.rust-lang.org/std/primitive.slice.html#method.sort_unstable). Default modules have a priority of `100`.
 
 When running your module, you will get the following environment variables:
 

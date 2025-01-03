@@ -21,18 +21,6 @@ pub fn suggest_candidates(data: &mut Data) {
 	let modules = &data.modules;
 	let fallbacks = &data.fallbacks;
 
-	if privilege.is_none() {
-		if let Some(candidates) = match_pattern("_PR_privilege", data) {
-			add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
-		}
-	}
-	if let Some(candidates) = match_pattern(executable, data) {
-		add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
-	}
-	if let Some(candidates) = match_pattern("_PR_general", data) {
-		add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
-	}
-
 	#[cfg(debug_assertions)]
 	{
 		eprintln!("modules: {modules:?}");
@@ -45,6 +33,18 @@ pub fn suggest_candidates(data: &mut Data) {
 		if let Some(candidates) = new_candidates {
 			add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
 		}
+	}
+
+	if privilege.is_none() {
+		if let Some(candidates) = match_pattern("_PR_privilege", data) {
+			add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
+		}
+	}
+	if let Some(candidates) = match_pattern(executable, data) {
+		add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
+	}
+	if let Some(candidates) = match_pattern("_PR_general", data) {
+		add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
 	}
 
 	if !suggest_candidates.is_empty() {
