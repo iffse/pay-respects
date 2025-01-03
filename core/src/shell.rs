@@ -263,32 +263,32 @@ pub fn get_error(shell: &str, command: &str) -> String {
 pub fn error_output_threaded(shell: &str, command: &str) -> String {
 	let (sender, receiver) = channel();
 
-	let _shell = shell.to_owned();
-	let _command = command.to_owned();
-	thread::spawn(move || {
-		sender
-			.send(
-				std::process::Command::new(_shell)
-					.arg("-c")
-					.arg(_command)
-					.env("LC_ALL", "C")
-					.output()
-					.expect("failed to execute process"),
-			)
-			.expect("failed to send output");
-	});
+	thread::scope(|s| {
+		s.spawn(|| {
+			sender
+				.send(
+					std::process::Command::new(shell)
+						.arg("-c")
+						.arg(command)
+						.env("LC_ALL", "C")
+						.output()
+						.expect("failed to execute process"),
+				)
+				.expect("failed to send output");
+		});
 
-	match receiver.recv_timeout(Duration::from_secs(3)) {
-		Ok(output) => match output.stderr.is_empty() {
-			true => String::from_utf8_lossy(&output.stdout).to_lowercase(),
-			false => String::from_utf8_lossy(&output.stderr).to_lowercase(),
-		},
-		Err(_) => {
-			use colored::*;
-			eprintln!("Timeout while executing command: {}", command.red());
-			exit(1);
+		match receiver.recv_timeout(Duration::from_secs(3)) {
+			Ok(output) => match output.stderr.is_empty() {
+				true => String::from_utf8_lossy(&output.stdout).to_lowercase(),
+				false => String::from_utf8_lossy(&output.stderr).to_lowercase(),
+			},
+			Err(_) => {
+				use colored::*;
+				eprintln!("Timeout while executing command: {}", command.red());
+				exit(1);
+			}
 		}
-	}
+	})
 }
 
 pub fn command_output(shell: &str, command: &str) -> String {
