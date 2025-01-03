@@ -1,5 +1,6 @@
 use std::io::stderr;
 use std::process::{exit, Stdio};
+use std::thread;
 use std::time::{Duration, Instant};
 
 use colored::Colorize;
@@ -17,6 +18,8 @@ pub fn suggest_candidates(data: &mut Data) {
 	let command = &data.command;
 	let privilege = &data.privilege;
 	let mut suggest_candidates = vec![];
+	let mut module_candidates = vec![];
+	let mut final_candidates = vec![];
 
 	let modules = &data.modules;
 	let fallbacks = &data.fallbacks;
@@ -27,35 +30,47 @@ pub fn suggest_candidates(data: &mut Data) {
 		eprintln!("fallbacks: {fallbacks:?}");
 	}
 
-	for module in modules {
-		let new_candidates = module_output(data, module);
+	thread::scope(|s| {
+		s.spawn(|| {
+			let command = &data.command;
+			for module in modules {
+				let new_candidates = module_output(&data, module);
 
-		if let Some(candidates) = new_candidates {
+				if let Some(candidates) = new_candidates {
+					add_candidates_no_dup(command, &mut module_candidates, &candidates);
+				}
+			}
+		});
+
+		if privilege.is_none() {
+			if let Some(candidates) = match_pattern("_PR_privilege", data) {
+				add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
+			}
+		}
+		if let Some(candidates) = match_pattern(executable, data) {
 			add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
 		}
-	}
-
-	if privilege.is_none() {
-		if let Some(candidates) = match_pattern("_PR_privilege", data) {
+		if let Some(candidates) = match_pattern("_PR_general", data) {
 			add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
 		}
-	}
-	if let Some(candidates) = match_pattern(executable, data) {
-		add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
-	}
-	if let Some(candidates) = match_pattern("_PR_general", data) {
-		add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
-	}
+	});
 
+	if !module_candidates.is_empty() {
+		add_candidates_no_dup(command, &mut final_candidates, &module_candidates);
+	}
 	if !suggest_candidates.is_empty() {
-		data.candidates = suggest_candidates;
+		add_candidates_no_dup(command, &mut final_candidates, &suggest_candidates);
+	}
+
+	if !final_candidates.is_empty() {
+		data.candidates = final_candidates;
 		return;
 	}
 	for fallback in fallbacks {
 		let candidates = module_output(data, fallback);
 		if candidates.is_some() {
-			add_candidates_no_dup(command, &mut suggest_candidates, &candidates.unwrap());
-			data.candidates = suggest_candidates;
+			add_candidates_no_dup(command, &mut final_candidates, &candidates.unwrap());
+			data.candidates = final_candidates;
 			return;
 		}
 	}

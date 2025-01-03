@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Running standard modules in a separated thread
+
 ## [0.6.8] - 2025-01-02
 
 ### Fixed
@@ -127,7 +131,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 History start.
 
 [unreleased]: https://github.com/iffse/pay-respects/compare/v0.6.8..HEAD
-[0.6.8]: https://github.com/iffse/pay-respects/compare/v0.6.8..HEAD
+[0.6.8]: https://github.com/iffse/pay-respects/compare/v0.6.7..HEAD
 [0.6.7]: https://github.com/iffse/pay-respects/compare/v0.6.6..v0.6.7
 [0.6.6]: https://github.com/iffse/pay-respects/compare/v0.6.5..v0.6.6
 [0.6.5]: https://github.com/iffse/pay-respects/compare/v0.6.4..v0.6.5
