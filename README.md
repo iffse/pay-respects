@@ -231,6 +231,8 @@ Current option to write rules should cover most of the cases.
 
 We need more rule files, contributions are welcomed!
 
+Also see [development status](./development.md) for contribution opportunities.
+
 This project is hosted at various sites, choose the one that suits you best:
 
 - [Codeberg](https://codeberg.org/iff/pay-respects)
