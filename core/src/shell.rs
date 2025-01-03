@@ -545,13 +545,20 @@ def --env {} [] {{
 
 	match shell.as_str() {
 		"bash" | "zsh" => {
-			initialize = format!(r#"alias {}='{}'"#, alias, initialize);
+			initialize = format!(
+				r#"
+{} () {{
+	{}
+}}
+"#,
+				alias, initialize
+			);
 		}
 		"fish" => {
 			initialize = format!(
 				r#"
-function {} -d "Terminal command correction"
-	eval $({})
+function {} -d "Suggest fixes to the previous command"
+	{}
 end
 "#,
 				alias, initialize
