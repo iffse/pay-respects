@@ -21,6 +21,8 @@
 
 ### Entertaining
 
-- Select library that works well with `pay-respects`' complex difference highlighting
+- Select library that:
+	- Works well with `pay-respects`' complex difference highlighting
+	- Supports adding candidates dynamically
 - NLP model as alternative to the current LLM based AI requests
 

@@ -147,19 +147,12 @@ fn eval_suggest(
 }
 
 fn get_rule(executable: &str) -> Option<String> {
-	let xdg_config_home = if cfg!(windows) {
-		std::env::var("APPDATA").unwrap()
-	} else {
-		std::env::var("XDG_CONFIG_HOME")
-			.unwrap_or_else(|_| std::env::var("HOME").unwrap() + "/.config")
-	};
 
-	let user_rule_dir = format!("{}/pay-respects/rules", xdg_config_home);
-	let user_rule_file = format!("{}/{}.toml", user_rule_dir, executable);
-
-	if std::path::Path::new(&user_rule_file).exists() {
-		return Some(user_rule_file);
-	}
+	#[cfg(windows)]
+	let xdg_config_home = std::env::var("APPDATA").unwrap();
+	#[cfg(not(windows))]
+	let xdg_config_home = std::env::var("XDG_CONFIG_HOME")
+		.unwrap_or_else(|_| std::env::var("HOME").unwrap() + "/.config");
 
 	let check_dirs = |dirs: &[&str]| -> Option<String> {
 		for dir in dirs {
@@ -172,20 +165,25 @@ fn get_rule(executable: &str) -> Option<String> {
 		None
 	};
 
-	let xdg_config_dirs = std::env::var("XDG_CONFIG_DIRS").unwrap_or("/etc/xdg".to_owned());
-	let xdg_config_dirs = xdg_config_dirs.split(':').collect::<Vec<&str>>();
-
-	if let Some(file) = check_dirs(&xdg_config_dirs) {
+	if let Some(file) = check_dirs(&[&xdg_config_home]) {
 		return Some(file);
 	}
 
-	let xdg_data_dirs =
+	#[cfg(not(windows))] {
+		let xdg_config_dirs = std::env::var("XDG_CONFIG_DIRS").unwrap_or("/etc/xdg".to_owned());
+		let xdg_config_dirs = xdg_config_dirs.split(':').collect::<Vec<&str>>();
+
+		if let Some(file) = check_dirs(&xdg_config_dirs) {
+			return Some(file);
+		}
+
+		let xdg_data_dirs =
 		std::env::var("XDG_DATA_DIRS").unwrap_or("/usr/local/share:/usr/share".to_owned());
-	let xdg_data_dirs = xdg_data_dirs.split(':').collect::<Vec<&str>>();
+		let xdg_data_dirs = xdg_data_dirs.split(':').collect::<Vec<&str>>();
 
-	if let Some(file) = check_dirs(&xdg_data_dirs) {
-		return Some(file);
+		if let Some(file) = check_dirs(&xdg_data_dirs) {
+			return Some(file);
+		}
 	}
-
 	None
 }

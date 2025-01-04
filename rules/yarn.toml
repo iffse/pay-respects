@@ -56,7 +56,7 @@ workspaces
 
 [[match_err]]
 pattern = [
-	"error `install` has been replaced with `add` to add new dependencies."
+	"`install` has been replaced with `add`"
 ]
 suggest = [
 '''

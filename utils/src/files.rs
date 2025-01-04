@@ -7,9 +7,8 @@ use crate::evals::find_similar;
 pub fn get_path_files() -> Vec<String> {
 	let path_env = path_env();
 
-	if cfg!(debug_assertions) {
-		eprintln!("path_env: {path_env}");
-	}
+	#[cfg(debug_assertions)]
+	eprintln!("path_env: {path_env}");
 
 	let path_env_sep = path_env_sep();
 
@@ -50,9 +49,8 @@ pub fn get_path_files() -> Vec<String> {
 
 pub fn best_match_file(input: &str) -> Option<String> {
 	let mut input = input.trim_matches(|c| c == '\'' || c == '"').to_owned();
-	if cfg!(debug_assertions) {
-		eprintln!("best_match_file input: {input}");
-	}
+	#[cfg(debug_assertions)]
+	eprintln!("best_match_file input: {input}");
 	let mut exit_dirs = Vec::new();
 	let mut files = loop {
 		match std::fs::read_dir(&input) {

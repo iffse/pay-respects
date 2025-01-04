@@ -32,7 +32,6 @@ pub fn suggest_candidates(data: &mut Data) {
 
 	thread::scope(|s| {
 		s.spawn(|| {
-			let command = &data.command;
 			for module in modules {
 				let new_candidates = module_output(&data, module);
 

@@ -5,7 +5,7 @@ pattern = [
 	"command not found",
 	"unknown command",
 	"nu::shell::external_command",
-	"is not recognized as a name of a cmdlet, function, script file, or executable program"
+	"is not recognized as a name of a cmdlet"
 ]
 suggest = [
 '''
