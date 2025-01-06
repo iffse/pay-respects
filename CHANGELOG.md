@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Running standard modules in a separated thread
+- Bash init: use `fc` instead of history
 
 ## [0.6.8] - 2025-01-02
 

@@ -352,10 +352,7 @@ pub fn last_command(shell: &str) -> String {
 	};
 
 	match shell {
-		"bash" => {
-			let first_line = last_command.lines().next().unwrap().trim();
-			first_line.split_once(' ').unwrap().1.to_string()
-		}
+		"bash" => last_command,
 		"zsh" => last_command,
 		"fish" => last_command,
 		"nu" => last_command,
@@ -456,7 +453,7 @@ pub fn initialization(init: &mut Init) {
 
 	match init.shell.as_str() {
 		"bash" => {
-			last_command = "$(history 2)";
+			last_command = "$(fc -ln -1)";
 			shell_alias = "`alias`";
 		}
 		"zsh" => {
@@ -583,7 +580,7 @@ end
 				initialize = format!(
 					r#"
 command_not_found_handle() {{
-	eval $(_PR_LAST_COMMAND="_ $@" _PR_SHELL="{}" _PR_ALIAS="{}" _PR_MODE="cnf" "{}")
+	eval $(_PR_LAST_COMMAND="$@" _PR_SHELL="{}" _PR_ALIAS="{}" _PR_MODE="cnf" "{}")
 }}
 
 {}
