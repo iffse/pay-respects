@@ -5,15 +5,20 @@
 use crate::files::*;
 use regex_lite::Regex;
 
-pub fn opt_regex(regex: &str, command: &mut String) -> String {
+fn regex_captures(regex: &str, string: &str) -> Vec<String> {
 	let regex = Regex::new(regex).unwrap();
 
-	let mut opts = Vec::new();
-	for captures in regex.captures_iter(command) {
+	let mut caps = Vec::new();
+	for captures in regex.captures_iter(string) {
 		for cap in captures.iter().skip(1).flatten() {
-			opts.push(cap.as_str().to_owned());
+			caps.push(cap.as_str().to_owned());
 		}
 	}
+	caps
+}
+
+pub fn opt_regex(regex: &str, command: &mut String) -> String {
+	let opts = regex_captures(regex, command);
 
 	for opt in opts.clone() {
 		*command = command.replace(&opt, "");
@@ -22,26 +27,12 @@ pub fn opt_regex(regex: &str, command: &mut String) -> String {
 }
 
 pub fn err_regex(regex: &str, error_msg: &str) -> String {
-	let regex = Regex::new(regex).unwrap();
-
-	let mut err = Vec::new();
-	for captures in regex.captures_iter(error_msg) {
-		for cap in captures.iter().skip(1).flatten() {
-			err.push(cap.as_str().to_owned());
-		}
-	}
+	let err = regex_captures(regex, error_msg);
 	err.join(" ")
 }
 
 pub fn cmd_regex(regex: &str, command: &str) -> String {
-	let regex = Regex::new(regex).unwrap();
-
-	let mut cmd = Vec::new();
-	for captures in regex.captures_iter(command) {
-		for cap in captures.iter().skip(1).flatten() {
-			cmd.push(cap.as_str().to_owned());
-		}
-	}
+	let cmd = regex_captures(regex, command);
 	cmd.join(" ")
 }
 
