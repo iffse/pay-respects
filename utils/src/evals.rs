@@ -138,7 +138,11 @@ pub fn find_similar(typo: &str, candidates: &[String], threshold: Option<usize>)
 	None
 }
 
-pub fn find_similars(typo: &str, candidates: &[String], threshold: Option<usize>) -> Option<Vec<String>> {
+pub fn find_similars(
+	typo: &str,
+	candidates: &[String],
+	threshold: Option<usize>,
+) -> Option<Vec<String>> {
 	let threshold = threshold.unwrap_or(2);
 	let mut min_distance = typo.chars().count() / threshold + 1;
 	let mut min_distance_index = vec![];
@@ -156,7 +160,12 @@ pub fn find_similars(typo: &str, candidates: &[String], threshold: Option<usize>
 		}
 	}
 	if !min_distance_index.is_empty() {
-		return Some(min_distance_index.iter().map(|&i| candidates[i].to_string()).collect());
+		return Some(
+			min_distance_index
+				.iter()
+				.map(|&i| candidates[i].to_string())
+				.collect(),
+		);
 	}
 	None
 }

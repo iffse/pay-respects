@@ -175,7 +175,12 @@ pub fn typo(suggest: &mut String, split_command: &[String], executables: &[Strin
 	}
 }
 
-pub fn exes(suggest: &mut String, split_command: &[String], executables: &[String], exes_list: &mut Vec<String>) {
+pub fn exes(
+	suggest: &mut String,
+	split_command: &[String],
+	executables: &[String],
+	exes_list: &mut Vec<String>,
+) {
 	if suggest.contains("{{exes") {
 		let (placeholder, args) = eval_placeholder(suggest, "{{exes", "}}");
 

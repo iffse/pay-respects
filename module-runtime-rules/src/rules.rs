@@ -83,7 +83,8 @@ pub fn runtime_match(
 					if pure_suggest.contains("{{command}}") {
 						pure_suggest = pure_suggest.replace("{{command}}", last_command);
 					}
-					let suggests = eval_suggest(&pure_suggest, last_command, error_msg, executables, shell);
+					let suggests =
+						eval_suggest(&pure_suggest, last_command, error_msg, executables, shell);
 					for suggest in suggests {
 						print!("{}", suggest);
 						print!("<_PR_BR>");
@@ -159,7 +160,6 @@ fn eval_suggest(
 }
 
 fn get_rule(executable: &str) -> Option<String> {
-
 	#[cfg(windows)]
 	let xdg_config_home = std::env::var("APPDATA").unwrap();
 	#[cfg(not(windows))]
@@ -181,7 +181,8 @@ fn get_rule(executable: &str) -> Option<String> {
 		return Some(file);
 	}
 
-	#[cfg(not(windows))] {
+	#[cfg(not(windows))]
+	{
 		let xdg_config_dirs = std::env::var("XDG_CONFIG_DIRS").unwrap_or("/etc/xdg".to_owned());
 		let xdg_config_dirs = xdg_config_dirs.split(':').collect::<Vec<&str>>();
 
@@ -190,7 +191,7 @@ fn get_rule(executable: &str) -> Option<String> {
 		}
 
 		let xdg_data_dirs =
-		std::env::var("XDG_DATA_DIRS").unwrap_or("/usr/local/share:/usr/share".to_owned());
+			std::env::var("XDG_DATA_DIRS").unwrap_or("/usr/local/share:/usr/share".to_owned());
 		let xdg_data_dirs = xdg_data_dirs.split(':').collect::<Vec<&str>>();
 
 		if let Some(file) = check_dirs(&xdg_data_dirs) {

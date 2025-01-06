@@ -249,7 +249,6 @@ pub fn exes(suggest: &mut String, exes_list: &mut Vec<TokenStream2>) {
 				}
 			} else {
 				unreachable!("Exes suggestion does not support range");
-
 			}
 		} else {
 			unreachable!("Exes suggestion must have a command index");
