@@ -4,6 +4,7 @@
 
 use crate::files::*;
 use regex_lite::Regex;
+use itertools::Itertools;
 
 fn regex_captures(regex: &str, string: &str) -> Vec<String> {
 	let regex = Regex::new(regex).unwrap();
@@ -151,12 +152,15 @@ pub fn find_similars(
 			continue;
 		}
 		let distance = compare_string(typo, candidate);
-		if distance == min_distance {
-			min_distance_index.push(i);
-		} else if distance < min_distance {
-			min_distance = distance;
-			min_distance_index.clear();
-			min_distance_index.push(i);
+		use std::cmp::Ordering::*;
+		match distance.cmp(&min_distance) {
+			Equal => min_distance_index.push(i),
+			Less => {
+				min_distance = distance;
+				min_distance_index.clear();
+				min_distance_index.push(i);
+			}
+			_ => {}
 		}
 	}
 	if !min_distance_index.is_empty() {
@@ -164,6 +168,9 @@ pub fn find_similars(
 			min_distance_index
 				.iter()
 				.map(|&i| candidates[i].to_string())
+				.collect::<Vec<String>>()
+				.into_iter()
+				.unique()
 				.collect(),
 		);
 	}
