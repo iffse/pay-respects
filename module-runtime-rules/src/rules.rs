@@ -83,11 +83,11 @@ pub fn runtime_match(
 					if pure_suggest.contains("{{command}}") {
 						pure_suggest = pure_suggest.replace("{{command}}", last_command);
 					}
-					print!(
-						"{}",
-						eval_suggest(&pure_suggest, last_command, error_msg, executables, shell,)
-					);
-					print!("<_PR_BR>");
+					let suggests = eval_suggest(&pure_suggest, last_command, error_msg, executables, shell);
+					for suggest in suggests {
+						print!("{}", suggest);
+						print!("<_PR_BR>");
+					}
 				}
 			}
 		}
@@ -121,7 +121,7 @@ fn eval_suggest(
 	error_msg: &str,
 	executables: &[String],
 	shell: &str,
-) -> String {
+) -> Vec<String> {
 	let mut suggest = suggest.to_owned();
 	if suggest.contains("{{command}}") {
 		suggest = suggest.replace("{{command}}", "{last_command}");
@@ -139,11 +139,23 @@ fn eval_suggest(
 	replaces::shell(&mut suggest, shell);
 	replaces::typo(&mut suggest, &split_command, executables, shell);
 
+	let mut exes_list = Vec::new();
+	replaces::exes(&mut suggest, &split_command, executables, &mut exes_list);
+
 	for (tag, value) in opt_list {
 		suggest = suggest.replace(&tag, &value);
 	}
 
-	suggest
+	let mut suggests = vec![];
+	if exes_list.is_empty() {
+		suggests.push(suggest);
+	} else {
+		for exe in exes_list {
+			let eval_suggest = suggest.clone().replace("{{exes}}", &exe);
+			suggests.push(eval_suggest);
+		}
+	}
+	suggests
 }
 
 fn get_rule(executable: &str) -> Option<String> {

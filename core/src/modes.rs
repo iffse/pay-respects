@@ -4,7 +4,7 @@ use crate::system;
 use crate::{shell, suggestions};
 use colored::Colorize;
 use inquire::*;
-use pay_respects_utils::evals::best_match_path;
+use pay_respects_utils::evals::best_matches_path;
 use pay_respects_utils::files::best_match_file;
 
 use std::path::Path;
@@ -66,23 +66,29 @@ pub fn cnf(data: &mut Data) {
 		executable
 	);
 
-	let best_match = {
+	let best_matches = {
 		if executable.contains(std::path::MAIN_SEPARATOR) {
-			best_match_file(executable)
+			let file = best_match_file(executable);
+			if file.is_some() {
+				Some(vec![file.unwrap()])
+			} else {
+				None
+			}
 		} else {
-			best_match_path(executable, &data.executables)
+			best_matches_path(executable, &data.executables)
 		}
 	};
-	if best_match.is_some() {
-		let best_match = best_match.unwrap();
-		split_command[0] = best_match;
-		let suggest = split_command.join(" ");
-
-		data.candidates.push(suggest.clone());
+	if let Some(best_matches) = best_matches {
+		for best_match in best_matches {
+			split_command[0] = best_match;
+			let suggest = split_command.join(" ");
+			data.candidates.push(suggest);
+		}
 		suggestions::select_candidate(data);
 
 		let status = suggestions::confirm_suggestion(data);
 		if status.is_err() {
+			let suggest = data.suggest.clone().unwrap();
 			data.update_command(&suggest);
 			let msg = Some(
 				status

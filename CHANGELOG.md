@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Include all candidates with the same distances for executable typos
+
 ### Changed
 
 - Running standard modules in a separated thread

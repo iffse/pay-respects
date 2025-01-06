@@ -188,6 +188,7 @@ fn eval_suggest(suggest: &str) -> TokenStream2 {
 	}
 
 	let mut replace_list = Vec::new();
+	let mut exes_list = Vec::new();
 	let mut opt_list = Vec::new();
 	let mut cmd_list = Vec::new();
 
@@ -197,10 +198,26 @@ fn eval_suggest(suggest: &str) -> TokenStream2 {
 	replaces::command(&mut suggest, &mut replace_list);
 	replaces::shell(&mut suggest, &mut cmd_list);
 	replaces::typo(&mut suggest, &mut replace_list);
+	replaces::exes(&mut suggest, &mut exes_list);
 	replaces::shell_tag(&mut suggest, &mut replace_list, &cmd_list);
+
+	let suggests = if exes_list.is_empty() {
+		quote! {
+			candidates.push(format!{#suggest, #(#replace_list),*});
+		}
+	} else {
+		quote! {
+			#(#exes_list)*
+			let suggest = format!{#suggest, #(#replace_list),*};
+			for match_ in exes_matches {
+				let suggest = suggest.replace("{{exes}}", &match_);
+				candidates.push(suggest);
+			}
+		}
+	};
 
 	quote! {
 		#(#opt_list)*
-		candidates.push(format!{#suggest, #(#replace_list),*});
+		#suggests
 	}
 }

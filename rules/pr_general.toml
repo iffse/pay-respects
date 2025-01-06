@@ -9,5 +9,5 @@ pattern = [
 ]
 suggest = [
 '''
-{{typo[0](path)}} {{command[1:]}} '''
+{{exes[0]}} {{command[1:]}} '''
 ]

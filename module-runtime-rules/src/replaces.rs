@@ -173,6 +173,49 @@ pub fn typo(suggest: &mut String, split_command: &[String], executables: &[Strin
 	}
 }
 
+pub fn exes(suggest: &mut String, split_command: &[String], executables: &[String], exes_list: &mut Vec<String>) {
+	if suggest.contains("{{exes") {
+		let (placeholder, args) = eval_placeholder(suggest, "{{exes", "}}");
+
+		let index = if suggest.contains('[') {
+			let split = suggest[args.to_owned()]
+				.split(&['[', ']'])
+				.collect::<Vec<&str>>();
+			let command_index = split[1];
+			if !command_index.contains(':') {
+				let command_index = command_index.parse::<i32>().unwrap();
+
+				let index = if command_index < 0 {
+					split_command.len() as i32 + command_index
+				} else {
+					command_index
+				};
+				index as usize
+			} else {
+				unreachable!("Exes suggestion does not support range");
+			}
+		} else {
+			unreachable!("Exes suggestion must have a command index");
+		};
+
+		let matches = {
+			let res = best_matches_path(&split_command[index], executables);
+			if res.is_none() {
+				vec![split_command[index].clone()]
+			} else {
+				res.unwrap()
+			}
+		};
+		for match_ in matches {
+			exes_list.push(match_);
+		}
+
+		let tag = "{{exes}}";
+		let placeholder = suggest[placeholder.clone()].to_owned();
+		*suggest = suggest.replace(&placeholder, &tag);
+	}
+}
+
 pub fn shell(suggest: &mut String, shell: &str) {
 	while suggest.contains("{{shell") {
 		let (placeholder, args) = eval_placeholder(suggest, "{{shell", "}}");

@@ -118,6 +118,10 @@ pub fn best_match_path(typo: &str, executables: &[String]) -> Option<String> {
 	find_similar(typo, executables, Some(3))
 }
 
+pub fn best_matches_path(typo: &str, executables: &[String]) -> Option<Vec<String>> {
+	find_similars(typo, executables, Some(3))
+}
+
 // higher the threshold, the stricter the comparison
 // 1: anything
 // 2: 50%
@@ -139,6 +143,29 @@ pub fn find_similar(typo: &str, candidates: &[String], threshold: Option<usize>)
 	}
 	if let Some(min_distance_index) = min_distance_index {
 		return Some(candidates[min_distance_index].to_string());
+	}
+	None
+}
+
+pub fn find_similars(typo: &str, candidates: &[String], threshold: Option<usize>) -> Option<Vec<String>> {
+	let threshold = threshold.unwrap_or(2);
+	let mut min_distance = typo.chars().count() / threshold + 1;
+	let mut min_distance_index = vec![];
+	for (i, candidate) in candidates.iter().enumerate() {
+		if candidate.is_empty() {
+			continue;
+		}
+		let distance = compare_string(typo, candidate);
+		if distance == min_distance {
+			min_distance_index.push(i);
+		} else if distance < min_distance {
+			min_distance = distance;
+			min_distance_index.clear();
+			min_distance_index.push(i);
+		}
+	}
+	if !min_distance_index.is_empty() {
+		return Some(min_distance_index.iter().map(|&i| candidates[i].to_string()).collect());
 	}
 	None
 }

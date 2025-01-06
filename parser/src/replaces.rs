@@ -230,6 +230,50 @@ pub fn typo(suggest: &mut String, replace_list: &mut Vec<TokenStream2>) {
 	}
 }
 
+pub fn exes(suggest: &mut String, exes_list: &mut Vec<TokenStream2>) {
+	if suggest.contains("{{exes") {
+		let (placeholder, args) = eval_placeholder(suggest, "{{exes", "}}");
+
+		let index = if suggest.contains('[') {
+			let split = suggest[args.to_owned()]
+				.split(&['[', ']'])
+				.collect::<Vec<&str>>();
+			let command_index = split[1];
+			if !command_index.contains(':') {
+				let command_index = command_index.parse::<i32>().unwrap();
+
+				if command_index < 0 {
+					quote! {split.len() as usize + #command_index}
+				} else {
+					quote! {#command_index as usize}
+				}
+			} else {
+				unreachable!("Exes suggestion does not support range");
+
+			}
+		} else {
+			unreachable!("Exes suggestion must have a command index");
+		};
+
+		let command = quote! {
+			let exes_matches = {
+				let split = split_command(&last_command);
+				let res = best_matches_path(&split[#index], executables);
+				if res.is_none() {
+					vec![split[#index].clone()]
+				} else {
+					res.unwrap()
+				}
+			};
+		};
+		exes_list.push(command);
+
+		let tag = "{{{{exes}}}}";
+		let placeholder = suggest[placeholder.clone()].to_owned();
+		*suggest = suggest.replace(&placeholder, &tag);
+	}
+}
+
 pub fn shell(suggest: &mut String, cmd_list: &mut Vec<String>) {
 	while suggest.contains("{{shell") {
 		let (placeholder, args) = eval_placeholder(suggest, "{{shell", "}}");
