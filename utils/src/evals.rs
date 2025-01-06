@@ -154,7 +154,11 @@ pub fn find_similars(
 		let distance = compare_string(typo, candidate);
 		use std::cmp::Ordering::*;
 		match distance.cmp(&min_distance) {
-			Equal => min_distance_index.push(i),
+			Equal => {
+				if !min_distance_index.is_empty() {
+					min_distance_index.push(i)
+				}
+			},
 			Less => {
 				min_distance = distance;
 				min_distance_index.clear();
