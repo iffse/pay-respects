@@ -268,7 +268,7 @@ pub fn exes(suggest: &mut String, exes_list: &mut Vec<TokenStream2>) {
 
 		let tag = "{{{{exes}}}}";
 		let placeholder = suggest[placeholder.clone()].to_owned();
-		*suggest = suggest.replace(&placeholder, &tag);
+		*suggest = suggest.replace(&placeholder, tag);
 	}
 }
 

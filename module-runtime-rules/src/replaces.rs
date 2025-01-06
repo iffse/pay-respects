@@ -207,10 +207,10 @@ pub fn exes(
 
 		let matches = {
 			let res = best_matches_path(&split_command[index], executables);
-			if res.is_none() {
-				vec![split_command[index].clone()]
+			if let Some(res) = res {
+				res
 			} else {
-				res.unwrap()
+				vec![split_command[index].clone()]
 			}
 		};
 		for match_ in matches {
@@ -219,7 +219,7 @@ pub fn exes(
 
 		let tag = "{{exes}}";
 		let placeholder = suggest[placeholder.clone()].to_owned();
-		*suggest = suggest.replace(&placeholder, &tag);
+		*suggest = suggest.replace(&placeholder, tag);
 	}
 }
 

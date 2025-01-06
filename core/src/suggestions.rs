@@ -33,7 +33,7 @@ pub fn suggest_candidates(data: &mut Data) {
 	thread::scope(|s| {
 		s.spawn(|| {
 			for module in modules {
-				let new_candidates = module_output(&data, module);
+				let new_candidates = module_output(data, module);
 
 				if let Some(candidates) = new_candidates {
 					add_candidates_no_dup(command, &mut module_candidates, &candidates);
