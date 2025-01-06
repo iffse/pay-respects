@@ -11,7 +11,7 @@ suggest = [
 
 [[match_err]]
 pattern = [
-	"cannot create directory",
+	"cannot create",
 ]
 suggest = [
 '''

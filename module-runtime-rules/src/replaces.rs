@@ -30,7 +30,9 @@ pub fn opts(suggest: &mut String, last_command: &mut String, opt_list: &mut Vec<
 		let regex = opt.trim();
 		let current_tag = tag(tag_name, replace_tag);
 
-		opt_list.push((current_tag.clone(), opt_regex(regex, last_command)));
+		let opts = format!(" {}", opt_regex(regex, last_command));
+
+		opt_list.push((current_tag.clone(), opts));
 		suggest.replace_range(placeholder, &current_tag);
 
 		replace_tag += 1;

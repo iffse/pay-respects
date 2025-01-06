@@ -43,7 +43,7 @@ pub fn opts(
 		let current_tag = tag(tag_name, replace_tag);
 		let token_tag: TokenStream2 = format!("{}{}", tag_name, replace_tag).parse().unwrap();
 		let command = quote! {
-			let #token_tag = opt_regex(#regex, &mut last_command);
+			let #token_tag = format!(" {}", opt_regex(#regex, &mut last_command));
 		};
 		opt_list.push(command);
 
