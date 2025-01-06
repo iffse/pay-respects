@@ -256,7 +256,6 @@ pub fn exes(suggest: &mut String, exes_list: &mut Vec<TokenStream2>) {
 
 		let command = quote! {
 			let exes_matches = {
-				let split = split_command(&last_command);
 				let res = best_matches_path(&split[#index], executables);
 				if res.is_none() {
 					vec![split[#index].clone()]
