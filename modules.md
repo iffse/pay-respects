@@ -38,6 +38,13 @@ Your module should print:
 	- At the end of each suggestion, append `<_PR_BR>` so pay-respects knows you are either done or adding another suggestion
 - **To `stderr`**: Any relevant information that should display to the user (e.g, warning for AI generated content)
 
+An example of a shell based module that always adds a `sudo` before the command:
+```sh
+#!/bin/sh
+echo "sudo $_PR_LAST_COMMAND"
+echo "<_PR_BR>"
+```
+
 ## Adding a Module
 
 Expose your module as executable (`chmod u+x`) in `PATH`, and done!

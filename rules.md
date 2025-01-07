@@ -57,7 +57,7 @@ The placeholder is evaluated as following:
 - `{{command[1]}}`: The first argument of the command (the command itself has index of 0). Negative values will count from reverse.
 - `{{command[2:5]}}`: The second to fifth arguments. If any of the side is not specified, then it defaults to the start (if it is left) or the end (if it is right).
 - `{{typo[2](fix1, fix2)}}`: This will try to change the second argument to candidates in the parenthesis. The argument in parentheses must have at least 2 values. Single arguments are reserved for specific matches, for instance, `path` to search all commands found in the `$PATH` environment, or the `{{shell}}` placeholder, among others.
-	- `{{exes[<index>]}}`: Special case for executables, will create multiple suggestions for each match with the same linguistic distance. Currently, only can appear once to avoid recursions.
+- `{{select[3][selection1, selection2]}}`: A derivative of `typo` placeholder. Will create a suggestion for each selection in the parenthesis. The argument in parentheses also must have at least 2 values. Single arguments are reserved for specific selections, for instance, `path` to search all commands found in the `$PATH` environment with the minimum linguistic distance, or the `{{shell}}` placeholder.
 - `{{opt::<Regular Expression>}}`: Optional patterns captured in the command with RegEx ([see regex crate for syntax](https://docs.rs/regex-lite/latest/regex_lite/#syntax)). Note that all patterns matching this placeholder will be removed from indexing.
 - `{{cmd::<Regular Expression>}}`: Get the matching captures from the last command. Unlike `{{opt}}`, this won't remove the string after matching
 - `{{err::<Regular Expression}}`: Get the matching captures from the error message.
