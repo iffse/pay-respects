@@ -157,8 +157,8 @@ fn eval_suggest(
 	if select_list.is_empty() {
 		suggests.push(suggest);
 	} else {
-		for exe in select_list {
-			let eval_suggest = suggest.clone().replace("{{selection}}", &exe);
+		for selection in select_list {
+			let eval_suggest = suggest.clone().replace("{{selection}}", &selection);
 			suggests.push(eval_suggest);
 		}
 	}
