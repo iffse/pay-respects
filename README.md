@@ -107,15 +107,17 @@ Install from your package manager if available:
 <details>
 	<summary>Instructions for package managers</summary>
 
-> | OS / Distribution | Repository      | Instructions                     |
-> |-------------------|-----------------|----------------------------------|
-> | Arch Linux        | [AUR]           | `paru -S pay-respects` (`-bin`)  |
-> | Arch Linux (ARM)  | [Arch Linux CN] | `sudo pacman -S pay-respects`    |
-> | NixOS / *Any*     | [nixpkgs]       | `nix-env -iA nixos.pay-respects` |
+> | OS / Distribution | Repository      | Instructions                                      |
+> |-------------------|-----------------|---------------------------------------------------|
+> | Arch Linux        | [AUR]           | `paru -S pay-respects` (`-bin`)                   |
+> | Arch Linux (ARM)  | [Arch Linux CN] | `sudo pacman -S pay-respects`                     |
+> | MacOS / *Any*     | [timescam]      | `brew install timescam/homebrew-tap/pay-respects` |
+> | NixOS / *Any*     | [nixpkgs]       | `nix-env -iA nixos.pay-respects`                  |
 
 [AUR]: https://aur.archlinux.org/
 [Arch Linux CN]: https://github.com/archlinuxcn/repo
 [nixpkgs]: https://github.com/NixOS/nixpkgs
+[timescam]: https://github.com/timescam/homebrew-tap
 
 </details>
 
