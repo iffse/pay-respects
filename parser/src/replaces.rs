@@ -258,7 +258,7 @@ pub fn select(suggest: &mut String, select_list: &mut Vec<TokenStream2>) {
 				unreachable!("Select suggestion does not support range");
 			}
 		} else {
-			unreachable!("Select suggestion must have a command index");
+			quote! {0}
 		};
 		let selection_list = if suggest.contains('(') {
 			let split = suggest[args.to_owned()]

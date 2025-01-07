@@ -210,7 +210,7 @@ pub fn select(
 				unreachable!("Select suggestion does not support range");
 			}
 		} else {
-			unreachable!("Select suggestion must have a command index");
+			0
 		};
 
 		let selection_list = if suggest.contains('(') {
