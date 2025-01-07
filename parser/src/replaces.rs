@@ -42,10 +42,17 @@ pub fn opts(
 		let regex = opt.trim();
 		let current_tag = tag(tag_name, replace_tag);
 		let token_tag: TokenStream2 = format!("{}{}", tag_name, replace_tag).parse().unwrap();
-		let command = quote! {
-			let #token_tag = format!(" {}", opt_regex(#regex, &mut last_command));
+		let opts = quote! {
+			let caps = opt_regex(#regex, &mut last_command);
+			let #token_tag = {
+				if caps.is_empty() {
+					"".to_string()
+				} else {
+					format!(" {}", caps)
+				}
+			};
 		};
-		opt_list.push(command);
+		opt_list.push(opts);
 
 		replace_list.push(rtag(tag_name, replace_tag, &current_tag));
 		suggest.replace_range(placeholder, &current_tag);

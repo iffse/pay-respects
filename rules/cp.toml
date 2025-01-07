@@ -17,6 +17,6 @@ suggest = [
 '''
 #[err_contains(no such file or directory)]
 mkdir -p {{cmd::(?m)\s(\S+[\\\/])\S*\s*$}} && \
-{{command[0]}} {{opt::\s(-[\w]+)}} {{command[1:]}} '''
+{{command[0]}} {{opt::(?:\s)(-[\w]+)}} {{command[1:]}} '''
 ]
 

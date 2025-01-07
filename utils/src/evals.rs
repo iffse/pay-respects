@@ -3,8 +3,8 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 use crate::files::*;
-use regex_lite::Regex;
 use itertools::Itertools;
+use regex_lite::Regex;
 
 fn regex_captures(regex: &str, string: &str) -> Vec<String> {
 	let regex = Regex::new(regex).unwrap();
@@ -158,7 +158,7 @@ pub fn find_similars(
 				if !min_distance_index.is_empty() {
 					min_distance_index.push(i)
 				}
-			},
+			}
 			Less => {
 				min_distance = distance;
 				min_distance_index.clear();
