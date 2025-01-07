@@ -281,12 +281,14 @@ pub fn select(suggest: &mut String, select_list: &mut Vec<TokenStream2>) {
 		let command = if selection_list[0].starts_with("eval_shell_command(") {
 			let function = selection_list.join(",");
 			// add a " after first comma, and a " before last )
-			let function = format!(
+			let function: TokenStream2 = format!(
 				"{}\"{}{}",
 				&function[..function.find(',').unwrap() + 1],
 				&function[function.find(',').unwrap() + 1..function.len() - 1],
 				"\")"
-			);
+			)
+			.parse()
+			.unwrap();
 			quote! {
 				let selects = #function;
 			}
