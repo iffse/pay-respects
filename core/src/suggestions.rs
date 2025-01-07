@@ -11,6 +11,9 @@ use crate::shell::{add_candidates_no_dup, module_output, shell_evaluated_command
 use crate::style::highlight_difference;
 
 pub fn suggest_candidates(data: &mut Data) {
+	if data.split.is_empty() {
+		return;
+	}
 	let executable = &data.split[0]
 		.rsplit(std::path::MAIN_SEPARATOR)
 		.next()
