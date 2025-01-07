@@ -166,6 +166,7 @@ The command `{last_command}` returns the following error message: `{error_msg}`.
 			str?;
 			str.expect("AI module: Failed to get content from response")
 				.trim_start_matches("```")
+				.trim_start_matches("json")
 				.trim_end_matches("```")
 		};
 		let json = serde_json::from_str(str);
