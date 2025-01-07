@@ -131,7 +131,7 @@ pub fn select_candidate(data: &mut Data) {
 			.without_help_message()
 			.with_render_config(render_config)
 			.prompt()
-			.unwrap();
+			.unwrap_or_else(|_| exit(1));
 		let pos = highlight_candidates.iter().position(|x| x == &ans).unwrap();
 		let suggestion = candidates[pos].to_string();
 		data.update_suggest(&suggestion);

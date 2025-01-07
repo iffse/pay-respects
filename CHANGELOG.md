@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- No longer panics when interrupting multi-suggest
+
 ## [0.6.10] - 2025-01-07
 
 ### Fixed

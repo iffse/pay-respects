@@ -155,7 +155,7 @@ pub fn cnf(data: &mut Data) {
 			.with_render_config(render_config)
 			.without_filtering()
 			.prompt()
-			.unwrap();
+			.unwrap_or_else(|_| std::process::exit(1));
 
 		// retry after installing package
 		if system::install_package(data, &package_manager, &package) {
