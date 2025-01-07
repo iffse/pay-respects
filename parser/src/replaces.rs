@@ -237,9 +237,9 @@ pub fn typo(suggest: &mut String, replace_list: &mut Vec<TokenStream2>) {
 	}
 }
 
-pub fn exes(suggest: &mut String, exes_list: &mut Vec<TokenStream2>) {
-	if suggest.contains("{{exes") {
-		let (placeholder, args) = eval_placeholder(suggest, "{{exes", "}}");
+pub fn select(suggest: &mut String, select_list: &mut Vec<TokenStream2>) {
+	if suggest.contains("{{select") {
+		let (placeholder, args) = eval_placeholder(suggest, "{{select", "}}");
 
 		let index = if suggest.contains('[') {
 			let split = suggest[args.to_owned()]
@@ -255,25 +255,62 @@ pub fn exes(suggest: &mut String, exes_list: &mut Vec<TokenStream2>) {
 					quote! {#command_index as usize}
 				}
 			} else {
-				unreachable!("Exes suggestion does not support range");
+				unreachable!("Select suggestion does not support range");
 			}
 		} else {
-			unreachable!("Exes suggestion must have a command index");
+			unreachable!("Select suggestion must have a command index");
+		};
+		let selection_list = if suggest.contains('(') {
+			let split = suggest[args.to_owned()]
+				.split_once("(")
+				.unwrap()
+				.1
+				.rsplit_once(")")
+				.unwrap()
+				.0;
+			split.split(',').collect::<Vec<&str>>()
+		} else {
+			unreachable!("Select suggestion must have a selection list");
 		};
 
-		let command = quote! {
-			let exes_matches = {
-				let res = best_matches_path(&split[#index], executables);
-				if res.is_none() {
-					vec![split[#index].clone()]
-				} else {
-					res.unwrap()
-				}
-			};
-		};
-		exes_list.push(command);
+		let selection_list = selection_list
+			.iter()
+			.map(|s| s.trim().to_string())
+			.collect::<Vec<String>>();
 
-		let tag = "{{{{exes}}}}";
+		let command = if selection_list[0].starts_with("eval_shell_command(") {
+			let function = selection_list.join(",");
+			// add a " after first comma, and a " before last )
+			let function = format!(
+				"{}\"{}{}",
+				&function[..function.find(',').unwrap() + 1],
+				&function[function.find(',').unwrap() + 1..function.len() - 1],
+				"\")"
+			);
+			quote! {
+				let selects = #function;
+			}
+		} else if selection_list[0] == "path" {
+			quote! {
+				let selects = {
+					let res = best_matches_path(&split[#index], executables);
+					if res.is_none() {
+						vec![split[#index].clone()]
+					} else {
+						res.unwrap()
+					}
+				};
+			}
+		} else {
+			let string_match_list = selection_list.join("\".to_string(), \"");
+			let string_match_list = format!("\"{}\".to_string()", string_match_list);
+			quote! {
+				let selects = vec![#string_match_list];
+			}
+		};
+
+		select_list.push(command);
+		let tag = "{{{{selection}}}}";
 		let placeholder = suggest[placeholder.clone()].to_owned();
 		*suggest = suggest.replace(&placeholder, tag);
 	}

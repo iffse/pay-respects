@@ -182,14 +182,15 @@ pub fn typo(suggest: &mut String, split_command: &[String], executables: &[Strin
 	}
 }
 
-pub fn exes(
+pub fn select(
+	shell: &str,
 	suggest: &mut String,
 	split_command: &[String],
 	executables: &[String],
-	exes_list: &mut Vec<String>,
+	select_list: &mut Vec<String>,
 ) {
-	if suggest.contains("{{exes") {
-		let (placeholder, args) = eval_placeholder(suggest, "{{exes", "}}");
+	if suggest.contains("{{select") {
+		let (placeholder, args) = eval_placeholder(suggest, "{{select", "}}");
 
 		let index = if suggest.contains('[') {
 			let split = suggest[args.to_owned()]
@@ -206,25 +207,51 @@ pub fn exes(
 				};
 				index as usize
 			} else {
-				unreachable!("Exes suggestion does not support range");
+				unreachable!("Select suggestion does not support range");
 			}
 		} else {
-			unreachable!("Exes suggestion must have a command index");
+			unreachable!("Select suggestion must have a command index");
 		};
 
-		let matches = {
+		let selection_list = if suggest.contains('(') {
+			let split = suggest[args.to_owned()]
+				.split_once("(")
+				.unwrap()
+				.1
+				.rsplit_once(")")
+				.unwrap()
+				.0;
+			split.split(',').collect::<Vec<&str>>()
+		} else {
+			unreachable!("Select suggestion must have a match list");
+		};
+
+		let selection_list = selection_list
+			.iter()
+			.map(|s| s.trim().to_string())
+			.collect::<Vec<String>>();
+
+		let selects = if selection_list[0].starts_with("{{shell") {
+			let function = selection_list.join(",");
+			let (_, args) = eval_placeholder(&function, "{{shell", "}}");
+			let function = &function[args.to_owned()].trim_matches(|c| c == '(' || c == ')');
+			eval_shell_command(shell, function)
+		} else if selection_list[0] == "path" {
 			let res = best_matches_path(&split_command[index], executables);
 			if let Some(res) = res {
 				res
 			} else {
 				vec![split_command[index].clone()]
 			}
+		} else {
+			selection_list
 		};
-		for match_ in matches {
-			exes_list.push(match_);
+
+		for match_ in selects {
+			select_list.push(match_);
 		}
 
-		let tag = "{{exes}}";
+		let tag = "{{selection}}";
 		let placeholder = suggest[placeholder.clone()].to_owned();
 		*suggest = suggest.replace(&placeholder, tag);
 	}

@@ -140,19 +140,25 @@ fn eval_suggest(
 	replaces::shell(&mut suggest, shell);
 	replaces::typo(&mut suggest, &split_command, executables, shell);
 
-	let mut exes_list = Vec::new();
-	replaces::exes(&mut suggest, &split_command, executables, &mut exes_list);
+	let mut select_list = Vec::new();
+	replaces::select(
+		shell,
+		&mut suggest,
+		&split_command,
+		executables,
+		&mut select_list,
+	);
 
 	for (tag, value) in opt_list {
 		suggest = suggest.replace(&tag, &value);
 	}
 
 	let mut suggests = vec![];
-	if exes_list.is_empty() {
+	if select_list.is_empty() {
 		suggests.push(suggest);
 	} else {
-		for exe in exes_list {
-			let eval_suggest = suggest.clone().replace("{{exes}}", &exe);
+		for exe in select_list {
+			let eval_suggest = suggest.clone().replace("{{selection}}", &exe);
 			suggests.push(eval_suggest);
 		}
 	}
