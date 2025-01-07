@@ -1,6 +1,6 @@
 [package]
 name = "pay-respects-module-request-ai"
-version = "0.1.7"
+version = "0.1.8"
 edition = "2021"
 
 description = "AI request module for the pay-respects CLI tool"
@@ -17,7 +17,6 @@ serde_json = { version = "1.0" }
 serde = { version = "1.0", features = ["derive"]}
 textwrap = "0.16"
 terminal_size = "0.4"
-
 
 curl = { version = "0.4", optional = true }
 
