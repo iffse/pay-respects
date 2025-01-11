@@ -134,6 +134,9 @@ pattern = [
 ]
 suggest = [
 '''
+#[cmd_contains(pull)]
+{{command}} --rebase --autostash ''',
+'''
 git stash && \
 {{command}} && \
 git stash pop '''
