@@ -141,3 +141,16 @@ git stash && \
 {{command}} && \
 git stash pop '''
 ]
+
+[[match_err]]
+pattern = [
+	"you have divergent branches and need to specify how to reconcile them"
+]
+suggest = [
+'''
+#[cmd_contains(pull)]
+{{command}} --rebase ''',
+'''
+#[cmd_contains(pull)]
+{{command}} --merge '''
+]
