@@ -14,7 +14,7 @@ license = "AGPL-3.0-or-later"
 include = ["**/*.rs", "**/*.toml"]
 
 [dependencies]
-colored = "2"
+colored = "3"
 sys-locale = "0.3"
 rust-i18n = "3"
 regex-lite = "0.1"
