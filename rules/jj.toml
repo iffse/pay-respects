@@ -1,0 +1,28 @@
+command = "jj"
+
+[[match_err]]
+pattern = [
+	"pass `--ignore-immutable`"
+]
+suggest = [
+'''
+{{command}} --ignore-immutable'''
+]
+
+[[match_err]]
+pattern = [
+	"use --allow-new to push new bookmark"
+]
+suggest = [
+'''
+{{command}} --allow-new'''
+]
+
+[[match_err]]
+pattern = [
+	"no bookmarks found in the default push revset"
+]
+suggest = [
+'''
+{{command}} --change @'''
+]
