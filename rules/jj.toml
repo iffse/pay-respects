@@ -11,7 +11,7 @@ suggest = [
 
 [[match_err]]
 pattern = [
-	"Use --allow-new to push new bookmark."
+	"use --allow-new to push new bookmark"
 ]
 suggest = [
 '''
@@ -20,7 +20,7 @@ suggest = [
 
 [[match_err]]
 pattern = [
-	"No bookmarks found in the default push revset:"
+	"no bookmarks found in the default push revset"
 ]
 suggest = [
 '''
