@@ -7,9 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.11]
+
 ### Fixed
 
 - No longer panics when interrupting multi-suggest
+- Bash & Zsh: Reverted function based initialization to alias
 
 ## [0.6.10] - 2025-01-07
 
@@ -152,7 +155,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 History start.
 
-[unreleased]: https://github.com/iffse/pay-respects/compare/v0.6.10..HEAD
+[unreleased]: https://github.com/iffse/pay-respects/compare/v0.6.11..HEAD
+[0.6.11]: https://github.com/iffse/pay-respects/compare/v0.6.10..v0.6.11
 [0.6.10]: https://github.com/iffse/pay-respects/compare/v0.6.9..v0.6.10
 [0.6.9]: https://github.com/iffse/pay-respects/compare/v0.6.8..v0.6.9
 [0.6.8]: https://github.com/iffse/pay-respects/compare/v0.6.7..v0.6.8
