@@ -544,9 +544,7 @@ def --env {} [] {{
 		"bash" | "zsh" => {
 			initialize = format!(
 				r#"
-{} () {{
-	{}
-}}
+alias {}='{}'
 "#,
 				alias, initialize
 			);
