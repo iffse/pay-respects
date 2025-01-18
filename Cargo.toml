@@ -6,6 +6,7 @@ members = [
 	"module-runtime-rules",
 	"module-request-ai",
 ]
+default-members = ["core"]
 
 [profile.release]
 strip = true
