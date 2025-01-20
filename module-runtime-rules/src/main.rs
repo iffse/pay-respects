@@ -16,6 +16,7 @@
 
 mod replaces;
 mod rules;
+use pay_respects_utils::files::get_path_files;
 
 fn main() -> Result<(), std::io::Error> {
 	let executable = std::env::var("_PR_COMMAND").expect("_PR_COMMAND not set");
@@ -23,8 +24,12 @@ fn main() -> Result<(), std::io::Error> {
 	let last_command = std::env::var("_PR_LAST_COMMAND").expect("_PR_LAST_COMMAND not set");
 	let error_msg = std::env::var("_PR_ERROR_MSG").expect("_PR_ERROR_MSG not set");
 	let executables: Vec<String> = {
-		let executables = std::env::var("_PR_EXECUTABLES").expect("_PR_EXECUTABLES not set");
-		executables.split(" ").map(|s| s.to_string()).collect()
+		let exes = std::env::var("_PR_EXECUTABLES").expect("_PR_EXECUTABLES not set");
+		if exes.is_empty() {
+			get_path_files()
+		} else {
+			exes.split(" ").map(|s| s.to_string()).collect()
+		}
 	};
 
 	#[cfg(debug_assertions)]
