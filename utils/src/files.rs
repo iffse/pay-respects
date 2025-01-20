@@ -3,6 +3,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 use crate::evals::find_similar;
+use itertools::Itertools;
 
 pub fn get_path_files() -> Vec<String> {
 	let path_env = path_env();
@@ -44,7 +45,7 @@ pub fn get_path_files() -> Vec<String> {
 		eprintln!("all_executable={all_executable:?}");
 	}
 
-	all_executable
+	all_executable.iter().unique().cloned().collect()
 }
 
 pub fn best_match_file(input: &str) -> Option<String> {
