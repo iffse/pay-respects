@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `nix-index` panic by [jakobhellermann](https://github.com/iffse/pay-respects/pull/31)
+
+### Changed
+
+- Executables environment variable passed to modules is now limited to 100k characters
+- Changed the format for multi-suggest
+
 ## [0.6.11]
 
 ### Fixed
