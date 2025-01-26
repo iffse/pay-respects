@@ -5,6 +5,7 @@ use std::time::{Duration, Instant};
 
 use colored::Colorize;
 use inquire::*;
+use ui::Color;
 
 use crate::rules::match_pattern;
 use crate::shell::{add_candidates_no_dup, module_output, shell_evaluated_commands, Data};
@@ -85,8 +86,8 @@ pub fn select_candidate(data: &mut Data) {
 	if candidates.len() == 1 {
 		let suggestion = candidates[0].to_string();
 		let highlighted = highlight_difference(data, &suggestion).unwrap();
-		eprintln!("{}\n", highlighted);
 		let confirm = format!("[{}]", t!("confirm-yes")).green();
+		eprintln!("{}\n", highlighted);
 		eprintln!("{}: {} {}", t!("confirm"), confirm, "[Ctrl+C]".red());
 		std::io::stdin().read_line(&mut String::new()).unwrap();
 		data.update_suggest(&suggestion);
@@ -97,24 +98,19 @@ pub fn select_candidate(data: &mut Data) {
 			.map(|candidate| highlight_difference(data, candidate).unwrap())
 			.collect::<Vec<String>>();
 
-		for candidate in highlight_candidates.iter_mut() {
-			let lines = candidate.lines().collect::<Vec<&str>>();
-			let mut formated = String::new();
-			for (j, line) in lines.iter().enumerate() {
-				if j == 0 {
-					formated = line.to_string();
-				} else {
-					formated = format!("{}\n {}", formated, line);
-				}
+		if highlight_candidates.iter().any(|x| x.contains('\n')) {
+			for candidate in highlight_candidates.iter_mut() {
+				*candidate = format!("\t{}", candidate.replace("\n", "\n\t"));
 			}
-			*candidate = formated;
 		}
 
 		let style = ui::Styled::default();
 		let render_config = ui::RenderConfig::default()
 			.with_prompt_prefix(style)
-			.with_answered_prompt_prefix(style)
-			.with_highlighted_option_prefix(style);
+			.with_highlighted_option_prefix(ui::Styled::new(">").with_fg(Color::LightBlue))
+			.with_scroll_up_prefix(ui::Styled::new("^").with_fg(Color::LightBlue))
+			.with_scroll_down_prefix(ui::Styled::new("v").with_fg(Color::LightBlue))
+			.with_option_index_prefix(ui::IndexPrefix::SpacePadded);
 
 		let msg = format!("{}", t!("multi-suggest", num = candidates.len()))
 			.bold()
@@ -125,7 +121,6 @@ pub fn select_candidate(data: &mut Data) {
 		eprintln!("{}", hint);
 
 		let ans = Select::new("\n", highlight_candidates.clone())
-			.with_page_size(1)
 			.with_vim_mode(true)
 			.without_filtering()
 			.without_help_message()

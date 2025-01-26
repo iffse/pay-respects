@@ -19,7 +19,7 @@ sys-locale = "0.3"
 rust-i18n = "3"
 regex-lite = "0.1"
 
-inquire = "0.7.5"
+inquire = "0.7"
 
 pay-respects-parser = { version = "0.3", path = "../parser" }
 pay-respects-utils = { version ="0.1", path = "../utils"}

@@ -6,6 +6,7 @@ use colored::Colorize;
 use inquire::*;
 use pay_respects_utils::evals::best_matches_path;
 use pay_respects_utils::files::best_match_file;
+use ui::Color;
 
 use std::path::Path;
 
@@ -143,7 +144,13 @@ pub fn cnf(data: &mut Data) {
 		eprintln!("packages: {:?}", packages);
 
 		let style = ui::Styled::default();
-		let render_config = ui::RenderConfig::default().with_prompt_prefix(style);
+		let render_config = ui::RenderConfig::default()
+			.with_prompt_prefix(style)
+			.with_highlighted_option_prefix(ui::Styled::new(">").with_fg(Color::LightBlue))
+			.with_scroll_up_prefix(ui::Styled::new("^"))
+			.with_scroll_down_prefix(ui::Styled::new("v"))
+			.with_option_index_prefix(ui::IndexPrefix::SpacePadded);
+
 		let msg = format!("{}:", t!("install-package")).bold().blue();
 		let confirm = format!("[{}]", t!("confirm-yes")).green();
 		let hint = format!("{} {} {}", "[↑/↓]".blue(), confirm, "[Ctrl+C]".red());
