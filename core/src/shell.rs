@@ -418,6 +418,7 @@ pub fn alias_map(shell: &str) -> Option<HashMap<String, String>> {
 			unreachable!("Unsupported shell: {}", shell);
 		}
 	}
+	std::env::remove_var("_PR_ALIAS");
 	Some(alias_map)
 }
 
