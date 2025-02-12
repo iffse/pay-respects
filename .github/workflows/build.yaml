@@ -23,24 +23,28 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
+            target: x86_64-unknown-linux-musl
             deb: true
             rpm: true
+            musl: true
           - os: ubuntu-latest
-            target: i686-unknown-linux-gnu
+            target: i686-unknown-linux-musl
             deb: true
             rpm: true
             cross: true
+            musl: true
           - os: ubuntu-latest
-            target: aarch64-unknown-linux-gnu
+            target: aarch64-unknown-linux-musl
             deb: true
             rpm: true
             cross: true
+            musl: true
           - os: ubuntu-latest
-            target: armv7-unknown-linux-gnueabihf
+            target: armv7-unknown-linux-musleabihf
             deb: true
             rpm: true
             cross: true
+            musl: true
           - os: ubuntu-latest
             target: aarch64-linux-android
             cross: true
@@ -67,15 +71,24 @@ jobs:
           target: ${{ matrix.target }}
           profile: minimal
 
+      - name: Install musl
+        if: matrix.musl == true
+        run: sudo apt-get install -y musl-tools
+
       - name: Caching
         uses: Swatinem/rust-cache@v2
         with:
           key: ${{ matrix.target }}
 
       - name: Build
-        if: ${{ matrix.cross == false}}
+        if: ${{ matrix.cross == false && matrix.musl == false }}
         run:
           cargo build --release --workspace --locked --target ${{ matrix.target }}
+
+      - name: Build (musl)
+        if: ${{ matrix.cross == false && matrix.musl == true }}
+        run:
+          cargo build --release --workspace --no-default-features --locked --target ${{ matrix.target }}
 
       - name: Build (cross)
         if: ${{ matrix.cross == true}}

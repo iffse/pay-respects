@@ -201,7 +201,7 @@ get_architecture() {
 	local _ostype _cputype _bitness _arch _clibtype
 	_ostype="$(uname -s)"
 	_cputype="$(uname -m)"
-	_clibtype="gnu"
+	_clibtype="musl"
 
 	if [ "${_ostype}" = Linux ]; then
 		if [ "$(uname -o || true)" = Android ]; then
@@ -329,7 +329,7 @@ get_architecture() {
 	esac
 
 	# Detect 64-bit linux with 32-bit userland
-	if [ "${_ostype}" = unknown-linux-gnu ] && [ "${_bitness}" -eq 32 ]; then
+	if [ "${_ostype}" = unknown-linux-musl ] && [ "${_bitness}" -eq 32 ]; then
 		case ${_cputype} in
 		x86_64)
 			# 32-bit executable for amd64 = x32
