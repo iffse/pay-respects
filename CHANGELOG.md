@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.13] - 2025-02-12
+
+### Changed
+
+- CI binaries now use statically linked musl library
+- Multi-suggest format changed to unordered bullet list
+- Single suggests merged into multi-suggest
+
 ## [0.6.12] - 2025-01-26
 
 ### Fixed
@@ -166,7 +174,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 History start.
 
-[unreleased]: https://github.com/iffse/pay-respects/compare/v0.6.12..HEAD
+[unreleased]: https://github.com/iffse/pay-respects/compare/v0.6.13..HEAD
+[0.6.13]: https://github.com/iffse/pay-respects/compare/v0.6.12..v0.6.13
 [0.6.12]: https://github.com/iffse/pay-respects/compare/v0.6.11..v0.6.12
 [0.6.11]: https://github.com/iffse/pay-respects/compare/v0.6.10..v0.6.11
 [0.6.10]: https://github.com/iffse/pay-respects/compare/v0.6.9..v0.6.10
