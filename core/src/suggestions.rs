@@ -83,54 +83,44 @@ pub fn select_candidate(data: &mut Data) {
 	let candidates = &data.candidates;
 	#[cfg(debug_assertions)]
 	eprintln!("candidates: {candidates:?}");
-	if candidates.len() == 1 {
-		let suggestion = candidates[0].to_string();
-		let highlighted = highlight_difference(data, &suggestion).unwrap();
-		let confirm = format!("[{}]", t!("confirm-yes")).green();
-		eprintln!("{}\n", highlighted);
-		eprintln!("{}: {} {}", t!("confirm"), confirm, "[Ctrl+C]".red());
-		std::io::stdin().read_line(&mut String::new()).unwrap();
-		data.update_suggest(&suggestion);
-		data.expand_suggest();
-	} else {
-		let mut highlight_candidates = candidates
-			.iter()
-			.map(|candidate| highlight_difference(data, candidate).unwrap())
-			.collect::<Vec<String>>();
 
-		if highlight_candidates.iter().any(|x| x.contains('\n')) {
-			for candidate in highlight_candidates.iter_mut() {
-				*candidate = format!("* {}", candidate.replace("\n", "\n    "));
-			}
+	let mut highlight_candidates = candidates
+		.iter()
+		.map(|candidate| highlight_difference(data, candidate).unwrap())
+		.collect::<Vec<String>>();
+
+	if highlight_candidates.iter().any(|x| x.contains('\n')) {
+		for candidate in highlight_candidates.iter_mut() {
+			*candidate = format!("* {}", candidate.replace("\n", "\n    "));
 		}
-
-		let style = ui::Styled::default();
-		let render_config = ui::RenderConfig::default()
-			.with_prompt_prefix(style)
-			.with_highlighted_option_prefix(ui::Styled::new(">").with_fg(Color::LightBlue))
-			.with_scroll_up_prefix(ui::Styled::new("^").with_fg(Color::LightBlue))
-			.with_scroll_down_prefix(ui::Styled::new("v").with_fg(Color::LightBlue));
-
-		let msg = format!("{}", t!("multi-suggest", num = candidates.len()))
-			.bold()
-			.blue();
-		let confirm = format!("[{}]", t!("confirm-yes")).green();
-		let hint = format!("{} {} {}", "[↑/↓]".blue(), confirm, "[Ctrl+C]".red());
-		eprintln!("{}", msg);
-		eprintln!("{}", hint);
-
-		let ans = Select::new("\n", highlight_candidates.clone())
-			.with_vim_mode(true)
-			.without_filtering()
-			.without_help_message()
-			.with_render_config(render_config)
-			.prompt()
-			.unwrap_or_else(|_| exit(1));
-		let pos = highlight_candidates.iter().position(|x| x == &ans).unwrap();
-		let suggestion = candidates[pos].to_string();
-		data.update_suggest(&suggestion);
-		data.expand_suggest();
 	}
+
+	let style = ui::Styled::default();
+	let render_config = ui::RenderConfig::default()
+		.with_prompt_prefix(style)
+		.with_highlighted_option_prefix(ui::Styled::new(">").with_fg(Color::LightBlue))
+		.with_scroll_up_prefix(ui::Styled::new("^").with_fg(Color::LightBlue))
+		.with_scroll_down_prefix(ui::Styled::new("v").with_fg(Color::LightBlue));
+
+	let msg = format!("{}", t!("multi-suggest", num = candidates.len()))
+		.bold()
+		.blue();
+	let confirm = format!("[{}]", t!("confirm-yes")).green();
+	let hint = format!("{} {} {}", "[↑/↓/j/k]".blue(), confirm, "[ESC]".red());
+	eprintln!("{}", msg);
+	eprintln!("{}", hint);
+
+	let ans = Select::new("\n", highlight_candidates.clone())
+		.with_vim_mode(true)
+		.without_filtering()
+		.without_help_message()
+		.with_render_config(render_config)
+		.prompt()
+		.unwrap_or_else(|_| exit(1));
+	let pos = highlight_candidates.iter().position(|x| x == &ans).unwrap();
+	let suggestion = candidates[pos].to_string();
+	data.update_suggest(&suggestion);
+	data.expand_suggest();
 
 	data.candidates.clear();
 }
