@@ -100,7 +100,7 @@ pub fn select_candidate(data: &mut Data) {
 
 		if highlight_candidates.iter().any(|x| x.contains('\n')) {
 			for candidate in highlight_candidates.iter_mut() {
-				*candidate = format!("\t{}", candidate.replace("\n", "\n\t"));
+				*candidate = format!("* {}", candidate.replace("\n", "\n    "));
 			}
 		}
 
@@ -109,8 +109,7 @@ pub fn select_candidate(data: &mut Data) {
 			.with_prompt_prefix(style)
 			.with_highlighted_option_prefix(ui::Styled::new(">").with_fg(Color::LightBlue))
 			.with_scroll_up_prefix(ui::Styled::new("^").with_fg(Color::LightBlue))
-			.with_scroll_down_prefix(ui::Styled::new("v").with_fg(Color::LightBlue))
-			.with_option_index_prefix(ui::IndexPrefix::SpacePadded);
+			.with_scroll_down_prefix(ui::Styled::new("v").with_fg(Color::LightBlue));
 
 		let msg = format!("{}", t!("multi-suggest", num = candidates.len()))
 			.bold()
