@@ -153,7 +153,7 @@ pub fn cnf(data: &mut Data) {
 
 		let msg = format!("{}:", t!("install-package")).bold().blue();
 		let confirm = format!("[{}]", t!("confirm-yes")).green();
-		let hint = format!("{} {} {}", "[↑/↓]".blue(), confirm, "[Ctrl+C]".red());
+		let hint = format!("{} {} {}", "[↑/↓/j/k]".blue(), confirm, "[ESC]".red());
 		eprintln!("{}", msg);
 		eprintln!("{}", hint);
 		let package = Select::new("\n", packages)
