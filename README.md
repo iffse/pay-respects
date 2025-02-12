@@ -162,7 +162,7 @@ See the following pages:
 
 AI suggestions should work out of the box with `request-ai` module installed.
 
-An API key is included with the source. It should always work unless I can no longer afford this public service or rate limits are reached. If it's useful to you, **please share this project and spread the word**. Also consider making a donation to keep its public usage alive:
+An API key is included with the source (your distribution might have stripped them out). It should always work unless I can no longer afford this public service or rate limits are reached. If it's useful to you, **please share this project and spread the word**. Also consider making a donation to keep its public usage alive:
 
 <div>
 	<a
@@ -204,28 +204,7 @@ An API key is included with the source. It should always work unless I can no lo
 	>
 </div>
 
-<details>
-	<summary>AI and API Configuration</summary>
-
-> Configuration is done via environment variables:
->
-> - `_PR_AI_API_KEY`: Your own API key
-> - `_PR_AI_URL`: URL used. Any OpenAI compatible URL can be used, e.g.:
->	- `https://api.openai.com/v1/chat/completions` (Note: OpenAI's ChatGPT is very slow)
->	- `https://api.groq.com/openai/v1/chat/completions`
-> - `_PR_AI_MODEL`: Model used
-> - `_PR_AI_DISABLE`: Setting to any value disables AI integration
-> - `_PR_AI_LOCALE`: Locale in which the AI explains the suggestion. Defaults to user system locale
-
-> Compile time variables: Default values for the respective variables above when not set
->
-> - `_DEF_PR_AI_API_KEY`
-> - `_DEF_PR_AI_URL`
-> - `_DEF_PR_AI_MODEL`
->
->  If default values were not provided, pay-respects' own values will be used. Your request will be filtered to avoid abuse usages. Request will then be forwarded to a LLM provider that will not use your data for training.
-
-</details>
+[AI and API configurations](./module-request-ai/README.md)
 
 ## Contributing
 
