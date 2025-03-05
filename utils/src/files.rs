@@ -164,6 +164,6 @@ fn path_env() -> String {
 }
 
 #[cfg(not(windows))]
-fn path_env_sep() -> &'static str {
+pub fn path_env_sep() -> &'static str {
 	":"
 }

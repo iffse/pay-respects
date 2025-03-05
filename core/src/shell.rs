@@ -1,13 +1,16 @@
 use pay_respects_utils::evals::split_command;
 use pay_respects_utils::files::get_path_files;
-use pay_respects_utils::files::path_convert;
 use pay_respects_utils::files::path_env_sep;
+
 use std::process::{exit, Stdio};
 
 use std::collections::HashMap;
 use std::sync::mpsc::channel;
 use std::thread;
 use std::time::Duration;
+
+#[cfg(windows)]
+use pay_respects_utils::files::path_convert;
 
 pub const PRIVILEGE_LIST: [&str; 2] = ["sudo", "doas"];
 
@@ -114,9 +117,6 @@ impl Data {
 					}
 				}
 
-				#[cfg(not(windows))]
-				let path = lib_dir.split(':').collect::<Vec<&str>>();
-				#[cfg(windows)]
 				let path = lib_dir.split(path_env_sep()).collect::<Vec<&str>>();
 
 				for p in path {
