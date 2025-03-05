@@ -1,5 +1,7 @@
 use pay_respects_utils::evals::split_command;
 use pay_respects_utils::files::get_path_files;
+use pay_respects_utils::files::path_convert;
+use pay_respects_utils::files::path_env_sep;
 use std::process::{exit, Stdio};
 
 use std::collections::HashMap;
@@ -115,9 +117,12 @@ impl Data {
 				#[cfg(not(windows))]
 				let path = lib_dir.split(':').collect::<Vec<&str>>();
 				#[cfg(windows)]
-				let path = lib_dir.split(';').collect::<Vec<&str>>();
+				let path = lib_dir.split(path_env_sep()).collect::<Vec<&str>>();
 
 				for p in path {
+					#[cfg(windows)]
+					let p = path_convert(p);
+
 					let files = match std::fs::read_dir(p) {
 						Ok(files) => files,
 						Err(_) => continue,
