@@ -112,7 +112,11 @@ impl Data {
 					}
 				}
 
+				#[cfg(not(windows))]
 				let path = lib_dir.split(':').collect::<Vec<&str>>();
+				#[cfg(windows)]
+				let path = lib_dir.split(';').collect::<Vec<&str>>();
+
 				for p in path {
 					let files = match std::fs::read_dir(p) {
 						Ok(files) => files,
