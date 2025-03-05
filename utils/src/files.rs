@@ -123,7 +123,7 @@ fn path_env() -> String {
 }
 
 #[cfg(windows)]
-fn path_env_sep() -> &'static str {
+pub fn path_env_sep() -> &'static str {
 	if is_msystem() {
 		":"
 	} else {
@@ -132,7 +132,7 @@ fn path_env_sep() -> &'static str {
 }
 
 #[cfg(windows)]
-fn path_convert(path: &str) -> String {
+pub fn path_convert(path: &str) -> String {
 	if is_msystem() {
 		msys2_conv_path(path).expect("Failed to convert path for msys")
 	} else {
@@ -164,6 +164,6 @@ fn path_env() -> String {
 }
 
 #[cfg(not(windows))]
-fn path_env_sep() -> &'static str {
+pub fn path_env_sep() -> &'static str {
 	":"
 }
