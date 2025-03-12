@@ -163,12 +163,14 @@ impl Data {
 		};
 
 		init.split();
+		init.expand_command();
 		if init.mode != Mode::Cnf {
 			init.update_error(None);
 		}
 
 		#[cfg(debug_assertions)]
 		{
+			eprintln!("/// data initialization");
 			eprintln!("shell: {}", init.shell);
 			eprintln!("command: {}", init.command);
 			eprintln!("error: {}", init.error);
@@ -209,6 +211,8 @@ impl Data {
 			self.command = self.command.replacen(&split[0], "", 1).trim().to_string();
 			self.privilege = Some(split.remove(0))
 		}
+		#[cfg(debug_assertions)]
+		eprintln!("split: {:?}", split);
 		self.split = split;
 	}
 
@@ -454,7 +458,7 @@ pub fn expand_alias_multiline(map: &HashMap<String, String>, command: &str) -> O
 		}
 	}
 	if expansion {
-		Some(expanded)
+		Some(expanded.trim().to_string())
 	} else {
 		None
 	}

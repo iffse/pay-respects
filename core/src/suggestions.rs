@@ -30,6 +30,10 @@ pub fn suggest_candidates(data: &mut Data) {
 
 	#[cfg(debug_assertions)]
 	{
+		eprintln!("/// suggest_candidates");
+		eprintln!("split: {:?}", data.split);
+		eprintln!("command: {command}");
+		eprintln!("privilege: {privilege:?}");
 		eprintln!("modules: {modules:?}");
 		eprintln!("fallbacks: {fallbacks:?}");
 	}

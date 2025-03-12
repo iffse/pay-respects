@@ -51,7 +51,6 @@ fn main() -> Result<(), std::io::Error> {
 		init.ok().unwrap()
 	};
 
-	data.expand_command();
 	use shell::Mode::*;
 	match data.mode {
 		Suggestion => modes::suggestion(&mut data),
