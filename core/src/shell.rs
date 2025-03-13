@@ -388,6 +388,7 @@ pub fn run_mode() -> Mode {
 	}
 }
 
+#[allow(clippy::wildcard_in_or_patterns)]
 pub fn alias_map(shell: &str) -> Option<HashMap<String, String>> {
 	let env = std::env::var("_PR_ALIAS");
 
@@ -424,8 +425,11 @@ pub fn alias_map(shell: &str) -> Option<HashMap<String, String>> {
 				alias_map.insert(alias.to_string(), command.to_string());
 			}
 		}
-		_ => {
-			unreachable!("Unsupported shell: {}", shell);
+		"nu" | _ => {
+			for line in env.lines() {
+				let (alias, command) = line.split_once('=').unwrap();
+				alias_map.insert(alias.to_string(), command.to_string());
+			}
 		}
 	}
 	std::env::remove_var("_PR_ALIAS");
@@ -484,7 +488,7 @@ pub fn initialization(init: &mut Init) {
 		}
 		"nu" | "nush" | "nushell" => {
 			last_command = "(history | last).command";
-			shell_alias = "\"\"";
+			shell_alias = r#"(help aliases | select name expansion | each ({ |row| $row.name + "=" + $row.expansion }) | str join (char nl))"#;
 			init.shell = "nu".to_string();
 		}
 		"pwsh" | "powershell" => {
@@ -504,11 +508,11 @@ pub fn initialization(init: &mut Init) {
 		let init = format!(
 			r#"
 def --env {} [] {{
-	let dir = (with-env {{ _PR_LAST_COMMAND: {}, _PR_SHELL: nu }} {{ {} }})
+	let dir = (with-env {{ _PR_LAST_COMMAND: {}, _PR_ALIAS: {}, _PR_SHELL: nu }} {{ {} }})
 	cd $dir
 }}
 "#,
-			init.alias, last_command, init.binary_path
+			init.alias, last_command, shell_alias, init.binary_path
 		);
 		println!("{}", init);
 		return;
