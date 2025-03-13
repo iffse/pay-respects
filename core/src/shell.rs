@@ -684,6 +684,7 @@ pub fn shell_syntax(shell: &str, command: &mut String) {
 	match shell {
 		"nu" => {
 			*command = command.replace(" && ", " and ");
+			*command = command.replace(" || ", " or ");
 		}
 		_ => {}
 	}
