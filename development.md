@@ -8,7 +8,7 @@
 
 | Feature           | Bash | Zsh | Fish | Nush | Pwsh   |
 |-------------------|------|-----|------|------|--------|
-| Get other alias   | ✅   | ✅  | ✅   | ❌   | ❌     |
+| Get other alias   | ✅   | ✅  | ✅   | ✅   | ❌     |
 | Command not found | ✅   | ✅  | ✅   | ❌   | ⚠️ [^1] |
 
 [^1]: Cannot retrieve arguments.

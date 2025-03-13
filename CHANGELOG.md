@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Nushell: Added alias support
+	- Also allows arbitrary shell to provide support
+
+### Fixed
+
+- No longer having newlines when expanding alias
+
+### Changed
+
+- (Windows) Separator for `_PR_LIB` has changed to `;` by [codyduong](https://github.com/iffse/pay-respects/pull/37)
+
 ## [0.6.13] - 2025-02-12
 
 ### Changed
