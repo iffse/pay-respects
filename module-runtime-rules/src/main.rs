@@ -23,14 +23,7 @@ fn main() -> Result<(), std::io::Error> {
 	let shell = std::env::var("_PR_SHELL").expect("_PR_SHELL not set");
 	let last_command = std::env::var("_PR_LAST_COMMAND").expect("_PR_LAST_COMMAND not set");
 	let error_msg = std::env::var("_PR_ERROR_MSG").expect("_PR_ERROR_MSG not set");
-	let executables: Vec<String> = {
-		let exes = std::env::var("_PR_EXECUTABLES").expect("_PR_EXECUTABLES not set");
-		if exes.is_empty() {
-			get_path_files()
-		} else {
-			exes.split(" ").map(|s| s.to_string()).collect()
-		}
-	};
+	let executables: Vec<String> = get_path_files();
 
 	#[cfg(debug_assertions)]
 	{

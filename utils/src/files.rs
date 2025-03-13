@@ -6,6 +6,13 @@ use crate::evals::find_similar;
 use itertools::Itertools;
 
 pub fn get_path_files() -> Vec<String> {
+	let env = std::env::var("_PR_EXECUTABLES");
+	if let Ok(env) = env {
+		if !env.is_empty() {
+			return env.split(' ').map(|s| s.to_owned()).collect();
+		}
+	}
+
 	let path_env = path_env();
 
 	#[cfg(debug_assertions)]

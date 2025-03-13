@@ -86,6 +86,12 @@ Please follow the instruction for your shell:
 > eval $(_PR_SHELL=sh _PR_LAST_COMMAND="git comit" pay-respects)
 > ```
 
+> Following variables are not required, but can be used to reduce unnecessary operations:
+>
+> - `_PR_ALIAS`: A list of aliases to commands. Separated by newlines with zsh-like formatting, e.g. `gc=git commit`
+> - `_PR_ERROR_MSG`: Error message from the previous command. `pay-respects` will rerun previous command to get the error message if absent
+> - `_PR_EXECUTABLES`: A space separated list of commands/executables. `pay-respects` will search for `$PATH` if absent
+
 </details>
 
 <details>
