@@ -54,6 +54,18 @@ pub fn suggestion(data: &mut Data) {
 	);
 }
 
+pub fn echo(data: &mut Data) {
+	let shell = data.shell.clone();
+	suggest_candidates(data);
+	if data.candidates.is_empty() {
+		eprintln!("No suggestions found")
+	};
+	for candidate in &mut data.candidates {
+		shell::shell_syntax(&shell, candidate);
+		println!("{} <_PR_BR>", candidate);
+	}
+}
+
 pub fn cnf(data: &mut Data) {
 	let shell = data.shell.clone();
 	let mut split_command = data.split.clone();

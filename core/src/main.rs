@@ -54,6 +54,7 @@ fn main() -> Result<(), std::io::Error> {
 	use shell::Mode::*;
 	match data.mode {
 		Suggestion => modes::suggestion(&mut data),
+		Echo => modes::echo(&mut data),
 		Cnf => modes::cnf(&mut data),
 	}
 

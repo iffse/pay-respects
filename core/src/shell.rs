@@ -17,6 +17,7 @@ pub const PRIVILEGE_LIST: [&str; 2] = ["sudo", "doas"];
 #[derive(PartialEq)]
 pub enum Mode {
 	Suggestion,
+	Echo,
 	Cnf,
 }
 pub struct Init {
@@ -382,7 +383,11 @@ pub fn run_mode() -> Mode {
 		Ok(mode) => match mode.as_str() {
 			"suggestion" => Mode::Suggestion,
 			"cnf" => Mode::Cnf,
-			_ => Mode::Suggestion,
+			"echo" => Mode::Echo,
+			_ => {
+				eprintln!("Invalid mode: {}", mode);
+				exit(1);
+			}
 		},
 		Err(_) => Mode::Suggestion,
 	}

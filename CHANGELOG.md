@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Nushell: Added alias support
 	- Also allows arbitrary shell to provide support
+- `echo` mode: Only print suggestion
 
 ### Fixed
 
