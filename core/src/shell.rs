@@ -538,7 +538,12 @@ def --env {} [] {{
 		# fetch command and error from session history only when not in cnf mode
 		if ($env:_PR_MODE -ne 'cnf') {{
 			$env:_PR_LAST_COMMAND = ({});
-			$err = Get-Error;
+			if ($PSVersionTable.PSVersion.Major -ge 7) {{
+				$err = Get-Error;
+				if ($env:_PR_LAST_COMMAND -eq $err.InvocationInfo.Line) {{
+					$env:_PR_ERROR_MSG = $err.Exception.Message
+				}}
+			}}
 			if ($env:_PR_LAST_COMMAND -eq $err.InvocationInfo.Line) {{
 				$env:_PR_ERROR_MSG = $err.Exception.Message
 			}}
@@ -638,28 +643,30 @@ end
 				);
 			}
 			"pwsh" => {
-				initialize = format!(
-					r#"{}
-$ExecutionContext.InvokeCommand.CommandNotFoundAction =
-{{
-	param(
-		[string]
-		$commandName,
-		[System.Management.Automation.CommandLookupEventArgs]
-		$eventArgs
-	)
-	# powershell does not support run command with specific environment variables
-	# but you must set global variables. so we are memorizing the current mode and the alias function will reset it later.
-	$env:_PR_PWSH_ORIGIN_MODE=$env:_PR_MODE;
-	$env:_PR_MODE='cnf';
-	# powershell may search command with prefix 'get-' or '.\' first when this hook is hit, strip them
-	$env:_PR_LAST_COMMAND=$commandName -replace '^get-|\.\\','';
-	$eventArgs.Command = (Get-Command {});
-	$eventArgs.StopSearch = $True;
-}}
-"#,
-					initialize, alias
-				)
+				// usage with pwsh is limited as we cannot get arguments
+				// furthermore there is recursion
+// 				initialize = format!(
+// 					r#"{}
+// $ExecutionContext.InvokeCommand.CommandNotFoundAction =
+// {{
+// 	param(
+// 		[string]
+// 		$commandName,
+// 		[System.Management.Automation.CommandLookupEventArgs]
+// 		$eventArgs
+// 	)
+// 	# powershell does not support run command with specific environment variables
+// 	# but you must set global variables. so we are memorizing the current mode and the alias function will reset it later.
+// 	$env:_PR_PWSH_ORIGIN_MODE=$env:_PR_MODE;
+// 	$env:_PR_MODE='cnf';
+// 	# powershell may search command with prefix 'get-' or '.\' first when this hook is hit, strip them
+// 	$env:_PR_LAST_COMMAND=$commandName -replace '^get-|\.\\','';
+// 	$eventArgs.Command = (Get-Command {});
+// 	$eventArgs.StopSearch = $True;
+// }}
+// "#,
+// 					initialize, alias
+// 				)
 			}
 			_ => {
 				println!("Unsupported shell: {}", shell);

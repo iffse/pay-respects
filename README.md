@@ -61,12 +61,12 @@ Please follow the instruction for your shell:
 
 > Append the following output to your profile:
 > ```pwsh
-> pay-respects pwsh --alias [<alias>] [--nocnf]
+> pay-respects pwsh --alias [<alias>]
 > ```
 
 > Or directly pipe the output to your profile:
 > ```pwsh
-> pay-respects pwsh --alias [<alias>] [--nocnf] >> $PROFILE
+> pay-respects pwsh --alias [<alias>] >> $PROFILE
 > ```
 
 </details>
