@@ -6,6 +6,6 @@ pattern = [
 ]
 suggest = [
 '''
-{{command}} -Syu'''
+{{command}} -S'''
 ]
 
