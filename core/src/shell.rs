@@ -695,8 +695,7 @@ pub fn shell_syntax(shell: &str, command: &mut String) {
 	#[allow(clippy::single_match)]
 	match shell {
 		"nu" => {
-			*command = command.replace(" && ", " and ");
-			*command = command.replace(" || ", " or ");
+			*command = command.replace(" && ", " ; ");
 		}
 		_ => {}
 	}
