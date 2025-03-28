@@ -12,13 +12,11 @@ pub fn get_package_manager(data: &mut Data) -> Option<String> {
 		return Some(package_manager);
 	}
 
-	let package_managers = vec![
+	for package_manager in &[
 		"apt", "dnf", "emerge", "nix", "pacman", "yum",
 		// "zypper",
-	];
-
-	for package_manager in package_managers {
-		if data.executables.contains(&package_manager.to_string()) {
+	] {
+		if data.executables.iter().any(|exe| exe == package_manager) {
 			return Some(package_manager.to_string());
 		}
 	}
