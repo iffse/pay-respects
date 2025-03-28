@@ -11,3 +11,15 @@ suggest = [
 '''
 {{select[0](path)}} {{command[1:]}} '''
 ]
+
+[[match_err]]
+pattern = [
+	"permission denied",
+	"is not an executable file"
+]
+suggest = [
+'''
+#[cmd_contains(./)]
+chmod +x {{command[0]}} &&
+{{command}}'''
+]
