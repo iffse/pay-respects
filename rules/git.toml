@@ -79,8 +79,7 @@ suggest = [
 git checkout {{typo[2]({{shell(git branch | sed 's/^*//')}})}} ''',
 '''
 #[cmd_contains(checkout)]
-git branch {{command[2]}} && \
-git checkout {{command[2]}} '''
+git checkout -b {{command[2]}} '''
 ]
 
 [[match_err]]
