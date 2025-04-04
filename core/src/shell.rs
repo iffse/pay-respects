@@ -691,13 +691,11 @@ pub fn get_shell() -> String {
 	}
 }
 
-pub fn shell_syntax(shell: &str, command: &mut String) {
+pub fn shell_syntax(shell: &str, command: &str) -> String {
 	#[allow(clippy::single_match)]
 	match shell {
-		"nu" => {
-			*command = command.replace(" && ", " ; ");
-		}
-		_ => {}
+		"nu" => command.replace("&&", ";").to_string(),
+		_ => command.to_string(),
 	}
 }
 

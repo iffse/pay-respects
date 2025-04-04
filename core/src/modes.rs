@@ -1,7 +1,7 @@
 use crate::shell::Data;
+use crate::suggestions;
 use crate::suggestions::suggest_candidates;
 use crate::system;
-use crate::{shell, suggestions};
 use colored::Colorize;
 use inquire::*;
 use pay_respects_utils::evals::best_matches_path;
@@ -11,7 +11,6 @@ use ui::Color;
 use std::path::Path;
 
 pub fn suggestion(data: &mut Data) {
-	let shell = data.shell.clone();
 	let mut last_command;
 
 	loop {
@@ -20,10 +19,6 @@ pub fn suggestion(data: &mut Data) {
 		if data.candidates.is_empty() {
 			break;
 		};
-
-		for candidate in &mut data.candidates {
-			shell::shell_syntax(&shell, candidate);
-		}
 
 		suggestions::select_candidate(data);
 
@@ -55,15 +50,11 @@ pub fn suggestion(data: &mut Data) {
 }
 
 pub fn echo(data: &mut Data) {
-	let shell = data.shell.clone();
 	suggest_candidates(data);
 	if data.candidates.is_empty() {
-		eprintln!("No suggestions found")
+		return;
 	};
-	for candidate in &mut data.candidates {
-		shell::shell_syntax(&shell, candidate);
-		println!("{} <_PR_BR>", candidate);
-	}
+	println!("{}", data.candidates.join("<PR_BR>\n"));
 }
 
 pub fn cnf(data: &mut Data) {

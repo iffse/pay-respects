@@ -8,13 +8,16 @@ use inquire::*;
 use ui::Color;
 
 use crate::rules::match_pattern;
-use crate::shell::{add_candidates_no_dup, module_output, shell_evaluated_commands, Data};
+use crate::shell::{
+	add_candidates_no_dup, module_output, shell_evaluated_commands, shell_syntax, Data,
+};
 use crate::style::highlight_difference;
 
 pub fn suggest_candidates(data: &mut Data) {
 	if data.split.is_empty() {
 		return;
 	}
+	let shell = &data.shell;
 	let executable = &data.split[0]
 		.rsplit(std::path::MAIN_SEPARATOR)
 		.next()
@@ -70,14 +73,20 @@ pub fn suggest_candidates(data: &mut Data) {
 	}
 
 	if !final_candidates.is_empty() {
-		data.candidates = final_candidates;
+		data.candidates = final_candidates
+			.iter()
+			.map(|s| shell_syntax(shell, s))
+			.collect();
 		return;
 	}
 	for fallback in fallbacks {
 		let candidates = module_output(data, fallback);
 		if candidates.is_some() {
 			add_candidates_no_dup(command, &mut final_candidates, &candidates.unwrap());
-			data.candidates = final_candidates;
+			data.candidates = final_candidates
+				.iter()
+				.map(|s| shell_syntax(shell, s))
+				.collect();
 			return;
 		}
 	}
