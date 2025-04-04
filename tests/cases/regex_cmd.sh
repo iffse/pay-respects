@@ -1,0 +1,8 @@
+case="regex: command"
+command="touch dir/file"
+error="no such file or directory"
+expect="\
+mkdir --parents dir/ &&
+touch dir/file\
+"
+pre='cd $TMP'
