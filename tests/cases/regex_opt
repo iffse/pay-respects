@@ -1,0 +1,6 @@
+case="regex: options"
+command="rm correc -r"
+error="no such file or directory"
+expect="rm -r ./correct"
+
+mkdir -p correct

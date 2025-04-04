@@ -1,0 +1,4 @@
+case="privilege"
+command="pacman -Syu"
+error="you cannot perform this operation unless you are root"
+expect="sudo pacman -Syu"
