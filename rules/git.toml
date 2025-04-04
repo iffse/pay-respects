@@ -119,7 +119,7 @@ pattern = [
 suggest = [
 '''
 #[cmd_contains(push)]
-git pull && \
+git pull &&
 {{command}} ''',
 '''
 #[cmd_contains(push)]
@@ -136,8 +136,8 @@ suggest = [
 #[cmd_contains(pull)]
 {{command}} --rebase --autostash ''',
 '''
-git stash && \
-{{command}} && \
+git stash &&
+{{command}} &&
 git stash pop '''
 ]
 

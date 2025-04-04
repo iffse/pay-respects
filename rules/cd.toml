@@ -11,7 +11,7 @@ cd {{typo[1](file)}}
 ''',
 '''
 #[!shell(nu)]
-mkdir --parents {{command[1]}} && \
+mkdir --parents {{command[1]}} &&
 cd {{command[1]}} '''
 ]
 
