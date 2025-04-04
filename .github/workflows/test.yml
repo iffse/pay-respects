@@ -1,4 +1,4 @@
-name: Rust
+name: Test
 
 on:
   push:
@@ -11,7 +11,7 @@ env:
   CARGO_INCREMENTAL: 0
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,6 +24,6 @@ jobs:
       - name: Build
         run: cargo build --verbose
 
-      - name: Run tests
-        run: cargo test --verbose
+      - name: Tests
+        run: make test
 
