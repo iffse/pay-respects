@@ -27,14 +27,7 @@ pub fn suggestion(data: &mut Data) {
 			return;
 		} else {
 			data.update_command(&data.suggest.clone().unwrap());
-			let msg = Some(
-				execution
-					.err()
-					.unwrap()
-					.split_whitespace()
-					.collect::<Vec<&str>>()
-					.join(" "),
-			);
+			let msg = Some(execution.err().unwrap());
 			data.update_error(msg);
 
 			let retry_message = format!("{}...", t!("retry"));
@@ -94,14 +87,7 @@ pub fn cnf(data: &mut Data) {
 		if status.is_err() {
 			let suggest = data.suggest.clone().unwrap();
 			data.update_command(&suggest);
-			let msg = Some(
-				status
-					.err()
-					.unwrap()
-					.split_whitespace()
-					.collect::<Vec<&str>>()
-					.join(" "),
-			);
+			let msg = Some(status.err().unwrap());
 			data.update_error(msg);
 			let retry_message = format!("{}...", t!("retry"));
 			eprintln!("\n{}\n", retry_message.cyan().bold());

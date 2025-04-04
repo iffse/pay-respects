@@ -219,7 +219,7 @@ impl Data {
 
 	pub fn update_error(&mut self, error: Option<String>) {
 		if let Some(error) = error {
-			self.error = error;
+			self.error = error.to_lowercase().split_whitespace().collect::<Vec<&str>>().join(" ");
 		} else {
 			self.error = get_error(&self.shell, &self.command);
 		}
@@ -271,7 +271,7 @@ pub fn get_error(shell: &str, command: &str) -> String {
 	} else {
 		error_output_threaded(shell, command)
 	};
-	error.split_whitespace().collect::<Vec<&str>>().join(" ")
+	error.to_lowercase().split_whitespace().collect::<Vec<&str>>().join(" ")
 }
 
 pub fn error_output_threaded(shell: &str, command: &str) -> String {
@@ -293,8 +293,8 @@ pub fn error_output_threaded(shell: &str, command: &str) -> String {
 
 		match receiver.recv_timeout(Duration::from_secs(3)) {
 			Ok(output) => match output.stderr.is_empty() {
-				true => String::from_utf8_lossy(&output.stdout).to_lowercase(),
-				false => String::from_utf8_lossy(&output.stderr).to_lowercase(),
+				true => String::from_utf8_lossy(&output.stdout).to_string(),
+				false => String::from_utf8_lossy(&output.stderr).to_string(),
 			},
 			Err(_) => {
 				use colored::*;
