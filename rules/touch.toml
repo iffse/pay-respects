@@ -4,14 +4,19 @@ command = "touch"
 pattern = [ "no such file or directory" ]
 suggest = [
 '''
-mkdir --parents {{cmd::(?:\s)+(.*[\\\/])(?:\s)*}} && \
+#[!shell(nu)]
+mkdir --parents {{cmd::(?:\s)+(.*[\\\/])(?:\s)*}} &&
 touch {{command[1:]}} '''
 ]
 
 [[match_err]]
-pattern = [ "nu::shell::create_not_possible" ]
+pattern = [
+	"nu::shell::create_not_possible",
+	"no such file or directory",
+]
 suggest = [
 '''
-mkdir {{cmd::(?:\s)+(.*[\\\/])(?:\s)*}} and \
+#[shell(nu)]
+mkdir {{cmd::(?:\s)+(.*[\\\/])(?:\s)*}};
 touch {{command[1:]}} '''
 ]
