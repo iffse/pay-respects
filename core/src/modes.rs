@@ -2,6 +2,7 @@ use crate::shell::Data;
 use crate::suggestions;
 use crate::suggestions::suggest_candidates;
 use crate::system;
+use crate::style::highlight_difference;
 use colored::Colorize;
 use inquire::*;
 use pay_respects_utils::evals::best_matches_path;
@@ -48,6 +49,43 @@ pub fn echo(data: &mut Data) {
 		return;
 	};
 	println!("{}", data.candidates.join("<PR_BR>\n"));
+}
+
+pub fn noconfirm(data: &mut Data) {
+	let mut last_command;
+
+	loop {
+		last_command = data.command.clone();
+		suggest_candidates(data);
+		if data.candidates.is_empty() {
+			break;
+		};
+
+		let candidate = data.candidates[0].clone();
+		eprintln!("{}",
+			highlight_difference(data, &candidate).unwrap()
+		);
+		data.update_suggest(&candidate);
+		data.candidates.clear();
+
+		let execution = suggestions::confirm_suggestion(data);
+		if execution.is_ok() {
+			return;
+		} else {
+			data.update_command(&data.suggest.clone().unwrap());
+			let msg = Some(execution.err().unwrap());
+			data.update_error(msg);
+
+			let retry_message = format!("{}...", t!("retry"));
+			eprintln!("\n{}\n", retry_message.cyan().bold());
+		}
+	}
+	eprintln!("{}: {}\n", t!("no-suggestion"), last_command.red());
+	eprintln!(
+		"{}\n{}",
+		t!("contribute"),
+		option_env!("CARGO_PKG_REPOSITORY").unwrap_or("https://github.com/iffse/pay-respects/")
+	);
 }
 
 pub fn cnf(data: &mut Data) {

@@ -24,6 +24,13 @@ extern crate rust_i18n;
 i18n!("i18n", fallback = "en", minify_key = true);
 
 fn main() -> Result<(), std::io::Error> {
+	let mode = std::env::var("_PR_MODE");
+	if let Ok(mode) = mode {
+		if mode.as_str() == "noconfirm" {
+			return Ok(());
+		}
+	}
+
 	let command = std::env::var("_PR_LAST_COMMAND").expect("_PR_LAST_COMMAND not set");
 	let error = std::env::var("_PR_ERROR_MSG").expect("_PR_ERROR_MSG not set");
 	colored::control::set_override(true);
