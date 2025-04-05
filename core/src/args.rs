@@ -28,17 +28,13 @@ pub fn handle_args(args: impl IntoIterator<Item = String>) -> Status {
 				print_version();
 				return Status::Exit;
 			}
-			"-a" | "--alias" => {
-				match iter.peek() {
-					Some(next_arg) if !next_arg.starts_with('-') => {
-						init.alias = next_arg.to_string();
-						iter.next();
-					}
-					_ => init.alias = String::from("f"),
+			"-a" | "--alias" => match iter.peek() {
+				Some(next_arg) if !next_arg.starts_with('-') => {
+					init.alias = next_arg.to_string();
+					iter.next();
 				}
-
-				init.auto_alias = true;
-			}
+				_ => init.alias = String::from("f"),
+			},
 			"--nocnf" => init.cnf = false,
 			_ => init.shell = arg,
 		}
@@ -61,14 +57,14 @@ fn print_help() {
 			usage = "pay-respects <shell> [--alias [<alias>]] [--nocnf]",
 			eval = "Bash / Zsh / Fish".bold(),
 			eval_examples = r#"
-eval "$(pay-respects bash --alias)"
-eval "$(pay-respects zsh --alias)"
-pay-respects fish --alias | source
+eval "$(pay-respects bash)"
+eval "$(pay-respects zsh)"
+pay-respects fish | source
 "#,
 			manual = "Nushell / PowerShell".bold(),
 			manual_examples = r#"
-pay-respects nushell --alias
-pay-respects pwsh --alias
+pay-respects nushell
+pay-respects pwsh
 "#
 		)
 	);

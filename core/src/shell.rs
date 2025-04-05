@@ -2,6 +2,8 @@ use pay_respects_utils::evals::split_command;
 use pay_respects_utils::files::get_path_files;
 use pay_respects_utils::files::path_env_sep;
 
+use askama::Template;
+
 use std::process::{exit, Stdio};
 
 use std::collections::HashMap;
@@ -24,7 +26,6 @@ pub struct Init {
 	pub shell: String,
 	pub binary_path: String,
 	pub alias: String,
-	pub auto_alias: bool,
 	pub cnf: bool,
 }
 
@@ -34,7 +35,6 @@ impl Init {
 			shell: String::from(""),
 			binary_path: String::from(""),
 			alias: String::from("f"),
-			auto_alias: false,
 			cnf: true,
 		}
 	}
@@ -219,7 +219,11 @@ impl Data {
 
 	pub fn update_error(&mut self, error: Option<String>) {
 		if let Some(error) = error {
-			self.error = error.to_lowercase().split_whitespace().collect::<Vec<&str>>().join(" ");
+			self.error = error
+				.to_lowercase()
+				.split_whitespace()
+				.collect::<Vec<&str>>()
+				.join(" ");
 		} else {
 			self.error = get_error(&self.shell, &self.command);
 		}
@@ -271,7 +275,11 @@ pub fn get_error(shell: &str, command: &str) -> String {
 	} else {
 		error_output_threaded(shell, command)
 	};
-	error.to_lowercase().split_whitespace().collect::<Vec<&str>>().join(" ")
+	error
+		.to_lowercase()
+		.split_whitespace()
+		.collect::<Vec<&str>>()
+		.join(" ")
 }
 
 pub fn error_output_threaded(shell: &str, command: &str) -> String {
@@ -471,209 +479,82 @@ pub fn expand_alias_multiline(map: &HashMap<String, String>, command: &str) -> O
 }
 
 pub fn initialization(init: &mut Init) {
-	let last_command;
-	let shell_alias;
 	let alias = &init.alias;
-	let auto_alias = init.auto_alias;
 	let cnf = init.cnf;
 	let binary_path = &init.binary_path;
 
-	match init.shell.as_str() {
-		"bash" => {
-			last_command = "$(fc -ln -1)";
-			shell_alias = "`alias`";
-		}
-		"zsh" => {
-			last_command = "$(fc -ln -1)";
-			shell_alias = "`alias`";
-		}
-		"fish" => {
-			last_command = "$(history | head -n 1)";
-			shell_alias = "$(alias)";
-		}
-		"nu" | "nush" | "nushell" => {
-			last_command = "(history | last).command";
-			shell_alias = r#"(help aliases | select name expansion | each ({ |row| $row.name + "=" + $row.expansion }) | str join (char nl))"#;
-			init.shell = "nu".to_string();
-		}
-		"pwsh" | "powershell" => {
-			last_command = "Get-History | Select-Object -Last 1 | ForEach-Object {$_.CommandLine}";
-			shell_alias = ";";
-			init.shell = "pwsh".to_string();
-		}
-		_ => {
-			println!("Unknown shell: {}", init.shell);
-			return;
-		}
-	}
-
 	let shell = &init.shell;
 
-	if init.shell == "nu" {
-		let init = format!(
-			r#"
-def --env {} [] {{
-	let dir = (with-env {{ _PR_LAST_COMMAND: {}, _PR_ALIAS: {}, _PR_SHELL: nu }} {{ {} }})
-	cd $dir
-}}
-"#,
-			init.alias, last_command, shell_alias, init.binary_path
-		);
-		println!("{}", init);
-		return;
+	#[derive(Template)]
+	#[template(path = "init.bash", escape = "none")]
+	struct BashTemplate<'a> {
+		alias: &'a str,
+		binary_path: &'a str,
+		cnf: bool,
+	}
+	#[derive(Template)]
+	#[template(path = "init.zsh", escape = "none")]
+	struct ZshTemplate<'a> {
+		alias: &'a str,
+		binary_path: &'a str,
+		cnf: bool,
+	}
+	#[derive(Template)]
+	#[template(path = "init.fish", escape = "none")]
+	struct FishTemplate<'a> {
+		alias: &'a str,
+		binary_path: &'a str,
+		cnf: bool,
+	}
+	#[derive(Template)]
+	#[template(path = "init.ps1", escape = "none")]
+	struct PowershellTemplate<'a> {
+		alias: &'a str,
+		binary_path: &'a str,
+		cnf: bool,
+	}
+	#[derive(Template)]
+	#[template(path = "init.nu", escape = "none")]
+	struct NuTemplate<'a> {
+		alias: &'a str,
+		binary_path: &'a str,
 	}
 
-	let mut initialize = match shell.as_str() {
-		"bash" | "zsh" | "fish" => format!(
-			"\
-			eval $(_PR_LAST_COMMAND=\"{}\" \
-			_PR_ALIAS=\"{}\" \
-			_PR_SHELL=\"{}\" \
-			\"{}\")",
-			last_command, shell_alias, shell, binary_path
-		),
-		"pwsh" | "powershell" => format!(
-			r#"& {{
-	try {{
-		# fetch command and error from session history only when not in cnf mode
-		if ($env:_PR_MODE -ne 'cnf') {{
-			$env:_PR_LAST_COMMAND = ({});
-			if ($PSVersionTable.PSVersion.Major -ge 7) {{
-				$err = Get-Error;
-				if ($env:_PR_LAST_COMMAND -eq $err.InvocationInfo.Line) {{
-					$env:_PR_ERROR_MSG = $err.Exception.Message
-				}}
-			}}
-			if ($env:_PR_LAST_COMMAND -eq $err.InvocationInfo.Line) {{
-				$env:_PR_ERROR_MSG = $err.Exception.Message
-			}}
-		}}
-		$env:_PR_SHELL = '{}';
-		&'{}';
-	}}
-	finally {{
-		# restore mode from cnf
-		if ($env:_PR_MODE -eq 'cnf') {{
-			$env:_PR_MODE = $env:_PR_PWSH_ORIGIN_MODE;
-			$env:_PR_PWSH_ORIGIN_MODE = $null;
-		}}
-	}}
-}}
-"#,
-			last_command, shell, binary_path
-		),
+	let initialize = match shell.as_str() {
+		"bash" => BashTemplate {
+			alias,
+			binary_path,
+			cnf,
+		}
+		.render()
+		.unwrap(),
+		"zsh" => ZshTemplate {
+			alias,
+			binary_path,
+			cnf,
+		}
+		.render()
+		.unwrap(),
+		"fish" => FishTemplate {
+			alias,
+			binary_path,
+			cnf,
+		}
+		.render()
+		.unwrap(),
+		"pwsh" | "powershell" | "ps" => PowershellTemplate {
+			alias,
+			binary_path,
+			cnf,
+		}
+		.render()
+		.unwrap(),
+		"nu" | "nush" | "nushell" => NuTemplate { alias, binary_path }.render().unwrap(),
 		_ => {
-			println!("Unsupported shell: {}", shell);
-			return;
+			eprintln!("{}: {}", t!("unknown-shell"), shell);
+			exit(1);
 		}
 	};
-	if !auto_alias {
-		println!("{}", initialize);
-		return;
-	}
-
-	match shell.as_str() {
-		"bash" | "zsh" => {
-			initialize = format!(
-				r#"
-alias {}='{}'
-"#,
-				alias, initialize
-			);
-		}
-		"fish" => {
-			initialize = format!(
-				r#"
-function {} -d "Suggest fixes to the previous command"
-	{}
-end
-"#,
-				alias, initialize
-			);
-		}
-		"pwsh" => {
-			initialize = format!(
-				"function {} {{\n{}",
-				alias,
-				initialize.split_once("\n").unwrap().1,
-			);
-		}
-		_ => {
-			println!("Unsupported shell: {}", shell);
-			return;
-		}
-	}
-
-	if cnf {
-		match shell.as_str() {
-			"bash" => {
-				initialize = format!(
-					r#"
-command_not_found_handle() {{
-	eval $(_PR_LAST_COMMAND="$@" _PR_SHELL="{}" _PR_ALIAS="{}" _PR_MODE="cnf" "{}")
-}}
-
-{}
-"#,
-					shell, shell_alias, binary_path, initialize
-				);
-			}
-			"zsh" => {
-				initialize = format!(
-					r#"
-command_not_found_handler() {{
-	eval $(_PR_LAST_COMMAND="$@" _PR_SHELL="{}" _PR_ALIAS="{}" _PR_MODE="cnf" "{}")
-}}
-
-{}
-"#,
-					shell, shell_alias, binary_path, initialize
-				);
-			}
-			"fish" => {
-				initialize = format!(
-					r#"
-function fish_command_not_found --on-event fish_command_not_found
-	eval $(_PR_LAST_COMMAND="$argv" _PR_SHELL="{}" _PR_ALIAS="{}" _PR_MODE="cnf" "{}")
-end
-
-{}
-"#,
-					shell, shell_alias, binary_path, initialize
-				);
-			}
-			"pwsh" => {
-				// usage with pwsh is limited as we cannot get arguments
-				// furthermore there is recursion
-// 				initialize = format!(
-// 					r#"{}
-// $ExecutionContext.InvokeCommand.CommandNotFoundAction =
-// {{
-// 	param(
-// 		[string]
-// 		$commandName,
-// 		[System.Management.Automation.CommandLookupEventArgs]
-// 		$eventArgs
-// 	)
-// 	# powershell does not support run command with specific environment variables
-// 	# but you must set global variables. so we are memorizing the current mode and the alias function will reset it later.
-// 	$env:_PR_PWSH_ORIGIN_MODE=$env:_PR_MODE;
-// 	$env:_PR_MODE='cnf';
-// 	# powershell may search command with prefix 'get-' or '.\' first when this hook is hit, strip them
-// 	$env:_PR_LAST_COMMAND=$commandName -replace '^get-|\.\\','';
-// 	$eventArgs.Command = (Get-Command {});
-// 	$eventArgs.StopSearch = $True;
-// }}
-// "#,
-// 					initialize, alias
-// 				)
-			}
-			_ => {
-				println!("Unsupported shell: {}", shell);
-				return;
-			}
-		}
-	}
 
 	println!("{}", initialize);
 }
