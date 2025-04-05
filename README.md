@@ -18,7 +18,7 @@ Please follow the instruction for your shell:
 <details>
 	<summary>Bash / Zsh / Fish</summary>
 
-> Append the following line to your configuration file:
+> Append the following line to your configuration file (`--alias` no longer required for v0.7+):
 > ```sh
 > eval "$(pay-respects bash --alias)"
 > eval "$(pay-respects zsh --alias)"
@@ -28,7 +28,7 @@ Please follow the instruction for your shell:
 > - `--alias [alias]`: Alias to a custom key, defaults to `f`
 > - `--nocnf`: Disables `command_not_found` handler
 
-> Manual aliasing (**DEPRECATED**, do not use):
+> Manual aliasing (**REMOVED** after v0.7):
 > ```sh
 > alias f="$(pay-respects bash)"
 > alias f="$(pay-respects zsh)"
@@ -99,6 +99,23 @@ Please follow the instruction for your shell:
 
 > - `_PR_LIB`: Directory of modules, analogous to `PATH`. If not provided, search in `PATH` or compile-time provided value.
 > - `_PR_PACKAGE_MANAGER`: Use defined package manager instead of auto-detecting alphabetically
+
+> You can specify different modes to run with `_PR_MODE`:
+>
+> - `noconfirm`: Execute suggestions without confirm
+> - `echo`: Print suggestions to `stdout` without executing
+> - `cnf`: Used for command not found hook
+>
+> Example usage with `noconfirm`:
+>
+> ```sh
+> function ff() {
+> 	(
+> 		export _PR_MODE="noconfirm"
+> 		f
+> 	)
+> }
+> ```
 
 </details>
 

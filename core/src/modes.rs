@@ -1,8 +1,8 @@
 use crate::shell::Data;
+use crate::style::highlight_difference;
 use crate::suggestions;
 use crate::suggestions::suggest_candidates;
 use crate::system;
-use crate::style::highlight_difference;
 use colored::Colorize;
 use inquire::*;
 use pay_respects_utils::evals::best_matches_path;
@@ -62,9 +62,7 @@ pub fn noconfirm(data: &mut Data) {
 		};
 
 		let candidate = data.candidates[0].clone();
-		eprintln!("{}",
-			highlight_difference(data, &candidate).unwrap()
-		);
+		eprintln!("{}", highlight_difference(data, &candidate).unwrap());
 		data.update_suggest(&candidate);
 		data.candidates.clear();
 

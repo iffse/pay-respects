@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Breaking
+
+- Manual aliasing no longer supported
+
+### Added
+
+- `noconfirm` mode: Run suggestions without confirmation
+- Suggestion tests
+
+### Fixed
+
+- PowerShell's initialization for versions that does not support `Get-Error`
+
+### Changed
+
+- Reimplemented initialization with templates
+
 ## [0.6.14] - 2025-03-13
 
 ### Added

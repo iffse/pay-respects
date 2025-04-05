@@ -11,7 +11,7 @@ repository = "https://github.com/iffse/pay-respects"
 keywords = ["cli", "terminal", "utility", "shell"]
 categories = ["command-line-utilities"]
 license = "AGPL-3.0-or-later"
-include = ["**/*.rs", "**/*.toml"]
+include = ["**/*.rs", "**/*.toml", "templates/**/*"]
 
 [dependencies]
 colored = "3"
