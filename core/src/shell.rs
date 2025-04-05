@@ -20,6 +20,7 @@ pub const PRIVILEGE_LIST: [&str; 2] = ["sudo", "doas"];
 pub enum Mode {
 	Suggestion,
 	Echo,
+	NoConfirm,
 	Cnf,
 }
 pub struct Init {
@@ -391,6 +392,7 @@ pub fn run_mode() -> Mode {
 		Ok(mode) => match mode.as_str() {
 			"suggestion" => Mode::Suggestion,
 			"cnf" => Mode::Cnf,
+			"noconfirm" => Mode::NoConfirm,
 			"echo" => Mode::Echo,
 			_ => {
 				eprintln!("Invalid mode: {}", mode);

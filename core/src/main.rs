@@ -55,6 +55,7 @@ fn main() -> Result<(), std::io::Error> {
 	match data.mode {
 		Suggestion => modes::suggestion(&mut data),
 		Echo => modes::echo(&mut data),
+		NoConfirm => modes::noconfirm(&mut data),
 		Cnf => modes::cnf(&mut data),
 	}
 
