@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Not getting `command-not-found`'s output as it goes into `stderr`
+
 ## [0.7.0] - 2025-04-05
 
 ### Breaking

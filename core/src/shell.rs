@@ -325,6 +325,21 @@ pub fn command_output(shell: &str, command: &str) -> String {
 	String::from_utf8_lossy(&output.stdout).to_string()
 }
 
+pub fn command_output_or_error(shell: &str, command: &str) -> String {
+	let output = std::process::Command::new(shell)
+		.arg("-c")
+		.arg(command)
+		.env("LC_ALL", "C")
+		.output()
+		.expect("failed to execute process");
+
+	if !output.stdout.is_empty() {
+		String::from_utf8_lossy(&output.stdout).to_string()
+	} else {
+		String::from_utf8_lossy(&output.stderr).to_string()
+	}
+}
+
 pub fn module_output(data: &Data, module: &str) -> Option<Vec<String>> {
 	let shell = &data.shell;
 	let executable = &data.split[0];

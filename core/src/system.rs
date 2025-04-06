@@ -1,3 +1,4 @@
+use crate::shell::command_output_or_error;
 use crate::shell::{command_output, elevate, Data};
 use colored::Colorize;
 use std::io::stderr;
@@ -152,7 +153,8 @@ pub fn get_packages(
 		}
 		_ => match package_manager.ends_with("command-not-found") {
 			true => {
-				let result = command_output(shell, &format!("{} {}", package_manager, executable));
+				let result =
+					command_output_or_error(shell, &format!("{} {}", package_manager, executable));
 				if result.is_empty() {
 					return None;
 				}
@@ -167,7 +169,7 @@ pub fn get_packages(
 				None
 			}
 			false => {
-				eprintln!("{} Unsupported package manager", ":pay-respects".yellow());
+				eprintln!("{} Unsupported package manager", "pay-respects:".yellow());
 				None
 			}
 		},
