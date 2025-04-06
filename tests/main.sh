@@ -28,8 +28,10 @@ run_test() {
 }
 
 run_case() {
-	source $1
-	run_test "$case" "$command" "$error" "$expect"
+	(
+		source $1
+		run_test "$case" "$command" "$error" "$expect"
+	)
 
 	if [[ $? == 0 ]]; then
 		PASSED=$((PASSED + 1))

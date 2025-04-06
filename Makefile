@@ -4,8 +4,14 @@ build:
 release:
 	cargo build --release
 
-test-rust: build
-	cargo test --verbose
+build-all:
+	cargo build --workspace
+
+release-all:
+	cargo build --release --workspace
+
+test-rust:
+	cargo test --workspace --verbose
 
 install:
 	echo "Installing pay-respects core. Use `install-all` to install all modules."
