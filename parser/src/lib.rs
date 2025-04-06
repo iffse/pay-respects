@@ -104,7 +104,6 @@ fn gen_match_rules(rules: &[Rule]) -> TokenStream {
 			#(
 			for pattern in #patterns_tokens {
 				if error_msg.contains(pattern) {
-					let split = split_command(&last_command);
 					#suggestion_tokens;
 				};
 			})*
@@ -173,6 +172,7 @@ fn eval_condition(condition: &str, arg: &str) -> TokenStream2 {
 		"executable" => quote! {executables.contains(&#arg.to_string())},
 		"err_contains" => quote! {error_msg.contains(#arg)},
 		"cmd_contains" => quote! {last_command.contains(#arg)},
+		"exe_contains" => quote! {split[0].contains(#arg)},
 		"min_length" => quote! {(split.len() >= #arg.parse::<usize>().unwrap())},
 		"length" => quote! {(split.len() == #arg.parse::<usize>().unwrap())},
 		"max_length" => quote! {(split.len() <= #arg.parse::<usize>().unwrap() + 1)},

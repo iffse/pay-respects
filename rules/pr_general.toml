@@ -19,7 +19,7 @@ pattern = [
 ]
 suggest = [
 '''
-#[cmd_contains(./)]
+#[exe_contains(/)]
 chmod +x {{command[0]}} &&
 {{command}}'''
 ]

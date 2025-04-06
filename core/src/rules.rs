@@ -8,6 +8,7 @@ pub fn match_pattern(executable: &str, data: &Data) -> Option<Vec<String>> {
 	let last_command = &data.command;
 	let executables = &data.executables;
 	let mut candidates = vec![];
+	let split = split_command(last_command);
 	parse_rules!("rules");
 	if candidates.is_empty() {
 		None

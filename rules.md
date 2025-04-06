@@ -76,11 +76,12 @@ The placeholder is evaluated as following:
 
 Suggestions can have additional conditions to check. To specify conditions, add a `#[...]` at the first line (just like derive macros in Rust). Available conditions:
 
-- `executable`: Check whether the argument can be found in path
-- `cmd_contains`: Check whether the last user input contains the argument
-- `err_contains`: Check whether the error of the command contains the argument
-- `length`: Check whether the given command has the length of the argument
-- `min_length`: Check whether the given command has at least the length of the argument
-- `max_length`: Check whether the given command has at most the length of the argument
+- `executable`: Check if the argument can be found in path
+- `cmd_contains`: Check if the last user input contains the argument
+- `err_contains`: Check if the error of the command contains the argument
+- `exe_contains`: Check if the command name itself contains the argument
+- `length`: Check if the given command has the length of the argument
+- `min_length`: Check if the given command has at least the length of the argument
+- `max_length`: Check if the given command has at most the length of the argument
 - `shell`: Check if the current running shell is the argument
 

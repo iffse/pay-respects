@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `exe_contains` condition to check if the command contains the argument
+
 ### Fixed
 
 - Parsing command environment variables (e.g. `LANG=ja_JP.UTF-8 pacman` will work as intended)

@@ -108,6 +108,7 @@ fn eval_condition(
 		"executable" => executables.contains(&arg.to_string()),
 		"err_contains" => error_msg.contains(arg),
 		"cmd_contains" => last_command.contains(arg),
+		"exe_contains" => split_command[0].contains(arg),
 		"min_length" => split_command.len() >= arg.parse::<usize>().unwrap(),
 		"length" => split_command.len() == arg.parse::<usize>().unwrap(),
 		"max_length" => split_command.len() <= arg.parse::<usize>().unwrap() + 1,
