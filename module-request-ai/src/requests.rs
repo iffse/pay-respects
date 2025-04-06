@@ -68,9 +68,9 @@ pub fn ai_suggestion(last_command: &str, error_msg: &str) -> Option<AISuggest> {
 
 	let ai_prompt = format!(
 		r#"
-The command `{last_command}` returns the following error message: `{error_msg}`. Provide possible commands to fix it. Answer in the following exact JSON template without any extra text:
+`{last_command}` returns the following error message: `{error_msg}`. Provide possible commands to fix it. Answer in the following exact JSON template without any extra text:
 ```
-{{"commands":["command 1", "command 2"],"note":"why they may fix the error{set_locale}"}}
+{{"commands":["command 1","command 2"],"note":"why they may fix the error{set_locale}"}}
 ```
 "#
 	);
@@ -79,7 +79,7 @@ The command `{last_command}` returns the following error message: `{error_msg}`.
 	let messages = Messages {
 		messages: vec![Input {
 			role: "user".to_string(),
-			content: ai_prompt.to_string(),
+			content: ai_prompt.trim().to_string(),
 		}],
 		model: conf.model,
 	};
@@ -215,7 +215,7 @@ impl Conf {
 				if let Some(model) = option_env!("_DEF_PR_AI_MODEL") {
 					model.to_string()
 				} else {
-					"llama3-8b-8192".to_string()
+					"llama3-70b-8192".to_string()
 				}
 			}
 		};
