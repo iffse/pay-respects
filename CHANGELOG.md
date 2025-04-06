@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Support reasoning AI models (can take more than 20 seconds)
+- Allow adding additional prompts for role-playing with perversion or whatever
 - `exe_contains` condition to check if the command contains the argument
 
 ### Fixed

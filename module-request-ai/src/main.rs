@@ -48,11 +48,16 @@ fn main() -> Result<(), std::io::Error> {
 	}
 	let suggest = ai_suggestion(&command, &error);
 	if let Some(suggest) = suggest {
+		if let Some(thinking) = suggest.think {
+			let note = format!("{}:", t!("ai-thinking")).bold().blue();
+			let thinking = fill(&thinking, termwidth());
+			eprintln!("{}{}", note, thinking);
+		}
 		let warn = format!("{}:", t!("ai-suggestion")).bold().blue();
-		let note = fill(&suggest.note, termwidth());
+		let note = fill(&suggest.suggestion.note, termwidth());
 
 		eprintln!("{}\n{}\n", warn, note);
-		let suggestions = suggest.commands;
+		let suggestions = suggest.suggestion.commands;
 		for suggestion in suggestions {
 			print!("{}<_PR_BR>", suggestion);
 		}

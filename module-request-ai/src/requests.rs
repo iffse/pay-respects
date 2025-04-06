@@ -28,7 +28,12 @@ pub struct AISuggest {
 	pub note: String,
 }
 
-pub fn ai_suggestion(last_command: &str, error_msg: &str) -> Option<AISuggest> {
+pub struct AIResponse {
+	pub suggestion: AISuggest,
+	pub think: Option<String>,
+}
+
+pub fn ai_suggestion(last_command: &str, error_msg: &str) -> Option<AIResponse> {
 	if std::env::var("_PR_AI_DISABLE").is_ok() {
 		return None;
 	}
@@ -148,6 +153,7 @@ pub fn ai_suggestion(last_command: &str, error_msg: &str) -> Option<AISuggest> {
 		};
 		res = String::from_utf8(out).unwrap();
 	}
+
 	let json: Value = {
 		let json = serde_json::from_str(&res);
 		if let Ok(json) = json {
@@ -159,12 +165,26 @@ pub fn ai_suggestion(last_command: &str, error_msg: &str) -> Option<AISuggest> {
 	};
 
 	let content = &json["choices"][0]["message"]["content"];
+	let mut str = content
+		.as_str()
+		.expect("AI module: Failed to get content from response")
+		.trim()
+		.to_string();
+
+	let think = if str.starts_with("<think>") {
+		let start_len = "<think>".len();
+		let end_len = "</think>".len();
+		let end = str.find("</think>").unwrap() + end_len;
+		let think = str[start_len..end - end_len].to_string();
+		str = str[end..].to_string();
+		Some(think)
+	} else {
+		None
+	};
 
 	let suggestion: AISuggest = {
 		let str = {
-			let str = content.as_str();
-			str?;
-			str.expect("AI module: Failed to get content from response")
+			str.trim()
 				.trim_start_matches("```")
 				.trim_start_matches("json")
 				.trim_end_matches("```")
@@ -176,7 +196,9 @@ pub fn ai_suggestion(last_command: &str, error_msg: &str) -> Option<AISuggest> {
 		}
 		json.unwrap()
 	};
-	Some(suggestion)
+
+	let response = AIResponse { suggestion, think };
+	Some(response)
 }
 
 impl Conf {
@@ -215,7 +237,7 @@ impl Conf {
 				if let Some(model) = option_env!("_DEF_PR_AI_MODEL") {
 					model.to_string()
 				} else {
-					"llama3-70b-8192".to_string()
+					"qwen-2.5-32b".to_string()
 				}
 			}
 		};
