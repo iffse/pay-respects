@@ -16,6 +16,7 @@
 
 use crate::requests::ai_suggestion;
 use colored::Colorize;
+use sys_locale::get_locale;
 use textwrap::fill;
 mod requests;
 
@@ -24,6 +25,16 @@ extern crate rust_i18n;
 i18n!("i18n", fallback = "en", minify_key = true);
 
 fn main() -> Result<(), std::io::Error> {
+	let locale = {
+		let sys_locale = get_locale().unwrap_or("en-US".to_string());
+		if sys_locale.len() < 2 {
+			"en-US".to_string()
+		} else {
+			sys_locale
+		}
+	};
+	rust_i18n::set_locale(&locale[0..2]);
+
 	let mode = std::env::var("_PR_MODE");
 	if let Ok(mode) = mode {
 		if mode.as_str() == "noconfirm" {
