@@ -52,16 +52,16 @@ pub fn suggest_candidates(data: &mut Data) {
 			}
 		});
 
-		if privilege.is_none() {
-			if let Some(candidates) = match_pattern("_PR_privilege", data) {
-				add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
-			}
-		}
 		if let Some(candidates) = match_pattern(executable, data) {
 			add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
 		}
 		if let Some(candidates) = match_pattern("_PR_general", data) {
 			add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
+		}
+		if privilege.is_none() {
+			if let Some(candidates) = match_pattern("_PR_privilege", data) {
+				add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
+			}
 		}
 	});
 
