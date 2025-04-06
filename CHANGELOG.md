@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Parsing command environment variables (e.g. `LANG=ja_JP.UTF-8 pacman` will work as intended)
 - Not getting `command-not-found`'s output as it goes into `stderr`
 
 ## [0.7.0] - 2025-04-05

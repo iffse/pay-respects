@@ -43,6 +43,7 @@ impl Init {
 
 pub struct Data {
 	pub shell: String,
+	pub env: Option<String>,
 	pub command: String,
 	pub suggest: Option<String>,
 	pub candidates: Vec<String>,
@@ -151,6 +152,7 @@ impl Data {
 
 		let mut init = Data {
 			shell,
+			env: None,
 			command,
 			suggest: None,
 			candidates: vec![],
@@ -165,6 +167,7 @@ impl Data {
 		};
 
 		init.split();
+		init.extract_env();
 		init.expand_command();
 		if init.mode != Mode::Cnf {
 			init.update_error(None);
@@ -174,6 +177,7 @@ impl Data {
 		{
 			eprintln!("/// data initialization");
 			eprintln!("shell: {}", init.shell);
+			eprintln!("env: {:?}", init.env);
 			eprintln!("command: {}", init.command);
 			eprintln!("error: {}", init.error);
 			eprintln!("modules: {:?}", init.modules);
@@ -216,6 +220,21 @@ impl Data {
 		#[cfg(debug_assertions)]
 		eprintln!("split: {:?}", split);
 		self.split = split;
+	}
+
+	pub fn extract_env(&mut self) {
+		let mut envs = vec![];
+		loop {
+			if self.split[0][1..].contains("=") {
+				envs.push(self.split.remove(0));
+			} else {
+				break;
+			}
+		}
+		if !envs.is_empty() {
+			self.env = Some(envs.join(" "));
+			self.command = self.split.join(" ");
+		}
 	}
 
 	pub fn update_error(&mut self, error: Option<String>) {

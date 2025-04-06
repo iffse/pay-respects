@@ -164,6 +164,11 @@ pub fn confirm_suggestion(data: &Data) -> Result<(), String> {
 pub fn run_suggestion(data: &Data, command: &str) -> std::process::ExitStatus {
 	let shell = &data.shell;
 	let privilege = &data.privilege;
+	let command = if let Some(env) = &data.env {
+		format!("{env} {command}")
+	} else {
+		command.to_string()
+	};
 	match privilege {
 		Some(sudo) => std::process::Command::new(sudo)
 			.arg(shell)
@@ -186,6 +191,11 @@ pub fn run_suggestion(data: &Data, command: &str) -> std::process::ExitStatus {
 fn suggestion_err(data: &Data, command: &str) -> Result<(), String> {
 	let shell = &data.shell;
 	let privilege = &data.privilege;
+	let command = if let Some(env) = &data.env {
+		format!("{env} {command}")
+	} else {
+		command.to_string()
+	};
 	let process = match privilege {
 		Some(sudo) => std::process::Command::new(sudo)
 			.arg(shell)
