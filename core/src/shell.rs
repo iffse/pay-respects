@@ -389,7 +389,8 @@ pub fn module_output(data: &Data, module: &str) -> Option<Vec<String>> {
 	}
 	let break_holder = "<_PR_BR>";
 	Some(
-		String::from_utf8_lossy(&output.stdout)[..output.stdout.len() - break_holder.len()]
+		String::from_utf8_lossy(&output.stdout)
+			.trim_end_matches(break_holder)
 			.split("<_PR_BR>")
 			.map(|s| s.trim().to_string())
 			.collect::<Vec<String>>(),

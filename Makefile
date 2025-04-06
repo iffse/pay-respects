@@ -13,6 +13,12 @@ release-all:
 test-rust:
 	cargo test --workspace --verbose
 
+fmt:
+	cargo fmt
+
+fix:
+	cargo clippy --all --fix --allow-dirty --allow-staged
+
 install:
 	echo "Installing pay-respects core. Use `install-all` to install all modules."
 	cargo install --path core
