@@ -71,14 +71,24 @@ pub fn ai_suggestion(last_command: &str, error_msg: &str) -> Option<AIResponse> 
 		"".to_string()
 	};
 
+	let addtional_prompt = if std::env::var("_PR_AI_ADDITIONAL_PROMPT").is_ok() {
+		std::env::var("_PR_AI_ADDITIONAL_PROMPT").unwrap()
+	} else {
+		"".to_string()
+	};
+
 	let ai_prompt = format!(
 		r#"
+{addtional_prompt}
 `{last_command}` returns the following error message: `{error_msg}`. Provide possible commands to fix it. Answer in the following exact JSON template without any extra text:
 ```
 {{"commands":["command 1","command 2"],"note":"why they may fix the error{set_locale}"}}
 ```
 "#
 	);
+
+	#[cfg(debug_assertions)]
+	eprintln!("AI module: AI prompt: {}", ai_prompt);
 
 	let res;
 	let messages = Messages {

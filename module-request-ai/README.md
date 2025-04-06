@@ -18,6 +18,8 @@ Configuration is done via environment variables:
 - `_PR_AI_MODEL`: Model used
 - `_PR_AI_DISABLE`: Setting to any value disables AI integration
 - `_PR_AI_LOCALE`: Locale in which the AI explains the suggestion. Defaults to user system locale
+- `_PR_AI_ADDITIONAL_PROMPT`: Additional prompts to be included. (Yes, you can include role-playing prompts you pervert)
+	- `You are a cute catgirl. Always use cute phrases and expressions to prove your cuteness in the note, including cat imitations like nya~, にゃ~,　喵～.`
 
 Compile time variables: Default values for the respective variables above when not set
 
