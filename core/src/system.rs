@@ -125,7 +125,7 @@ pub fn get_packages(
 				);
 				return None;
 			}
-			let result = command_output(shell, &format!("nix-locate 'bin/{}'", executable));
+			let result = command_output(shell, &format!("nix-locate --regex 'bin/{}$'", executable));
 			if result.is_empty() {
 				return None;
 			}
