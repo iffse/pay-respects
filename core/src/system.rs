@@ -14,7 +14,7 @@ pub fn get_package_manager(data: &mut Data) -> Option<String> {
 	}
 
 	for package_manager in &[
-		"apt", "dnf", "emerge", "nix", "pacman", "yum",
+		"apt", "dnf", "emerge", "guix", "nix", "pacman", "yum",
 		// "zypper",
 	] {
 		if data.executables.iter().any(|exe| exe == package_manager) {
@@ -93,6 +93,24 @@ pub fn get_packages(
 					packages.push(line.to_string());
 				}
 			}
+			if packages.is_empty() {
+				None
+			} else {
+				Some(packages)
+			}
+		}
+		"guix" => {
+			let result = command_output(
+				shell,
+				&format!("{} locate {}", package_manager, executable),
+			);
+			if result.is_empty() {
+				return None;
+			}
+			let packages: Vec<String> = result
+				.lines()
+				.map(|line| line.split_whitespace().next().unwrap().to_string())
+				.collect();
 			if packages.is_empty() {
 				None
 			} else {
@@ -183,6 +201,7 @@ pub fn install_package(data: &mut Data, package_manager: &str, package: &str) ->
 			format!("{} install {}", package_manager, package)
 		}
 		"emerge" => format!("emerge {}", package),
+		"guix" => format!("guix package -i {}", package),
 		"nix" => format!("nix profile install nixpkgs#{}", package),
 		"pacman" => format!("pacman -S {}", package),
 		_ => match package_manager.ends_with("command-not-found") {
@@ -201,10 +220,10 @@ pub fn install_package(data: &mut Data, package_manager: &str, package: &str) ->
 		},
 	};
 
-	// nix does not require privilege escalation
+	// guix and nix do not require privilege escalation
 	#[allow(clippy::single_match)]
 	match package_manager {
-		"nix" => {}
+		"guix" | "nix" => {}
 		_ => elevate(data, &mut install),
 	}
 
