@@ -227,7 +227,7 @@ An API key is included with the source (your distribution might have stripped th
 	>
 </div>
 
-[AI and API configurations](./module-request-ai/README.md)
+[AI usages and API configurations](./module-request-ai/README.md)
 
 ## Contributing
 
