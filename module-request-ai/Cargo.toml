@@ -7,7 +7,7 @@ description = "AI request module for the pay-respects CLI tool"
 homepage = "https://codeberg.org/iff/pay-respects"
 repository = "https://github.com/iffse/pay-respects"
 license = "AGPL-3.0-or-later"
-include = ["**/*.rs"]
+include = ["**/*.rs", "templates/*"]
 
 [dependencies]
 colored = "3"
