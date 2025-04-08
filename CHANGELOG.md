@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Streaming output support for AI module
+	- Wasn't easy as my brain is pretty much dead at the time of writing
+- `guix` support in package installation by [gs-101](https://github.com/iffse/pay-respects/pull/44)
+
+### Fixed
+
+- Redundant packages from `nix-index` by [SigmaSquadron](https://github.com/iffse/pay-respects/pull/45)
+
 ## [0.7.1] - 2025-04-06
 
 ### Added

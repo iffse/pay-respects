@@ -2,10 +2,6 @@
 
 Module for [pay-respects](https://codeberg.org/iff/pay-respects) to request AI for suggestions.
 
-Compile time features:
-
-- `libcurl` (default): Dynamically links to libcurl. Requires OpenSSL when compiling. When disabled, a curl process is spawned instead.
-
 ## Configurations
 
 Configuration is done via environment variables:
