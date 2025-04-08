@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Redundant packages from `nix-index` by [SigmaSquadron](https://github.com/iffse/pay-respects/pull/45)
 
+### Removed
+
+- No longer depends on `libcurl`. Now using `rusttls`
+
 ## [0.7.1] - 2025-04-06
 
 ### Added
