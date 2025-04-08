@@ -3,6 +3,7 @@ use pay_respects_utils::files::get_path_files;
 use pay_respects_utils::files::path_env_sep;
 
 use askama::Template;
+use itertools::Itertools;
 
 use std::process::{exit, Stdio};
 
@@ -63,7 +64,7 @@ impl Data {
 		let command = last_command(&shell).trim().to_string();
 		let alias = alias_map(&shell);
 		let mode = run_mode();
-		let (executables, modules, fallbacks);
+		let (mut executables, modules, fallbacks);
 		let lib_dir = {
 			if let Ok(lib_dir) = std::env::var("_PR_LIB") {
 				Some(lib_dir)
@@ -149,6 +150,10 @@ impl Data {
 				(executables, modules, fallbacks)
 			};
 		}
+
+		let builtins = builtin_commands(&shell);
+		executables.extend(builtins.clone());
+		executables = executables.iter().unique().cloned().collect();
 
 		let mut init = Data {
 			shell,
@@ -610,6 +615,21 @@ pub fn get_shell() -> String {
 			std::process::exit(1);
 		}
 	}
+}
+
+fn builtin_commands(shell: &str) -> Vec<String> {
+	// TODO: add the commands for each shell
+	// these should cover most of the builtin commands
+	// (maybe with false positives)
+	let builtin = vec![
+		"alias", "bg", "bind", "break", "builtin", "case", "cd", "command", "compgen", "complete",
+		"continue", "declare", "dirs", "disown", "echo", "enable", "eval", "exec", "exit",
+		"export", "fc", "fg", "getopts", "hash", "help", "history", "if", "jobs", "kill", "let",
+		"local", "logout", "popd", "printf", "pushd", "pwd", "read", "readonly", "return", "set",
+		"shift", "shopt", "source", "suspend", "test", "times", "trap", "type", "typeset",
+		"ulimit", "umask", "unalias", "unset", "until", "wait", "while", "which",
+	];
+	builtin.iter().map(|&cmd| cmd.to_string()).collect()
 }
 
 pub fn shell_syntax(shell: &str, command: &str) -> String {

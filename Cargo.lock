@@ -967,6 +967,7 @@ dependencies = [
  "askama",
  "colored",
  "inquire",
+ "itertools 0.14.0",
  "pay-respects-parser",
  "pay-respects-utils",
  "regex-lite",
