@@ -1,0 +1,15 @@
+{{ additional_prompt }}
+`{{ last_command }}` returns the following error message: `{{ error_msg }}`. Guess the intention of the command and provide possible commands to solve the issue.
+Only provide the commands in the <suggestions> section. Do not include any explanations or additional text.
+No other text should be included outside the <note> and <suggestions> sections.
+Your answer should be in the following format:
+```
+<note>
+Anything other than the commands should be included in this section. Explain why your suggestions can be helpful{{ set_locale }}.
+</note>
+<suggestions>
+command
+<br>
+command
+</suggestions>
+```
