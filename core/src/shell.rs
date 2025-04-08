@@ -281,6 +281,9 @@ pub fn add_candidates_no_dup(
 ) {
 	for candidate in new_candidates {
 		let candidate = candidate.trim();
+		if candidate.is_empty() {
+			continue;
+		}
 		if candidate != command && !candidates.contains(&candidate.to_string()) {
 			candidates.push(candidate.to_string());
 		}
