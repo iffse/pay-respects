@@ -1,7 +1,7 @@
 {{ additional_prompt }}
 `{{ last_command }}` returns the following error message: `{{ error_msg }}`. Guess the intention of the command and provide possible commands to solve the issue.
-Only provide the commands in the <suggestions> section. Do not include any explanations or additional text.
-No other text should be included outside the <note> and <suggestions> sections.
+Only provide commands in the <suggestions> section. Do not include any additional text.
+No other text allowed outside the <note> and <suggestions> sections.
 Your answer should be in the following format:
 ```
 <note>
