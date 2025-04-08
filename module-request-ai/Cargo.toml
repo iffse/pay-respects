@@ -17,6 +17,11 @@ serde_json = { version = "1.0" }
 serde = { version = "1.0", features = ["derive"]}
 textwrap = "0.16"
 terminal_size = "0.4"
+askama = "0.13"
+
+reqwest = { version = "0.12", features = ["stream", "json", "rustls-tls"], default-features = false }
+tokio = { version = "1", features = ["full"] }
+futures-util = "0.3"
 
 curl = { version = "0.4", optional = true }
 

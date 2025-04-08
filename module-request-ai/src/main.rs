@@ -15,16 +15,16 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 use crate::requests::ai_suggestion;
-use colored::Colorize;
 use sys_locale::get_locale;
-use textwrap::fill;
+mod buffer;
 mod requests;
 
 #[macro_use]
 extern crate rust_i18n;
 i18n!("i18n", fallback = "en", minify_key = true);
 
-fn main() -> Result<(), std::io::Error> {
+#[tokio::main]
+async fn main() -> Result<(), std::io::Error> {
 	let locale = {
 		let sys_locale = get_locale().unwrap_or("en-US".to_string());
 		if sys_locale.len() < 2 {
@@ -57,31 +57,8 @@ fn main() -> Result<(), std::io::Error> {
 	if command.split_whitespace().count() == 1 {
 		return Ok(());
 	}
-	let suggest = ai_suggestion(&command, &error);
-	if let Some(suggest) = suggest {
-		if let Some(thinking) = suggest.think {
-			let note = format!("{}:", t!("ai-thinking")).bold().blue();
-			let thinking = fill(&thinking, termwidth());
-			eprintln!("{}{}", note, thinking);
-		}
-		let warn = format!("{}:", t!("ai-suggestion")).bold().blue();
-		let note = fill(&suggest.suggestion.note, termwidth());
-
-		eprintln!("{}\n{}\n", warn, note);
-		let suggestions = suggest.suggestion.commands;
-		for suggestion in suggestions {
-			print!("{}<_PR_BR>", suggestion);
-		}
-	}
+	ai_suggestion(&command, &error).await;
+	// if let Some(suggest) = suggest {
+	// }
 	Ok(())
-}
-
-fn termwidth() -> usize {
-	use terminal_size::{terminal_size, Height, Width};
-	let size = terminal_size();
-	if let Some((Width(w), Height(_))) = size {
-		std::cmp::min(w as usize, 80)
-	} else {
-		80
-	}
 }

@@ -100,10 +100,8 @@ pub fn get_packages(
 			}
 		}
 		"guix" => {
-			let result = command_output(
-				shell,
-				&format!("{} locate {}", package_manager, executable),
-			);
+			let result =
+				command_output(shell, &format!("{} locate {}", package_manager, executable));
 			if result.is_empty() {
 				return None;
 			}
@@ -125,7 +123,8 @@ pub fn get_packages(
 				);
 				return None;
 			}
-			let result = command_output(shell, &format!("nix-locate --regex 'bin/{}$'", executable));
+			let result =
+				command_output(shell, &format!("nix-locate --regex 'bin/{}$'", executable));
 			if result.is_empty() {
 				return None;
 			}
