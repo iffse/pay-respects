@@ -23,8 +23,6 @@ reqwest = { version = "0.12", features = ["stream", "json", "rustls-tls"], defau
 tokio = { version = "1", features = ["full"] }
 futures-util = "0.3"
 
-curl = { version = "0.4", optional = true }
-
 [[bin]]
 name = "_pay-respects-fallback-100-request-ai"
 path = "src/main.rs"
