@@ -25,6 +25,10 @@ i18n!("i18n", fallback = "en", minify_key = true);
 
 #[tokio::main]
 async fn main() -> Result<(), std::io::Error> {
+	if std::env::var("_PR_AI_DISABLE").is_ok() {
+		return Ok(());
+	}
+
 	let locale = {
 		let sys_locale = get_locale().unwrap_or("en-US".to_string());
 		if sys_locale.len() < 2 {
@@ -58,7 +62,6 @@ async fn main() -> Result<(), std::io::Error> {
 		return Ok(());
 	}
 	ai_suggestion(&command, &error).await;
-	// if let Some(suggest) = suggest {
-	// }
+
 	Ok(())
 }

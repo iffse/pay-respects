@@ -57,10 +57,6 @@ struct AiPrompt<'a> {
 }
 
 pub async fn ai_suggestion(last_command: &str, error_msg: &str) {
-	if std::env::var("_PR_AI_DISABLE").is_ok() {
-		return;
-	}
-
 	let conf = match Conf::new() {
 		Some(conf) => conf,
 		None => {
