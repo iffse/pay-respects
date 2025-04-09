@@ -128,20 +128,18 @@ pub fn get_packages(
 			if result.is_empty() {
 				return None;
 			}
-			let packages: Option<Vec<String>> = result
+			let packages: Vec<String> = result
 				.lines()
 				.map(|line| {
-					let package = line.split_whitespace().next()?;
-					Some(package.rsplit_once('.')?.0.to_string())
+					line.split_whitespace()
+						.next()
+						.unwrap()
+						.rsplit_once('.')
+						.unwrap()
+						.0
+						.to_string()
 				})
 				.collect();
-			let Some(packages) = packages else {
-				eprintln!(
-					"Unexpected output from nix-index:\n  {}",
-					result.replace("\n", "\n  ")
-				);
-				return None;
-			};
 
 			if packages.is_empty() {
 				None
