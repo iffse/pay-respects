@@ -103,7 +103,7 @@ pub fn command(suggest: &mut String, split_command: &[String]) {
 	}
 }
 
-pub fn typo(suggest: &mut String, split_command: &[String], executables: &[String], shell: &str) {
+pub fn typo(suggest: &mut String, split_command: &[String], executables: &[String]) {
 	while suggest.contains("{{typo") {
 		let (placeholder, args) = eval_placeholder(suggest, "{{typo", "}}");
 
@@ -155,7 +155,7 @@ pub fn typo(suggest: &mut String, split_command: &[String], executables: &[Strin
 				.rsplit_once(")")
 				.unwrap()
 				.0;
-			split.split(',').collect::<Vec<&str>>()
+			split.split(&[',', '\n']).collect::<Vec<&str>>()
 		} else {
 			unreachable!("Typo suggestion must have a match list");
 		};
@@ -165,34 +165,17 @@ pub fn typo(suggest: &mut String, split_command: &[String], executables: &[Strin
 			.map(|s| s.trim().to_string())
 			.collect::<Vec<String>>();
 
-		let command = if match_list[0].starts_with("{{shell") {
-			let function = match_list.join(",");
-			let (_, args) = eval_placeholder(&function, "{{shell", "}}");
-			let function = &function[args.to_owned()].trim_matches(|c| c == '(' || c == ')');
-			suggest_typo(
-				&split_command[index],
-				&eval_shell_command(shell, function),
-				executables,
-			)
-		} else {
-			suggest_typo(&split_command[index], &match_list, executables)
-		};
+		let command = suggest_typo(&split_command[index], &match_list, executables);
 
 		suggest.replace_range(placeholder, &command);
 	}
 }
 
-pub fn select(
-	shell: &str,
-	suggest: &mut String,
-	split_command: &[String],
-	executables: &[String],
-	select_list: &mut Vec<String>,
-) {
+pub fn select(suggest: &mut String, split_command: &[String], select_list: &mut Vec<String>) {
 	if suggest.contains("{{select") {
 		let (placeholder, args) = eval_placeholder(suggest, "{{select", "}}");
 
-		let index = if suggest.contains('[') {
+		let _ = if suggest.contains('[') {
 			let split = suggest[args.to_owned()]
 				.split(&['[', ']'])
 				.collect::<Vec<&str>>();
@@ -221,7 +204,7 @@ pub fn select(
 				.rsplit_once(")")
 				.unwrap()
 				.0;
-			split.split(',').collect::<Vec<&str>>()
+			split.split(&[',', '\n']).collect::<Vec<&str>>()
 		} else {
 			unreachable!("Select suggestion must have a match list");
 		};
@@ -231,21 +214,7 @@ pub fn select(
 			.map(|s| s.trim().to_string())
 			.collect::<Vec<String>>();
 
-		let selects = if selection_list[0].starts_with("{{shell") {
-			let function = selection_list.join(",");
-			let (_, args) = eval_placeholder(&function, "{{shell", "}}");
-			let function = &function[args.to_owned()].trim_matches(|c| c == '(' || c == ')');
-			eval_shell_command(shell, function)
-		} else if selection_list[0] == "path" {
-			let res = best_matches_path(&split_command[index], executables);
-			if let Some(res) = res {
-				res
-			} else {
-				vec![split_command[index].clone()]
-			}
-		} else {
-			selection_list
-		};
+		let selects = selection_list;
 
 		for match_ in selects {
 			select_list.push(match_);

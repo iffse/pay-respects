@@ -143,16 +143,10 @@ fn eval_suggest(
 	replaces::err(&mut suggest, error_msg);
 	replaces::command(&mut suggest, &split_command);
 	replaces::shell(&mut suggest, shell);
-	replaces::typo(&mut suggest, &split_command, executables, shell);
+	replaces::typo(&mut suggest, &split_command, executables);
 
 	let mut select_list = Vec::new();
-	replaces::select(
-		shell,
-		&mut suggest,
-		&split_command,
-		executables,
-		&mut select_list,
-	);
+	replaces::select(&mut suggest, &split_command, &mut select_list);
 
 	for (tag, value) in opt_list {
 		suggest = suggest.replace(&tag, &value);
