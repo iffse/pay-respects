@@ -9,9 +9,6 @@ function {{ alias }} {
 					$env:_PR_ERROR_MSG = $err.Exception.Message
 				}
 			}
-			if ($env:_PR_LAST_COMMAND -eq $err.InvocationInfo.Line) {
-				$env:_PR_ERROR_MSG = $err.Exception.Message
-			}
 		}
 		$env:_PR_SHELL = 'pwsh';
 		&'{{ binary_path }}';
