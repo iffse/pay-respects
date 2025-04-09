@@ -130,27 +130,27 @@ pub async fn ai_suggestion(last_command: &str, error_msg: &str) {
 		.await;
 
 	let mut stream = res.unwrap().bytes_stream();
-	let mut json_buffer = vec![];
+	let mut json_buffer = String::new();
 	let mut buffer = buffer::Buffer::new();
 	while let Some(item) = stream.next().await {
 		let item = item.unwrap();
 		let str = std::str::from_utf8(&item).unwrap();
 
 		if json_buffer.is_empty() {
-			json_buffer.push(str.to_string());
+			json_buffer.push_str(str);
 			continue;
 		}
 
 		if !str.contains("\n\ndata: {") {
-			json_buffer.push(str.to_string());
+			json_buffer.push_str(str);
 			continue;
 		}
 		let data_loc = str.find("\n\ndata: {").unwrap();
 		let split = str.split_at(data_loc);
-		json_buffer.push(split.0.to_string());
-		let working_str = json_buffer.join("");
+		json_buffer.push_str(split.0);
+		let working_str = json_buffer.clone();
 		json_buffer.clear();
-		json_buffer.push(split.1.to_string());
+		json_buffer.push_str(split.1);
 
 		for part in working_str.split("\n\n") {
 			if let Some(data) = part.strip_prefix("data: ") {
@@ -168,7 +168,7 @@ pub async fn ai_suggestion(last_command: &str, error_msg: &str) {
 		}
 	}
 	if !json_buffer.is_empty() {
-		let working_str = json_buffer.join("");
+		let working_str = json_buffer.clone();
 		for part in working_str.split("\n\n") {
 			if let Some(data) = part.strip_prefix("data: ") {
 				if data == "[DONE]" {

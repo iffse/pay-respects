@@ -38,14 +38,14 @@ enum State {
 }
 
 pub struct Buffer {
-	pub buf: Vec<String>,
+	pub buf: String,
 	state: State,
 }
 
 impl Buffer {
 	pub fn new() -> Self {
 		Buffer {
-			buf: vec![],
+			buf: String::new(),
 			state: State::Write,
 		}
 	}
@@ -53,12 +53,12 @@ impl Buffer {
 		match self.state {
 			State::Write => self.proc_write(data),
 			State::Think => self.proc_think(data),
-			State::Buf => self.buf.push(data.to_string()),
+			State::Buf => self.buf.push_str(data),
 		}
 	}
 
 	pub fn print_return_remain(&mut self) -> String {
-		let buffered = self.buf.join("").trim().to_string();
+		let buffered = self.buf.trim().to_string();
 		self.buf.clear();
 		if self.state == State::Buf {
 			return buffered;
@@ -75,15 +75,14 @@ impl Buffer {
 
 	fn proc_write(&mut self, data: &str) {
 		if !data.contains("\n") {
-			self.buf.push(data.to_string());
-			let buffered = self.buf.join("").trim().to_string();
+			self.buf.push_str(data);
+			let buffered = self.buf.trim().to_string();
 			let filled = fill(&buffered);
 			if let Some(filled) = filled {
 				self.buf.clear();
 				let formatted = clear_format(&filled);
 				eprint!("{}", formatted);
-				self.buf
-					.push(formatted.split_once("\n").unwrap().1.to_string());
+				self.buf.push_str(formatted.split_once("\n").unwrap().1);
 				std::io::stdout().flush().unwrap();
 				return;
 			}
@@ -97,8 +96,8 @@ impl Buffer {
 			let lines = data.split_once("\n").unwrap();
 			let first = lines.0;
 			let last = lines.1;
-			self.buf.push(first.to_string());
-			let buffered = self.buf.join("").trim().to_string();
+			self.buf.push_str(first);
+			let buffered = self.buf.trim().to_string();
 			self.buf.clear();
 			if buffered.ends_with("<note>") {
 				let warn = format!("{}:", t!("ai-suggestion"))
@@ -148,15 +147,14 @@ impl Buffer {
 
 	fn proc_think(&mut self, data: &str) {
 		if !data.contains("\n") {
-			self.buf.push(data.to_string());
-			let buffered = self.buf.join("").trim().to_string();
+			self.buf.push_str(data);
+			let buffered = self.buf.trim().to_string();
 			let filled = fill(&buffered);
 			if let Some(filled) = filled {
 				self.buf.clear();
 				let formatted = clear_format(&filled);
 				eprint!("{}", formatted);
-				self.buf
-					.push(formatted.split_once("\n").unwrap().1.to_string());
+				self.buf.push_str(formatted.split_once("\n").unwrap().1);
 				std::io::stdout().flush().unwrap();
 				return;
 			}
@@ -170,8 +168,8 @@ impl Buffer {
 			let lines = data.split_once("\n").unwrap();
 			let first = lines.0;
 			let last = lines.1;
-			self.buf.push(first.to_string());
-			let buffered = self.buf.join("").trim().to_string();
+			self.buf.push_str(first);
+			let buffered = self.buf.trim().to_string();
 			self.buf.clear();
 			if buffered.ends_with("</think>") {
 				let tag = "</think>";
