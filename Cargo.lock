@@ -774,9 +774,9 @@ checksum = "c19937216e9d3aa9956d9bb8dfc0b0c8beb6058fc4f7a4dc4d850edf86a237d6"
 
 [[package]]
 name = "linux-raw-sys"
-version = "0.9.3"
+version = "0.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fe7db12097d22ec582439daf8618b8fdd1a7bef6270e9af3b1ebcd30893cf413"
+checksum = "cd945864f07fe9f5371a27ad7b52a172b4b499999f1d97574c9fa68373937e12"
 
 [[package]]
 name = "litemap"
@@ -902,7 +902,7 @@ dependencies = [
 
 [[package]]
 name = "pay-respects"
-version = "0.7.2"
+version = "0.7.3"
 dependencies = [
  "askama",
  "colored",
@@ -917,7 +917,7 @@ dependencies = [
 
 [[package]]
 name = "pay-respects-module-request-ai"
-version = "0.2.1"
+version = "0.2.2"
 dependencies = [
  "askama",
  "colored",
@@ -934,7 +934,7 @@ dependencies = [
 
 [[package]]
 name = "pay-respects-module-runtime-rules"
-version = "0.1.8"
+version = "0.1.9"
 dependencies = [
  "pay-respects-utils",
  "regex-lite",
@@ -944,7 +944,7 @@ dependencies = [
 
 [[package]]
 name = "pay-respects-parser"
-version = "0.3.8"
+version = "0.3.9"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -955,7 +955,7 @@ dependencies = [
 
 [[package]]
 name = "pay-respects-utils"
-version = "0.1.7"
+version = "0.1.8"
 dependencies = [
  "itertools 0.14.0",
  "regex-lite",

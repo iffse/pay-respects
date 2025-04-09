@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.3] - 2025-04-09
+
 ### Added
 
 - Regex support for conditions matching
@@ -256,7 +258,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 History start.
 
-[unreleased]: https://github.com/iffse/pay-respects/compare/v0.7.1..HEAD
+[unreleased]: https://github.com/iffse/pay-respects/compare/v0.7.3..HEAD
+[0.7.3]: https://github.com/iffse/pay-respects/compare/v0.7.2..v0.7.3
 [0.7.2]: https://github.com/iffse/pay-respects/compare/v0.7.1..v0.7.2
 [0.7.1]: https://github.com/iffse/pay-respects/compare/v0.7.0..v0.7.1
 [0.7.0]: https://github.com/iffse/pay-respects/compare/v0.6.14..v0.7.0
