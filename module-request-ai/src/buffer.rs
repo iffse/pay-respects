@@ -21,6 +21,13 @@ fn fill(str: &str) -> Option<String> {
 	}
 }
 
+fn clear_format(str: &str) -> String {
+	let width = termwidth();
+	let whitespace = " ".repeat(width);
+	let filled = textwrap_fill(str, width);
+	format!("\r{}\r{}", whitespace, filled)
+}
+
 use colored::Colorize;
 
 #[derive(PartialEq)]
@@ -73,7 +80,7 @@ impl Buffer {
 			let filled = fill(&buffered);
 			if let Some(filled) = filled {
 				self.buf.clear();
-				let formatted = format!("\r{}", filled);
+				let formatted = clear_format(&filled);
 				eprint!("{}", formatted);
 				self.buf
 					.push(formatted.split_once("\n").unwrap().1.to_string());
@@ -149,7 +156,7 @@ impl Buffer {
 			let filled = fill(&buffered);
 			if let Some(filled) = filled {
 				self.buf.clear();
-				let formatted = format!("\r{}", filled);
+				let formatted = clear_format(&filled);
 				eprint!("{}", formatted);
 				self.buf
 					.push(formatted.split_once("\n").unwrap().1.to_string());
