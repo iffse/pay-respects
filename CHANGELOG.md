@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Regex support for conditions matching
+	- `,` cannot be used though
+
+### Changed
+
+- Using Damerau variation for string comparison
+
+### Removed
+
+- `exe_contains` rule as it can be done with regex
+
 ## [0.7.2] - 2025-04-08
 
 ### Added

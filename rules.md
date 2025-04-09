@@ -25,8 +25,9 @@ command = "helloworld"
 # you can add as many `[[match_err]]` section as you want
 [[match_err]]
 # Note:
-# - patterns must be in lowercase
+# - patterns must be in lowercase without extra space characters
 # - patterns should be the output with `LC_ALL=C` environment variable
+# - this is a first-pass match. It should be quick so regex is not supported
 pattern = [
 	"pattern 1",
 	"pattern 2"
@@ -77,9 +78,8 @@ The placeholder is evaluated as following:
 Suggestions can have additional conditions to check. To specify conditions, add a `#[...]` at the first line (just like derive macros in Rust). Available conditions:
 
 - `executable`: Check if the argument can be found in path
-- `cmd_contains`: Check if the last user input contains the argument
-- `err_contains`: Check if the error of the command contains the argument
-- `exe_contains`: Check if the command name itself contains the argument
+- `cmd_contains`: Check if the last user input contains the argument. Regex supported (you can't use `,` currently because it's used as condition separator)
+- `err_contains`: Same as `cmd_contains` but for error message
 - `length`: Check if the given command has the length of the argument
 - `min_length`: Check if the given command has at least the length of the argument
 - `max_length`: Check if the given command has at most the length of the argument
