@@ -18,6 +18,11 @@ fn regex_captures(regex: &str, string: &str) -> Vec<String> {
 	caps
 }
 
+pub fn regex_match(regex: &str, string: &str) -> bool {
+	let regex = Regex::new(regex).unwrap();
+	regex.is_match(string)
+}
+
 pub fn opt_regex(regex: &str, command: &mut String) -> String {
 	let opts = regex_captures(regex, command);
 

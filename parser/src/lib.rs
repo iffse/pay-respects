@@ -105,6 +105,7 @@ fn gen_match_rules(rules: &[Rule]) -> TokenStream {
 			for pattern in #patterns_tokens {
 				if error_msg.contains(pattern) {
 					#suggestion_tokens;
+					break;
 				};
 			})*
 		})
@@ -149,7 +150,14 @@ fn parse_conditions(suggest: &str) -> (String, Vec<TokenStream2>) {
 		for condition in conditions {
 			let (mut condition, arg) = condition.split_once('(').unwrap();
 			condition = condition.trim();
-			let arg = arg.trim_start_matches('(').trim_end_matches(')');
+			// remove only the last character which is ')'
+			// other ')' are kept for regex
+			let arg = arg
+				.to_string()
+				.chars()
+				.take(arg.len() - 1)
+				.collect::<String>();
+
 			let reverse = match condition.starts_with('!') {
 				true => {
 					condition = condition.trim_start_matches('!');
@@ -157,7 +165,7 @@ fn parse_conditions(suggest: &str) -> (String, Vec<TokenStream2>) {
 				}
 				false => false,
 			};
-			let evaluated_condition = eval_condition(condition, arg);
+			let evaluated_condition = eval_condition(condition, &arg);
 
 			eval_conditions.push(quote! {#evaluated_condition == !#reverse});
 		}
@@ -170,9 +178,8 @@ fn parse_conditions(suggest: &str) -> (String, Vec<TokenStream2>) {
 fn eval_condition(condition: &str, arg: &str) -> TokenStream2 {
 	match condition {
 		"executable" => quote! {executables.contains(&#arg.to_string())},
-		"err_contains" => quote! {error_msg.contains(#arg)},
-		"cmd_contains" => quote! {last_command.contains(#arg)},
-		"exe_contains" => quote! {split[0].contains(#arg)},
+		"err_contains" => quote! {regex_match(#arg, &error_msg)},
+		"cmd_contains" => quote! {regex_match(#arg, &last_command)},
 		"min_length" => quote! {(split.len() >= #arg.parse::<usize>().unwrap())},
 		"length" => quote! {(split.len() == #arg.parse::<usize>().unwrap())},
 		"max_length" => quote! {(split.len() <= #arg.parse::<usize>().unwrap() + 1)},

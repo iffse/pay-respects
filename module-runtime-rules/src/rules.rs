@@ -29,7 +29,6 @@ pub fn runtime_match(
 	let split_command = split_command(last_command);
 
 	let mut pure_suggest;
-
 	for match_err in rule.match_err {
 		for pattern in match_err.pattern {
 			if error_msg.contains(&pattern) {
@@ -53,7 +52,11 @@ pub fn runtime_match(
 						for condition in conditions {
 							let (mut condition, arg) = condition.split_once('(').unwrap();
 							condition = condition.trim();
-							let arg = arg.trim_start_matches('(').trim_end_matches(')');
+							let arg = arg
+								.to_string()
+								.chars()
+								.take(arg.len() - 1)
+								.collect::<String>();
 							let reverse = match condition.starts_with('!') {
 								true => {
 									condition = condition.trim_start_matches('!');
@@ -63,7 +66,7 @@ pub fn runtime_match(
 							};
 							if eval_condition(
 								condition,
-								arg,
+								&arg,
 								shell,
 								last_command,
 								error_msg,
@@ -79,6 +82,7 @@ pub fn runtime_match(
 					} else {
 						pure_suggest = suggest.to_owned();
 					}
+
 					// replacing placeholders
 					if pure_suggest.contains("{{command}}") {
 						pure_suggest = pure_suggest.replace("{{command}}", last_command);
@@ -90,6 +94,7 @@ pub fn runtime_match(
 						print!("<_PR_BR>");
 					}
 				}
+				break;
 			}
 		}
 	}
@@ -106,9 +111,8 @@ fn eval_condition(
 ) -> bool {
 	match condition {
 		"executable" => executables.contains(&arg.to_string()),
-		"err_contains" => error_msg.contains(arg),
-		"cmd_contains" => last_command.contains(arg),
-		"exe_contains" => split_command[0].contains(arg),
+		"err_contains" => regex_match(arg, error_msg),
+		"cmd_contains" => regex_match(arg, last_command),
 		"min_length" => split_command.len() >= arg.parse::<usize>().unwrap(),
 		"length" => split_command.len() == arg.parse::<usize>().unwrap(),
 		"max_length" => split_command.len() <= arg.parse::<usize>().unwrap() + 1,
