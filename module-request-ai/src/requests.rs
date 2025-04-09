@@ -194,8 +194,8 @@ pub async fn ai_suggestion(last_command: &str, error_msg: &str) {
 		.trim()
 		.trim_end_matches("```")
 		.trim()
-		.trim_start_matches("<suggestions>")
-		.trim_end_matches("</suggestions>")
+		.trim_start_matches("<suggest>")
+		.trim_end_matches("</suggest>")
 		.replace("<br>", "<_PR_BR>");
 
 	println!("{}", suggestions);
