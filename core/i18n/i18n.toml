@@ -118,6 +118,19 @@ ja = "シェルが指定されていません。シェルを指定してくだ�
 ko = "쉘이 지정되지 않았습니다. 쉘을 지정하십시오."
 zh = "未指定 shell。请指定一个 shell。"
 
+[empty-command]
+en = "Last command was empty"
+es = "El último comando estaba vacío"
+de = "Der letzte Befehl war leer"
+fr = "La dernière commande était vide"
+it = "L'ultimo comando era vuoto"
+pt = "O último comando estava vazio"
+ru = "Последняя команда была пустой"
+ja = "最後のコマンドは空でした"
+ko = "마지막 명령이 비어 있었습니다"
+zh = "最后一个命令是空的"
+
+
 [multi-suggest]
 en = "%{num} suggestion(s) found"
 es = "%{num} sugerencia(s) encontrada(s)"

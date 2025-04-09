@@ -224,6 +224,10 @@ impl Data {
 		}
 		#[cfg(debug_assertions)]
 		eprintln!("split: {:?}", split);
+		if split.is_empty() {
+			eprintln!("{}", t!("empty-command"));
+			exit(1);
+		}
 		self.split = split;
 	}
 
