@@ -181,6 +181,7 @@ pub fn find_similars(
 	None
 }
 
+/// Damerau-Levenshtein distance algorithm
 #[allow(clippy::needless_range_loop)]
 pub fn compare_string(a: &str, b: &str) -> usize {
 	let mut matrix = vec![vec![0; b.chars().count() + 1]; a.chars().count() + 1];
@@ -199,6 +200,15 @@ pub fn compare_string(a: &str, b: &str) -> usize {
 				std::cmp::min(matrix[i][j + 1] + 1, matrix[i + 1][j] + 1),
 				matrix[i][j] + cost,
 			);
+
+			// addition for optimal string alignment distance
+			if i > 0
+				&& j > 0 && ca == b.chars().nth(j - 1).unwrap()
+				&& a.chars().nth(i - 1).unwrap() == cb
+			{
+				matrix[i + 1][j + 1] =
+					std::cmp::min(matrix[i + 1][j + 1], matrix[i - 1][j - 1] + 1);
+			}
 		}
 	}
 	matrix[a.chars().count()][b.chars().count()]
