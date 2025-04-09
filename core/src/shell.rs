@@ -353,6 +353,12 @@ pub fn command_output(shell: &str, command: &str) -> String {
 		.output()
 		.expect("failed to execute process");
 
+	let err = String::from_utf8_lossy(&output.stderr);
+	if !err.is_empty() {
+		eprintln!("Error while executing command: {}", command);
+		eprintln!("  {}", err.replace("\n", "\n  "));
+	}
+
 	String::from_utf8_lossy(&output.stdout).to_string()
 }
 
