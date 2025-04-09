@@ -101,37 +101,34 @@ impl Buffer {
 			let buffered = self.buf.join("").trim().to_string();
 			self.buf.clear();
 			if buffered.ends_with("<note>") {
-				let warn = format!("\r{}:", t!("ai-suggestion"))
+				let warn = format!("{}:", t!("ai-suggestion"))
 					.bold()
 					.blue()
 					.to_string();
 				let first = buffered.replace("<note>", &warn);
-				eprintln!("{}", first);
+				eprintln!("\r{}", first);
 				std::io::stdout().flush().unwrap();
 			} else if buffered.ends_with("</note>") {
 				let tag = "</note>";
 				let whitespace = " ".repeat(tag.len());
-				let formatted = format!("\r{}", whitespace);
-				let first = buffered.replace("</note>", &formatted);
-				eprintln!("{}", first);
+				let clear = whitespace.to_string();
+				let first = buffered.replace("</note>", &clear);
+				eprintln!("\r{}", first);
 				self.state = State::Buf;
 				std::io::stdout().flush().unwrap();
 			} else if buffered.ends_with("<think>") {
 				let tag = "<think>";
-				let warn = format!("\r{}:", t!("ai-thinking"))
-					.bold()
-					.blue()
-					.to_string();
+				let warn = format!("{}:", t!("ai-thinking")).bold().blue().to_string();
 				let first = buffered.replace(tag, &warn);
 				self.state = State::Think;
-				eprintln!("{}", first);
+				eprintln!("\r{}", first);
 				std::io::stdout().flush().unwrap();
 			} else if buffered.ends_with("</think>") {
 				let tag = "</think>";
 				let whitespace = " ".repeat(tag.len());
-				let formatted = format!("\r{}", whitespace);
-				let first = buffered.replace(tag, &formatted);
-				eprintln!("{}", first);
+				let clear = whitespace.to_string();
+				let first = buffered.replace(tag, &clear);
+				eprintln!("\r{}", first);
 				std::io::stdout().flush().unwrap();
 			} else if buffered.ends_with("```") {
 				let tag = "```";
@@ -179,10 +176,10 @@ impl Buffer {
 			if buffered.ends_with("</think>") {
 				let tag = "</think>";
 				let whitespace = " ".repeat(tag.len());
-				let formatted = format!("\r{}", whitespace);
-				let first = buffered.replace(tag, &formatted);
+				let clear = whitespace.to_string();
+				let first = buffered.replace(tag, &clear);
 				self.state = State::Write;
-				eprintln!("{}", first);
+				eprintln!("\r{}", first);
 				std::io::stdout().flush().unwrap();
 			} else {
 				eprintln!("{}", first);
