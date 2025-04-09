@@ -11,7 +11,7 @@ Configuration is done via environment variables:
 	- `https://api.openai.com/v1/chat/completions` (Note: OpenAI's ChatGPT is very slow)
 	- `https://api.groq.com/openai/v1/chat/completions`
 	- `http://localhost:11434/api/chat`: Ollama
-- `_PR_AI_MODEL`: Model used
+- `_PR_AI_MODEL`: Model used. Reasoning models are also supported
 - `_PR_AI_DISABLE`: Setting to any value disables AI integration
 - `_PR_AI_LOCALE`: Locale in which the AI explains the suggestion. Defaults to user system locale
 - `_PR_AI_ADDITIONAL_PROMPT`: Additional prompts to be included. (Yes, you can include role-playing prompts you pervert)
@@ -68,7 +68,7 @@ If default values were not provided, pay-respects' own values will be used. Your
 
 ## Advanced Usages
 
-For non-trivial suggestions, you can add more context as comments (interactive comments needs to be explicitly enabled in Bash and Zsh):
+For non-trivial suggestions, you can add more context as comments (for Bash and Zsh, interactive comments needs to be explicitly enabled):
 ```sh
 pacman -S # how do I install Rust?
 ```

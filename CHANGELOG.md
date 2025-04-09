@@ -16,6 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Using Damerau variation for string comparison
 
+### Fixed
+
+- Panics in core and runtime-rules module
+- Removed duplicated characters in stream output
+
 ### Removed
 
 - `exe_contains` rule as it can be done with regex
