@@ -37,6 +37,8 @@ pub fn cmd_regex(regex: &str, command: &str) -> String {
 	cmd.join(" ")
 }
 
+/// Returns the output of a shell command as a vector of strings
+/// Each string is a line of output
 pub fn eval_shell_command(shell: &str, command: &str) -> Vec<String> {
 	let output = std::process::Command::new(shell)
 		.arg("-c")
@@ -51,6 +53,7 @@ pub fn eval_shell_command(shell: &str, command: &str) -> Vec<String> {
 		.collect::<Vec<String>>()
 }
 
+/// Split the full command into command and arguments
 pub fn split_command(command: &str) -> Vec<String> {
 	#[cfg(debug_assertions)]
 	eprintln!("command: {command}");
@@ -114,11 +117,12 @@ pub fn best_matches_path(typo: &str, executables: &[String]) -> Option<Vec<Strin
 	find_similars(typo, executables, Some(3))
 }
 
-// higher the threshold, the stricter the comparison
-// 1: anything
-// 2: 50%
-// 3: 33%
-// ... etc
+/// Find the best match for a typo given a list of candidates
+/// higher the threshold, stricter the comparison
+/// 1: anything
+/// 2: 50%
+/// 3: 33%
+/// ... etc
 pub fn find_similar(typo: &str, candidates: &[String], threshold: Option<usize>) -> Option<String> {
 	let threshold = threshold.unwrap_or(2);
 	let mut min_distance = typo.chars().count() / threshold + 1;
@@ -139,6 +143,8 @@ pub fn find_similar(typo: &str, candidates: &[String], threshold: Option<usize>)
 	None
 }
 
+/// Similar to `find_similar`, but returns a vector of all candidates
+/// with the same minimum distance
 pub fn find_similars(
 	typo: &str,
 	candidates: &[String],
