@@ -26,7 +26,8 @@ use colored::Colorize;
 #[derive(PartialEq)]
 enum State {
 	Write,
-	Store,
+	Think,
+	Buf,
 }
 
 pub struct Buffer {
@@ -42,88 +43,17 @@ impl Buffer {
 		}
 	}
 	pub fn proc(&mut self, data: &str) {
-		if self.state == State::Write {
-			if !data.contains("\n") {
-				self.buf.push(data.to_string());
-				let buffered = self.buf.join("").trim().to_string();
-				let filled = fill(&buffered);
-				if let Some(filled) = filled {
-					self.buf.clear();
-					let formatted = format!("\r{}", filled);
-					eprint!("{}", formatted);
-					self.buf
-						.push(formatted.split_once("\n").unwrap().1.to_string());
-					std::io::stdout().flush().unwrap();
-					return;
-				}
-				eprint!("{}", data);
-				std::io::stdout().flush().unwrap();
-				return;
-			}
-
-			let mut data = data.to_string();
-			while data.contains("\n") {
-				let lines = data.split_once("\n").unwrap();
-				let first = lines.0;
-				let last = lines.1;
-				self.buf.push(first.to_string());
-				let buffered = self.buf.join("").trim().to_string();
-				self.buf.clear();
-				if buffered.ends_with("<note>") {
-					let warn = format!("\r{}:", t!("ai-suggestion"))
-						.bold()
-						.blue()
-						.to_string();
-					let first = buffered.replace("<note>", &warn);
-					eprintln!("{}", first);
-					std::io::stdout().flush().unwrap();
-				} else if buffered.ends_with("</note>") {
-					let tag = "</note>";
-					let whitespace = " ".repeat(tag.len());
-					let formatted = format!("\r{}", whitespace);
-					let first = buffered.replace("</note>", &formatted);
-					eprintln!("{}", first);
-					self.state = State::Store;
-					std::io::stdout().flush().unwrap();
-				} else if buffered.ends_with("<think>") {
-					let tag = "<think>";
-					let warn = format!("\r{}:", t!("ai-thinking"))
-						.bold()
-						.blue()
-						.to_string();
-					let first = buffered.replace(tag, &warn);
-					eprintln!("{}", first);
-					std::io::stdout().flush().unwrap();
-				} else if buffered.ends_with("</think>") {
-					let tag = "</think>";
-					let whitespace = " ".repeat(tag.len());
-					let formatted = format!("\r{}", whitespace);
-					let first = buffered.replace(tag, &formatted);
-					eprintln!("{}", first);
-					std::io::stdout().flush().unwrap();
-				} else if buffered.ends_with("```") {
-					let tag = "```";
-					let whitespace = " ".repeat(tag.len());
-					let formatted = format!("\r{}", whitespace);
-					let first = buffered.replace(tag, &formatted);
-					eprintln!("{}", first);
-					std::io::stdout().flush().unwrap();
-				} else {
-					eprintln!("{}", first);
-					std::io::stdout().flush().unwrap();
-				}
-				data = last.to_string();
-			}
-			eprint!("{}", data);
-			return;
+		match self.state {
+			State::Write => self.proc_write(data),
+			State::Think => self.proc_think(data),
+			State::Buf => self.buf.push(data.to_string()),
 		}
-		self.buf.push(data.to_string());
 	}
 
 	pub fn print_return_remain(&mut self) -> String {
 		let buffered = self.buf.join("").trim().to_string();
 		self.buf.clear();
-		if self.state == State::Store {
+		if self.state == State::Buf {
 			return buffered;
 		}
 
@@ -134,5 +64,125 @@ impl Buffer {
 			return last.to_string();
 		}
 		"".to_string()
+	}
+
+	fn proc_write(&mut self, data: &str) {
+		if !data.contains("\n") {
+			self.buf.push(data.to_string());
+			let buffered = self.buf.join("").trim().to_string();
+			let filled = fill(&buffered);
+			if let Some(filled) = filled {
+				self.buf.clear();
+				let formatted = format!("\r{}", filled);
+				eprint!("{}", formatted);
+				self.buf
+					.push(formatted.split_once("\n").unwrap().1.to_string());
+				std::io::stdout().flush().unwrap();
+				return;
+			}
+			eprint!("{}", data);
+			std::io::stdout().flush().unwrap();
+			return;
+		}
+
+		let mut data = data.to_string();
+		while data.contains("\n") {
+			let lines = data.split_once("\n").unwrap();
+			let first = lines.0;
+			let last = lines.1;
+			self.buf.push(first.to_string());
+			let buffered = self.buf.join("").trim().to_string();
+			self.buf.clear();
+			if buffered.ends_with("<note>") {
+				let warn = format!("\r{}:", t!("ai-suggestion"))
+					.bold()
+					.blue()
+					.to_string();
+				let first = buffered.replace("<note>", &warn);
+				eprintln!("{}", first);
+				std::io::stdout().flush().unwrap();
+			} else if buffered.ends_with("</note>") {
+				let tag = "</note>";
+				let whitespace = " ".repeat(tag.len());
+				let formatted = format!("\r{}", whitespace);
+				let first = buffered.replace("</note>", &formatted);
+				eprintln!("{}", first);
+				self.state = State::Buf;
+				std::io::stdout().flush().unwrap();
+			} else if buffered.ends_with("<think>") {
+				let tag = "<think>";
+				let warn = format!("\r{}:", t!("ai-thinking"))
+					.bold()
+					.blue()
+					.to_string();
+				let first = buffered.replace(tag, &warn);
+				self.state = State::Think;
+				eprintln!("{}", first);
+				std::io::stdout().flush().unwrap();
+			} else if buffered.ends_with("</think>") {
+				let tag = "</think>";
+				let whitespace = " ".repeat(tag.len());
+				let formatted = format!("\r{}", whitespace);
+				let first = buffered.replace(tag, &formatted);
+				eprintln!("{}", first);
+				std::io::stdout().flush().unwrap();
+			} else if buffered.ends_with("```") {
+				let tag = "```";
+				let whitespace = " ".repeat(tag.len());
+				let formatted = format!("\r{}", whitespace);
+				let first = buffered.replace(tag, &formatted);
+				eprintln!("{}", first);
+				std::io::stdout().flush().unwrap();
+			} else {
+				eprintln!("{}", first);
+				std::io::stdout().flush().unwrap();
+			}
+			data = last.to_string();
+		}
+		eprint!("{}", data);
+	}
+
+	fn proc_think(&mut self, data: &str) {
+		if !data.contains("\n") {
+			self.buf.push(data.to_string());
+			let buffered = self.buf.join("").trim().to_string();
+			let filled = fill(&buffered);
+			if let Some(filled) = filled {
+				self.buf.clear();
+				let formatted = format!("\r{}", filled);
+				eprint!("{}", formatted);
+				self.buf
+					.push(formatted.split_once("\n").unwrap().1.to_string());
+				std::io::stdout().flush().unwrap();
+				return;
+			}
+			eprint!("{}", data);
+			std::io::stdout().flush().unwrap();
+			return;
+		}
+
+		let mut data = data.to_string();
+		while data.contains("\n") {
+			let lines = data.split_once("\n").unwrap();
+			let first = lines.0;
+			let last = lines.1;
+			self.buf.push(first.to_string());
+			let buffered = self.buf.join("").trim().to_string();
+			self.buf.clear();
+			if buffered.ends_with("</think>") {
+				let tag = "</think>";
+				let whitespace = " ".repeat(tag.len());
+				let formatted = format!("\r{}", whitespace);
+				let first = buffered.replace(tag, &formatted);
+				self.state = State::Write;
+				eprintln!("{}", first);
+				std::io::stdout().flush().unwrap();
+			} else {
+				eprintln!("{}", first);
+				std::io::stdout().flush().unwrap();
+			}
+			data = last.to_string();
+		}
+		eprint!("{}", data);
 	}
 }
