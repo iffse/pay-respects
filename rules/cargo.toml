@@ -10,3 +10,11 @@ suggest = [
 {{command[0]}} {{err::(?:did you mean `)(.*)(?:`\?)}} {{command[2:]}} '''
 ]
 
+[[match_err]]
+pattern = [
+"using `cargo install` to install the binaries from the package in current working directory is no longer supported",
+]
+suggest = [
+'''
+{{command}} --path .'''
+]
