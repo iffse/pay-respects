@@ -650,13 +650,13 @@ pub fn shell_syntax(shell: &str, command: &str) -> String {
 	}
 }
 
-pub fn shell_evaluated_commands(shell: &str, command: &str, cd: bool) {
+pub fn shell_evaluated_commands(shell: &str, command: &str, success: bool) {
 	let lines = command
 		.lines()
 		.map(|line| line.trim().trim_end_matches(['\\', ';', '|', '&']))
 		.collect::<Vec<&str>>();
 
-	let cd = if cd {
+	let cd = if success {
 		let dirs = {
 			let mut dirs = Vec::new();
 			for line in lines {
@@ -692,6 +692,7 @@ pub fn shell_evaluated_commands(shell: &str, command: &str, cd: bool) {
 	struct FishTemplate<'a> {
 		command: &'a str,
 		cd: Option<&'a str>,
+		success: bool,
 	}
 	#[derive(Template)]
 	#[template(path = "eval.nu", escape = "none")]
@@ -729,6 +730,7 @@ pub fn shell_evaluated_commands(shell: &str, command: &str, cd: bool) {
 			let template = FishTemplate {
 				command: &command,
 				cd: cd.as_deref(),
+				success,
 			};
 			template.render().unwrap()
 		}
@@ -741,5 +743,8 @@ pub fn shell_evaluated_commands(shell: &str, command: &str, cd: bool) {
 			template.render().unwrap()
 		}
 	};
-	println!("{}", print.trim());
+	let print = print.trim();
+	if !print.is_empty() {
+		println!("{}", print);
+	}
 }
