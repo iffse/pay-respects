@@ -1,4 +1,4 @@
-use crate::shell::Data;
+use crate::shell::{shell_evaluated_commands, Data};
 use crate::style::highlight_difference;
 use crate::suggestions;
 use crate::suggestions::suggest_candidates;
@@ -192,7 +192,10 @@ pub fn cnf(data: &mut Data) {
 		// retry after installing package
 		if system::install_package(data, &package_manager, &package) {
 			let status = suggestions::run_suggestion(data, &data.command);
-			if !status.success() {
+			if status.success() {
+				shell_evaluated_commands(&shell, &data.command, true);
+			} else {
+				shell_evaluated_commands(&shell, &data.command, false);
 				data.update_error(None);
 				suggestion(data);
 			}

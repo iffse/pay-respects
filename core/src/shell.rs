@@ -650,26 +650,96 @@ pub fn shell_syntax(shell: &str, command: &str) -> String {
 	}
 }
 
-pub fn shell_evaluated_commands(shell: &str, command: &str) -> Option<String> {
+pub fn shell_evaluated_commands(shell: &str, command: &str, cd: bool) {
 	let lines = command
 		.lines()
 		.map(|line| line.trim().trim_end_matches(['\\', ';', '|', '&']))
 		.collect::<Vec<&str>>();
-	let mut dirs = Vec::new();
-	for line in lines {
-		if let Some(dir) = line.strip_prefix("cd ") {
-			dirs.push(dir.to_string());
+
+	let cd = if cd {
+		let dirs = {
+			let mut dirs = Vec::new();
+			for line in lines {
+				if let Some(dir) = line.strip_prefix("cd ") {
+					dirs.push(dir.to_string());
+				}
+			}
+			dirs.join("")
+		};
+		if dirs.is_empty() {
+			None
+		} else {
+			Some(dirs.to_string())
 		}
+	} else {
+		None
+	};
+
+	#[derive(Template)]
+	#[template(path = "eval.bash", escape = "none")]
+	struct BashTemplate<'a> {
+		command: &'a str,
+		cd: Option<&'a str>,
+	}
+	#[derive(Template)]
+	#[template(path = "eval.zsh", escape = "none")]
+	struct ZshTemplate<'a> {
+		command: &'a str,
+		cd: Option<&'a str>,
+	}
+	#[derive(Template)]
+	#[template(path = "eval.fish", escape = "none")]
+	struct FishTemplate<'a> {
+		command: &'a str,
+		cd: Option<&'a str>,
+	}
+	#[derive(Template)]
+	#[template(path = "eval.nu", escape = "none")]
+	struct NuTemplate<'a> {
+		cd: Option<&'a str>,
+	}
+	#[derive(Template)]
+	#[template(path = "eval.sh", escape = "none")]
+	struct GenericTemplate<'a> {
+		cd: Option<&'a str>,
 	}
 
-	let cd_dir = dirs.join("");
-	if cd_dir.is_empty() {
-		return None;
-	}
-
-	#[allow(clippy::single_match)]
-	match shell {
-		"nu" => Some(cd_dir),
-		_ => Some(format!("cd {}", cd_dir)),
-	}
+	let print = match shell {
+		"bash" => {
+			let command = command.replace("$", "\\$").replace("`", "\\`");
+			let template = BashTemplate {
+				command: &command,
+				cd: cd.as_deref(),
+			};
+			template.render().unwrap()
+		}
+		"zsh" => {
+			let command = command.replace("$", "\\$").replace("`", "\\`");
+			let template = ZshTemplate {
+				command: &command,
+				cd: cd.as_deref(),
+			};
+			template.render().unwrap()
+		}
+		"fish" => {
+			let command = command
+				.replace("$", "\\$")
+				.replace("`", "\\`")
+				.replace("\"", "\\\"");
+			let template = FishTemplate {
+				command: &command,
+				cd: cd.as_deref(),
+			};
+			template.render().unwrap()
+		}
+		"nu" => {
+			let template = NuTemplate { cd: cd.as_deref() };
+			template.render().unwrap()
+		}
+		_ => {
+			let template = GenericTemplate { cd: cd.as_deref() };
+			template.render().unwrap()
+		}
+	};
+	println!("{}", print.trim());
 }

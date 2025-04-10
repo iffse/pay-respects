@@ -148,12 +148,10 @@ pub fn confirm_suggestion(data: &Data) -> Result<(), String> {
 	let process = run_suggestion(data, command);
 
 	if process.success() {
-		let cd = shell_evaluated_commands(shell, command);
-		if let Some(cd) = cd {
-			println!("{}", cd);
-		}
+		shell_evaluated_commands(shell, command, true);
 		Ok(())
 	} else {
+		shell_evaluated_commands(shell, command, false);
 		if now.elapsed() > Duration::from_secs(3) {
 			exit(1);
 		}
