@@ -127,11 +127,22 @@ pub async fn ai_suggestion(last_command: &str, error_msg: &str) {
 		.header("Content-Type", "application/json")
 		.bearer_auth(&conf.key)
 		.send()
-		.await;
+		.await
+		.unwrap();
 
-	let mut stream = res.unwrap().bytes_stream();
+	if res.status() != 200 {
+		eprintln!("AI module: Status code: {}", res.status());
+		eprintln!(
+			"AI module: Error message:\n  {}",
+			res.text().await.unwrap().replace("\n", "\n  ")
+		);
+		return;
+	}
+
+	let mut stream = res.bytes_stream();
 	let mut json_buffer = String::new();
 	let mut buffer = buffer::Buffer::new();
+
 	while let Some(item) = stream.next().await {
 		let item = item.unwrap();
 		let str = std::str::from_utf8(&item).unwrap();
