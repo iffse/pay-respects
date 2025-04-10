@@ -707,7 +707,10 @@ pub fn shell_evaluated_commands(shell: &str, command: &str, success: bool) {
 
 	let print = match shell {
 		"bash" => {
-			let command = command.replace("$", "\\$").replace("`", "\\`");
+			let command = command
+				.replace("$", "\\$")
+				.replace("`", "\\`")
+				.replace("\"", "\\\"");
 			let template = BashTemplate {
 				command: &command,
 				cd: cd.as_deref(),
@@ -715,7 +718,10 @@ pub fn shell_evaluated_commands(shell: &str, command: &str, success: bool) {
 			template.render().unwrap()
 		}
 		"zsh" => {
-			let command = command.replace("$", "\\$").replace("`", "\\`");
+			let command = command
+				.replace("$", "\\$")
+				.replace("`", "\\`")
+				.replace("\"", "\\\"");
 			let template = ZshTemplate {
 				command: &command,
 				cd: cd.as_deref(),
