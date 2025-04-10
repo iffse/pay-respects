@@ -28,6 +28,12 @@ async fn main() -> Result<(), std::io::Error> {
 	if std::env::var("_PR_AI_DISABLE").is_ok() {
 		return Ok(());
 	}
+	let mode = std::env::var("_PR_MODE");
+	if let Ok(mode) = mode {
+		if mode.as_str() == "noconfirm" {
+			return Ok(());
+		}
+	}
 
 	let locale = {
 		let sys_locale = get_locale().unwrap_or("en-US".to_string());
@@ -38,13 +44,6 @@ async fn main() -> Result<(), std::io::Error> {
 		}
 	};
 	rust_i18n::set_locale(&locale[0..2]);
-
-	let mode = std::env::var("_PR_MODE");
-	if let Ok(mode) = mode {
-		if mode.as_str() == "noconfirm" {
-			return Ok(());
-		}
-	}
 
 	let command = std::env::var("_PR_LAST_COMMAND").expect("_PR_LAST_COMMAND not set");
 	let error = std::env::var("_PR_ERROR_MSG").expect("_PR_ERROR_MSG not set");

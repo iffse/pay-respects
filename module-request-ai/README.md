@@ -7,13 +7,13 @@ Module for [pay-respects](https://codeberg.org/iff/pay-respects) to request AI f
 Configuration is done via environment variables:
 
 - `_PR_AI_API_KEY`: Your own API key
-- `_PR_AI_URL`: URL used. Any OpenAI compatible URL can be used, e.g.:
-	- `https://api.openai.com/v1/chat/completions` (Note: OpenAI's ChatGPT is very slow)
-	- `https://api.groq.com/openai/v1/chat/completions`
-	- `http://localhost:11434/api/chat`: Ollama
+- `_PR_AI_URL`: Any OpenAI compatible URL can be used, e.g.:
+	- `https://api.openai.com/v1/chat/completions`: OpenAI ChatGPT
+	- `https://api.groq.com/openai/v1/chat/completions`: GroqCloud
+	- `http://localhost:11434/api/chat`: Local Ollama
 - `_PR_AI_MODEL`: Model used. Reasoning models are also supported
 - `_PR_AI_DISABLE`: Setting to any value disables AI integration
-- `_PR_AI_LOCALE`: Locale in which the AI explains the suggestion. Defaults to user system locale
+- `_PR_AI_LOCALE`: Locale in which the AI explains the suggestion. Defaults to user system locale. Useful when you use small models that speak only English, for example.
 - `_PR_AI_ADDITIONAL_PROMPT`: Additional prompts to be included. (Yes, you can include role-playing prompts you pervert)
 	- `User's environment is Zsh running in Arch Linux.`
 	- `You are a cute catgirl. Always use cute phrases and expressions to prove your cuteness in the <note> section, including cat imitations like nya~, にゃ~,　喵～.`
