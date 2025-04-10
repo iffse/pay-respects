@@ -11,7 +11,7 @@ function {{ alias }} {
 			}
 		}
 		$env:_PR_SHELL = 'pwsh';
-		&'{{ binary_path }}';
+		&'{{ binary_path }}' | Invoke-Expression;
 	}
 	finally {
 # restore mode from cnf
