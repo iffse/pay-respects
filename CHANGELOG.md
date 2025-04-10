@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Adding executed commands to history for Bash, Zsh, and Fish
+
+### Fixed
+
+- PowerShell's init wasn't executing returned commands to be evaluated
+
 ## [0.7.3] - 2025-04-09
 
 ### Added
@@ -41,7 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- No longer depends on `libcurl`. Now using `rusttls`
+- No longer depends on `libcurl`. Now using `rustls`
 
 ## [0.7.1] - 2025-04-06
 
