@@ -1,0 +1,11 @@
+command = "size"
+
+[[match_err]]
+pattern = [
+	"file format not recognized",
+	"is a directory",
+]
+suggest = [
+'''
+du -h {{command[1:]}} '''
+]
