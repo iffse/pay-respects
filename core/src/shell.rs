@@ -692,7 +692,6 @@ pub fn shell_evaluated_commands(shell: &str, command: &str, success: bool) {
 	struct FishTemplate<'a> {
 		command: &'a str,
 		cd: Option<&'a str>,
-		success: bool,
 	}
 	#[derive(Template)]
 	#[template(path = "eval.nu", escape = "none")]
@@ -736,7 +735,6 @@ pub fn shell_evaluated_commands(shell: &str, command: &str, success: bool) {
 			let template = FishTemplate {
 				command: &command,
 				cd: cd.as_deref(),
-				success,
 			};
 			template.render().unwrap()
 		}
