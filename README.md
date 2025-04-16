@@ -76,8 +76,8 @@ Please follow the instruction for your shell:
 
 > pay-respects only requires 2 environment variables to function:
 >
-> - `_PR_SHELL`: The binary name of the current working shell.
-> - `_PR_LAST_COMMAND`: The last command.
+> - `_PR_SHELL`: The binary name of the current working shell
+> - `_PR_LAST_COMMAND`: The last command
 >
 > pay-respects echos back, if applicable, a `cd` command that can be evaluated by the current working shell.
 
@@ -97,8 +97,8 @@ Please follow the instruction for your shell:
 <details>
 	<summary>Environment variable configurations</summary>
 
-> - `_PR_LIB`: Directory of modules, analogous to `PATH`. If not provided, search in `PATH` or compile-time provided value.
-> - `_PR_PACKAGE_MANAGER`: Use defined package manager instead of auto-detecting alphabetically
+> - `_PR_LIB`: Directory of modules, analogous to `PATH`. If not provided, search in `PATH` or compile-time provided value
+> - `_PR_PACKAGE_MANAGER`: Use defined package manager instead of auto-detecting alphabetically. Empty value disables package search functionality
 
 > You can specify different modes to run with `_PR_MODE`:
 >
@@ -119,7 +119,9 @@ Please follow the instruction for your shell:
 
 </details>
 
-You can now **press `F` to Pay Respects**!
+You can now **[Press `F` to Pay Respects]**!
+
+[Press `F` to Pay Respects]: https://en.wikipedia.org/wiki/Press_F_to_pay_respects
 
 ## Installing
 
