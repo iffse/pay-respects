@@ -234,7 +234,10 @@ impl Data {
 	pub fn extract_env(&mut self) {
 		let mut envs = vec![];
 		loop {
-			if self.split[0][1..].contains("=") {
+			let mut char = self.split[0].char_indices();
+			char.next();
+			let offset = char.offset();
+			if self.split[0][offset..].contains("=") {
 				envs.push(self.split.remove(0));
 			} else {
 				break;
