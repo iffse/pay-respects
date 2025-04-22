@@ -113,6 +113,7 @@ Please follow the instruction for your shell:
 > - `_PR_PACKAGE_MANAGER`: Use defined package manager instead of
 > auto-detecting alphabetically. Empty value disables package search
 > functionality
+> 	- `_DEF_PR_PACKAGE_MANAGER`: compile-time value
 
 > You can specify different modes to run with `_PR_MODE`:
 >

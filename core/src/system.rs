@@ -13,6 +13,13 @@ pub fn get_package_manager(data: &mut Data) -> Option<String> {
 		return Some(package_manager);
 	}
 
+	if let Some(package_manager) = option_env!("_DEF_PR_PACKAGE_MANAGER") {
+		if package_manager.is_empty() {
+			return None;
+		}
+		return Some(package_manager.to_string());
+	}
+
 	for package_manager in &[
 		"apt", "dnf", "emerge", "guix", "nix", "pacman", "yum",
 		// "zypper",

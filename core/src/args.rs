@@ -79,6 +79,10 @@ fn print_version() {
 	if lib.is_some() {
 		println!("Default lib directory: {}", lib.unwrap());
 	}
+	let package_manager = option_env!("_DEF_PR_PACKAGE_MANAGER").map(|dir| dir.to_string());
+	if package_manager.is_some() {
+		println!("Default package manager: {}", package_manager.unwrap());
+	}
 }
 
 #[cfg(test)]
