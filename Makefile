@@ -10,6 +10,9 @@ build-all:
 release-all:
 	cargo build --release --workspace
 
+clean:
+	cargo clean
+
 test-rust:
 	cargo test --workspace --verbose
 
