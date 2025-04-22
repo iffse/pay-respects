@@ -1,15 +1,16 @@
+use std::path::Path;
+use colored::Colorize;
+use inquire::*;
+use ui::Color;
+
+use pay_respects_utils::evals::best_matches_path;
+use pay_respects_utils::files::best_match_file;
+
 use crate::shell::{shell_evaluated_commands, Data};
 use crate::style::highlight_difference;
 use crate::suggestions;
 use crate::suggestions::suggest_candidates;
 use crate::system;
-use colored::Colorize;
-use inquire::*;
-use pay_respects_utils::evals::best_matches_path;
-use pay_respects_utils::files::best_match_file;
-use ui::Color;
-
-use std::path::Path;
 
 pub fn suggestion(data: &mut Data) {
 	let mut last_command;

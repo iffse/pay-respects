@@ -121,11 +121,11 @@ pub fn select_candidate(data: &mut Data) {
 	let confirm = format!("[{}]", t!("confirm-yes")).green();
 	let hint = format!("{} {} {}", "[↑/↓/j/k]".blue(), confirm, "[ESC]".red());
 	eprintln!("{}", msg);
-	eprintln!("{}", hint);
+	eprint!("{}", hint);
 
 	let ans = Select::new("\n", highlight_candidates.clone())
 		.with_vim_mode(true)
-		.without_filtering()
+		// .without_filtering()
 		.without_help_message()
 		.with_render_config(render_config)
 		.prompt()
