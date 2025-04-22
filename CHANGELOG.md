@@ -1,17 +1,41 @@
 # Changelog
 
-All notable changes to components of this project since 0.5.14 will be documented in this file.
+All notable changes to components of this project since 0.5.14 will be
+documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog], and this project adheres to
+[Semantic Versioning].
+
+[Keep a Changelog]: https://keepachangelog.com/en/1.1.0/
+[Semantic Versioning]:  https://semver.org/spec/v2.0.0.html
 
 ## [Unreleased]
+
+### Added
+
+- Compile-time variable to specify package manager (to be set by each
+distribution)
+- Rules for `size` and `brew`
+
+### Changed
+
+- Re-enabled filtering when selecting candidate (`jk` does not work as Vim mode
+is also enabled)
+	- Workaround to move terminal cursor away from last line (cannot hide as
+	`inquire` controls the cursor)
+
+### Fixed
+
+- Fixed panics for commands starting with a character more than 1 byte
+- Fish: Don't run CNF mode recursively (in case that user's config does not
+have an early return in non-interactive session)
 
 ## [0.7.5] - 2025-04-10
 
 ### Fixed
 
-- Multi-line suggestions are run multiple times in the last release instead of adding to history
+- Multi-line suggestions are run multiple times in the last release instead of
+adding to history
 
 ## [0.7.4] - 2025-04-10 [YANKED]
 
@@ -69,7 +93,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Parsing command environment variables (e.g. `LANG=ja_JP.UTF-8 pacman` will work as intended)
+- Parsing command environment variables (e.g. `LANG=ja_JP.UTF-8 pacman` will
+work as intended)
 - Not getting `command-not-found`'s output as it goes into `stderr`
 
 ## [0.7.0] - 2025-04-05
@@ -123,7 +148,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Executables environment variable passed to modules is now limited to 100k characters
+- Executables environment variable passed to modules is now limited to 100k
+characters
 - Changed the format for multi-suggest
 
 ## [0.6.11] - 2025-01-18
@@ -169,7 +195,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- No longer running `get_error` in CNF mode (makes PowerShell hang with recursive calls)
+- No longer running `get_error` in CNF mode (makes PowerShell hang with
+recursive calls)
 - Not showing `sudo` in successive suggestions (although they were applied)
 
 ### Changed
@@ -214,7 +241,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- FHS 3.0 compliance: Compile-time and runtime environment variable `_PR_LIB` specifying `lib` directories for storing modules, separated by `:`
+- FHS 3.0 compliance: Compile-time and runtime environment variable `_PR_LIB`
+specifying `lib` directories for storing modules, separated by `:`
 	- Search in `PATH` if not provided
 
 ## [0.6.2] - 2024-12-10
@@ -227,7 +255,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **BREAKING:** Executable list passed to modules is now a space ` ` instead of a comma `,`
+- **BREAKING:** Executable list passed to modules is now a space ` ` instead of
+a comma `,`
 - Skip privilege elevation for `nix`
 
 ## [0.6.1] - 2024-12-09
@@ -238,14 +267,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- `--nocnf` option in docs wasn't the same as in the code `--noncf`. They are normalized to `--nocnf`
+- `--nocnf` option in docs wasn't the same as in the code `--noncf`. They are
+normalized to `--nocnf`
 
 ## [0.6.0] - 2024-12-08
 
 ### Added
 
 - Modular system
-- Package manager integration for `apt` (also `snap` and `pkg` via `command-not-found`), `dnf`, `portage`, `nix`, `yum`
+- Package manager integration for `apt` (also `snap` and `pkg` via
+`command-not-found`), `dnf`, `portage`, `nix`, `yum`
 - Adding aliases to executable match
 
 ### Changed
@@ -261,7 +292,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - MSYS2 fix by [mokurin000](https://github.com/iffse/pay-respects/pull/12)
 - Command not found mode: Run `pay-respects` automatically by shell
 	- Suggest command if a good match is found
-	- If no good match is found, search if package manager (`pacman` only) has a binary with the same name and prompt to install
+	- If no good match is found, search if package manager (`pacman` only) has a
+	binary with the same name and prompt to install
 - Multiple suggestions
 
 ### Changed
