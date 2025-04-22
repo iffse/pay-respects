@@ -7,7 +7,63 @@ pattern = [
 suggest = [
 '''
 #[err_contains(did you mean)]
-{{command[0]}} {{err::(?:did you mean `)(.*)(?:`\?)}} {{command[2:]}} '''
+{{command[0]}} {{err::(?:did you mean `)(.*)(?:`\?)}} {{command[2:]}} ''',
+'''
+#[err_contains(a command with a similar name exists)]
+{{command[0]}} {{err::(?:a command with a similar name exists: `)(\S+)(?:`)}} {{command[2:]}} ''',
+'''
+#[!err_contains(did you mean),
+!err_contains(a command with a similar name exists)]
+{{command[0]}} {{typo[1](
+add,
+bench,
+build,
+check,
+clean,
+clippy,
+config,
+deb,
+doc,
+expand,
+fetch,
+fix,
+fmt,
+generate-lockfil,
+generate-rpm,
+git-checkout,
+help,
+info,
+init,
+install,
+lipo,
+locate-project,
+login,
+logout,
+make,
+metadata,
+miri,
+new,
+owner,
+package,
+pkgid,
+publish,
+read-manifest,
+remove,
+report,
+rm,
+run,
+rustc,
+rustdoc,
+search,
+test,
+tree,
+uninstall,
+update,
+vendor,
+verify-project,
+version,
+yank
+)}} {{command[2:]}} ''',
 ]
 
 [[match_err]]
