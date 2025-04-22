@@ -1,4 +1,4 @@
-# Development
+# Roadmap
 
 ## Shell Integrations
 
@@ -15,14 +15,4 @@
 
 ## Features Pending Implementation
 
-### Trivial
-
-### Regular
-
-### Entertaining
-
-- Select library that:
-	- Works well with `pay-respects`' complex difference highlighting
-	- Supports adding candidates dynamically
-- NLP model as alternative to the current LLM based AI requests
-
+- Chained commands (e.g. `echo "1\n2" | grepp "2"`)

@@ -2,11 +2,16 @@
 
 Typed a wrong command or don't know what to do? Pay Respects will suggest a fix to your console command by simply pressing `F`!
 
-- 🚀 **Blazing fast suggestion**: You won't notice any delay for asking suggestions!
-- 🎯 **Accurate results**: Suggestions are verified before being prompted to the user, no `sudo` suggestions when you are using `doas`!
-- ✏️ **Easy to write rules**: You don't need to know Rust. The rules are written in a TOML file!
-- 🔩 **Modular**: TOML not your taste? Add sources using your favorite language with a custom module!
-- 🤖 **AI Support**: AI module comes in aid when there is no rule for your error!
+- 🚀 **Blazing fast suggestion**: You won't notice any delay for asking
+suggestions!
+- 🎯 **Accurate results**: Suggestions are verified before being prompted to
+the user, no `sudo` suggestions when you are using `doas`!
+- ✏️ **Easy to write rules**: You don't need to know Rust. The rules are
+written in a TOML file!
+- 🔩 **Modular**: TOML not your taste? Add sources using your favorite language
+with a custom module!
+- 🤖 **AI Support**: AI module comes in aid when there is no rule for your
+error!
 - 🪶 **Tiny binary size**: Not even 1MB for core features!
 
 ![showcase](https://raw.githubusercontent.com/iffse/static-assets/refs/heads/main/pay-respects/showcase.gif)
@@ -18,7 +23,8 @@ Please follow the instruction for your shell:
 <details>
 	<summary>Bash / Zsh / Fish</summary>
 
-> Append the following line to your configuration file (`--alias` no longer required for v0.7+):
+> Append the following line to your configuration file (`--alias` no longer
+> required for v0.7+):
 > ```sh
 > eval "$(pay-respects bash --alias)"
 > eval "$(pay-respects zsh --alias)"
@@ -79,26 +85,34 @@ Please follow the instruction for your shell:
 > - `_PR_SHELL`: The binary name of the current working shell
 > - `_PR_LAST_COMMAND`: The last command
 >
-> pay-respects echos back, if applicable, a `cd` command that can be evaluated by the current working shell.
+> pay-respects echos back, if applicable, a `cd` command that can be evaluated
+> by the current working shell.
 
 > General example:
 > ```sh
 > eval $(_PR_SHELL=sh _PR_LAST_COMMAND="git comit" pay-respects)
 > ```
 
-> Following variables are not required, but can be used to reduce unnecessary operations:
+> Following variables are not required, but can be used to reduce unnecessary
+> operations:
 >
-> - `_PR_ALIAS`: A list of aliases to commands. Separated by newlines with zsh-like formatting, e.g. `gc=git commit`
-> - `_PR_ERROR_MSG`: Error message from the previous command. `pay-respects` will rerun previous command to get the error message if absent
-> - `_PR_EXECUTABLES`: A space separated list of commands/executables. `pay-respects` will search for `$PATH` if absent
+> - `_PR_ALIAS`: A list of aliases to commands. Separated by newlines with
+> zsh-like formatting, e.g. `gc=git commit`
+> - `_PR_ERROR_MSG`: Error message from the previous command. `pay-respects`
+> will rerun previous command to get the error message if absent
+> - `_PR_EXECUTABLES`: A space separated list of commands/executables.
+> `pay-respects` will search for `$PATH` if absent
 
 </details>
 
 <details>
 	<summary>Environment variable configurations</summary>
 
-> - `_PR_LIB`: Directory of modules, analogous to `PATH`. If not provided, search in `PATH` or compile-time provided value
-> - `_PR_PACKAGE_MANAGER`: Use defined package manager instead of auto-detecting alphabetically. Empty value disables package search functionality
+> - `_PR_LIB`: Directory of modules, analogous to `PATH`. If not provided,
+>   search in `PATH` or compile-time provided value
+> - `_PR_PACKAGE_MANAGER`: Use defined package manager instead of
+> auto-detecting alphabetically. Empty value disables package search
+> functionality
 
 > You can specify different modes to run with `_PR_MODE`:
 >
@@ -146,10 +160,13 @@ Install from your package manager if available:
 
 </details>
 
-Alternatively, install pre-built binaries from [GitHub releases](https://github.com/iffse/pay-respects/releases). An [install script](./install.sh) is available:
+Alternatively, install pre-built binaries from [GitHub releases]. An [install
+script] is available:
 ```sh
 curl -sSfL https://raw.githubusercontent.com/iffse/pay-respects/main/install.sh | sh
 ```
+[GitHub releases]: https://github.com/iffse/pay-respects/releases
+[install script]: ./install.sh
 
 <details>
 	<summary>Cargo / Compile from source (any OS/architecture supported by Rust)</summary>
@@ -183,11 +200,15 @@ See the following pages:
 
 ## AI Integration
 
-> **Disclaimer**: You are using AI generated content on your own risk. Please double-check its suggestions before accepting.
+> **Disclaimer**: You are using AI generated content on your own risk. Please
+> double-check its suggestions before accepting.
 
 AI suggestions should work out of the box with `request-ai` module installed.
 
-An API key is included with the source (your distribution might have stripped them out). It should always work unless I can no longer afford this public service or rate limits are reached. If it's useful to you, **please share this project and spread the word**. Also consider making a donation to keep its public usage alive:
+An API key is included with the source (your distribution might have stripped
+them out). It should always work unless I can no longer afford this public
+service or rate limits are reached. If it's useful to you, consider making a
+donation:
 
 <div>
 	<a
@@ -233,13 +254,15 @@ An API key is included with the source (your distribution might have stripped th
 
 ## Contributing
 
-Current option to write rules should cover most of the cases.
+Current option to write rules should cover most of the cases. We need more
+rules, contributions are welcomed!
 
-We need more rule files, contributions are welcomed!
+There's also a [roadmap] for contribution opportunities.
 
-Also see [development status](./development.md) for contribution opportunities.
+[roadmap]: ./roadmap.md
 
-This project is hosted at various sites, choose the one that suits you best:
+This project is hosted at various sites, you can choose the one that you feel
+most comfortable with:
 
 - [Codeberg](https://codeberg.org/iff/pay-respects)
 - [GitHub](https://github.com/iffse/pay-respects)
