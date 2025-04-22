@@ -13,3 +13,12 @@ suggest = [
 {{command[0]}} -S {{command[1:]}}''',
 ]
 
+[[match_err]]
+pattern = [
+	"no targets specified"
+]
+suggest = [
+'''
+#[cmd_contains(-S)]
+{{command[0]}} -Syu''',
+]
