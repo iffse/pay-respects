@@ -4,12 +4,12 @@ updates:
     directory: /
     schedule:
       interval: weekly
-    target-branch: dev
+    target-branch: main
   - package-ecosystem: cargo
     directory: /
     schedule:
       interval: weekly
-    target-branch: dev
+    target-branch: main
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-patch"]
