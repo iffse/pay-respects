@@ -18,7 +18,7 @@ colored = "3"
 sys-locale = "0.3"
 rust-i18n = "3"
 regex-lite = "0.1"
-askama = "0.13"
+askama = "0.14"
 
 inquire = "0.7"
 
