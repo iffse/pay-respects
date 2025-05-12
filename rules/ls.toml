@@ -1,0 +1,12 @@
+command = "ls"
+
+[[match_err]]
+pattern = [
+	"no such file or directory",
+	"does not exist"
+]
+suggest = [
+'''
+{{command[0]}} {{typo[1](file)}} {{opt::(?:\s)(-[\S]+)}}
+''',
+]
