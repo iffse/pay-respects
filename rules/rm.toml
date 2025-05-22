@@ -7,7 +7,7 @@ pattern = [
 ]
 suggest = [
 '''
-{{command}} --recursive '''
+{{command[0]}} -r {{command[1:]}} '''
 ]
 
 [[match_err]]

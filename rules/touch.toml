@@ -5,7 +5,7 @@ pattern = [ "no such file or directory" ]
 suggest = [
 '''
 #[!shell(nu)]
-mkdir --parents {{cmd::(?:\s)+(.*[\\\/])(?:\s)*}} &&
+mkdir -p {{cmd::(?:\s)+(.*[\\\/])(?:\s)*}} &&
 touch {{command[1:]}} '''
 ]
 
