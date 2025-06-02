@@ -1,8 +1,6 @@
 use askama::Template;
 use std::collections::HashMap;
 
-use sys_locale::get_locale;
-
 use futures_util::StreamExt;
 use serde::{Deserialize, Serialize};
 
@@ -56,7 +54,7 @@ struct AiPrompt<'a> {
 	set_locale: &'a str,
 }
 
-pub async fn ai_suggestion(last_command: &str, error_msg: &str) {
+pub async fn ai_suggestion(last_command: &str, error_msg: &str, locale: &str) {
 	let conf = match Conf::new() {
 		Some(conf) => conf,
 		None => {
@@ -76,7 +74,7 @@ pub async fn ai_suggestion(last_command: &str, error_msg: &str) {
 
 	let user_locale = {
 		let locale = std::env::var("_PR_AI_LOCALE")
-			.unwrap_or_else(|_| get_locale().unwrap_or("en-us".to_string()));
+			.unwrap_or_else(|_| locale.to_string());
 		if locale.len() < 2 {
 			"en-US".to_string()
 		} else {

@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+use std::env;
+
 use crate::requests::ai_suggestion;
 use sys_locale::get_locale;
 mod buffer;
@@ -36,7 +38,18 @@ async fn main() -> Result<(), std::io::Error> {
 	}
 
 	let locale = {
-		let sys_locale = get_locale().unwrap_or("en-US".to_string());
+		let sys_locale = {
+			// use terminal locale if available
+			if let Ok(locale) = env::var("LANG") {
+				locale
+			} else if let Ok(locale) = env::var("LC_ALL") {
+				locale
+			} else if let Ok(locale) = env::var("LC_MESSAGES") {
+				locale
+			} else {
+				get_locale().unwrap_or("en-US".to_string())
+			}
+		};
 		if sys_locale.len() < 2 {
 			"en-US".to_string()
 		} else {
@@ -60,7 +73,7 @@ async fn main() -> Result<(), std::io::Error> {
 	if command.split_whitespace().count() == 1 {
 		return Ok(());
 	}
-	ai_suggestion(&command, &error).await;
+	ai_suggestion(&command, &error, &locale).await;
 
 	Ok(())
 }

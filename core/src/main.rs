@@ -64,7 +64,18 @@ fn main() -> Result<(), std::io::Error> {
 
 fn init() -> Result<shell::Data, args::Status> {
 	let locale = {
-		let sys_locale = get_locale().unwrap_or("en-US".to_string());
+		let sys_locale = {
+			// use terminal locale if available
+			if let Ok(locale) = env::var("LANG") {
+				locale
+			} else if let Ok(locale) = env::var("LC_ALL") {
+				locale
+			} else if let Ok(locale) = env::var("LC_MESSAGES") {
+				locale
+			} else {
+				get_locale().unwrap_or("en-US".to_string())
+			}
+		};
 		if sys_locale.len() < 2 {
 			"en-US".to_string()
 		} else {
