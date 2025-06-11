@@ -61,7 +61,8 @@ pub fn get_error(shell: &str, command: &str, data: &Data) -> String {
 		error_msg
 	} else {
 		let timeout = data.config.timeout.0;
-		eprintln!("time out is: {}", timeout);
+		#[cfg(debug_assertions)]
+		eprintln!("timeout: {}", timeout);
 		error_output_threaded(shell, command, timeout)
 	};
 	error
