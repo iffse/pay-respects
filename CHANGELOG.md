@@ -11,6 +11,10 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Nix: Shell install via `nix-shell`
+
 ## [0.7.7] - 2025-06-11
 
 ### Added
