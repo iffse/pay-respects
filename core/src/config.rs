@@ -1,8 +1,7 @@
 use serde::Deserialize;
 
 #[allow(dead_code)]
-#[derive(Deserialize)]
-#[derive(Default)]
+#[derive(Deserialize, Default)]
 pub struct Config {
 	pub sudo: Option<String>,
 	#[serde(default)]
@@ -12,15 +11,12 @@ pub struct Config {
 }
 
 #[allow(dead_code)]
-#[derive(Deserialize)]
-#[derive(Default)]
+#[derive(Deserialize, Default)]
 pub struct PackageManagerConfig {
 	pub package_manager: Option<String>,
 	#[serde(default)]
 	pub install_method: InstallMethod,
 }
-
-
 
 #[derive(Deserialize)]
 pub struct Timeout(pub u64);
@@ -30,13 +26,14 @@ impl Default for Timeout {
 	}
 }
 
-#[derive(Deserialize)]
-#[derive(Default)]
+#[derive(Deserialize, Default, PartialEq)]
 pub enum InstallMethod {
 	#[default]
 	System,
-	User,
-	Temp,
+	// !TODO: Implement other install methods
+	// User,
+	// Temp,
+	Shell,
 }
 
 pub fn load_config() -> Config {

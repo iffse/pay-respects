@@ -14,6 +14,13 @@ pub fn get_package_manager(data: &mut Data) -> Option<String> {
 		return Some(package_manager);
 	}
 
+	if let Some(package_manager) = data.config.package_manager.package_manager.as_ref() {
+		if package_manager.is_empty() {
+			return None;
+		}
+		return Some(package_manager.to_string());
+	}
+
 	if let Some(package_manager) = option_env!("_DEF_PR_PACKAGE_MANAGER") {
 		if package_manager.is_empty() {
 			return None;
@@ -244,4 +251,17 @@ pub fn install_package(data: &mut Data, package_manager: &str, package: &str) ->
 		.expect("failed to execute process");
 
 	result.success()
+}
+
+pub fn shell_package(data: &Data, package_manager: &str, package: &str) -> String {
+	let command = data.command.clone();
+
+	match package_manager {
+		"guix" => format!("guix shell {} -- {}", package, command),
+		"nix" => format!(
+			r#"nix shell nixpkgs#{} --command "{};return""#,
+			package, command
+		),
+		_ => unreachable!("Only `nix` and `guix` are supported for shell installation"),
+	}
 }

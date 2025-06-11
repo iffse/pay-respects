@@ -9,9 +9,9 @@ use pay_respects_utils::files::best_match_file;
 use crate::data::Data;
 use crate::shell::shell_evaluated_commands;
 use crate::style::highlight_difference;
-use crate::suggestions;
 use crate::suggestions::suggest_candidates;
 use crate::system;
+use crate::{config, suggestions};
 
 pub fn suggestion(data: &mut Data) {
 	let mut last_command;
@@ -190,6 +190,17 @@ pub fn cnf(data: &mut Data) {
 			.without_filtering()
 			.prompt()
 			.unwrap_or_else(|_| std::process::exit(1));
+
+		let install_method = &data.config.package_manager.install_method;
+		if install_method == &config::InstallMethod::Shell {
+			// let the shell handle the installation and place the user in a shell
+			// environment with the package installed
+			println!(
+				"{}",
+				system::shell_package(data, &package_manager, &package)
+			);
+			return;
+		}
 
 		// retry after installing package
 		if system::install_package(data, &package_manager, &package) {

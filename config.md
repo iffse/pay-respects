@@ -19,6 +19,8 @@ sudo = "run0"
 package_manager = "pacman"
 
 # preferred installation method, can be limited with the package manager
-# available options are: System, User, Temp
+# available options are:
+# - System
+# - Shell (nix and guix only)
 install_method = "System"
 ```
