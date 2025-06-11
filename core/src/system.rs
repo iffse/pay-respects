@@ -259,7 +259,7 @@ pub fn shell_package(data: &Data, package_manager: &str, package: &str) -> Strin
 	match package_manager {
 		"guix" => format!("guix shell {} -- {}", package, command),
 		"nix" => format!(
-			r#"nix shell nixpkgs#{} --command "{}""#,
+			r#"nix-shell -p {} --command "{};return""#,
 			package, command
 		),
 		_ => unreachable!("Only `nix` and `guix` are supported for shell installation"),
