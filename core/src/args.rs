@@ -1,4 +1,4 @@
-use crate::shell::{initialization, Init};
+use crate::{init::Init, shell::initialization};
 use colored::Colorize;
 
 pub enum Status {

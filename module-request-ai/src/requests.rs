@@ -73,8 +73,7 @@ pub async fn ai_suggestion(last_command: &str, error_msg: &str, locale: &str) {
 	map.insert("error_msg", error_msg);
 
 	let user_locale = {
-		let locale = std::env::var("_PR_AI_LOCALE")
-			.unwrap_or_else(|_| locale.to_string());
+		let locale = std::env::var("_PR_AI_LOCALE").unwrap_or_else(|_| locale.to_string());
 		if locale.len() < 2 {
 			"en-US".to_string()
 		} else {

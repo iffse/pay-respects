@@ -35,6 +35,12 @@ fn main() -> Result<(), std::io::Error> {
 	}
 
 	rules::runtime_match(&executable, &shell, &last_command, &error_msg, &executables);
-	rules::runtime_match("_PR_GENERAL", &shell, &last_command, &error_msg, &executables);
+	rules::runtime_match(
+		"_PR_GENERAL",
+		&shell,
+		&last_command,
+		&error_msg,
+		&executables,
+	);
 	Ok(())
 }

@@ -7,10 +7,9 @@ use colored::Colorize;
 use inquire::*;
 use ui::Color;
 
+use crate::data::Data;
 use crate::rules::match_pattern;
-use crate::shell::{
-	add_candidates_no_dup, module_output, shell_evaluated_commands, shell_syntax, Data,
-};
+use crate::shell::{add_candidates_no_dup, module_output, shell_evaluated_commands, shell_syntax};
 use crate::style::highlight_difference;
 
 pub fn suggest_candidates(data: &mut Data) {

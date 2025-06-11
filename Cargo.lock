@@ -912,7 +912,9 @@ dependencies = [
  "pay-respects-utils",
  "regex-lite",
  "rust-i18n",
+ "serde",
  "sys-locale",
+ "toml",
 ]
 
 [[package]]

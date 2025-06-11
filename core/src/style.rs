@@ -1,5 +1,5 @@
-use crate::shell::Data;
-use crate::shell::PRIVILEGE_LIST;
+use crate::data::Data;
+use crate::shell::is_privileged;
 use colored::*;
 use pay_respects_utils::evals::split_command;
 
@@ -19,7 +19,7 @@ pub fn highlight_difference(data: &Data, suggested_command: &str) -> Option<Stri
 		return None;
 	}
 
-	let privileged = PRIVILEGE_LIST.contains(&split_suggested_command[0].as_str());
+	let privileged = is_privileged(&split_suggested_command[0], data);
 
 	let mut old_entries = Vec::new();
 	for command in &split_suggested_command {

@@ -1,5 +1,6 @@
+use crate::data::Data;
 use crate::shell::command_output_or_error;
-use crate::shell::{command_output, elevate, Data};
+use crate::shell::{command_output, elevate};
 use colored::Colorize;
 use std::io::stderr;
 use std::process::Command;

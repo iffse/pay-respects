@@ -18,6 +18,9 @@ use std::env;
 use sys_locale::get_locale;
 
 mod args;
+mod config;
+mod data;
+mod init;
 mod modes;
 mod rules;
 mod shell;
@@ -51,7 +54,7 @@ fn main() -> Result<(), std::io::Error> {
 		init.ok().unwrap()
 	};
 
-	use shell::Mode::*;
+	use data::Mode::*;
 	match data.mode {
 		Suggestion => modes::suggestion(&mut data),
 		Echo => modes::echo(&mut data),
@@ -62,7 +65,7 @@ fn main() -> Result<(), std::io::Error> {
 	Ok(())
 }
 
-fn init() -> Result<shell::Data, args::Status> {
+fn init() -> Result<data::Data, args::Status> {
 	let locale = {
 		let sys_locale = {
 			// use terminal locale if available
@@ -95,5 +98,5 @@ fn init() -> Result<shell::Data, args::Status> {
 		_ => {}
 	}
 
-	Ok(shell::Data::init())
+	Ok(data::Data::init())
 }

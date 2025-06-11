@@ -6,7 +6,8 @@ use ui::Color;
 use pay_respects_utils::evals::best_matches_path;
 use pay_respects_utils::files::best_match_file;
 
-use crate::shell::{shell_evaluated_commands, Data};
+use crate::data::Data;
+use crate::shell::shell_evaluated_commands;
 use crate::style::highlight_difference;
 use crate::suggestions;
 use crate::suggestions::suggest_candidates;
