@@ -7,6 +7,8 @@ pub struct Config {
 	#[serde(default)]
 	pub timeout: Timeout,
 	#[serde(default)]
+	pub eval_method: EvalMethod,
+	#[serde(default)]
 	pub package_manager: PackageManagerConfig,
 }
 
@@ -33,6 +35,13 @@ pub enum InstallMethod {
 	// !TODO: Implement other install methods
 	// User,
 	// Temp,
+	Shell,
+}
+
+#[derive(Deserialize, Default, PartialEq)]
+pub enum EvalMethod {
+	#[default]
+	Internal,
 	Shell,
 }
 

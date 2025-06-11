@@ -7,9 +7,12 @@ use colored::Colorize;
 use inquire::*;
 use ui::Color;
 
+use crate::config;
 use crate::data::Data;
 use crate::rules::match_pattern;
-use crate::shell::{add_candidates_no_dup, module_output, shell_evaluated_commands, shell_syntax};
+use crate::shell::{
+	add_candidates_no_dup, add_privilege, module_output, shell_evaluated_commands, shell_syntax,
+};
 use crate::style::highlight_difference;
 
 pub fn suggest_candidates(data: &mut Data) {
@@ -143,6 +146,12 @@ pub fn confirm_suggestion(data: &Data) -> Result<(), String> {
 	#[cfg(debug_assertions)]
 	eprintln!("running command: {command}");
 
+	let eval_method = &data.config.eval_method;
+	if eval_method == &config::EvalMethod::Shell {
+		shell_suggestion(data, command);
+		return Ok(());
+	};
+
 	let now = Instant::now();
 	let process = run_suggestion(data, command);
 
@@ -183,6 +192,23 @@ pub fn run_suggestion(data: &Data, command: &str) -> std::process::ExitStatus {
 			.status()
 			.expect("failed to execute process"),
 	}
+}
+
+pub fn shell_suggestion(data: &Data, command: &str) {
+	let shell = &data.shell;
+	let privilege = &data.privilege;
+	let command = if let Some(env) = &data.env {
+		format!("{env} {command}")
+	} else {
+		command.to_string()
+	};
+
+	let command = if let Some(privilege) = privilege {
+		add_privilege(shell, privilege, &command)
+	} else {
+		command
+	};
+	println!("{}", command);
 }
 
 fn suggestion_err(data: &Data, command: &str) -> Result<(), String> {
