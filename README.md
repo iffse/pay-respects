@@ -192,6 +192,10 @@ curl -sSfL https://raw.githubusercontent.com/iffse/pay-respects/main/install.sh 
 
 </details>
 
+## Configuration
+
+See [configuration](./config.md).
+
 ## Rules & Modules
 
 See the following pages:

@@ -11,6 +11,8 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+## [0.7.7] - 2025-06-11
+
 ### Added
 
 - Configuration file, allowing to customize some parameters
@@ -326,7 +328,8 @@ normalized to `--nocnf`
 
 History start.
 
-[unreleased]: https://github.com/iffse/pay-respects/compare/v0.7.6..HEAD
+[unreleased]: https://github.com/iffse/pay-respects/compare/v0.7.7..HEAD
+[0.7.7]: https://github.com/iffse/pay-respects/compare/v0.7.6..v0.7.7
 [0.7.6]: https://github.com/iffse/pay-respects/compare/v0.7.5..v0.7.6
 [0.7.5]: https://github.com/iffse/pay-respects/compare/v0.7.4..v0.7.5
 [0.7.4]: https://github.com/iffse/pay-respects/compare/v0.7.3..v0.7.4
