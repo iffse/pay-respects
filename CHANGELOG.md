@@ -11,6 +11,23 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Configuration file, allowing to customize some parameters
+	- (Nix/Guix): Installation method as shell, without installing to system
+	profile
+	- Option for let the working shell be responsible for the suggestions
+
+### Changed
+
+- Terminal environment variable for locales now has higher priority than system
+locales (MacOS or Windows that have different locales between system and `LANG`)
+
+### Fixed
+
+- MacOS: Fixed arguments not available in MacOS
+
+
 ## [0.7.6] - 2025-04-22
 
 ### Added
