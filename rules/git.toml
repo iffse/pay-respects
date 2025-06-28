@@ -151,5 +151,5 @@ suggest = [
 {{command}} --rebase ''',
 '''
 #[cmd_contains(pull)]
-{{command}} --merge '''
+{{command}} --no-rebase '''
 ]
