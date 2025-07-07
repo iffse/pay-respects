@@ -139,7 +139,13 @@ pub fn get_packages(
 				return None;
 			}
 			let result =
-				command_output(shell, &format!("nix-locate --regex 'bin/{}$'", executable));
+				command_output(
+					shell,
+					&format!(
+						"nix-locate --minimal --no-group --top-level --type x --type s --whole-name --at-root '/bin/{}'", 
+						executable,
+					),
+				);
 			if result.is_empty() {
 				return None;
 			}
@@ -149,9 +155,7 @@ pub fn get_packages(
 					line.split_whitespace()
 						.next()
 						.unwrap()
-						.rsplit_once('.')
-						.unwrap()
-						.0
+						.trim_end_matches(".out") // remove .out, keep the rest as is
 						.to_string()
 				})
 				.collect();
@@ -258,10 +262,7 @@ pub fn shell_package(data: &Data, package_manager: &str, package: &str) -> Strin
 
 	match package_manager {
 		"guix" => format!("guix shell {} -- {}", package, command),
-		"nix" => format!(
-			r#"nix-shell -p {} --command "{};return""#,
-			package, command
-		),
+		"nix" => format!(r#"nix shell nixpkgs#{} -c {}"#, package, command),
 		_ => unreachable!("Only `nix` and `guix` are supported for shell installation"),
 	}
 }
