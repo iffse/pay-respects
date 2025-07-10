@@ -131,15 +131,15 @@ pub fn get_packages(
 			}
 		}
 		"nix" => {
-			if !data.executables.contains(&"nix-locate".to_string()) {
+			if !data.executables.contains(&"nix-search".to_string()) {
 				eprintln!(
-					"{} nix-index is required to find packages",
+					"{} nix-search-cli is required to find packages",
 					"pay-respects:".yellow()
 				);
 				return None;
 			}
 			let result =
-				command_output(shell, &format!("nix-locate --regex 'bin/{}$'", executable));
+				command_output(shell, &format!("nix-search '{}'", executable));
 			if result.is_empty() {
 				return None;
 			}
@@ -149,9 +149,6 @@ pub fn get_packages(
 					line.split_whitespace()
 						.next()
 						.unwrap()
-						.rsplit_once('.')
-						.unwrap()
-						.0
 						.to_string()
 				})
 				.collect();
