@@ -45,7 +45,11 @@ main() {
 	case "${_package}" in
 	*.tar.zst)
 		need_cmd tar
-		ensure tar -xf "${_package}"
+		if check_cmd zstd; then
+			ensure zstd -d -c "${_package}" | tar -x
+		else
+			ensure tar -xf "${_package}"
+		fi
 		;;
 	*.zip)
 		need_cmd unzip
