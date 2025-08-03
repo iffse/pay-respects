@@ -153,3 +153,13 @@ suggest = [
 #[cmd_contains(pull)]
 {{command}} --no-rebase '''
 ]
+
+[[match_err]]
+pattern = [
+	"is not fully merged"
+]
+suggest = [
+'''
+#[cmd_contains(branch -d)]
+{{command[:1]}} -D {{command[3:]}} ''',
+]
