@@ -6,6 +6,8 @@ use std::io::stderr;
 use std::process::Command;
 use std::process::Stdio;
 
+use crate::config::InstallMethod;
+
 pub fn get_package_manager(data: &mut Data) -> Option<String> {
 	if let Ok(package_manager) = std::env::var("_PR_PACKAGE_MANAGER") {
 		if package_manager.is_empty() {
@@ -138,19 +140,13 @@ pub fn get_packages(
 				);
 				return None;
 			}
-			let result =
-				command_output(shell, &format!("nix-search '{}'", executable));
+			let result = command_output(shell, &format!("nix-search '{}'", executable));
 			if result.is_empty() {
 				return None;
 			}
 			let packages: Vec<String> = result
 				.lines()
-				.map(|line| {
-					line.split_whitespace()
-						.next()
-						.unwrap()
-						.to_string()
-				})
+				.map(|line| line.split_whitespace().next().unwrap().to_string())
 				.collect();
 
 			if packages.is_empty() {
@@ -203,15 +199,25 @@ pub fn get_packages(
 	}
 }
 
-pub fn install_package(data: &mut Data, package_manager: &str, package: &str) -> bool {
-	let shell = &data.shell.clone();
-	let mut install = match package_manager {
+pub fn install_string(data: &mut Data, package_manager: &str, package: &str) -> String {
+	let method = &data.config.package_manager.install_method;
+	match package_manager {
 		"apt" | "dnf" | "pkg" | "yum" | "zypper" => {
 			format!("{} install {}", package_manager, package)
 		}
 		"emerge" => format!("emerge {}", package),
-		"guix" => format!("guix package -i {}", package),
-		"nix" => format!("nix profile install nixpkgs#{}", package),
+		"guix" => {
+			if method == &InstallMethod::Shell {
+				return format!("guix shell {}", package);
+			}
+			format!("guix package -i {}", package)
+		}
+		"nix" => {
+			if method == &InstallMethod::Shell {
+				return format!("nix-shell -p {}", package,);
+			}
+			format!("nix profile install nixpkgs#{}", package)
+		}
 		"pacman" => format!("pacman -S {}", package),
 		_ => match package_manager.ends_with("command-not-found") {
 			true => match package.starts_with("Command ") {
@@ -227,8 +233,12 @@ pub fn install_package(data: &mut Data, package_manager: &str, package: &str) ->
 			},
 			false => unreachable!("Unsupported package manager"),
 		},
-	};
+	}
+}
 
+pub fn install_package(data: &mut Data, package_manager: &str, install: &str) -> bool {
+	let shell = data.shell.clone();
+	let mut install = install.to_string();
 	// guix and nix do not require privilege escalation
 	#[allow(clippy::single_match)]
 	match package_manager {
@@ -250,15 +260,12 @@ pub fn install_package(data: &mut Data, package_manager: &str, package: &str) ->
 	result.success()
 }
 
-pub fn shell_package(data: &Data, package_manager: &str, package: &str) -> String {
+pub fn shell_package(data: &Data, package_manager: &str, install: &str) -> String {
 	let command = data.command.clone();
 
 	match package_manager {
-		"guix" => format!("guix shell {} -- {}", package, command),
-		"nix" => format!(
-			r#"nix-shell -p {} --command "{};return""#,
-			package, command
-		),
+		"guix" => format!("{} -- {}", install, command),
+		"nix" => format!(r#"{} --command "{};return""#, install, command),
 		_ => unreachable!("Only `nix` and `guix` are supported for shell installation"),
 	}
 }

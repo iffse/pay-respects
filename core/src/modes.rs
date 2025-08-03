@@ -155,6 +155,9 @@ pub fn cnf(data: &mut Data) {
 				return;
 			}
 		};
+		data.config
+			.package_manager
+			.set_package_manager(&package_manager);
 
 		#[cfg(debug_assertions)]
 		eprintln!("package_manager: {}", package_manager);
@@ -169,6 +172,14 @@ pub fn cnf(data: &mut Data) {
 
 		#[cfg(debug_assertions)]
 		eprintln!("packages: {:?}", packages);
+
+		// change default install method based on package manager
+		data.config.package_manager.set_install_method();
+
+		let packages = packages
+			.iter()
+			.map(|p| system::install_string(data, &package_manager, p))
+			.collect::<Vec<String>>();
 
 		let style = ui::Styled::default();
 		let render_config = ui::RenderConfig::default()

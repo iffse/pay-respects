@@ -31,11 +31,9 @@ impl Default for Timeout {
 #[derive(Deserialize, Default, PartialEq)]
 pub enum InstallMethod {
 	#[default]
+	Default,
 	System,
-	// !TODO: Implement other install methods
-	// User,
-	// Temp,
-	Shell,
+	Shell, // only available for nix and guix
 }
 
 #[derive(Deserialize, Default, PartialEq)]
@@ -43,6 +41,22 @@ pub enum EvalMethod {
 	#[default]
 	Internal,
 	Shell,
+}
+
+impl PackageManagerConfig {
+	pub fn set_package_manager(&mut self, package_manager: &str) {
+		self.package_manager = Some(package_manager.to_string());
+	}
+
+	pub fn set_install_method(&mut self) {
+		let package_manager = self.package_manager.as_deref().unwrap();
+		if self.install_method == InstallMethod::Default {
+			match package_manager {
+				"nix" | "guix" => self.install_method = InstallMethod::Shell,
+				_ => self.install_method = InstallMethod::System,
+			}
+		}
+	}
 }
 
 pub fn load_config() -> Config {
