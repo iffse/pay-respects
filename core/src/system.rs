@@ -181,7 +181,10 @@ pub fn get_packages(
 				if result.is_empty() {
 					return None;
 				}
-				if result.contains("did you mean") || result.contains("is not installed") {
+				if result.contains("did you mean")
+					|| result.contains("is not installed")
+					|| result.contains("can be installed")
+				{
 					let packages = result
 						.lines()
 						.skip(1)
