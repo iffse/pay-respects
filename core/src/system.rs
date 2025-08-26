@@ -133,21 +133,41 @@ pub fn get_packages(
 			}
 		}
 		"nix" => {
-			if !data.executables.contains(&"nix-search".to_string()) {
+			let packages: Vec<String>;
+			if data.executables.contains(&"nix-locate".to_string()) {
+				let result =
+					command_output(shell, &format!("nix-locate --regex 'bin/{}$'", executable));
+				if result.is_empty() {
+					return None;
+				}
+				packages = result
+					.lines()
+					.map(|line| {
+						line.split_whitespace()
+							.next()
+							.unwrap()
+							.rsplit_once('.')
+							.unwrap()
+							.0
+							.to_string()
+					})
+					.collect();
+			} else if data.executables.contains(&"nix-search".to_string()) {
+				let result = command_output(shell, &format!("nix-search '{}'", executable));
+				if result.is_empty() {
+					return None;
+				}
+				packages = result
+					.lines()
+					.map(|line| line.split_whitespace().next().unwrap().to_string())
+					.collect()
+			} else {
 				eprintln!(
-					"{} nix-search-cli is required to find packages",
+					"{} nix-locate or nix-search-cli is required to find packages",
 					"pay-respects:".yellow()
 				);
 				return None;
-			}
-			let result = command_output(shell, &format!("nix-search '{}'", executable));
-			if result.is_empty() {
-				return None;
-			}
-			let packages: Vec<String> = result
-				.lines()
-				.map(|line| line.split_whitespace().next().unwrap().to_string())
-				.collect();
+			};
 
 			if packages.is_empty() {
 				None
