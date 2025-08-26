@@ -11,6 +11,8 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+## [0.7.9] - 2025-08-26
+
 ### Changed
 
 - Install command is now explicit
@@ -340,7 +342,8 @@ normalized to `--nocnf`
 
 History start.
 
-[unreleased]: https://github.com/iffse/pay-respects/compare/v0.7.8..HEAD
+[unreleased]: https://github.com/iffse/pay-respects/compare/v0.7.9..HEAD
+[0.7.9]: https://github.com/iffse/pay-respects/compare/v0.7.8..v0.7.9
 [0.7.8]: https://github.com/iffse/pay-respects/compare/v0.7.7..v0.7.8
 [0.7.7]: https://github.com/iffse/pay-respects/compare/v0.7.6..v0.7.7
 [0.7.6]: https://github.com/iffse/pay-respects/compare/v0.7.5..v0.7.6
