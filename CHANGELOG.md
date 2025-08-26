@@ -11,6 +11,12 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Install command is now explicit
+- Nix and Guix: Default installation for missing commands changed to shell
+- Nix: Adding `nix-search` as package query tool in addition to `nix-index`
+
 ## [0.7.8] - 2025-06-12
 
 ### Fixed
