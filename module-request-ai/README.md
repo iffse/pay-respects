@@ -10,7 +10,7 @@ Configuration is done via environment variables:
 - `_PR_AI_URL`: Any OpenAI compatible URL can be used, e.g.:
 	- `https://api.openai.com/v1/chat/completions`: OpenAI ChatGPT
 	- `https://api.groq.com/openai/v1/chat/completions`: GroqCloud
-	- `http://localhost:11434/api/chat`: Local Ollama
+	- `http://localhost:11434/v1/chat/completions`: Local Ollama
 - `_PR_AI_MODEL`: Model used. Reasoning models are also supported
 - `_PR_AI_DISABLE`: Setting to any value disables AI integration
 - `_PR_AI_LOCALE`: Locale in which the AI explains the suggestion. Defaults to user system locale. Useful when you use small models that speak only English, for example.
