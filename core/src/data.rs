@@ -65,80 +65,73 @@ impl Data {
 		#[cfg(debug_assertions)]
 		eprintln!("lib_dir: {:?}", lib_dir);
 
-		if lib_dir.is_none() {
-			(executables, modules, fallbacks) = {
-				let path_executables = get_path_files();
-				let mut executables = vec![];
-				let mut modules = vec![];
-				let mut fallbacks = vec![];
-				for exe in path_executables {
-					if exe.starts_with("_pay-respects-module-") {
-						modules.push(exe.to_string());
-					} else if exe.starts_with("_pay-respects-fallback-") {
-						fallbacks.push(exe.to_string());
-					} else {
-						executables.push(exe.to_string());
+		(executables, modules, fallbacks) = if let Some(lib_dir) = lib_dir {
+			let mut modules = vec![];
+			let mut fallbacks = vec![];
+			let mut executables = get_path_files();
+			if let Some(alias) = &alias {
+				for command in alias.keys() {
+					if executables.contains(command) {
+						continue;
 					}
+					executables.push(command.to_string());
 				}
-				modules.sort_unstable();
-				fallbacks.sort_unstable();
-				if alias.is_some() {
-					let alias = alias.as_ref().unwrap();
-					for command in alias.keys() {
-						if executables.contains(command) {
-							continue;
-						}
-						executables.push(command.to_string());
-					}
-				}
+			}
 
-				(executables, modules, fallbacks)
-			};
+			let path = lib_dir.split(path_env_sep()).collect::<Vec<&str>>();
+
+			for p in path {
+				#[cfg(windows)]
+				let p = path_convert(p);
+
+				let files = match std::fs::read_dir(p) {
+					Ok(files) => files,
+					Err(_) => continue,
+				};
+				for file in files {
+					let file = file.unwrap();
+					let file_name = file.file_name().into_string().unwrap();
+					let file_path = file.path();
+
+					if file_name.starts_with("_pay-respects-module-") {
+						modules.push(file_path.to_string_lossy().to_string());
+					} else if file_name.starts_with("_pay-respects-fallback-") {
+						fallbacks.push(file_path.to_string_lossy().to_string());
+					}
+				}
+			}
+
+			modules.sort_unstable();
+			fallbacks.sort_unstable();
+
+			(executables, modules, fallbacks)
 		} else {
-			(executables, modules, fallbacks) = {
-				let mut modules = vec![];
-				let mut fallbacks = vec![];
-				let lib_dir = lib_dir.unwrap();
-				let mut executables = get_path_files();
-				if alias.is_some() {
-					let alias = alias.as_ref().unwrap();
-					for command in alias.keys() {
-						if executables.contains(command) {
-							continue;
-						}
-						executables.push(command.to_string());
-					}
+			let path_executables = get_path_files();
+			let mut executables = vec![];
+			let mut modules = vec![];
+			let mut fallbacks = vec![];
+			for exe in path_executables {
+				if exe.starts_with("_pay-respects-module-") {
+					modules.push(exe.to_string());
+				} else if exe.starts_with("_pay-respects-fallback-") {
+					fallbacks.push(exe.to_string());
+				} else {
+					executables.push(exe.to_string());
 				}
-
-				let path = lib_dir.split(path_env_sep()).collect::<Vec<&str>>();
-
-				for p in path {
-					#[cfg(windows)]
-					let p = path_convert(p);
-
-					let files = match std::fs::read_dir(p) {
-						Ok(files) => files,
-						Err(_) => continue,
-					};
-					for file in files {
-						let file = file.unwrap();
-						let file_name = file.file_name().into_string().unwrap();
-						let file_path = file.path();
-
-						if file_name.starts_with("_pay-respects-module-") {
-							modules.push(file_path.to_string_lossy().to_string());
-						} else if file_name.starts_with("_pay-respects-fallback-") {
-							fallbacks.push(file_path.to_string_lossy().to_string());
-						}
+			}
+			modules.sort_unstable();
+			fallbacks.sort_unstable();
+			if let Some(alias) = &alias {
+				for command in alias.keys() {
+					if executables.contains(command) {
+						continue;
 					}
+					executables.push(command.to_string());
 				}
+			}
 
-				modules.sort_unstable();
-				fallbacks.sort_unstable();
-
-				(executables, modules, fallbacks)
-			};
-		}
+			(executables, modules, fallbacks)
+		};
 
 		let builtins = builtin_commands(&shell);
 		executables.extend(builtins.clone());

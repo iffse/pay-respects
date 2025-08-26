@@ -80,16 +80,16 @@ pub fn command(suggest: &mut String, split_command: &[String]) {
 			};
 			let mut end_index;
 			let parsed_end = end.parse::<i32>();
-			if parsed_end.is_err() {
-				end_index = split_command.len() as i32;
-			} else {
-				end_index = parsed_end.unwrap();
+			if let Ok(end) = parsed_end {
+				end_index = end;
 				if end_index < 0 {
 					end_index += split_command.len() as i32 + 1;
 				} else {
 					end_index += 1;
 				}
-			};
+			} else {
+				end_index = split_command.len() as i32;
+			}
 
 			let command = split_command[start_index as usize..end_index as usize].join(" ");
 
@@ -130,15 +130,14 @@ pub fn typo(suggest: &mut String, split_command: &[String], executables: &[Strin
 					start
 				};
 				let end = end.parse::<i32>();
-				let end_index = if end.is_err() {
-					split_command.len() as i32
-				} else {
-					let end = end.unwrap();
+				let end_index = if let Ok(end) = end {
 					if end < 0 {
 						split_command.len() as i32 + end + 1
 					} else {
 						end + 1
 					}
+				} else {
+					split_command.len() as i32
 				};
 
 				start_index as usize..end_index as usize

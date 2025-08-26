@@ -83,8 +83,8 @@ pub fn suggest_candidates(data: &mut Data) {
 	}
 	for fallback in fallbacks {
 		let candidates = module_output(data, fallback);
-		if candidates.is_some() {
-			add_candidates_no_dup(command, &mut final_candidates, &candidates.unwrap());
+		if let Some(candidates) = candidates {
+			add_candidates_no_dup(command, &mut final_candidates, &candidates);
 			data.candidates = final_candidates
 				.iter()
 				.map(|s| shell_syntax(shell, s))

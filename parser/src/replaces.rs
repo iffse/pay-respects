@@ -175,15 +175,14 @@ pub fn typo(suggest: &mut String, replace_list: &mut Vec<TokenStream2>) {
 					start.to_string()
 				};
 				let end = end.parse::<i32>();
-				let end_string = if end.is_err() {
-					String::from("split.len()")
-				} else {
-					let end = end.unwrap();
+				let end_string = if let Ok(end) = end {
 					if end < 0 {
 						format!("split.len() {}", end + 1)
 					} else {
 						(end + 1).to_string()
 					}
+				} else {
+					String::from("split.len()")
 				};
 
 				format!("{}..{}", start_string, end_string)
