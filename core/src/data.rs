@@ -231,13 +231,14 @@ impl Data {
 		if let Some(sudo) = self.config.sudo.as_ref() {
 			if command == *sudo {
 				self.privilege = Some(command.to_string());
-				self.command = self.command.replacen(sudo, "", 1);
+				self.command = self.command.replacen(sudo, "", 1).trim().to_string();
 			}
 			return;
 		}
 		if PRIVILEGE_LIST.contains(&command.as_str()) {
 			self.privilege = Some(command.to_string());
-			self.command = self.command.replacen(&self.split[0], "", 1);
+			let sudo = split_command(&self.command)[0].clone();
+			self.command = self.command.replacen(&sudo, "", 1).trim().to_string();
 		}
 	}
 
