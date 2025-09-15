@@ -20,7 +20,7 @@ rust-i18n = "3"
 regex-lite = "0.1"
 askama = "0.13"
 
-inquire = "0.7"
+inquire = "0.8"
 
 # config file
 toml = { version = "0.8" }
