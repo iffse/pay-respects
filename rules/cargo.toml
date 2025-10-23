@@ -68,6 +68,16 @@ yank
 
 [[match_err]]
 pattern = [
+"requires the features",
+]
+suggest = [
+'''
+#[err_contains(consider enabling them by passing)]
+{{command}} {{err::(?:`)(--features=.*")(?:`)}} ''',
+]
+
+[[match_err]]
+pattern = [
 "using `cargo install` to install the binaries from the package in current working directory is no longer supported",
 ]
 suggest = [
