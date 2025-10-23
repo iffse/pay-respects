@@ -1,0 +1,10 @@
+command = "snap"
+
+[[match_err]]
+pattern = [
+	"published using classic confinement"
+]
+suggest = [
+'''
+{{command}} --classic '''
+]
