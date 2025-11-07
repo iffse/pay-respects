@@ -72,3 +72,7 @@ For non-trivial suggestions, you can add more context as comments (for Bash and 
 ```sh
 pacman -S # how do I install Rust?
 ```
+Or just a comment:
+```sh
+# git cache credential for 3 hours
+```
