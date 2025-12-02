@@ -211,7 +211,7 @@ See the following pages:
 AI suggestions should work out of the box with `request-ai` module installed.
 You can disable it by setting `_PR_AI_DISABLE`:
 ```sh
-export _PR_AI_DISABLE
+export _PR_AI_DISABLE=''
 ```
 
 An API key is included with the source (your distribution might have stripped
