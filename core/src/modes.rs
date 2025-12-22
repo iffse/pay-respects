@@ -92,7 +92,7 @@ pub fn cnf(data: &mut Data) {
 	let shell = data.shell.clone();
 	let mut split_command = data.split.clone();
 
-	let executable = split_command[0].as_str();
+	let executable = split_command[0].clone();
 	let shell_msg = format!("{}:", shell);
 	eprintln!(
 		"{} {}: {}\n",
@@ -103,22 +103,29 @@ pub fn cnf(data: &mut Data) {
 
 	let best_matches = {
 		if executable.contains(std::path::MAIN_SEPARATOR) {
-			let file = best_match_file(executable);
+			let file = best_match_file(&executable);
 			if file.is_some() {
 				Some(vec![file.unwrap()])
 			} else {
 				None
 			}
 		} else {
-			best_matches_path(executable, &data.executables)
+			best_matches_path(&executable, &data.executables)
 		}
 	};
+
 	if let Some(best_matches) = best_matches {
 		for best_match in best_matches {
+			if best_match == executable {
+				continue;
+			}
 			split_command[0] = best_match;
 			let suggest = split_command.join(" ");
 			data.candidates.push(suggest);
 		}
+	}
+
+	if !data.candidates.is_empty() {
 		suggestions::select_candidate(data);
 
 		let status = suggestions::confirm_suggestion(data);
@@ -162,7 +169,7 @@ pub fn cnf(data: &mut Data) {
 		#[cfg(debug_assertions)]
 		eprintln!("package_manager: {}", package_manager);
 
-		let packages = match system::get_packages(data, &package_manager, executable) {
+		let packages = match system::get_packages(data, &package_manager, &executable) {
 			Some(packages) => packages,
 			None => {
 				eprintln!("{} {}", "pay-respects:".red(), t!("package-not-found"));
