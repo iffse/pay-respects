@@ -55,6 +55,7 @@ pub fn eval_shell_command(shell: &str, command: &str) -> Vec<String> {
 	split_output
 		.iter()
 		.map(|s| s.trim().to_string())
+		.filter(|s| !s.is_empty())
 		.collect::<Vec<String>>()
 }
 

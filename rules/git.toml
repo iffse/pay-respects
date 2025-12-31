@@ -84,12 +84,13 @@ git checkout -b {{command[2]}} '''
 
 [[match_err]]
 pattern = [
-	"has no upstream branch"
+	"has no upstream branch",
+	"No configured push destination.",
 ]
 suggest = [
 '''
 #[cmd_contains(push)]
-git push --set-upstream origin {{shell(git rev-parse --abbrev-ref HEAD)}} '''
+git push --set-upstream {{select({{shell(git remote)}})}} {{shell(git rev-parse --abbrev-ref HEAD)}} ''',
 ]
 
 [[match_err]]
@@ -99,7 +100,7 @@ pattern = [
 suggest = [
 '''
 #[cmd_contains(pull)]
-git pull --set-upstream origin {{shell(git rev-parse --abbrev-ref HEAD)}} '''
+git pull --set-upstream {{select({{shell(git remote)}})}} {{shell(git rev-parse --abbrev-ref HEAD)}} '''
 ]
 
 [[match_err]]
