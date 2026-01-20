@@ -238,37 +238,48 @@ pub fn alias_map(shell: &str) -> Option<HashMap<String, String>> {
 		"bash" => {
 			for line in env.lines() {
 				let alias = line.replace("alias ", "");
-				let (alias, command) = alias.split_once('=').unwrap();
-				let command = command.trim().trim_matches('\'');
-				alias_map.insert(alias.to_string(), command.to_string());
+				if let Some((alias, command)) = alias.split_once('=') {
+					let command = command.trim().trim_matches('\'');
+					alias_map.insert(alias.to_string(), command.to_string());
+				}
+				// Skip lines without '=', they're malformed
 			}
 		}
 		"zsh" => {
 			for line in env.lines() {
-				let (alias, command) = line.split_once('=').unwrap();
-				let command = command.trim().trim_matches('\'');
-				alias_map.insert(alias.to_string(), command.to_string());
+				if let Some((alias, command)) = line.split_once('=') {
+					let command = command.trim().trim_matches('\'');
+					alias_map.insert(alias.to_string(), command.to_string());
+				}
+				// Skip lines without '=', they're malformed
 			}
 		}
 		"fish" => {
 			for line in env.lines() {
 				let alias = line.replace("alias ", "");
-				let (alias, command) = alias.split_once(' ').unwrap();
-				let command = command.trim().trim_matches('\'');
-				alias_map.insert(alias.to_string(), command.to_string());
+				if let Some((alias, command)) = alias.split_once(' ') {
+					let command = command.trim().trim_matches('\'');
+					alias_map.insert(alias.to_string(), command.to_string());
+				}
+				// Skip lines without ' ', they're malformed
 			}
 		}
 		"nu" | _ => {
 			for line in env.lines() {
-				let (alias, command) = line.split_once('=').unwrap();
-				alias_map.insert(alias.to_string(), command.to_string());
+				if let Some((alias, command)) = line.split_once('=') {
+					alias_map.insert(alias.to_string(), command.to_string());
+				}
+				// Skip lines without '=', they're malformed
 			}
 		}
 	}
 	std::env::remove_var("_PR_ALIAS");
-	Some(alias_map)
+	if alias_map.is_empty() {
+		None
+	} else {
+		Some(alias_map)
+	}
 }
-
 pub fn expand_alias(map: &HashMap<String, String>, command: &str) -> Option<String> {
 	let (command, args) = if let Some(split) = command.split_once(' ') {
 		(split.0, split.1)
