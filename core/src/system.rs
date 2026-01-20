@@ -65,7 +65,7 @@ pub fn get_packages(
 			}
 			let packages: Vec<String> = result
 				.lines()
-				.map(|line| line.split_once(':').unwrap().0.to_string())
+				.filter_map(|line| line.split_once(':').map(|(pkg, _)| pkg.trim().to_string()))
 				.collect();
 
 			if packages.is_empty() {
@@ -74,6 +74,7 @@ pub fn get_packages(
 				Some(packages)
 			}
 		}
+
 		"dnf" | "yum" => {
 			let result = command_output(
 				shell,
@@ -84,7 +85,7 @@ pub fn get_packages(
 			}
 			let packages: Vec<String> = result
 				.lines()
-				.map(|line| line.split_whitespace().next().unwrap().to_string())
+				.filter_map(|line| line.split_whitespace().next().map(|s| s.to_string()))
 				.collect();
 			if packages.is_empty() {
 				None
@@ -106,7 +107,7 @@ pub fn get_packages(
 			}
 			let mut packages = vec![];
 			for line in result.lines() {
-				if !line.starts_with(" ") {
+				if !line.starts_with(' ') {
 					packages.push(line.to_string());
 				}
 			}
@@ -124,7 +125,7 @@ pub fn get_packages(
 			}
 			let packages: Vec<String> = result
 				.lines()
-				.map(|line| line.split_whitespace().next().unwrap().to_string())
+				.filter_map(|line| line.split_whitespace().next().map(|s| s.to_string()))
 				.collect();
 			if packages.is_empty() {
 				None
@@ -142,14 +143,10 @@ pub fn get_packages(
 				}
 				packages = result
 					.lines()
-					.map(|line| {
+					.filter_map(|line| {
 						line.split_whitespace()
 							.next()
-							.unwrap()
-							.rsplit_once('.')
-							.unwrap()
-							.0
-							.to_string()
+							.and_then(|s| s.rsplit_once('.').map(|(pkg, _)| pkg.to_string()))
 					})
 					.collect();
 			} else if data.executables.contains(&"nix-search".to_string()) {
@@ -159,7 +156,7 @@ pub fn get_packages(
 				}
 				packages = result
 					.lines()
-					.map(|line| line.split_whitespace().next().unwrap().to_string())
+					.filter_map(|line| line.split_whitespace().next().map(|s| s.to_string()))
 					.collect()
 			} else {
 				eprintln!(
@@ -186,7 +183,7 @@ pub fn get_packages(
 			}
 			let packages: Vec<String> = result
 				.lines()
-				.map(|line| line.split_whitespace().next().unwrap().to_string())
+				.filter_map(|line| line.split_whitespace().next().map(|s| s.to_string()))
 				.collect();
 			if packages.is_empty() {
 				None
@@ -247,8 +244,15 @@ pub fn install_string(data: &mut Data, package_manager: &str, package: &str) -> 
 				false => package.to_string(),
 				true => {
 					let split = package.split_whitespace().collect::<Vec<&str>>();
+					if split.len() < 2 {
+						return package.to_string(); // Handle malformed input
+					}
 					let command = split[1];
-					let package = split[split.len() - 1];
+					let package = if split.len() > 1 {
+						split[split.len() - 1]
+					} else {
+						split[0]
+					};
 					let new_command = data.command.clone().replacen(&data.split[0], command, 1);
 					data.update_command(&new_command);
 					format!("apt install {}", package)
