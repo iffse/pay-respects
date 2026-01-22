@@ -26,3 +26,17 @@ suggest = [
 '''
 {{command}} --change @'''
 ]
+
+[[match_err]]
+pattern = [
+	"hint: run `",
+	"and try again",
+]
+suggest = [
+'''
+#[
+  err_contains(hint: run `),
+  err_contains(and try again)
+]
+{{err::(?:hint: run `)(.*)(?:` and try again.)}}'''
+]
