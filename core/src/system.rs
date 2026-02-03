@@ -2,7 +2,6 @@ use crate::data::Data;
 use crate::shell::command_output_or_error;
 use crate::shell::{command_output, elevate};
 use crate::style::{print_warning, unexpected_format};
-use colored::Colorize;
 use std::io::stderr;
 use std::process::Command;
 use std::process::Stdio;
@@ -72,7 +71,6 @@ pub fn get_packages(
 						"".to_string()
 					}
 				})
-				.into_iter()
 				.filter(|s| !s.is_empty())
 				.collect();
 
@@ -157,7 +155,6 @@ pub fn get_packages(
 							"".to_string()
 						}
 					})
-					.into_iter()
 					.filter(|s| !s.is_empty())
 					.collect();
 			} else if data.executables.contains(&"nix-search".to_string()) {
