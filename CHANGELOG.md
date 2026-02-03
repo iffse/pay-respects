@@ -11,6 +11,10 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+## [0.7.10] - 2026-02-03
+
+Maintenance release, no major changes.
+
 ### Fixed
 
 - Many panics in various rare cases
@@ -350,7 +354,8 @@ normalized to `--nocnf`
 
 History start.
 
-[unreleased]: https://github.com/iffse/pay-respects/compare/v0.7.9..HEAD
+[unreleased]: https://github.com/iffse/pay-respects/compare/v0.7.10..HEAD
+[0.7.10]: https://github.com/iffse/pay-respects/compare/v0.7.9..v0.7.10
 [0.7.9]: https://github.com/iffse/pay-respects/compare/v0.7.8..v0.7.9
 [0.7.8]: https://github.com/iffse/pay-respects/compare/v0.7.7..v0.7.8
 [0.7.7]: https://github.com/iffse/pay-respects/compare/v0.7.6..v0.7.7
