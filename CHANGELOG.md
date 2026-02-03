@@ -11,6 +11,14 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Many panics in various rare cases
+
+### Added
+
+- New rules for `cargo`, `snap`, `git`, and `jj`
+
 ## [0.7.9] - 2025-08-26
 
 ### Changed
