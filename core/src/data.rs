@@ -238,6 +238,9 @@ impl Data {
 	pub fn extract_env(&mut self) {
 		let mut envs = vec![];
 		loop {
+			if self.split.is_empty() {
+				break;
+			}
 			let mut char = self.split[0].char_indices();
 			char.next();
 			let offset = char.offset();
