@@ -3,6 +3,20 @@ use crate::shell::is_privileged;
 use colored::*;
 use pay_respects_utils::evals::split_command;
 
+const PROJECT_NAME: &str = env!("CARGO_PKG_NAME");
+
+pub fn print_warning(message: &str) {
+	eprintln!("{}: {}", PROJECT_NAME.yellow(), message);
+}
+
+pub fn print_error(message: &str) {
+	eprintln!("{}: {}", PROJECT_NAME.red().bold(), message);
+}
+
+pub fn unexpected_format(message: &str) {
+	print_error(&format!("Unexpected format: {}", message));
+}
+
 // to_string() is necessary here, otherwise there won't be color in the output
 #[warn(clippy::unnecessary_to_owned)]
 pub fn highlight_difference(data: &Data, suggested_command: &str) -> Option<String> {
