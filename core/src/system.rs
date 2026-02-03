@@ -1,7 +1,7 @@
 use crate::data::Data;
 use crate::shell::command_output_or_error;
 use crate::shell::{command_output, elevate};
-use crate::style::unexpected_format;
+use crate::style::{print_warning, unexpected_format};
 use colored::Colorize;
 use std::io::stderr;
 use std::process::Command;
@@ -51,10 +51,7 @@ pub fn get_packages(
 	match package_manager {
 		"apt" => {
 			if !data.executables.contains(&"apt-file".to_string()) {
-				eprintln!(
-					"{} apt-file is required to find packages",
-					"pay-respects:".yellow()
-				);
+				print_warning("apt-file is required to find packages");
 				return None;
 			}
 			let result = command_output(
@@ -105,10 +102,7 @@ pub fn get_packages(
 		}
 		"emerge" => {
 			if !data.executables.contains(&"e-file".to_string()) {
-				eprintln!(
-					"{} pfl is required to find packages",
-					"pay-respects:".yellow()
-				);
+				print_warning("pfl is required to find packages");
 				return None;
 			}
 			let result = command_output(shell, &format!("e-file /usr/bin/{}", executable));
@@ -176,10 +170,7 @@ pub fn get_packages(
 					.map(|line| line.split_whitespace().next().unwrap().to_string())
 					.collect()
 			} else {
-				eprintln!(
-					"{} nix-locate or nix-search-cli is required to find packages",
-					"pay-respects:".yellow()
-				);
+				print_warning("nix-locate or nix-search is required to find packages");
 				return None;
 			};
 
@@ -229,7 +220,7 @@ pub fn get_packages(
 				None
 			}
 			false => {
-				eprintln!("{} Unsupported package manager", "pay-respects:".yellow());
+				print_warning("Unsupported package manager");
 				None
 			}
 		},
