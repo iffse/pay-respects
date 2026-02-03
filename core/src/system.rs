@@ -1,6 +1,7 @@
 use crate::data::Data;
 use crate::shell::command_output_or_error;
 use crate::shell::{command_output, elevate};
+use crate::style::unexpected_format;
 use colored::Colorize;
 use std::io::stderr;
 use std::process::Command;
@@ -65,7 +66,17 @@ pub fn get_packages(
 			}
 			let packages: Vec<String> = result
 				.lines()
-				.map(|line| line.split_once(':').unwrap().0.to_string())
+				.map(|line| {
+					let bin = line.split_once(':');
+					if let Some((pkg, _)) = bin {
+						pkg.to_string()
+					} else {
+						unexpected_format(line);
+						"".to_string()
+					}
+				})
+				.into_iter()
+				.filter(|s| !s.is_empty())
 				.collect();
 
 			if packages.is_empty() {
@@ -143,14 +154,17 @@ pub fn get_packages(
 				packages = result
 					.lines()
 					.map(|line| {
-						line.split_whitespace()
-							.next()
-							.unwrap()
-							.rsplit_once('.')
-							.unwrap()
-							.0
-							.to_string()
+						let out = line.split_whitespace().next().unwrap().rsplit_once('.');
+
+						if let Some((pkg, _)) = out {
+							pkg.to_string()
+						} else {
+							unexpected_format(line);
+							"".to_string()
+						}
 					})
+					.into_iter()
+					.filter(|s| !s.is_empty())
 					.collect();
 			} else if data.executables.contains(&"nix-search".to_string()) {
 				let result = command_output(shell, &format!("nix-search '{}'", executable));
