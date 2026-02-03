@@ -236,9 +236,10 @@ pub fn alias_map(shell: &str) -> Option<HashMap<String, String>> {
 	let mut alias_map = HashMap::new();
 	match shell {
 		"bash" => {
-			for line in env.lines() {
-				let alias = line.replace("alias ", "");
-				let (alias, command) = alias.split_once('=').unwrap();
+			// fix for multiline aliases
+			let lines = env.split("\nalias ").collect::<Vec<&str>>().into_iter();
+			for line in lines {
+				let (alias, command) = line.split_once('=').unwrap();
 				let command = command.trim().trim_matches('\'');
 				alias_map.insert(alias.to_string(), command.to_string());
 			}
