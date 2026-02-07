@@ -76,12 +76,12 @@ fn print_version() {
 		option_env!("CARGO_PKG_VERSION").unwrap_or("unknown")
 	);
 	let lib = option_env!("_DEF_PR_LIB").map(|dir| dir.to_string());
-	if lib.is_some() {
-		println!("Default lib directory: {}", lib.unwrap());
+	if let Some(lib) = lib {
+		println!("Default lib directory: {}", lib);
 	}
 	let package_manager = option_env!("_DEF_PR_PACKAGE_MANAGER").map(|dir| dir.to_string());
-	if package_manager.is_some() {
-		println!("Default package manager: {}", package_manager.unwrap());
+	if let Some(package_manager) = package_manager {
+		println!("Default package manager: {}", package_manager);
 	}
 }
 

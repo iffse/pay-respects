@@ -16,11 +16,12 @@ use crate::init::Init;
 const PRIVILEGE_LIST: [&str; 2] = ["sudo", "doas"];
 
 pub fn elevate(data: &mut Data, command: &mut String) {
-	if is_privileged(command, data) {
+	let first_command = command.split_whitespace().next().unwrap_or("");
+	if is_privileged(data, first_command) {
 		return;
 	}
-	if data.config.sudo.is_some() {
-		*command = format!("{} {}", data.config.sudo.as_ref().unwrap(), command);
+	if let Some(sudo) = &data.config.sudo {
+		*command = format!("{} {}", sudo, command);
 		return;
 	}
 	for privilege in PRIVILEGE_LIST.iter() {
@@ -31,9 +32,9 @@ pub fn elevate(data: &mut Data, command: &mut String) {
 	}
 }
 
-pub fn is_privileged(command: &str, data: &Data) -> bool {
-	if data.config.sudo.is_some() {
-		return command == data.config.sudo.as_ref().unwrap();
+pub fn is_privileged(data: &Data, command: &str) -> bool {
+	if let Some(sudo) = &data.config.sudo {
+		return sudo == command;
 	}
 	PRIVILEGE_LIST.contains(&command)
 }

@@ -104,8 +104,8 @@ pub fn cnf(data: &mut Data) {
 	let best_matches = {
 		if executable.contains(std::path::MAIN_SEPARATOR) {
 			let file = best_match_file(&executable);
-			if file.is_some() {
-				Some(vec![file.unwrap()])
+			if let Some(file) = file {
+				Some(vec![file])
 			} else {
 				None
 			}

@@ -33,7 +33,7 @@ pub fn highlight_difference(data: &Data, suggested_command: &str) -> Option<Stri
 		return None;
 	}
 
-	let privileged = is_privileged(&split_suggested_command[0], data);
+	let privileged = is_privileged(data, &split_suggested_command[0]);
 
 	let mut old_entries = Vec::new();
 	for command in &split_suggested_command {
