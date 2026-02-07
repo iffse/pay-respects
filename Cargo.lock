@@ -1011,7 +1011,7 @@ dependencies = [
 
 [[package]]
 name = "pay-respects"
-version = "0.7.10"
+version = "0.7.11"
 dependencies = [
  "askama",
  "colored",
@@ -1028,7 +1028,7 @@ dependencies = [
 
 [[package]]
 name = "pay-respects-module-request-ai"
-version = "0.2.4"
+version = "0.2.5"
 dependencies = [
  "askama",
  "colored",
