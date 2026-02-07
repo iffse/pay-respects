@@ -227,7 +227,7 @@ impl Conf {
 				if let Some(url) = option_env!("_DEF_PR_AI_URL") {
 					url.to_string()
 				} else {
-					"https://iff.envs.net/stream-completions.py".to_string()
+					"https://pay-respects-serverless.iffse.eu.org/".to_string()
 				}
 			}
 		};
@@ -241,7 +241,7 @@ impl Conf {
 				if let Some(model) = option_env!("_DEF_PR_AI_MODEL") {
 					model.to_string()
 				} else {
-					"{{ _PR_AI_MODEL }}".to_string()
+					"uwu".to_string()
 				}
 			}
 		};
