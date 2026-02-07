@@ -215,9 +215,12 @@ export _PR_AI_DISABLE=''
 ```
 
 An API key is included with the source (your distribution might have stripped
-them out). It should always work unless I can no longer afford this public
-service or rate limits are reached. If it's useful to you, consider making a
-donation:
+them out). It should always work unless I can no longer afford this public service or rate
+limits are reached.
+
+[I don't track nor store
+anything.](https://github.com/iffse/pay-respects-serverless/blob/main/src/lib.rs)
+If it's useful to you, consider making a donation:
 
 <div>
 	<a
@@ -241,7 +244,7 @@ donation:
 	<a href="https://iffse.eu.org/stripe" target="_blank" rel="noreferrer"
 		><img
 			height='30'
-			src="https://cdn.brandfolder.io/KGT2DTA4/at/8vbr8k4mr5xjwk4hxq4t9vs/Stripe_wordmark_-_blurple.svg"
+			src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Stripe_Logo%2C_revised_2016.svg/1280px-Stripe_Logo%2C_revised_2016.svg.png"
 			alt="Donate using Stripe"
 			style="height: 30px;"
 		/></a
