@@ -11,6 +11,18 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Layered configuration, allowing a system-wide configuration
+
+### Fixed
+
+- HTTPS connection of AI module
+
+### Changed
+
+- Default AI proxy is now serverless (URL changed)
+
 ## [0.7.10] - 2026-02-03
 
 Maintenance release, no major changes.
