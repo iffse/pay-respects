@@ -67,7 +67,7 @@ pub fn get_error(shell: &str, command: &str, data: &Data) -> String {
 		std::env::remove_var("_PR_ERROR_MSG");
 		error_msg
 	} else {
-		let timeout = data.config.timeout.0;
+		let timeout = data.config.timeout;
 		#[cfg(debug_assertions)]
 		eprintln!("timeout: {}", timeout);
 		error_output_threaded(shell, command, timeout)

@@ -16,7 +16,7 @@ pub fn get_package_manager(data: &mut Data) -> Option<String> {
 		return Some(package_manager);
 	}
 
-	if let Some(package_manager) = data.config.package_manager.package_manager.as_ref() {
+	if let Some(package_manager) = data.config.package_manager.as_ref() {
 		if package_manager.is_empty() {
 			return None;
 		}
@@ -225,7 +225,7 @@ pub fn get_packages(
 }
 
 pub fn install_string(data: &mut Data, package_manager: &str, package: &str) -> String {
-	let method = &data.config.package_manager.install_method;
+	let method = &data.config.install_method;
 	match package_manager {
 		"apt" | "dnf" | "pkg" | "yum" | "zypper" => {
 			format!("{} install {}", package_manager, package)

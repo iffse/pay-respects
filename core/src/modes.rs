@@ -162,9 +162,7 @@ pub fn cnf(data: &mut Data) {
 				return;
 			}
 		};
-		data.config
-			.package_manager
-			.set_package_manager(&package_manager);
+		data.config.set_package_manager(&package_manager);
 
 		#[cfg(debug_assertions)]
 		eprintln!("package_manager: {}", package_manager);
@@ -181,7 +179,7 @@ pub fn cnf(data: &mut Data) {
 		eprintln!("packages: {:?}", packages);
 
 		// change default install method based on package manager
-		data.config.package_manager.set_install_method();
+		data.config.set_install_method();
 
 		let packages = packages
 			.iter()
@@ -209,7 +207,7 @@ pub fn cnf(data: &mut Data) {
 			.prompt()
 			.unwrap_or_else(|_| std::process::exit(1));
 
-		let install_method = &data.config.package_manager.install_method;
+		let install_method = &data.config.install_method;
 		if install_method == &config::InstallMethod::Shell {
 			// let the shell handle the installation and place the user in a shell
 			// environment with the package installed
