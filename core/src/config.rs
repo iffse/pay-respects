@@ -130,7 +130,11 @@ fn config_paths() -> Vec<String> {
 
 fn system_config_path() -> Vec<String> {
 	#[cfg(windows)]
-	let xdg_config_dirs = std::env::var("APPDATA").unwrap();
+	let xdg_config_dirs = std::env::var("PROGRAMDATA")
+		.unwrap_or_else(|_| "C:\\ProgramData".to_string())
+		.split(';')
+		.map(|s| format!("{}/pay-respects/config.toml", s))
+		.collect::<Vec<String>>();
 	#[cfg(not(windows))]
 	let xdg_config_dirs = std::env::var("XDG_CONFIG_DIRS")
 		.unwrap_or_else(|_| "/etc/xdg".to_string())
