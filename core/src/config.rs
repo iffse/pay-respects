@@ -44,7 +44,7 @@ impl Default for Config {
 	fn default() -> Self {
 		Self {
 			sudo: None,
-			timeout: 3,
+			timeout: 3000,
 			eval_method: EvalMethod::Internal,
 			package_manager: None,
 			install_method: InstallMethod::Default,
