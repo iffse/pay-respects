@@ -11,7 +11,17 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
-## [0.7.11] - 2026-02-07
+## [0.7.12] - 2026-02-08
+
+### Fixed
+
+- Default timeout was 3 milliseconds instead of 3 seconds, therefore last
+version is not usable unless having a configuration file.
+- Rolling back `reqwest` to version `0.12`. New version does not work on
+android due to `rustls-platform-verifier`, despite the `0.13.1` changelog says
+something is fixed.
+
+## [0.7.11] - 2026-02-07 [YANKED]
 
 ### Added
 
@@ -368,7 +378,8 @@ normalized to `--nocnf`
 
 History start.
 
-[unreleased]: https://github.com/iffse/pay-respects/compare/v0.7.11..HEAD
+[unreleased]: https://github.com/iffse/pay-respects/compare/v0.7.12..HEAD
+[0.7.12]: https://github.com/iffse/pay-respects/compare/v0.7.11..v0.7.12
 [0.7.11]: https://github.com/iffse/pay-respects/compare/v0.7.10..v0.7.11
 [0.7.10]: https://github.com/iffse/pay-respects/compare/v0.7.9..v0.7.10
 [0.7.9]: https://github.com/iffse/pay-respects/compare/v0.7.8..v0.7.9
