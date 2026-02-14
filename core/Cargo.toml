@@ -23,7 +23,7 @@ askama = "0.15"
 inquire = "0.9"
 
 # config file
-toml = { version = "0.9" }
+toml = { version = "1.0" }
 serde = { version = "1.0", features = ["derive"] }
 
 pay-respects-parser = { version = "0.3", path = "../parser" }
