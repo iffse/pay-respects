@@ -48,6 +48,21 @@ const TAGS: &[&str] = &[
 	"</think>",
 ];
 
+/// Used by `partial_tag_len` to limit how far back it scans for a suffix
+/// that could be the start of a tag. Computed at compile time so it stays
+/// in sync when tags are added or removed.
+const MAX_TAG_LEN: usize = {
+	let mut max = 0;
+	let mut i = 0;
+	while i < TAGS.len() {
+		if TAGS[i].len() > max {
+			max = TAGS[i].len();
+		}
+		i += 1;
+	}
+	max
+};
+
 pub struct Buffer {
 	pub buf: String,
 	pending: String,
@@ -79,8 +94,10 @@ impl Buffer {
 	}
 
 	/// Return the length of a suffix of `s` that could be the start of a known tag.
+	/// e.g. `"hello<no"` -> 3, because `"<no"` is a prefix of `"<note>"`.
+	/// e.g. `"hello"` -> 0, because no suffix starts with `'<'`.
 	fn partial_tag_len(s: &str) -> usize {
-		let max_check = s.len().min(15);
+		let max_check = s.len().min(MAX_TAG_LEN);
 		for len in (1..=max_check).rev() {
 			let suffix = &s[s.len() - len..];
 			if !suffix.starts_with('<') {
@@ -100,6 +117,33 @@ impl Buffer {
 		self.drain();
 	}
 
+	/// Drain all pending data, processing any tags found.
+	/// Used on the last call when we know no more data will arrive
+	/// Unlike `drain`, this does not hold back partial tag suffixes.
+	fn drain_remaining(&mut self) {
+		loop {
+			if self.pending.is_empty() {
+				break;
+			}
+			match Self::find_first_tag(&self.pending) {
+				Some((pos, tag)) => {
+					if pos > 0 {
+						let before = self.pending[..pos].to_string();
+						self.emit_text(&before);
+					}
+					let after_pos = pos + tag.len();
+					self.pending = self.pending[after_pos..].to_string();
+					self.handle_tag(tag);
+				}
+				None => {
+					let remaining = std::mem::take(&mut self.pending);
+					self.emit_text(&remaining);
+					break;
+				}
+			}
+		}
+	}
+
 	fn drain(&mut self) {
 		loop {
 			let partial = Self::partial_tag_len(&self.pending);
@@ -108,9 +152,9 @@ impl Buffer {
 				break;
 			}
 
-			let safe = self.pending[..safe_len].to_string();
+			let result = Self::find_first_tag(&self.pending[..safe_len]);
 
-			match Self::find_first_tag(&safe) {
+			match result {
 				Some((pos, tag)) => {
 					if pos > 0 {
 						let before = self.pending[..pos].to_string();
@@ -194,7 +238,7 @@ impl Buffer {
 					if self.state == State::Write && buffered.ends_with("```") {
 						let whitespace = " ".repeat(3);
 						let formatted = format!("\r{}", whitespace);
-						let line = buffered.replace("```", &formatted);
+						let line = format!("{}{}", &buffered[..buffered.len() - 3], formatted);
 						eprintln!("{}", line);
 					} else {
 						let formatted = clear_format(&buffered);
@@ -222,10 +266,10 @@ impl Buffer {
 	}
 
 	pub fn print_return_remain(&mut self) -> String {
-		// Flush any remaining pending data
+		// Force-drain any remaining pending data, treating it all as safe
+		// (no more data will arrive, so partial tag matching is no longer needed).
 		if !self.pending.is_empty() {
-			let remaining = std::mem::take(&mut self.pending);
-			self.emit_text(&remaining);
+			self.drain_remaining();
 		}
 		self.flush_line();
 
@@ -445,6 +489,28 @@ mod tests {
 	fn angle_bracket_not_a_tag() {
 		let mut buf = Buffer::new();
 		buf.proc("x < y and y > x\n</note>captured");
+		let result = buf.print_return_remain();
+		assert_eq!(result, "captured");
+	}
+
+	#[test]
+	fn stuck_tag_not_emitted_as_raw_text_into_buf() {
+		// When state is Buf and a complete tag is stuck in pending at end-of-stream,
+		// print_return_remain calls emit_text which appends the raw tag into buf.
+		// The tag should be processed, not emitted as literal text.
+		let mut buf = Buffer::new();
+		buf.proc("text<note>detail\n</note>captured<suggest>");
+		// "<suggest>" is stuck in pending. State is Buf (from </note>).
+		// "captured" is in buf.
+		let result = buf.print_return_remain();
+		assert_eq!(result, "captured");
+	}
+
+	#[test]
+	fn stuck_closing_tag_not_emitted_as_raw_text_into_buf() {
+		// Same issue with </suggestions> stuck at end of stream
+		let mut buf = Buffer::new();
+		buf.proc("text<note>detail\n</note>captured</suggestions>");
 		let result = buf.print_return_remain();
 		assert_eq!(result, "captured");
 	}
