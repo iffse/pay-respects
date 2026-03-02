@@ -7,7 +7,7 @@ pattern = [
 suggest = [
 '''
 #[err_contains(did you mean)]
-{{command[0]}} {{err::(?:did you mean `)(.*)(?:`\?)}} {{command[2:]}} ''',
+{{command[0]}} {{err::(?:Did you mean `)(.*)(?:`\?)}} {{command[2:]}} ''',
 '''
 #[err_contains(a command with a similar name exists)]
 {{command[0]}} {{err::(?:a command with a similar name exists: `)(\S+)(?:`)}} {{command[2:]}} ''',

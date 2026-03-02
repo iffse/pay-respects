@@ -259,7 +259,6 @@ impl Data {
 	pub fn update_error(&mut self, error: Option<String>) {
 		if let Some(error) = error {
 			self.error = error
-				.to_lowercase()
 				.split_whitespace()
 				.collect::<Vec<&str>>()
 				.join(" ");

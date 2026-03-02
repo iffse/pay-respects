@@ -28,10 +28,12 @@ pub fn runtime_match(
 	let rule: Rule = toml::from_str(&file).unwrap();
 	let split_command = split_command(last_command);
 
+	let error_lower = error_msg.to_lowercase();
+
 	let mut pure_suggest;
 	for match_err in rule.match_err {
 		for pattern in match_err.pattern {
-			if error_msg.contains(&pattern) {
+			if error_lower.contains(&pattern) {
 				'suggest: for suggest in &match_err.suggest {
 					if suggest.starts_with('#') {
 						let mut lines = suggest.lines().collect::<Vec<&str>>();
@@ -69,7 +71,7 @@ pub fn runtime_match(
 								&arg,
 								shell,
 								last_command,
-								error_msg,
+								&error_lower,
 								&split_command,
 								executables,
 							) == reverse
@@ -105,13 +107,13 @@ fn eval_condition(
 	arg: &str,
 	shell: &str,
 	last_command: &str,
-	error_msg: &str,
+	error_lower: &str,
 	split_command: &[String],
 	executables: &[String],
 ) -> bool {
 	match condition {
 		"executable" => executables.contains(&arg.to_string()),
-		"err_contains" => regex_match(arg, error_msg),
+		"err_contains" => regex_match(&arg.to_lowercase(), error_lower),
 		"cmd_contains" => regex_match(arg, last_command),
 		"min_length" => split_command.len() >= arg.parse::<usize>().unwrap(),
 		"length" => split_command.len() == arg.parse::<usize>().unwrap(),

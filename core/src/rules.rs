@@ -4,6 +4,7 @@ use pay_respects_utils::evals::*;
 
 pub fn match_pattern(executable: &str, data: &Data) -> Option<Vec<String>> {
 	let error_msg = &data.error;
+	let error_lower = error_msg.to_lowercase();
 	let shell = &data.shell;
 	let last_command = &data.command;
 	let executables = &data.executables;

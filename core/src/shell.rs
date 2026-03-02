@@ -74,7 +74,6 @@ pub fn get_error(shell: &str, command: &str, data: &Data) -> String {
 		error_output_threaded(shell, command, timeout)
 	};
 	error
-		.to_lowercase()
 		.split_whitespace()
 		.collect::<Vec<&str>>()
 		.join(" ")
