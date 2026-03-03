@@ -4,12 +4,6 @@ Rule files placed under [rules](./rules) in the project directory are parsed at
 compilation, everything is parsed to Rust code before compiling. You don't have
 to know the project structure nor Rust to write blazing fast rules!
 
-For compile-time rules, if only rules are changed, cargo won't recompile the
-project because Rust code were intact. You will have to notify it manually by:
-```shell
-touch core/src/rules.rs && cargo build
-```
-
 Runtime-rules support is provided by `runtime-rules` module. Directories are
 searched with the following priority:
 
@@ -19,8 +13,8 @@ searched with the following priority:
 
 The actual rule file should be placed under `pay-respects/rules/`, for example:
 `~/.config/pay-respects/rules/cargo.toml`. Note that for runtime rules, the
-name of the file **MUST** match the command name. Except `_PR_GENERAL.toml`
-that is always parsed
+name of the file **MUST** match the command name. Except `_PR_GENERAL.toml`,
+that is always parsed.
 
 ## Syntax
 
