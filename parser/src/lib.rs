@@ -178,7 +178,7 @@ fn parse_conditions(suggest: &str) -> (String, Vec<TokenStream2>) {
 fn eval_condition(condition: &str, arg: &str) -> TokenStream2 {
 	match condition {
 		"executable" => quote! {executables.contains(&#arg.to_string())},
-		"err_contains" => quote! {regex_match(&#arg.to_lowercase(), &error_lower)},
+		"err_contains" => quote! {regex_match(#arg, &error_lower)},
 		"cmd_contains" => quote! {regex_match(#arg, &last_command)},
 		"min_length" => quote! {(split.len() >= #arg.parse::<usize>().unwrap())},
 		"length" => quote! {(split.len() == #arg.parse::<usize>().unwrap())},
