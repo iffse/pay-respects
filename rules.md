@@ -90,7 +90,7 @@ with RegEx ([see regex crate for syntax])
 	- All patterns matching this placeholder will be removed from indexing
 - `{{cmd::<Regular Expression>}}`: Get the matching captures from the last command
 	- Unlike `{{opt}}`, this won't remove the string after matching
-- `{{err::<Regular Expression}}`: Get the matching captures from the error message
+- `{{err::<Regular Expression}}`: Get the matching captures from the error message (**case-sensitive**)
 - `{{shell(<shell commands>)}}`: Replace with the output of the shell command
 	- Can be used along `{{typo}}` or `{{select}}` as its only argument, where
 	each newline will be evaluated to a candidate/selection
@@ -105,9 +105,24 @@ conditions:
 - `cmd_contains`: Check if the last user input contains the argument. Regex
 supported (you can't use `,` currently because it's used as condition
 separator)
-- `err_contains`: Same as `cmd_contains` but for error message
+- `err_contains`: Same as `cmd_contains` but for error message (all lowercase)
 - `length`: Check if the given command has the length of the argument
 - `min_length`: Check if the given command has at least the length of the argument
 - `max_length`: Check if the given command has at most the length of the argument
 - `shell`: Check if the current running shell is the argument
 
+## Other Considerations
+
+When suggesting a chained command with `&&`, try to break it into multiple lines.
+
+- More readable if the commands are long
+- Automatic conversion to compatible syntax where `&&` is unavailable (e.g. nushell)
+
+Example:
+```toml
+suggest = [
+'''
+command1 &&
+command2 '''
+]
+```
