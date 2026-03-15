@@ -1,5 +1,5 @@
 function {{ alias }} -d "Suggest fixes to the previous command"
-	eval $(_PR_LAST_COMMAND="$(history | head -n 1)" _PR_ALIAS="$(alias)" _PR_SHELL="fish" "{{ binary_path }}")
+	eval $(_PR_LAST_COMMAND="$(builtin history | head -n 1)" _PR_ALIAS="$(alias)" _PR_SHELL="fish" "{{ binary_path }}")
 end
 
 {%if cnf %}
