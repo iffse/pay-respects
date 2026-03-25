@@ -15,6 +15,22 @@ use crate::init::Init;
 
 const PRIVILEGE_LIST: [&str; 2] = ["sudo", "doas"];
 
+/// Build a `Command` that runs `command` via the user's shell, adding
+/// `-NoProfile` for PowerShell to prevent profile output from contaminating
+/// stdout/stderr capture.
+fn shell_command(shell: &str, command: &str) -> std::process::Command {
+	let mut cmd = std::process::Command::new(shell);
+	match shell {
+		"pwsh" | "powershell" => {
+			cmd.arg("-NoProfile").arg("-c").arg(command);
+		}
+		_ => {
+			cmd.arg("-c").arg(command);
+		}
+	}
+	cmd
+}
+
 pub fn elevate(data: &mut Data, command: &mut String) {
 	let first_command = command.split_whitespace().next().unwrap_or("");
 	if is_privileged(data, first_command) {
@@ -86,9 +102,7 @@ pub fn error_output_threaded(shell: &str, command: &str, timeout: u64) -> String
 		s.spawn(|| {
 			sender
 				.send(
-					std::process::Command::new(shell)
-						.arg("-c")
-						.arg(command)
+					shell_command(shell, command)
 						.env("LC_ALL", "C")
 						.output()
 						.expect("failed to execute process"),
@@ -111,9 +125,7 @@ pub fn error_output_threaded(shell: &str, command: &str, timeout: u64) -> String
 }
 
 pub fn command_output(shell: &str, command: &str) -> String {
-	let output = std::process::Command::new(shell)
-		.arg("-c")
-		.arg(command)
+	let output = shell_command(shell, command)
 		.env("LC_ALL", "C")
 		.output()
 		.expect("failed to execute process");
@@ -128,9 +140,7 @@ pub fn command_output(shell: &str, command: &str) -> String {
 }
 
 pub fn command_output_or_error(shell: &str, command: &str) -> String {
-	let output = std::process::Command::new(shell)
-		.arg("-c")
-		.arg(command)
+	let output = shell_command(shell, command)
 		.env("LC_ALL", "C")
 		.output()
 		.expect("failed to execute process");
@@ -155,9 +165,7 @@ pub fn module_output(data: &Data, module: &str) -> Option<Vec<String>> {
 			"".to_string()
 		}
 	};
-	let output = std::process::Command::new(shell)
-		.arg("-c")
-		.arg(module)
+	let output = shell_command(shell, module)
 		.env("_PR_COMMAND", executable)
 		.env("_PR_SHELL", shell)
 		.env("_PR_LAST_COMMAND", last_command)
