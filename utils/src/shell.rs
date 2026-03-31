@@ -1,5 +1,7 @@
 use crate::macros::*;
 
+use regex_lite::Regex;
+
 #[derive(Debug)]
 pub enum ShellType {
 	Generic,
@@ -19,7 +21,10 @@ pub static mut SHELL_TYPE: ShellType = Generic;
 /// Currently only used by nushell that does not allow `\ `
 pub fn shell_path_style(path: &mut String) {
 	if let Nu = get_shell_type() {
-		let formatted_path = format!("`{}`", path.replace("\\ ", " "));
+		// let formatted_path = format!("`{}`", path.replace("\\ ", " "));
+		// using regex instead to avoid escaped backslashes
+		let re = Regex::new(r"(?<!\\)\\ ").unwrap();
+		let formatted_path = format!("`{}`", re.replace_all(path, "\\ "));
 		*path = formatted_path;
 	}
 }
