@@ -12,6 +12,7 @@ use pay_respects_utils::files::path_convert;
 
 use crate::data::{Data, Mode};
 use crate::init::Init;
+use pay_respects_utils::remove_env_var;
 
 const PRIVILEGE_LIST: [&str; 2] = ["sudo", "doas"];
 
@@ -81,7 +82,7 @@ pub fn add_candidates_no_dup(
 pub fn get_error(shell: &str, command: &str, data: &Data) -> String {
 	let error_msg = std::env::var("_PR_ERROR_MSG");
 	let error = if let Ok(error_msg) = error_msg {
-		std::env::remove_var("_PR_ERROR_MSG");
+		remove_env_var!("_PR_ERROR_MSG");
 		error_msg
 	} else {
 		let timeout = data.config.timeout;
@@ -271,7 +272,7 @@ pub fn alias_map(shell: &str) -> Option<HashMap<String, String>> {
 			}
 		}
 	}
-	std::env::remove_var("_PR_ALIAS");
+	remove_env_var!("_PR_ALIAS");
 	Some(alias_map)
 }
 

@@ -2,7 +2,7 @@
 name = "pay-respects"
 authors = ["iff <iff@ik.me>"]
 version = "0.7.12"
-edition = "2021"
+edition = "2024"
 
 # for crates.io
 description = "Command suggestions, command-not-found and thefuck replacement written in Rust"
