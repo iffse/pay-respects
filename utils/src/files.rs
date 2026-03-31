@@ -3,6 +3,8 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 use crate::evals::find_similar;
+use crate::shell::shell_path_style;
+use crate::shell::*;
 use itertools::Itertools;
 
 pub fn get_path_files() -> Vec<String> {
@@ -52,11 +54,22 @@ pub fn get_path_files() -> Vec<String> {
 		eprintln!("all_executable={all_executable:?}");
 	}
 
-	all_executable.iter().unique().cloned().collect()
+	all_executable
+		.iter()
+		.unique()
+		.cloned()
+		.collect::<Vec<String>>()
+		.into_iter()
+		.map(|mut s| {
+			shell_path_style(&mut s);
+			s
+		})
+		.collect()
 }
 
 pub fn best_match_file(input: &str) -> Option<String> {
 	let mut input = input.trim_matches(|c| c == '\'' || c == '"').to_owned();
+	reverse_shell_path_style(&mut input);
 	#[cfg(debug_assertions)]
 	eprintln!("best_match_file input: {input}");
 	let mut exit_dirs = Vec::new();
@@ -91,10 +104,18 @@ pub fn best_match_file(input: &str) -> Option<String> {
 		input = format!("{}/{}", input, best_match.unwrap());
 		files = match std::fs::read_dir(&input) {
 			Ok(files) => files,
-			Err(_) => return Some(input),
+			Err(_) => break,
 		};
 	}
 
+	#[cfg(debug_assertions)]
+	{
+		eprintln!("best_match_file final input: {input}");
+		eprintln!("shell type is: {:?}", get_shell_type());
+	}
+	shell_path_style(&mut input);
+	#[cfg(debug_assertions)]
+	eprintln!("best_match_file final input after shell style: {input}");
 	Some(input)
 }
 

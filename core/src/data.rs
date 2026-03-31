@@ -1,6 +1,7 @@
 use pay_respects_utils::evals::split_command;
 use pay_respects_utils::files::get_path_files;
 use pay_respects_utils::files::path_env_sep;
+use pay_respects_utils::shell::set_shell_type;
 
 use itertools::Itertools;
 
@@ -162,6 +163,8 @@ impl Data {
 			init.update_error(None);
 		}
 
+		set_shell_type(&init.shell);
+
 		#[cfg(debug_assertions)]
 		{
 			eprintln!("/// data initialization");
@@ -258,10 +261,7 @@ impl Data {
 
 	pub fn update_error(&mut self, error: Option<String>) {
 		if let Some(error) = error {
-			self.error = error
-				.split_whitespace()
-				.collect::<Vec<&str>>()
-				.join(" ");
+			self.error = error.split_whitespace().collect::<Vec<&str>>().join(" ");
 		} else {
 			self.error = get_error(&self.shell, &self.command, self);
 		}

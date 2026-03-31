@@ -89,10 +89,7 @@ pub fn get_error(shell: &str, command: &str, data: &Data) -> String {
 		eprintln!("timeout: {}", timeout);
 		error_output_threaded(shell, command, timeout)
 	};
-	error
-		.split_whitespace()
-		.collect::<Vec<&str>>()
-		.join(" ")
+	error.split_whitespace().collect::<Vec<&str>>().join(" ")
 }
 
 pub fn error_output_threaded(shell: &str, command: &str, timeout: u64) -> String {
@@ -456,6 +453,8 @@ pub fn shell_evaluated_commands(shell: &str, command: &str, success: bool) {
 		};
 		if dirs.is_empty() {
 			None
+		} else if shell == "nu" {
+			Some(dirs.trim_matches('`').to_string())
 		} else {
 			Some(dirs.to_string())
 		}

@@ -2,8 +2,8 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-use std::path::Path;
 use itertools::sorted_unstable;
+use std::path::Path;
 
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
@@ -34,7 +34,11 @@ fn get_rules(directory: &str) -> Vec<Rule> {
 		.expect("Failed to read directory.")
 		.map(|entry| {
 			let entry = entry.expect("Failed to read directory entry.");
-			entry.path().to_str().expect("Failed to convert path to string.").to_string()
+			entry
+				.path()
+				.to_str()
+				.expect("Failed to convert path to string.")
+				.to_string()
 		});
 	let files = sorted_unstable(files).collect::<Vec<String>>();
 
