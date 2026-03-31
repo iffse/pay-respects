@@ -3,6 +3,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 use crate::files::*;
+use crate::settings::*;
 use itertools::Itertools;
 use regex_lite::Regex;
 
@@ -91,7 +92,7 @@ pub fn suggest_typo(typos: &[String], candidates: &[String], executables: &[Stri
 						}
 						continue;
 					}
-					if let Some(suggest) = find_similar(typo, executables, Some(2)) {
+					if let Some(suggest) = find_similar(typo, executables) {
 						suggestions.push(suggest);
 					} else {
 						suggestions.push(typo.to_string());
@@ -108,7 +109,7 @@ pub fn suggest_typo(typos: &[String], candidates: &[String], executables: &[Stri
 					unreachable!("suggest_typo: must have at least two candidates")
 				}
 			}
-		} else if let Some(suggest) = find_similar(typo, candidates, Some(2)) {
+		} else if let Some(suggest) = find_similar(typo, candidates) {
 			suggestions.push(suggest);
 		} else {
 			suggestions.push(typo.to_string());
@@ -118,22 +119,24 @@ pub fn suggest_typo(typos: &[String], candidates: &[String], executables: &[Stri
 }
 
 pub fn best_match_path(typo: &str, executables: &[String]) -> Option<String> {
-	find_similar(typo, executables, Some(3))
+	find_similar(typo, executables)
 }
 
 pub fn best_matches_path(typo: &str, executables: &[String]) -> Option<Vec<String>> {
-	find_similars(typo, executables, Some(3))
+	find_similars(typo, executables)
 }
 
-/// Find the best match for a typo given a list of candidates
-/// higher the threshold, stricter the comparison
-/// 1: anything
-/// 2: 50%
-/// 3: 33%
-/// ... etc
-pub fn find_similar(typo: &str, candidates: &[String], threshold: Option<usize>) -> Option<String> {
-	let threshold = threshold.unwrap_or(2);
-	let mut min_distance = typo.chars().count() / threshold + 1;
+pub fn get_min_distance(str: &str) -> usize {
+	let percentage = get_dl_distance_percentage();
+	let max = get_dl_distance_max();
+	let min = get_dl_distance_min();
+
+	let distance = (str.chars().count() as f64 * percentage as f64 / 100.0).ceil() as usize;
+	std::cmp::min(std::cmp::max(distance, min), max)
+}
+
+pub fn find_similar(typo: &str, candidates: &[String]) -> Option<String> {
+	let mut min_distance = get_min_distance(typo);
 	let mut min_distance_index = None;
 	for (i, candidate) in candidates.iter().enumerate() {
 		if candidate.is_empty() {
@@ -153,13 +156,8 @@ pub fn find_similar(typo: &str, candidates: &[String], threshold: Option<usize>)
 
 /// Similar to `find_similar`, but returns a vector of all candidates
 /// with the same minimum distance
-pub fn find_similars(
-	typo: &str,
-	candidates: &[String],
-	threshold: Option<usize>,
-) -> Option<Vec<String>> {
-	let threshold = threshold.unwrap_or(2);
-	let mut min_distance = typo.chars().count() / threshold + 1;
+pub fn find_similars(typo: &str, candidates: &[String]) -> Option<Vec<String>> {
+	let mut min_distance = get_min_distance(typo);
 	let mut min_distance_index = vec![];
 	for (i, candidate) in candidates.iter().enumerate() {
 		if candidate.is_empty() {
