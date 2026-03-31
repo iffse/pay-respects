@@ -3,6 +3,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 use std::path::Path;
+use itertools::sorted_unstable;
 
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
@@ -29,15 +30,17 @@ struct MatchError {
 }
 
 fn get_rules(directory: &str) -> Vec<Rule> {
-	let files = std::fs::read_dir(directory).expect("Failed to read directory.");
+	let files = std::fs::read_dir(directory)
+		.expect("Failed to read directory.")
+		.map(|entry| {
+			let entry = entry.expect("Failed to read directory entry.");
+			entry.path().to_str().expect("Failed to convert path to string.").to_string()
+		});
+	let files = sorted_unstable(files).collect::<Vec<String>>();
 
 	let mut rules = Vec::new();
-	for file in files {
-		let file = file.expect("Failed to read file.");
-		let path = file.path();
-		let path = path.to_str().expect("Failed to convert path to string.");
-
-		let rule_file = parse_file(Path::new(path));
+	for path in files {
+		let rule_file = parse_file(Path::new(&path));
 		rules.push(rule_file);
 	}
 	rules

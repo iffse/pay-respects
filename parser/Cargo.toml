@@ -21,3 +21,4 @@ quote = "1.0"
 proc-macro2 = "1.0"
 toml = "0.9"
 serde = { version = "1.0", features = ["derive"] }
+itertools = "0.14.0"
