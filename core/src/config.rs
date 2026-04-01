@@ -1,5 +1,8 @@
-use crate::style::print_error;
+use pay_respects_utils::strings::print_error;
 use serde::Deserialize;
+
+use pay_respects_utils::files::config_files;
+use pay_respects_utils::{merge, merge_option};
 
 #[allow(dead_code)]
 #[derive(Deserialize, Default)]
@@ -52,26 +55,6 @@ impl Default for Config {
 	}
 }
 
-macro_rules! merge {
-	($self:ident, $reader:ident, $($field:ident),*) => {
-		$(
-			if let Some($field) = $reader.$field {
-				$self.$field = $field;
-			}
-		)*
-	};
-}
-
-macro_rules! merge_option {
-	($self:ident, $reader:ident, $($field:ident),*) => {
-		$(
-			if let Some($field) = $reader.$field {
-				$self.$field = Some($field);
-			}
-		)*
-	};
-}
-
 impl Config {
 	pub fn merge(&mut self, reader: ConfigReader) {
 		merge_option!(self, reader, sudo);
@@ -101,56 +84,16 @@ impl Config {
 pub fn load_config() -> Config {
 	let mut config = Config::default();
 
-	for path in config_paths() {
-		if std::path::Path::new(&path).exists() {
-			let content = std::fs::read_to_string(&path).expect("Failed to read config file");
-			let reader: ConfigReader = toml::from_str(&content).unwrap_or_else(|_| {
-				print_error(&format!(
-					"Failed to parse config file at {}. Skipping.",
-					path
-				));
-				ConfigReader::default()
-			});
-			config.merge(reader);
-		}
+	for file in config_files() {
+		let content = std::fs::read_to_string(&file).expect("Failed to read config file");
+		let reader: ConfigReader = toml::from_str(&content).unwrap_or_else(|_| {
+			print_error(&format!(
+				"Failed to parse config file at {}. Skipping.",
+				file
+			));
+			ConfigReader::default()
+		});
+		config.merge(reader);
 	}
-
 	config
-}
-
-fn config_paths() -> Vec<String> {
-	let mut paths = system_config_path();
-	paths.push(user_config_path());
-
-	#[cfg(debug_assertions)]
-	eprintln!("Config paths: {:?}", paths);
-
-	paths
-}
-
-fn system_config_path() -> Vec<String> {
-	#[cfg(windows)]
-	let xdg_config_dirs = std::env::var("PROGRAMDATA")
-		.unwrap_or_else(|_| "C:\\ProgramData".to_string())
-		.split(';')
-		.map(|s| format!("{}/pay-respects/config.toml", s))
-		.collect::<Vec<String>>();
-	#[cfg(not(windows))]
-	let xdg_config_dirs = std::env::var("XDG_CONFIG_DIRS")
-		.unwrap_or_else(|_| "/etc/xdg".to_string())
-		.split(':')
-		.map(|s| format!("{}/pay-respects/config.toml", s))
-		.collect::<Vec<String>>();
-
-	xdg_config_dirs
-}
-
-fn user_config_path() -> String {
-	#[cfg(windows)]
-	let xdg_config_home = std::env::var("APPDATA").unwrap();
-	#[cfg(not(windows))]
-	let xdg_config_home = std::env::var("XDG_CONFIG_HOME")
-		.unwrap_or_else(|_| std::env::var("HOME").unwrap() + "/.config");
-
-	format!("{}/pay-respects/config.toml", xdg_config_home)
 }

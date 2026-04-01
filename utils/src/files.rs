@@ -9,10 +9,10 @@ use itertools::Itertools;
 
 pub fn get_path_files() -> Vec<String> {
 	let env = std::env::var("_PR_EXECUTABLES");
-	if let Ok(env) = env {
-		if !env.is_empty() {
-			return env.split(' ').map(|s| s.to_owned()).collect();
-		}
+	if let Ok(env) = env
+		&& !env.is_empty()
+	{
+		return env.split(' ').map(|s| s.to_owned()).collect();
 	}
 
 	let path_env = path_env();
@@ -119,6 +119,46 @@ pub fn best_match_file(input: &str) -> Option<String> {
 	Some(input)
 }
 
+pub fn config_files() -> Vec<String> {
+	let mut paths = system_config_path();
+	paths.push(user_config_path());
+
+	let mut files = Vec::new();
+	for path in paths {
+		if std::path::Path::new(&path).exists() {
+			files.push(path);
+		}
+	}
+	files
+}
+
+fn system_config_path() -> Vec<String> {
+	#[cfg(windows)]
+	let xdg_config_dirs = std::env::var("PROGRAMDATA")
+		.unwrap_or_else(|_| "C:\\ProgramData".to_string())
+		.split(';')
+		.map(|s| format!("{}/pay-respects/config.toml", s))
+		.collect::<Vec<String>>();
+	#[cfg(not(windows))]
+	let xdg_config_dirs = std::env::var("XDG_CONFIG_DIRS")
+		.unwrap_or_else(|_| "/etc/xdg".to_string())
+		.split(':')
+		.map(|s| format!("{}/pay-respects/config.toml", s))
+		.collect::<Vec<String>>();
+
+	xdg_config_dirs
+}
+
+fn user_config_path() -> String {
+	#[cfg(windows)]
+	let xdg_config_home = std::env::var("APPDATA").unwrap();
+	#[cfg(not(windows))]
+	let xdg_config_home = std::env::var("XDG_CONFIG_HOME")
+		.unwrap_or_else(|_| std::env::var("HOME").unwrap() + "/.config");
+
+	format!("{}/pay-respects/config.toml", xdg_config_home)
+}
+
 #[cfg(windows)]
 fn msys2_conv_path(p: &str) -> std::io::Result<String> {
 	std::process::Command::new("cygpath")
@@ -152,11 +192,7 @@ fn path_env() -> String {
 
 #[cfg(windows)]
 pub fn path_env_sep() -> &'static str {
-	if is_msystem() {
-		":"
-	} else {
-		";"
-	}
+	if is_msystem() { ":" } else { ";" }
 }
 
 #[cfg(windows)]

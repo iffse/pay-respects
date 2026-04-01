@@ -2,7 +2,7 @@ use std::io::Write;
 use textwrap::fill as textwrap_fill;
 
 fn termwidth() -> usize {
-	use terminal_size::{terminal_size, Height, Width};
+	use terminal_size::{Height, Width, terminal_size};
 	let size = terminal_size();
 	if let Some((Width(w), Height(_))) = size {
 		std::cmp::min(w as usize, 80)

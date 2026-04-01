@@ -1,5 +1,5 @@
 use std::io::stderr;
-use std::process::{exit, Stdio};
+use std::process::{Stdio, exit};
 use std::thread;
 use std::time::{Duration, Instant};
 
@@ -60,10 +60,10 @@ pub fn suggest_candidates(data: &mut Data) {
 		if let Some(candidates) = match_pattern("_PR_general", data) {
 			add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
 		}
-		if privilege.is_none() {
-			if let Some(candidates) = match_pattern("_PR_privilege", data) {
-				add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
-			}
+		if privilege.is_none()
+			&& let Some(candidates) = match_pattern("_PR_privilege", data)
+		{
+			add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
 		}
 	});
 

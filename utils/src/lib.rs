@@ -7,3 +7,4 @@ pub mod evals;
 pub mod files;
 pub mod settings;
 pub mod shell;
+pub mod strings;

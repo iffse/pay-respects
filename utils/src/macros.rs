@@ -1,3 +1,25 @@
+// used for configuration files
+#[macro_export]
+macro_rules! merge {
+	($self:ident, $reader:ident, $($field:ident),*) => {
+		$(
+			if let Some($field) = $reader.$field {
+				$self.$field = $field;
+			}
+		)*
+	};
+}
+#[macro_export]
+macro_rules! merge_option {
+	($self:ident, $reader:ident, $($field:ident),*) => {
+		$(
+			if let Some($field) = $reader.$field {
+				$self.$field = Some($field);
+			}
+		)*
+	};
+}
+
 // safe as long as it's not used concurrently
 macro_rules! static_read {
 	($var:ident) => {

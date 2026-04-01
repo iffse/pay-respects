@@ -31,10 +31,10 @@ async fn main() -> Result<(), std::io::Error> {
 		return Ok(());
 	}
 	let mode = std::env::var("_PR_MODE");
-	if let Ok(mode) = mode {
-		if mode.as_str() == "noconfirm" {
-			return Ok(());
-		}
+	if let Ok(mode) = mode
+		&& mode.as_str() == "noconfirm"
+	{
+		return Ok(());
 	}
 
 	let locale = {

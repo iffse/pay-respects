@@ -87,7 +87,7 @@ fn print_version() {
 
 #[cfg(test)]
 mod tests {
-	use super::{handle_args, Status};
+	use super::{Status, handle_args};
 
 	#[test]
 	fn test_handle_args() {

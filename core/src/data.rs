@@ -12,8 +12,8 @@ use std::collections::HashMap;
 #[cfg(windows)]
 use pay_respects_utils::files::path_convert;
 
-use crate::config::load_config;
 use crate::config::Config;
+use crate::config::load_config;
 use crate::shell::alias_map;
 use crate::shell::builtin_commands;
 use crate::shell::expand_alias_multiline;

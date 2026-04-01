@@ -1,6 +1,6 @@
 use askama::Template;
 
-use std::process::{exit, Stdio};
+use std::process::{Stdio, exit};
 
 use std::collections::HashMap;
 use std::sync::mpsc::channel;

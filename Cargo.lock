@@ -902,6 +902,7 @@ dependencies = [
 name = "pay-respects-utils"
 version = "0.1.8"
 dependencies = [
+ "colored",
  "itertools 0.14.0",
  "regex-lite",
 ]

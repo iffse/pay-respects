@@ -70,11 +70,11 @@ pub fn split_command(command: &str) -> Vec<String> {
 	// - is surrrounded by backticks
 	let regex = r#"([^\s"'`\\]+|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`|\\ )+|\\|\n"#;
 	let regex = Regex::new(regex).unwrap();
-	let split_command = regex
+
+	regex
 		.find_iter(command)
 		.map(|cap| cap.as_str().to_owned())
-		.collect::<Vec<String>>();
-	split_command
+		.collect::<Vec<String>>()
 }
 
 pub fn suggest_typo(typos: &[String], candidates: &[String], executables: &[String]) -> String {

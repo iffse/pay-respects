@@ -13,3 +13,4 @@ include = ["**/*.rs"]
 [dependencies]
 regex-lite = "0.1"
 itertools = "0.14"
+colored = "3.1.1"

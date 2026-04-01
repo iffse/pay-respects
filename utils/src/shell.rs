@@ -30,11 +30,12 @@ pub fn shell_path_style(path: &mut String) {
 }
 
 pub fn reverse_shell_path_style(path: &mut String) {
-	if let Nu = get_shell_type() {
-		if path.starts_with('`') && path.ends_with('`') {
-			let formatted_path = path.trim_matches('`').replace(" ", "\\ ");
-			*path = formatted_path;
-		}
+	if let Nu = get_shell_type()
+		&& path.starts_with('`')
+		&& path.ends_with('`')
+	{
+		let formatted_path = path.trim_matches('`').replace(" ", "\\ ");
+		*path = formatted_path;
 	}
 }
 

@@ -1,7 +1,8 @@
 use crate::data::Data;
 use crate::shell::command_output_or_error;
 use crate::shell::{command_output, elevate};
-use crate::style::{print_warning, unexpected_format};
+use pay_respects_utils::strings::{print_warning, unexpected_format};
+
 use std::io::stderr;
 use std::process::Command;
 use std::process::Stdio;
