@@ -4,9 +4,9 @@ use crate::files::config_files;
 use crate::macros::*;
 use crate::strings::print_error;
 
-const DL_DISTANCE_MAX_DEFAULT: usize = 10;
-const DL_DISTANCE_MIN_DEFAULT: usize = 2;
-const DL_DISTANCE_PERCENTAGE_DEFAULT: usize = 30;
+const DL_DISTANCE_MAX_DEFAULT: usize = 5;
+const DL_DISTANCE_MIN_DEFAULT: usize = 1;
+const DL_DISTANCE_PERCENTAGE_DEFAULT: usize = 35;
 
 pub static mut DL_DISTANCE_MAX: usize = DL_DISTANCE_MAX_DEFAULT;
 pub static mut DL_DISTANCE_MIN: usize = DL_DISTANCE_MIN_DEFAULT;
