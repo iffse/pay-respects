@@ -126,17 +126,21 @@ pub fn best_matches_path(typo: &str, executables: &[String]) -> Option<Vec<Strin
 	find_similars(typo, executables)
 }
 
-pub fn get_min_distance(str: &str) -> usize {
+pub fn get_min_distance(str: &str) -> Option<usize> {
 	let percentage = get_dl_distance_percentage();
 	let max = get_dl_distance_max();
 	let min = get_dl_distance_min();
 
 	let distance = (str.chars().count() as f64 * percentage as f64 / 100.0).ceil() as usize;
-	std::cmp::min(std::cmp::max(distance, min), max)
+	if distance < min {
+		None
+	} else {
+		Some(std::cmp::min(distance, max))
+	}
 }
 
 pub fn find_similar(typo: &str, candidates: &[String]) -> Option<String> {
-	let mut min_distance = get_min_distance(typo);
+	let mut min_distance = get_min_distance(typo)?;
 	let mut min_distance_index = None;
 	for (i, candidate) in candidates.iter().enumerate() {
 		if candidate.is_empty() {
@@ -157,7 +161,7 @@ pub fn find_similar(typo: &str, candidates: &[String]) -> Option<String> {
 /// Similar to `find_similar`, but returns a vector of all candidates
 /// with the same minimum distance
 pub fn find_similars(typo: &str, candidates: &[String]) -> Option<Vec<String>> {
-	let mut min_distance = get_min_distance(typo);
+	let mut min_distance = get_min_distance(typo)?;
 	let mut min_distance_index = vec![];
 	for (i, candidate) in candidates.iter().enumerate() {
 		if candidate.is_empty() {
