@@ -11,12 +11,12 @@ use crate::strings::print_error;
 const DL_DISTANCE_MAX_DEFAULT: usize = 5;
 const DL_DISTANCE_MIN_DEFAULT: usize = 1;
 const DL_DISTANCE_THRESHOLD_DEFAULT: usize = 3;
-const DL_DISTANCE_PERCENTAGE_DEFAULT: usize = 50;
+const DL_DISTANCE_PERCENTAGE_DEFAULT: f64 = std::f64::consts::E * 10.0;
 
 pub static mut DL_DISTANCE_MAX: usize = DL_DISTANCE_MAX_DEFAULT;
 pub static mut DL_DISTANCE_MIN: usize = DL_DISTANCE_MIN_DEFAULT;
 pub static mut DL_DISTANCE_THRESHOLD: usize = DL_DISTANCE_THRESHOLD_DEFAULT;
-pub static mut DL_DISTANCE_PERCENTAGE: usize = DL_DISTANCE_PERCENTAGE_DEFAULT;
+pub static mut DL_DISTANCE_PERCENTAGE: f64 = DL_DISTANCE_PERCENTAGE_DEFAULT;
 
 pub fn set_dl_distance_max(max: usize) {
 	static_write!(DL_DISTANCE_MAX, max);
@@ -30,7 +30,7 @@ pub fn set_dl_distance_threshold(threshold: usize) {
 	static_write!(DL_DISTANCE_THRESHOLD, threshold);
 }
 
-pub fn set_dl_distance_percentage(percentage: usize) {
+pub fn set_dl_distance_percentage(percentage: f64) {
 	static_write!(DL_DISTANCE_PERCENTAGE, percentage);
 }
 
@@ -46,7 +46,7 @@ pub fn get_dl_distance_threshold() -> usize {
 	static_read!(DL_DISTANCE_THRESHOLD)
 }
 
-pub fn get_dl_distance_percentage() -> usize {
+pub fn get_dl_distance_percentage() -> f64 {
 	static_read!(DL_DISTANCE_PERCENTAGE)
 }
 
@@ -62,14 +62,14 @@ pub struct DlDistanceConfig {
 	pub max: Option<usize>,
 	pub min: Option<usize>,
 	pub threshold: Option<usize>,
-	pub percentage: Option<usize>,
+	pub percentage: Option<f64>,
 }
 
 pub struct DLConfig {
 	pub max: usize,
 	pub min: usize,
 	pub threshold: usize,
-	pub percentage: usize,
+	pub percentage: f64,
 }
 
 impl Default for DLConfig {

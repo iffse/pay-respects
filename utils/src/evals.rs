@@ -137,7 +137,7 @@ pub fn get_initial_distance(str: &str) -> Option<usize> {
 		return None;
 	}
 
-	let distance = (str.chars().count() as f64 * percentage as f64 / 100.0).round() as usize;
+	let distance = (str.chars().count() as f64 * percentage / 100.0).round() as usize;
 	if distance < min {
 		return None;
 	}
