@@ -25,14 +25,15 @@ pub fn shell_path_post_processing(path: &mut String) {
 	}
 
 	if path.contains(' ') {
-		match get_shell_type() {
-			Nu => {
-				*path = format!("`{}`", path);
-			}
-			_ => {
-				*path = format!("\"{}\"", path);
-			}
-		}
+		*path = format!("\"{}\"", path);
+		// match get_shell_type() {
+		// 	Nu => {
+		// 		*path = format!("`{}`", path);
+		// 	}
+		// 	_ => {
+		// 		*path = format!("\"{}\"", path);
+		// 	}
+		// }
 	}
 
 	// if let Nu = get_shell_type() {

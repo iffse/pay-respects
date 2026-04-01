@@ -455,7 +455,12 @@ pub fn shell_evaluated_commands(shell: &str, command: &str, success: bool) {
 		if dirs.is_empty() {
 			None
 		} else if shell == "nu" {
-			Some(dirs.trim_matches('`').to_string())
+			Some(
+				dirs.trim_matches('`')
+					.trim_matches('"')
+					.trim_matches('\'')
+					.to_string(),
+			)
 		} else {
 			Some(dirs.to_string())
 		}
