@@ -1,8 +1,16 @@
-use crate::macros::*;
+use serde::Deserialize;
 
-pub static mut DL_DISTANCE_MAX: usize = 10;
-pub static mut DL_DISTANCE_MIN: usize = 2;
-pub static mut DL_DISTANCE_PERCENTAGE: usize = 30;
+use crate::files::config_files;
+use crate::macros::*;
+use crate::strings::print_error;
+
+const DL_DISTANCE_MAX_DEFAULT: usize = 10;
+const DL_DISTANCE_MIN_DEFAULT: usize = 2;
+const DL_DISTANCE_PERCENTAGE_DEFAULT: usize = 30;
+
+pub static mut DL_DISTANCE_MAX: usize = DL_DISTANCE_MAX_DEFAULT;
+pub static mut DL_DISTANCE_MIN: usize = DL_DISTANCE_MIN_DEFAULT;
+pub static mut DL_DISTANCE_PERCENTAGE: usize = DL_DISTANCE_PERCENTAGE_DEFAULT;
 
 pub fn set_dl_distance_max(max: usize) {
 	static_write!(DL_DISTANCE_MAX, max);
@@ -26,4 +34,65 @@ pub fn get_dl_distance_min() -> usize {
 
 pub fn get_dl_distance_percentage() -> usize {
 	static_read!(DL_DISTANCE_PERCENTAGE)
+}
+
+#[allow(dead_code)]
+#[derive(Deserialize, Default)]
+pub struct ConfigReader {
+	pub dl_distance: Option<DlDistanceConfig>,
+}
+
+#[allow(dead_code)]
+#[derive(Deserialize, Default)]
+pub struct DlDistanceConfig {
+	pub max: Option<usize>,
+	pub min: Option<usize>,
+	pub percentage: Option<usize>,
+}
+
+pub struct DLConfig {
+	pub max: usize,
+	pub min: usize,
+	pub percentage: usize,
+}
+
+impl Default for DLConfig {
+	fn default() -> Self {
+		Self {
+			max: DL_DISTANCE_MAX_DEFAULT,
+			min: DL_DISTANCE_MIN_DEFAULT,
+			percentage: DL_DISTANCE_PERCENTAGE_DEFAULT,
+		}
+	}
+}
+
+impl DLConfig {
+	pub fn merge(&mut self, reader: ConfigReader) {
+		if let Some(reader) = reader.dl_distance {
+			merge!(self, reader, max, min, percentage);
+		}
+	}
+
+	pub fn apply(&self) {
+		set_dl_distance_max(self.max);
+		set_dl_distance_min(self.min);
+		set_dl_distance_percentage(self.percentage);
+	}
+}
+
+pub fn load_config() {
+	let mut dl_config = DLConfig::default();
+
+	for file in config_files() {
+		let content = std::fs::read_to_string(&file).expect("Failed to read config file");
+		let reader: ConfigReader = toml::from_str(&content).unwrap_or_else(|_| {
+			print_error(&format!(
+				"Failed to parse config file at {}. Skipping.",
+				file
+			));
+			ConfigReader::default()
+		});
+		dl_config.merge(reader);
+	}
+	dl_config.apply();
 }

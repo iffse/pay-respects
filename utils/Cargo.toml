@@ -14,3 +14,7 @@ include = ["**/*.rs"]
 regex-lite = "0.1"
 itertools = "0.14"
 colored = "3.1.1"
+
+# config file
+toml = { version = "1.0" }
+serde = { version = "1.0", features = ["derive"] }

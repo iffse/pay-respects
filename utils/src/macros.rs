@@ -31,7 +31,7 @@ macro_rules! static_write {
 		unsafe { std::ptr::addr_of_mut!($var).write($value) }
 	};
 }
-pub(crate) use {static_read, static_write};
+pub(crate) use {merge, static_read, static_write};
 
 #[macro_export]
 macro_rules! remove_env_var {
