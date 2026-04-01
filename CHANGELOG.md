@@ -11,6 +11,8 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+## [0.7.13] - 2026-04-02
+
 ### Changed
 
 - **Reproducibility**: Every single version before is not actually
@@ -399,7 +401,8 @@ normalized to `--nocnf`
 
 History start.
 
-[unreleased]: https://github.com/iffse/pay-respects/compare/v0.7.12..HEAD
+[unreleased]: https://github.com/iffse/pay-respects/compare/v0.7.13..HEAD
+[0.7.13]: https://github.com/iffse/pay-respects/compare/v0.7.12..v0.7.13
 [0.7.12]: https://github.com/iffse/pay-respects/compare/v0.7.11..v0.7.12
 [0.7.11]: https://github.com/iffse/pay-respects/compare/v0.7.10..v0.7.11
 [0.7.10]: https://github.com/iffse/pay-respects/compare/v0.7.9..v0.7.10
