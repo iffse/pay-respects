@@ -127,21 +127,25 @@ pub fn best_matches_path(typo: &str, executables: &[String]) -> Option<Vec<Strin
 	find_similars(typo, executables)
 }
 
-pub fn get_min_distance(str: &str) -> Option<usize> {
+pub fn get_initial_distance(str: &str) -> Option<usize> {
 	let percentage = get_dl_distance_percentage();
+	let threshold = get_dl_distance_threshold();
 	let max = get_dl_distance_max();
 	let min = get_dl_distance_min();
 
-	let distance = (str.chars().count() as f64 * percentage as f64 / 100.0).ceil() as usize;
-	if distance < min {
-		None
-	} else {
-		Some(std::cmp::min(distance, max))
+	if str.chars().count() < threshold {
+		return None;
 	}
+
+	let distance = (str.chars().count() as f64 * percentage as f64 / 100.0).round() as usize;
+	if distance < min {
+		return None;
+	}
+	Some(std::cmp::min(distance + 1, max + 1))
 }
 
 pub fn find_similar(typo: &str, candidates: &[String]) -> Option<String> {
-	let mut min_distance = get_min_distance(typo)?;
+	let mut min_distance = get_initial_distance(typo)?;
 	let mut min_distance_index = None;
 	for (i, candidate) in candidates.iter().enumerate() {
 		if candidate.is_empty() {
@@ -152,9 +156,13 @@ pub fn find_similar(typo: &str, candidates: &[String]) -> Option<String> {
 			min_distance = distance;
 			min_distance_index = Some(i);
 		}
-
 		#[cfg(debug_assertions)]
 		eprintln!("comparing '{typo}' with '{candidate}': distance = {distance}");
+
+		// finding self, not a typo
+		if distance == 0 {
+			break;
+		}
 	}
 	if let Some(min_distance_index) = min_distance_index {
 		return Some(candidates[min_distance_index].to_string());
@@ -165,13 +173,15 @@ pub fn find_similar(typo: &str, candidates: &[String]) -> Option<String> {
 /// Similar to `find_similar`, but returns a vector of all candidates
 /// with the same minimum distance
 pub fn find_similars(typo: &str, candidates: &[String]) -> Option<Vec<String>> {
-	let mut min_distance = get_min_distance(typo)?;
+	let mut min_distance = get_initial_distance(typo)?;
 	let mut min_distance_index = vec![];
 	for (i, candidate) in candidates.iter().enumerate() {
 		if candidate.is_empty() {
 			continue;
 		}
 		let distance = compare_string(typo, candidate);
+		#[cfg(debug_assertions)]
+		eprintln!("comparing '{typo}' with '{candidate}': distance = {distance}");
 		use std::cmp::Ordering::*;
 		match distance.cmp(&min_distance) {
 			Equal => {

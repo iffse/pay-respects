@@ -10,10 +10,12 @@ use crate::strings::print_error;
 
 const DL_DISTANCE_MAX_DEFAULT: usize = 5;
 const DL_DISTANCE_MIN_DEFAULT: usize = 1;
-const DL_DISTANCE_PERCENTAGE_DEFAULT: usize = 35;
+const DL_DISTANCE_THRESHOLD_DEFAULT: usize = 3;
+const DL_DISTANCE_PERCENTAGE_DEFAULT: usize = 50;
 
 pub static mut DL_DISTANCE_MAX: usize = DL_DISTANCE_MAX_DEFAULT;
 pub static mut DL_DISTANCE_MIN: usize = DL_DISTANCE_MIN_DEFAULT;
+pub static mut DL_DISTANCE_THRESHOLD: usize = DL_DISTANCE_THRESHOLD_DEFAULT;
 pub static mut DL_DISTANCE_PERCENTAGE: usize = DL_DISTANCE_PERCENTAGE_DEFAULT;
 
 pub fn set_dl_distance_max(max: usize) {
@@ -22,6 +24,10 @@ pub fn set_dl_distance_max(max: usize) {
 
 pub fn set_dl_distance_min(min: usize) {
 	static_write!(DL_DISTANCE_MIN, min);
+}
+
+pub fn set_dl_distance_threshold(threshold: usize) {
+	static_write!(DL_DISTANCE_THRESHOLD, threshold);
 }
 
 pub fn set_dl_distance_percentage(percentage: usize) {
@@ -34,6 +40,10 @@ pub fn get_dl_distance_max() -> usize {
 
 pub fn get_dl_distance_min() -> usize {
 	static_read!(DL_DISTANCE_MIN)
+}
+
+pub fn get_dl_distance_threshold() -> usize {
+	static_read!(DL_DISTANCE_THRESHOLD)
 }
 
 pub fn get_dl_distance_percentage() -> usize {
@@ -51,12 +61,14 @@ pub struct ConfigReader {
 pub struct DlDistanceConfig {
 	pub max: Option<usize>,
 	pub min: Option<usize>,
+	pub threshold: Option<usize>,
 	pub percentage: Option<usize>,
 }
 
 pub struct DLConfig {
 	pub max: usize,
 	pub min: usize,
+	pub threshold: usize,
 	pub percentage: usize,
 }
 
@@ -65,6 +77,7 @@ impl Default for DLConfig {
 		Self {
 			max: DL_DISTANCE_MAX_DEFAULT,
 			min: DL_DISTANCE_MIN_DEFAULT,
+			threshold: DL_DISTANCE_THRESHOLD_DEFAULT,
 			percentage: DL_DISTANCE_PERCENTAGE_DEFAULT,
 		}
 	}
@@ -73,13 +86,14 @@ impl Default for DLConfig {
 impl DLConfig {
 	pub fn merge(&mut self, reader: ConfigReader) {
 		if let Some(reader) = reader.dl_distance {
-			merge!(self, reader, max, min, percentage);
+			merge!(self, reader, max, min, threshold, percentage);
 		}
 	}
 
 	pub fn apply(&self) {
 		set_dl_distance_max(self.max);
 		set_dl_distance_min(self.min);
+		set_dl_distance_threshold(self.threshold);
 		set_dl_distance_percentage(self.percentage);
 	}
 }
