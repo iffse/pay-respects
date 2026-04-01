@@ -891,6 +891,7 @@ name = "pay-respects-parser"
 version = "0.3.9"
 dependencies = [
  "itertools 0.14.0",
+ "pay-respects-utils",
  "proc-macro2",
  "quote",
  "serde",

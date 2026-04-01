@@ -1,5 +1,5 @@
 use crate::replaces;
-use pay_respects_utils::evals::*;
+use pay_respects_utils::{evals::*, strings::split_unescaped_character};
 
 #[derive(serde::Deserialize)]
 struct Rule {
@@ -47,9 +47,8 @@ pub fn runtime_match(
 						}
 						let conditions = conditions
 							.trim_start_matches(['#', '['])
-							.trim_end_matches(']')
-							.split(',')
-							.collect::<Vec<&str>>();
+							.trim_end_matches(']');
+						let conditions = split_unescaped_character(conditions, ',');
 
 						for condition in conditions {
 							let (mut condition, arg) = condition.split_once('(').unwrap();

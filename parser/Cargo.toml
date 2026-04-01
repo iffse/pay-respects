@@ -22,3 +22,4 @@ proc-macro2 = "1.0"
 toml = "0.9"
 serde = { version = "1.0", features = ["derive"] }
 itertools = "0.14.0"
+pay-respects-utils = { version ="0.1", path = "../utils"}

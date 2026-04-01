@@ -3,6 +3,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 use itertools::sorted_unstable;
+use pay_respects_utils::strings::split_unescaped_character;
 use std::path::Path;
 
 use proc_macro::TokenStream;
@@ -148,11 +149,11 @@ fn parse_conditions(suggest: &str) -> (String, Vec<TokenStream2>) {
 				break;
 			}
 		}
+
 		let conditions = conditions
 			.trim_start_matches(['#', '['])
-			.trim_end_matches(']')
-			.split(',')
-			.collect::<Vec<&str>>();
+			.trim_end_matches(']');
+		let conditions = split_unescaped_character(conditions, ',');
 
 		for condition in conditions {
 			let (mut condition, arg) = condition.split_once('(').unwrap();
