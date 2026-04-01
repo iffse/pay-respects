@@ -246,17 +246,7 @@ pub fn install_string(data: &mut Data, package_manager: &str, package: &str) -> 
 		}
 		"pacman" => format!("pacman -S {}", package),
 		_ => match package_manager.ends_with("command-not-found") {
-			true => match package.starts_with("Command ") {
-				false => package.to_string(),
-				true => {
-					let split = package.split_whitespace().collect::<Vec<&str>>();
-					let command = split[1];
-					let package = split[split.len() - 1];
-					let new_command = data.command.clone().replacen(&data.split[0], command, 1);
-					data.update_command(&new_command);
-					format!("apt install {}", package)
-				}
-			},
+			true => package.to_string(),
 			false => unreachable!("Unsupported package manager"),
 		},
 	}
@@ -265,6 +255,16 @@ pub fn install_string(data: &mut Data, package_manager: &str, package: &str) -> 
 pub fn install_package(data: &mut Data, package_manager: &str, install: &str) -> bool {
 	let shell = data.shell.clone();
 	let mut install = install.to_string();
+
+	if package_manager.ends_with("command-not-found") && install.starts_with("Command ") {
+		let split = install.split_whitespace().collect::<Vec<&str>>();
+		let command = split[1];
+		let package = split[split.len() - 1];
+		let new_command = data.command.clone().replacen(&data.split[0], command, 1);
+		data.update_command(&new_command);
+		install = format!("apt install {}", package)
+	}
+
 	// guix and nix do not require privilege escalation
 	#[allow(clippy::single_match)]
 	match package_manager {
