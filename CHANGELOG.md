@@ -11,6 +11,27 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- **Reproducibility**: Every single version before is not actually
+	*reproducible* because the procedural generation of Rust code places codes in
+	a random order. This does not affect how the program performs, but does make
+	the hash and binary sizes differs between different builds.
+	- [Unreproducible tests from
+		Debian.](https://tests.reproducible-builds.org/debian/rb-pkg/unstable/amd64/pay-respects.html)
+	- Source code is now reproducible, and technically should be for binaries as
+		well.
+- `err` placeholder is now case-sensitive to preserve usable upper-cases for
+	suggestions.
+
+### Added
+
+- Configurable linguistic distances
+
+### Fixed
+
+- Nushell: Paths are now correctly formatted (`\ ` is unsupported by Nushell)
+
 ## [0.7.12] - 2026-02-08
 
 ### Fixed
