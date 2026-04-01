@@ -17,3 +17,72 @@ pub fn print_error(message: &str) {
 pub fn unexpected_format(message: &str) {
 	print_error(&format!("Unexpected format: {}", message));
 }
+
+/// Replaces all occurrences of the target character in the input string with
+/// the replacement string, but only if the target character is not escaped
+/// by an **odd number** of backslashes.
+pub fn replace_unescaped_character(input: &str, target: char, replacement: &str) -> String {
+	let mut result = String::with_capacity(input.len());
+	let mut backslash_count = 0;
+
+	for c in input.chars() {
+		match c {
+			'\\' => {
+				backslash_count += 1;
+				result.push(c);
+			}
+			_ => {
+				if c == target {
+					if backslash_count % 2 == 0 {
+						// non-escaped character
+						result.push_str(replacement);
+					} else {
+						// escaped character, keep it as is
+						result.push(c);
+					}
+				} else {
+					backslash_count = 0;
+					result.push(c);
+				}
+			}
+		}
+	}
+	result
+}
+
+/// Same as `replace_unescaped_character`, but for escaped characters (i.e.,
+/// those preceded by an odd number of backslashes).
+pub fn replace_escaped_character(input: &str, target: char, replacement: &str) -> String {
+	let mut result = String::with_capacity(input.len());
+	let mut backslash_count = 0;
+
+	for c in input.chars() {
+		match c {
+			'\\' => {
+				backslash_count += 1;
+				result.push(c);
+			}
+			_ => {
+				if c == target {
+					if backslash_count % 2 == 0 {
+						// non-escaped character, keep it as is
+						result.push(c);
+					} else {
+						// escaped character
+						result.pop(); // remove the escaping backslash
+						result.push_str(replacement);
+					}
+				} else {
+					backslash_count = 0;
+					result.push(c);
+				}
+			}
+		}
+	}
+	result
+}
+
+pub fn split_unescaped_character(input: &str, char: char) -> Vec<String> {
+	let replaced = replace_unescaped_character(input, char, "\0");
+	replaced.split('\0').map(|s| s.to_string()).collect()
+}

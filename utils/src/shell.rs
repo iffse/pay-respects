@@ -3,8 +3,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 use crate::macros::*;
-
-use regex_lite::Regex;
+use crate::strings::replace_escaped_character;
 
 #[derive(Debug)]
 pub enum ShellType {
@@ -27,18 +26,26 @@ pub fn shell_path_style(path: &mut String) {
 	if let Nu = get_shell_type() {
 		// let formatted_path = format!("`{}`", path.replace("\\ ", " "));
 		// using regex instead to avoid escaped backslashes
-		let re = Regex::new(r"(?<!\\)\\ ").unwrap();
-		let formatted_path = format!("`{}`", re.replace_all(path, "\\ "));
+		// let re = Regex::new(r"(?<!\\)\\ ").unwrap();
+		// let formatted_path = format!("`{}`", re.replace_all(path, "\\ "));
+		// ^^^ Unsupported by regex carte
+
+		let formatted_path = replace_escaped_character(path, ' ', " ").replace("\\\\", "\\");
+		let formatted_path = if formatted_path.contains(' ') {
+			format!("`{}`", formatted_path)
+		} else {
+			formatted_path
+		};
 		*path = formatted_path;
 	}
 }
 
 pub fn reverse_shell_path_style(path: &mut String) {
-	if let Nu = get_shell_type()
-		&& path.starts_with('`')
-		&& path.ends_with('`')
-	{
-		let formatted_path = path.trim_matches('`').replace(" ", "\\ ");
+	if let Nu = get_shell_type() {
+		let formatted_path = path
+			.trim_matches('`')
+			.replace("\\", "\\\\")
+			.replace(" ", "\\ ");
 		*path = formatted_path;
 	}
 }
