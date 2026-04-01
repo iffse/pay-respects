@@ -3,8 +3,8 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 use crate::evals::find_similar;
-use crate::shell::shell_path_style;
 use crate::shell::*;
+use crate::strings::replace_escaped_character;
 use itertools::Itertools;
 
 pub fn get_path_files() -> Vec<String> {
@@ -61,16 +61,21 @@ pub fn get_path_files() -> Vec<String> {
 		.collect::<Vec<String>>()
 		.into_iter()
 		.map(|mut s| {
-			shell_path_style(&mut s);
+			shell_path_post_processing(&mut s);
 			s
 		})
 		.collect()
 }
 
 pub fn best_match_file(input: &str) -> Option<String> {
-	let mut input = input.trim_matches(|c| c == '\'' || c == '"').to_owned();
-	reverse_shell_path_style(&mut input);
-	#[cfg(debug_assertions)]
+	let quoted = input.starts_with('\'') || input.starts_with('"') || input.starts_with('`');
+	let mut input = if quoted {
+		input
+			.trim_matches(|c| c == '\'' || c == '"' || c == '`')
+			.to_owned()
+	} else {
+		replace_escaped_character(input, ' ', " ")
+	};
 	eprintln!("best_match_file input: {input}");
 	let mut exit_dirs = Vec::new();
 	let mut files = loop {
@@ -91,12 +96,11 @@ pub fn best_match_file(input: &str) -> Option<String> {
 
 	while let Some(exit_dir) = exit_dirs.pop() {
 		let dir_files = files
-			.map(|file| {
-				let file = file.unwrap();
-
-				file.file_name().into_string().unwrap().replace(' ', "\\ ")
-			})
+			.map(|file| file.unwrap().file_name().into_string().unwrap())
 			.collect::<Vec<String>>();
+
+		#[cfg(debug_assertions)]
+		eprintln!("dir_files: {dir_files:?}");
 
 		let best_match = find_similar(&exit_dir, &dir_files);
 		best_match.as_ref()?;
@@ -113,9 +117,9 @@ pub fn best_match_file(input: &str) -> Option<String> {
 		eprintln!("best_match_file final input: {input}");
 		eprintln!("shell type is: {:?}", get_shell_type());
 	}
-	shell_path_style(&mut input);
+	shell_path_post_processing(&mut input);
 	#[cfg(debug_assertions)]
-	eprintln!("best_match_file final input after shell style: {input}");
+	eprintln!("best_match_file final input after shell postprocessing: {input}");
 	Some(input)
 }
 

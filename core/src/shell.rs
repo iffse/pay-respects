@@ -65,7 +65,7 @@ pub fn add_candidates_no_dup(
 	{
 		eprintln!("Adding candidates for command: '{}'", command);
 		for candidate in new_candidates {
-			eprintln!("  - '{}'", candidate);
+			eprintln!("  - '{}'", candidate.trim());
 		}
 	}
 	for candidate in new_candidates {

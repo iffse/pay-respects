@@ -105,6 +105,12 @@ pub fn cnf(data: &mut Data) {
 		if executable.contains(std::path::MAIN_SEPARATOR) {
 			let file = best_match_file(&executable);
 			if let Some(file) = file {
+				let currrent_dir_prefix = format!(".{}", std::path::MAIN_SEPARATOR);
+				let file = if executable.starts_with(&currrent_dir_prefix) {
+					format!(".{}{}", std::path::MAIN_SEPARATOR, file)
+				} else {
+					file
+				};
 				Some(vec![file])
 			} else {
 				None

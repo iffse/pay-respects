@@ -68,7 +68,8 @@ pub fn split_command(command: &str) -> Vec<String> {
 	// - is escaped by a backslash
 	// - surrounded by quotes
 	// - is surrrounded by backticks
-	let regex = r#"([^\s"'`\\]+|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`|\\ )+|\\|\n"#;
+	let regex =
+		r#"([^\s"'`\\]+|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`|\\ )+|\\+|\n"#;
 	let regex = Regex::new(regex).unwrap();
 
 	regex
@@ -151,6 +152,9 @@ pub fn find_similar(typo: &str, candidates: &[String]) -> Option<String> {
 			min_distance = distance;
 			min_distance_index = Some(i);
 		}
+
+		#[cfg(debug_assertions)]
+		eprintln!("comparing '{typo}' with '{candidate}': distance = {distance}");
 	}
 	if let Some(min_distance_index) = min_distance_index {
 		return Some(candidates[min_distance_index].to_string());
