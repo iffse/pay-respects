@@ -34,6 +34,9 @@ fn main() -> Result<(), std::io::Error> {
 		eprintln!("executables: {:?}", executables);
 	}
 
+	pay_respects_utils::shell::set_shell_type(&shell);
+	pay_respects_utils::settings::load_config();
+
 	rules::runtime_match(&executable, &shell, &last_command, &error_msg, &executables);
 	rules::runtime_match(
 		"_PR_GENERAL",
