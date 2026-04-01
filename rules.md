@@ -84,7 +84,8 @@ with RegEx ([see regex crate for syntax])
 	- All patterns matching this placeholder will be removed from indexing
 - `{{cmd::<Regular Expression>}}`: Get the matching captures from the last command
 	- Unlike `{{opt}}`, this won't remove the string after matching
-- `{{err::<Regular Expression}}`: Get the matching captures from the error message (**case-sensitive**)
+- `{{err::<Regular Expression}}`: Get the matching captures from the error
+	message (**case-sensitive**)
 - `{{shell(<shell commands>)}}`: Replace with the output of the shell command
 	- Can be used along `{{typo}}` or `{{select}}` as its only argument, where
 	each newline will be evaluated to a candidate/selection
@@ -97,8 +98,7 @@ conditions:
 
 - `executable`: Check if the argument can be found in path
 - `cmd_contains`: Check if the last user input contains the argument. Regex
-supported (you can't use `,` currently because it's used as condition
-separator)
+supported (using `,` requires escaping, i.e. `\,`)
 - `err_contains`: Same as `cmd_contains` but for error message (all lowercase)
 - `length`: Check if the given command has the length of the argument
 - `min_length`: Check if the given command has at least the length of the argument

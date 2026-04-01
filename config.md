@@ -19,22 +19,37 @@ With the same directory structure, e.g. `/etc/xdg/pay-respects/config.toml`
 
 All available options are listed in the following example file:
 ```toml
-# maximum time in milliseconds for getting previous output
+# Maximum time in milliseconds for getting previous output
 timeout = 3000
 
-# how suggestions are evaluated after being confirmed
-# options can be:
-# - Internal: commands are evaluated inside `pay-respects`
-# - Shell: current working shell is responsible for execution
+# How suggestions are evaluated after being confirmed
+# Options can be:
+# - Internal: Commands are evaluated inside `pay-respects`
+# - Shell: Current working shell is responsible for execution
 eval_method = "Internal"
 
 [package_manager]
-# preferred package manager
+# Preferred package manager
 package_manager = "pacman"
 
-# preferred installation method, can be limited by the package manager
-# available options are:
+# Preferred installation method, can be limited by the package manager
+# Available options are:
 # - System
 # - Shell (nix and guix only)
 install_method = "System"
+
+# Configuring the linguistic distance (Damerau-Levenshtein)
+# - Percentage: How many characters can be different in the suggestion, rounded
+#   to the nearest integer.
+# - Threshold: How many characters are required for the reference string to
+#   start searching to avoid false positives when the reference string is too
+#   short.
+# - Max: Maximum distance allowed between the reference and the suggestion.
+# - Min: Minimum strating distance required. Seach only starts if the distance
+#   obtained after the percentage calculation is above or equal to this value.
+[dl_distance]
+percentage = 35
+threshold = 3
+max = 5
+min = 1
 ```
