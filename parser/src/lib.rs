@@ -26,7 +26,7 @@ struct Rule {
 
 #[derive(serde::Deserialize)]
 struct MatchError {
-	pattern: Vec<String>,
+	pattern: Option<Vec<String>>,
 	suggest: Vec<String>,
 }
 
@@ -62,11 +62,15 @@ fn gen_match_rules(rules: &[Rule]) -> TokenStream {
 			x.match_err
 				.iter()
 				.map(|x| {
-					let pattern = x
-						.pattern
-						.iter()
-						.map(|x| x.to_lowercase())
-						.collect::<Vec<String>>();
+					let pattern = if let Some(pattern) = &x.pattern {
+						let pattern = pattern
+							.iter()
+							.map(|x| x.to_lowercase())
+							.collect::<Vec<String>>();
+						Some(pattern)
+					} else {
+						None
+					};
 					let suggests = x
 						.suggest
 						.iter()
@@ -74,9 +78,9 @@ fn gen_match_rules(rules: &[Rule]) -> TokenStream {
 						.collect::<Vec<String>>();
 					(pattern, suggests)
 				})
-				.collect::<Vec<(Vec<String>, Vec<String>)>>()
+				.collect::<Vec<(Option<Vec<String>>, Vec<String>)>>()
 		})
-		.collect::<Vec<Vec<(Vec<String>, Vec<String>)>>>();
+		.collect::<Vec<Vec<(Option<Vec<String>>, Vec<String>)>>>();
 
 	let mut matches_tokens = Vec::new();
 
@@ -98,10 +102,14 @@ fn gen_match_rules(rules: &[Rule]) -> TokenStream {
 
 			suggestion_tokens.push(match_tokens);
 
-			let string_patterns = pattern.join("\", \"");
-			let string_patterns: TokenStream2 =
-				format!("[\"{}\"]", string_patterns).parse().unwrap();
-			patterns_tokens.push(string_patterns);
+			if let Some(pattern) = pattern {
+				let string_patterns = pattern.join("\", \"");
+				let string_patterns: TokenStream2 =
+					format!("[\"{}\"]", string_patterns).parse().unwrap();
+				patterns_tokens.push(string_patterns);
+			} else {
+				patterns_tokens.push("[\"\"]".parse().unwrap());
+			}
 		}
 
 		matches_tokens.push(quote! {
