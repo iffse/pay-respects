@@ -816,7 +816,7 @@ dependencies = [
 
 [[package]]
 name = "pay-respects"
-version = "0.7.13"
+version = "0.8.0"
 dependencies = [
  "askama",
  "colored",
@@ -881,7 +881,7 @@ dependencies = [
 
 [[package]]
 name = "pay-respects-utils"
-version = "0.1.9"
+version = "0.1.10"
 dependencies = [
  "colored",
  "itertools 0.14.0",

@@ -11,6 +11,8 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-04-02
+
 ### Changed
 
 - Introducing an in-house selection UI! Now we have a UI of a great taste (which was not possible with an external library)!
