@@ -7,9 +7,11 @@ suggestions!
 - 🎯 **Accurate results**: Suggestions are verified before being prompted to
 the user, no `sudo` suggestions when you are using `doas`!
 - ✏️ **Easy to write rules**: You don't need to know Rust. The rules are
-written in a TOML file!
-- 🔩 **Modular**: TOML not your taste? Add sources using your favorite language
-with a custom module!
+written in a TOML format that gets parsed into Rust code!
+- 🦀 **Full Rust capability**: Raw Rust code can be used if TOML rules are not
+enough for complex situations!
+- 🔩 **Modular**: TOML and Rust not your taste? Add sources using your favorite
+language with a custom module!
 - 🤖 **AI Support**: AI module comes in aid when there is no rule for your
 error!
 - 🪶 **Tiny binary size**: Not even 1MB for core features!
@@ -200,7 +202,7 @@ See [configuration](./config.md).
 
 See the following pages:
 
-- [Writing rules (TOML)](./rules.md)
+- [Writing rules (TOML or Rust)](./rules.md)
 - [Custom modules](./modules.md)
 
 ## AI Integration

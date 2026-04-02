@@ -22,6 +22,13 @@ All available options are listed in the following example file:
 # Maximum time in milliseconds for getting previous output
 timeout = 3000
 
+# Apply existing rules to a set of commands. Every set will use the rule
+# corresponding to the first entry
+merge_commands = [
+	[ls, exa], # both using rules corresponding to `ls`
+	[grep, rg], # both using rules corresponding to `grep`
+]
+
 # How suggestions are evaluated after being confirmed
 # Options can be:
 # - Internal: Commands are evaluated inside `pay-respects`
@@ -48,7 +55,7 @@ install_method = "System"
 # - Min: Minimum strating distance required. Seach only starts if the distance
 #   obtained after the percentage calculation is above or equal to this value.
 [dl_distance]
-percentage = 35
+percentage = 27.1828182845904523536028747135266250
 threshold = 3
 max = 5
 min = 1

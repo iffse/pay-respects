@@ -20,20 +20,22 @@ that is always parsed.
 
 Syntax of a rule file:
 ```toml
-# the name of the command
-command = "helloworld"
+# The name of the command
+# If multiple commands could share the same rules, add it to extends
+command = "hello"
+extends = ["goodbye"]
 
-# you can add as many `[[match_err]]` section as you want
+# You can add as many `[[match_err]]` section as you want
 [[match_err]]
 # Note:
-# - patterns must be in lowercase without extra space characters
-# - patterns should be the output with `LC_ALL=C` environment variable
-# - this is a first-pass match. It should be quick so regex is not supported
+# - Patterns should be the output with `LC_ALL=C` environment variable
+# - This is a first-pass match. It should be quick so regex is not supported
+# - This field is optional, always match if omitted
 pattern = [
 	"pattern 1",
 	"pattern 2"
 ]
-# if pattern is matched, suggest changing the first argument to fix:
+# If pattern is matched, suggest changing the first argument to fix:
 suggest = [
 '''
 {{command[0]}} fix {{command[2:]}} '''
@@ -52,6 +54,25 @@ suggest = [
 sudo {{command}} '''
 ]
 ```
+
+## Rust Functions
+
+You can also write in Rust if the rule is very complex. This is only allowed
+during compilation, by previously defining your function in
+[`rules_functions.rs`](./core/src/rules_function.rs):
+```toml
+[[match_err]]
+pattern = [
+	"pattern 1"
+]
+suggest = [
+'''
+#[FUNCTION]
+MyRustFunction '''
+]
+```
+
+## Placeholders
 
 The placeholder is evaluated as following:
 
@@ -91,6 +112,8 @@ with RegEx ([see regex crate for syntax])
 	each newline will be evaluated to a candidate/selection
 
 [see regex crate for syntax]: https://docs.rs/regex-lite/latest/regex_lite/#syntax
+
+## Conditions
 
 Suggestions can have additional conditions to check. To specify conditions, add
 a `#[...]` at the first line (just like derive macros in Rust). Available
