@@ -19,13 +19,23 @@ pub fn runtime_match(
 	error_msg: &str,
 	executables: &[String],
 ) {
-	let file = get_rule(executable);
-	if file.is_none() {
+	let Some(file_path) = get_rule(executable) else {
 		return;
-	}
-
-	let file = std::fs::read_to_string(file.unwrap()).unwrap();
-	let rule: Rule = toml::from_str(&file).unwrap();
+	};
+	let file = match std::fs::read_to_string(&file_path) {
+		Ok(content) => content,
+		Err(e) => {
+			eprintln!("runtime-rules: Failed to read {}: {}", file_path, e);
+			return;
+		}
+	};
+	let rule: Rule = match toml::from_str(&file) {
+		Ok(rule) => rule,
+		Err(e) => {
+			eprintln!("runtime-rules: Failed to parse {}: {}", file_path, e);
+			return;
+		}
+	};
 	let split_command = split_command(last_command);
 
 	let error_lower = error_msg.to_lowercase();
