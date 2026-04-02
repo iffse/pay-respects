@@ -5,7 +5,7 @@ use pay_respects_utils::evals::split_command;
 
 // to_string() is necessary here, otherwise there won't be color in the output
 #[warn(clippy::unnecessary_to_owned)]
-pub fn highlight_difference(data: &Data, suggested_command: &str) -> Option<String> {
+pub fn highlight_difference(data: &Data, suggested_command: &str, active: bool) -> Option<String> {
 	// let replaced_newline = suggested_command.replace('\n', r" {{newline}} ");
 	let shell = &data.shell;
 	let last_command = &data.command;
@@ -41,11 +41,11 @@ pub fn highlight_difference(data: &Data, suggested_command: &str) -> Option<Stri
 		}
 		for old in &old_entries {
 			if old == entry {
-				*entry = entry.blue().to_string();
+				*entry = color_same(entry, active).to_string();
 				continue 'next;
 			}
 		}
-		*entry = entry.red().bold().to_string();
+		*entry = color_diff(entry, active);
 	}
 
 	if privileged
@@ -54,10 +54,10 @@ pub fn highlight_difference(data: &Data, suggested_command: &str) -> Option<Stri
 			|| suggested_command.contains('>'))
 	{
 		split_suggested_command[1] =
-			format!("{} -c \"", shell).red().bold().to_string() + &split_suggested_command[1];
+			color_diff(&format!("{} -c \"", shell), active) + &split_suggested_command[1];
 		let len = split_suggested_command.len() - 1;
 		split_suggested_command[len] =
-			split_suggested_command[len].clone() + "\"".red().bold().to_string().as_str();
+			split_suggested_command[len].clone() + color_diff("\"", active).as_str();
 	}
 
 	if let Some(sudo) = data.privilege.clone() {
@@ -66,15 +66,31 @@ pub fn highlight_difference(data: &Data, suggested_command: &str) -> Option<Stri
 			|| suggested_command.contains('>')
 		{
 			split_suggested_command[0] =
-				format!("{} -c \"", shell).blue().to_string() + &split_suggested_command[0];
+				color_same(&format!("{} -c \"", shell), active) + &split_suggested_command[0];
 			let len = split_suggested_command.len() - 1;
 			split_suggested_command[len] =
-				split_suggested_command[len].clone() + "\"".blue().to_string().as_str();
+				split_suggested_command[len].clone() + color_same("\"", active).as_str();
 		}
-		split_suggested_command.insert(0, sudo.blue().to_string());
+		split_suggested_command.insert(0, color_same(&sudo, active));
 	}
 
 	let highlighted = split_suggested_command.join(" ");
 
 	Some(highlighted.replace(" \n ", "\n"))
+}
+
+fn color_same(str: &str, active: bool) -> String {
+	if active {
+		str.blue().to_string()
+	} else {
+		str.normal().to_string()
+	}
+}
+
+fn color_diff(str: &str, active: bool) -> String {
+	if active {
+		str.red().bold().to_string()
+	} else {
+		str.normal().bold().to_string()
+	}
 }

@@ -99,13 +99,24 @@ pub fn select_candidate(data: &mut Data) {
 	#[cfg(debug_assertions)]
 	eprintln!("candidates: {candidates:?}");
 
-	let mut highlight_candidates = candidates
+	let mut active_candidates = candidates
 		.iter()
-		.map(|candidate| highlight_difference(data, candidate).unwrap())
+		.map(|candidate| highlight_difference(data, candidate, true).unwrap())
 		.collect::<Vec<String>>();
 
-	if highlight_candidates.iter().any(|x| x.contains('\n')) {
-		for candidate in highlight_candidates.iter_mut() {
+	if active_candidates.iter().any(|x| x.contains('\n')) {
+		for candidate in active_candidates.iter_mut() {
+			*candidate = candidate.replace("\n", "\r\n     ").to_string();
+		}
+	}
+
+	let mut inactive_candidates = candidates
+		.iter()
+		.map(|candidate| highlight_difference(data, candidate, false).unwrap())
+		.collect::<Vec<String>>();
+
+	if inactive_candidates.iter().any(|x| x.contains('\n')) {
+		for candidate in inactive_candidates.iter_mut() {
 			*candidate = candidate.replace("\n", "\r\n     ").to_string();
 		}
 	}
@@ -117,10 +128,11 @@ pub fn select_candidate(data: &mut Data) {
 	let hint = format!("{} {} {}", "[↑/↓/j/k]".blue(), confirm, "[ESC]".red());
 	let prelude = format!("{}\n\r{}", msg, hint);
 
-	let selection = select(&prelude, &highlight_candidates, candidates).unwrap_or_else(|err| {
-		print_error(&format!("Selection failed: {}", err));
-		exit(1);
-	});
+	let selection =
+		select(&prelude, &active_candidates, &inactive_candidates).unwrap_or_else(|err| {
+			print_error(&format!("Selection failed: {}", err));
+			exit(1);
+		});
 
 	let suggestion = candidates[selection].to_string();
 	data.update_suggest(&suggestion);

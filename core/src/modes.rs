@@ -1,5 +1,5 @@
 use colored::Colorize;
-use pay_respects_select::select;
+use pay_respects_select::select_simple;
 use pay_respects_utils::strings::print_error;
 use std::path::Path;
 use std::process::exit;
@@ -65,7 +65,7 @@ pub fn noconfirm(data: &mut Data) {
 		};
 
 		let candidate = data.candidates[0].clone();
-		eprintln!("{}", highlight_difference(data, &candidate).unwrap());
+		eprintln!("{}", highlight_difference(data, &candidate, true).unwrap());
 		data.update_suggest(&candidate);
 		data.candidates.clear();
 
@@ -198,7 +198,7 @@ pub fn cnf(data: &mut Data) {
 		let hint = format!("{} {} {}", "[↑/↓/j/k]".blue(), confirm, "[ESC]".red());
 
 		let prelude = format!("{}\n\r{}", msg, hint);
-		let selection = select(&prelude, &packages, &packages).unwrap_or_else(|err| {
+		let selection = select_simple(&prelude, &packages).unwrap_or_else(|err| {
 			print_error(&format!("Selection failed: {}", err));
 			exit(1);
 		});
