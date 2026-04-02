@@ -19,8 +19,7 @@ sys-locale = "0.3"
 rust-i18n = "3"
 regex-lite = "0.1"
 askama = "0.15"
-
-inquire = "0.9"
+itertools = "0.14.0"
 
 # config file
 toml = { version = "1.0" }
@@ -28,7 +27,7 @@ serde = { version = "1.0", features = ["derive"] }
 
 pay-respects-parser = { version = "0.3", path = "../parser" }
 pay-respects-utils = { version ="0.1", path = "../utils"}
-itertools = "0.14.0"
+pay-respects-select = { version ="0.1", path = "../select"}
 
 [package.metadata.deb]
 assets = [

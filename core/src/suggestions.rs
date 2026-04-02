@@ -4,8 +4,8 @@ use std::thread;
 use std::time::{Duration, Instant};
 
 use colored::Colorize;
-use inquire::*;
-use ui::Color;
+use pay_respects_select::select;
+use pay_respects_utils::strings::print_error;
 
 use crate::config;
 use crate::data::Data;
@@ -110,30 +110,20 @@ pub fn select_candidate(data: &mut Data) {
 		}
 	}
 
-	let style = ui::Styled::default();
-	let render_config = ui::RenderConfig::default()
-		.with_prompt_prefix(style)
-		.with_highlighted_option_prefix(ui::Styled::new(">").with_fg(Color::LightBlue))
-		.with_scroll_up_prefix(ui::Styled::new("^").with_fg(Color::LightBlue))
-		.with_scroll_down_prefix(ui::Styled::new("v").with_fg(Color::LightBlue));
-
 	let msg = format!("{}", t!("multi-suggest", num = candidates.len()))
 		.bold()
 		.blue();
 	let confirm = format!("[{}]", t!("confirm-yes")).green();
 	let hint = format!("{} {} {}", "[↑/↓/j/k]".blue(), confirm, "[ESC]".red());
-	eprintln!("{}", msg);
-	eprint!("{}", hint);
+	let prelude = format!("{}\n\r{}", msg, hint);
 
-	let ans = Select::new("\n", highlight_candidates.clone())
-		.with_vim_mode(true)
-		// .without_filtering()
-		.without_help_message()
-		.with_render_config(render_config)
-		.prompt()
-		.unwrap_or_else(|_| exit(1));
-	let pos = highlight_candidates.iter().position(|x| x == &ans).unwrap();
-	let suggestion = candidates[pos].to_string();
+	let selection = select(&prelude, &highlight_candidates, candidates)
+		.unwrap_or_else(|err| {
+			print_error(&format!("Selection failed: {}" , err));
+			exit(1);
+		});
+
+	let suggestion = candidates[selection].to_string();
 	data.update_suggest(&suggestion);
 	data.expand_suggest();
 

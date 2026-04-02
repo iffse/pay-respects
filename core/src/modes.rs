@@ -1,7 +1,8 @@
 use colored::Colorize;
-use inquire::*;
+use pay_respects_select::select;
+use pay_respects_utils::strings::print_error;
 use std::path::Path;
-use ui::Color;
+use std::process::exit;
 
 use pay_respects_utils::evals::best_matches_path;
 use pay_respects_utils::files::best_match_file;
@@ -192,26 +193,18 @@ pub fn cnf(data: &mut Data) {
 			.map(|p| system::install_string(data, &package_manager, p))
 			.collect::<Vec<String>>();
 
-		let style = ui::Styled::default();
-		let render_config = ui::RenderConfig::default()
-			.with_prompt_prefix(style)
-			.with_highlighted_option_prefix(ui::Styled::new(">").with_fg(Color::LightBlue))
-			.with_scroll_up_prefix(ui::Styled::new("^"))
-			.with_scroll_down_prefix(ui::Styled::new("v"))
-			.with_option_index_prefix(ui::IndexPrefix::SpacePadded);
-
 		let msg = format!("{}:", t!("install-package")).bold().blue();
 		let confirm = format!("[{}]", t!("confirm-yes")).green();
 		let hint = format!("{} {} {}", "[↑/↓/j/k]".blue(), confirm, "[ESC]".red());
-		eprintln!("{}", msg);
-		eprintln!("{}", hint);
-		let package = Select::new("\n", packages)
-			.with_vim_mode(true)
-			.without_help_message()
-			.with_render_config(render_config)
-			.without_filtering()
-			.prompt()
-			.unwrap_or_else(|_| std::process::exit(1));
+
+		let prelude = format!("{}\n\r{}", msg, hint);
+		let selection = select(&prelude, &packages, &packages)
+			.unwrap_or_else(|err| {
+				print_error(&format!("Selection failed: {}" , err));
+				exit(1);
+			});
+
+		let package = packages[selection].to_string();
 
 		let install_method = &data.config.install_method;
 		if install_method == &config::InstallMethod::Shell {
