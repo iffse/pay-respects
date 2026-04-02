@@ -1,4 +1,5 @@
 command = "ls"
+extends = ["eza", "exa"]
 
 [[match_err]]
 pattern = [

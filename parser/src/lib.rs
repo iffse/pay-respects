@@ -21,6 +21,7 @@ pub fn parse_rules(input: TokenStream) -> TokenStream {
 #[derive(serde::Deserialize)]
 struct Rule {
 	command: String,
+	extends: Option<Vec<String>>,
 	match_err: Vec<MatchError>,
 }
 
@@ -54,8 +55,25 @@ fn get_rules(directory: &str) -> Vec<Rule> {
 fn gen_match_rules(rules: &[Rule]) -> TokenStream {
 	let command = rules
 		.iter()
-		.map(|x| x.command.to_owned())
-		.collect::<Vec<String>>();
+		.map(|x| {
+			if let Some(extends) = &x.extends {
+				format!(
+					"\"{}\"|{}",
+					x.command,
+					extends
+						.iter()
+						.map(|x| format!("\"{}\"", x))
+						.collect::<Vec<String>>()
+						.join("|")
+				)
+				.parse()
+				.unwrap()
+			} else {
+				format!("\"{}\"", x.command).parse().unwrap()
+			}
+		})
+		.collect::<Vec<TokenStream2>>();
+
 	let command_matches = rules
 		.iter()
 		.map(|x| {

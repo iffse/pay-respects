@@ -3,6 +3,7 @@ use pay_respects_utils::{evals::*, strings::split_unescaped_character};
 
 #[derive(serde::Deserialize)]
 struct Rule {
+	extends: Option<Vec<String>>,
 	match_err: Vec<MatchError>,
 }
 
@@ -18,22 +19,20 @@ pub fn runtime_match(
 	last_command: &str,
 	error_msg: &str,
 	executables: &[String],
-) {
-	let Some(file_path) = get_rule(executable) else {
-		return;
-	};
+) -> Option<Vec<String>> {
+	let file_path = get_rule(executable)?;
 	let file = match std::fs::read_to_string(&file_path) {
 		Ok(content) => content,
 		Err(e) => {
 			eprintln!("runtime-rules: Failed to read {}: {}", file_path, e);
-			return;
+			return None;
 		}
 	};
 	let rule: Rule = match toml::from_str(&file) {
 		Ok(rule) => rule,
 		Err(e) => {
 			eprintln!("runtime-rules: Failed to parse {}: {}", file_path, e);
-			return;
+			return None;
 		}
 	};
 	let split_command = split_command(last_command);
@@ -109,6 +108,8 @@ pub fn runtime_match(
 			}
 		}
 	}
+
+	rule.extends
 }
 
 fn eval_condition(

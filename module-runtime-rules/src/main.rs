@@ -37,7 +37,24 @@ fn main() -> Result<(), std::io::Error> {
 	pay_respects_utils::shell::set_shell_type(&shell);
 	pay_respects_utils::settings::load_config();
 
-	rules::runtime_match(&executable, &shell, &last_command, &error_msg, &executables);
+	let mut runned_rules = vec![];
+	let mut pending_rules = vec![executable.clone()];
+
+	while let Some(executable) = pending_rules.pop() {
+		if runned_rules.contains(&executable) {
+			continue;
+		}
+		runned_rules.push(executable.clone());
+		let extends =
+			rules::runtime_match(&executable, &shell, &last_command, &error_msg, &executables);
+		if let Some(extends) = extends {
+			for extend in extends {
+				if !runned_rules.contains(&extend) {
+					pending_rules.push(extend);
+				}
+			}
+		}
+	}
 	rules::runtime_match(
 		"_PR_GENERAL",
 		&shell,

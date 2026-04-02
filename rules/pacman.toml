@@ -1,4 +1,5 @@
 command = "pacman"
+extends = ["paru", "yay"]
 
 [[match_err]]
 pattern = [

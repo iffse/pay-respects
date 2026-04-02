@@ -1,4 +1,5 @@
 command = "cd"
+extends = ["z"]
 
 [[match_err]]
 pattern = [

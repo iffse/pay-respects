@@ -1,4 +1,5 @@
 command = "cat"
+extends = ["bat"]
 
 [[match_err]]
 pattern = [
