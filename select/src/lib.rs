@@ -15,6 +15,7 @@ pub fn select(
 	inactive_items: &[String],
 ) -> Result<usize, Box<dyn std::error::Error>> {
 	terminal::enable_raw_mode()?;
+	execute!(stderr(), cursor::Hide)?;
 	eprint!("{}\r\n", prelude);
 
 	let lines = {
@@ -29,10 +30,8 @@ pub fn select(
 	let shortcut_max = min(active_items.len(), 9);
 	let mut current = 0;
 
-	let mut stderr = stderr();
-
 	// Initial draw
-	draw(&mut stderr, active_items, inactive_items, current)?;
+	draw(active_items, inactive_items, current)?;
 
 	loop {
 		if let Event::Key(key) = event::read()? {
@@ -59,24 +58,24 @@ pub fn select(
 				// Quit keys
 				KeyCode::Char('c') | KeyCode::Char('d') => {
 					if key.modifiers.contains(event::KeyModifiers::CONTROL) {
-						cleanup(&mut stderr, total_lines)?;
+						cleanup(total_lines)?;
 						quit();
 					}
 				}
 				KeyCode::Esc | KeyCode::Char('q') => {
-					cleanup(&mut stderr, total_lines)?;
+					cleanup(total_lines)?;
 					quit()
 				}
 				KeyCode::Enter => break,
 				_ => {}
 			}
 
-			redraw(&mut stderr, active_items, inactive_items, current, lines)?;
+			redraw(active_items, inactive_items, current, lines)?;
 		}
 	}
 
 	// Cleanup
-	cleanup(&mut stderr, total_lines)?;
+	cleanup(total_lines)?;
 	terminal::disable_raw_mode()?;
 
 	eprintln!("{}", active_items[current]);
@@ -85,6 +84,7 @@ pub fn select(
 
 pub fn select_simple(prelude: &str, items: &[String]) -> Result<usize, Box<dyn std::error::Error>> {
 	terminal::enable_raw_mode()?;
+	execute!(stderr(), cursor::Hide)?;
 	eprint!("{}\r\n", prelude);
 
 	let lines = {
@@ -99,10 +99,8 @@ pub fn select_simple(prelude: &str, items: &[String]) -> Result<usize, Box<dyn s
 	let shortcut_max = min(items.len(), 9);
 	let mut current = 0;
 
-	let mut stderr = stderr();
-
 	// Initial draw
-	draw_simple(&mut stderr, items, current)?;
+	draw_simple(items, current)?;
 
 	loop {
 		if let Event::Key(key) = event::read()? {
@@ -129,24 +127,24 @@ pub fn select_simple(prelude: &str, items: &[String]) -> Result<usize, Box<dyn s
 				// Quit keys
 				KeyCode::Char('c') | KeyCode::Char('d') => {
 					if key.modifiers.contains(event::KeyModifiers::CONTROL) {
-						cleanup(&mut stderr, total_lines)?;
+						cleanup(total_lines)?;
 						quit();
 					}
 				}
 				KeyCode::Esc | KeyCode::Char('q') => {
-					cleanup(&mut stderr, total_lines)?;
+					cleanup(total_lines)?;
 					quit()
 				}
 				KeyCode::Enter => break,
 				_ => {}
 			}
 
-			redraw_simple(&mut stderr, items, current, lines)?;
+			redraw_simple(items, current, lines)?;
 		}
 	}
 
 	// Cleanup
-	cleanup(&mut stderr, total_lines)?;
+	cleanup(total_lines)?;
 	terminal::disable_raw_mode()?;
 
 	eprintln!("{}", items[current]);
@@ -162,13 +160,12 @@ fn select_idx(idx: usize) -> String {
 }
 
 fn draw(
-	stderr: &mut std::io::Stderr,
 	active_items: &[String],
 	inactive_items: &[String],
 	selected: usize,
 ) -> Result<(), Box<dyn std::error::Error>> {
 	for (i, item) in active_items.iter().enumerate() {
-		execute!(stderr, terminal::Clear(ClearType::CurrentLine))?;
+		execute!(stderr(), terminal::Clear(ClearType::CurrentLine))?;
 		if i == selected {
 			let prefix = format!("> {}) ", select_idx(i)).cyan().bold();
 			let line = format!("{}{}", prefix, item);
@@ -179,28 +176,23 @@ fn draw(
 			eprint!("{}\r\n", line);
 		}
 	}
-	stderr.flush()?;
+	stderr().flush()?;
 	Ok(())
 }
 
 fn redraw(
-	stderr: &mut std::io::Stderr,
 	active_items: &[String],
 	inactive_items: &[String],
 	selected: usize,
 	lines: usize,
 ) -> Result<(), Box<dyn std::error::Error>> {
-	execute!(stderr, cursor::MoveUp(lines as u16))?;
-	draw(stderr, active_items, inactive_items, selected)
+	execute!(stderr(), cursor::MoveUp(lines as u16))?;
+	draw(active_items, inactive_items, selected)
 }
 
-fn draw_simple(
-	stderr: &mut std::io::Stderr,
-	items: &[String],
-	selected: usize,
-) -> Result<(), Box<dyn std::error::Error>> {
+fn draw_simple(items: &[String], selected: usize) -> Result<(), Box<dyn std::error::Error>> {
 	for (i, item) in items.iter().enumerate() {
-		execute!(stderr, terminal::Clear(ClearType::CurrentLine))?;
+		execute!(stderr(), terminal::Clear(ClearType::CurrentLine))?;
 		if i == selected {
 			let prefix = format!("> {}) ", select_idx(i)).cyan().bold();
 			let line = format!("{}{}", prefix, item.cyan());
@@ -211,35 +203,36 @@ fn draw_simple(
 			eprint!("{}\r\n", line);
 		}
 	}
-	stderr.flush()?;
+	stderr().flush()?;
 	Ok(())
 }
 
 fn redraw_simple(
-	stderr: &mut std::io::Stderr,
 	items: &[String],
 	selected: usize,
 	lines: usize,
 ) -> Result<(), Box<dyn std::error::Error>> {
-	execute!(stderr, cursor::MoveUp(lines as u16))?;
-	draw_simple(stderr, items, selected)
+	execute!(stderr(), cursor::MoveUp(lines as u16))?;
+	draw_simple(items, selected)
 }
 
-fn cleanup(stderr: &mut std::io::Stderr, lines: usize) -> Result<(), Box<dyn std::error::Error>> {
-	execute!(stderr, cursor::MoveUp(lines as u16))?;
+fn cleanup(lines: usize) -> Result<(), Box<dyn std::error::Error>> {
+	execute!(stderr(), cursor::MoveUp(lines as u16))?;
 
 	for _ in 0..lines {
-		execute!(stderr, terminal::Clear(ClearType::CurrentLine))?;
+		execute!(stderr(), terminal::Clear(ClearType::CurrentLine))?;
 		eprint!("\r\n");
 	}
 
-	execute!(stderr, cursor::MoveUp(lines as u16))?;
-	stderr.flush()?;
+	execute!(stderr(), cursor::MoveUp(lines as u16))?;
+	stderr().flush()?;
 
+	execute!(stderr(), cursor::Show).unwrap();
 	Ok(())
 }
 
 fn quit() -> ! {
+	execute!(stderr(), cursor::Show).unwrap();
 	terminal::disable_raw_mode().unwrap();
 	let msg = "<Cancelled>".red();
 	eprintln!("{}", msg);
