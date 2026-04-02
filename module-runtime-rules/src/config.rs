@@ -2,23 +2,16 @@ use pay_respects_utils::strings::print_error;
 use serde::Deserialize;
 
 use pay_respects_utils::files::config_files;
-use pay_respects_utils::{merge, merge_option};
+use pay_respects_utils::merge_option;
 
 #[derive(Deserialize, Default)]
 pub struct ConfigReader {
 	pub merge_commands: Option<Vec<Vec<String>>>,
 }
 
+#[derive(Default)]
 pub struct Config {
 	pub merge_commands: Option<Vec<Vec<String>>>,
-}
-
-impl Default for Config {
-	fn default() -> Self {
-		Self {
-			merge_commands: None,
-		}
-	}
 }
 
 impl Config {

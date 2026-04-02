@@ -14,12 +14,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+mod config;
 mod replaces;
 mod rules;
-mod config;
 use pay_respects_utils::files::get_path_files;
 
-use crate::config::{load_config, get_target_rule};
+use crate::config::{get_target_rule, load_config};
 
 fn main() -> Result<(), std::io::Error> {
 	let executable = std::env::var("_PR_COMMAND").expect("_PR_COMMAND not set");

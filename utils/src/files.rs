@@ -60,9 +60,7 @@ pub fn get_path_files() -> Vec<String> {
 		.cloned()
 		.collect::<Vec<String>>()
 		.into_iter()
-		.map(|s| {
-			shell_path_post_processing(&s)
-		})
+		.map(|s| shell_path_post_processing(&s))
 		.collect()
 }
 

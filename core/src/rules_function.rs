@@ -72,6 +72,6 @@ fn zoxide_integration(
 			min_idx = idx;
 		}
 	}
-	let directory = shell_path_post_processing(&filtered_directories[min_idx]);
+	let directory = shell_path_post_processing(filtered_directories[min_idx]);
 	candidates.push(format!("cd {}", directory));
 }
