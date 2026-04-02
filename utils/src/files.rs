@@ -76,6 +76,7 @@ pub fn best_match_file(input: &str) -> Option<String> {
 	} else {
 		replace_escaped_character(input, ' ', " ")
 	};
+	#[cfg(debug_assertions)]
 	eprintln!("best_match_file input: {input}");
 	let mut exit_dirs = Vec::new();
 	let mut files = loop {
