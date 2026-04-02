@@ -198,11 +198,10 @@ pub fn cnf(data: &mut Data) {
 		let hint = format!("{} {} {}", "[↑/↓/j/k]".blue(), confirm, "[ESC]".red());
 
 		let prelude = format!("{}\n\r{}", msg, hint);
-		let selection = select(&prelude, &packages, &packages)
-			.unwrap_or_else(|err| {
-				print_error(&format!("Selection failed: {}" , err));
-				exit(1);
-			});
+		let selection = select(&prelude, &packages, &packages).unwrap_or_else(|err| {
+			print_error(&format!("Selection failed: {}", err));
+			exit(1);
+		});
 
 		let package = packages[selection].to_string();
 

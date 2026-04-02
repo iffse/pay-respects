@@ -18,7 +18,13 @@ pub fn select(
 	terminal::enable_raw_mode()?;
 	eprint!("{}\r\n", prelude);
 
-	let lines = active_items.len();
+	let lines = {
+		let mut lines = 0;
+		for item in active_items {
+			lines += item.lines().count();
+		}
+		lines
+	};
 	let total_lines = lines + prelude.lines().count();
 
 	// TODO: support for pagination if there are more than 9 items
@@ -67,7 +73,6 @@ pub fn select(
 					cleanup(&mut stderr, total_lines)?;
 					quit()
 				}
-					,
 				KeyCode::Enter => break,
 				_ => {}
 			}

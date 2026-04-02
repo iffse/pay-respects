@@ -106,7 +106,7 @@ pub fn select_candidate(data: &mut Data) {
 
 	if highlight_candidates.iter().any(|x| x.contains('\n')) {
 		for candidate in highlight_candidates.iter_mut() {
-			*candidate = format!("* {}", candidate.replace("\n", "\n    "));
+			*candidate = candidate.replace("\n", "\r\n     ").to_string();
 		}
 	}
 
@@ -117,11 +117,10 @@ pub fn select_candidate(data: &mut Data) {
 	let hint = format!("{} {} {}", "[↑/↓/j/k]".blue(), confirm, "[ESC]".red());
 	let prelude = format!("{}\n\r{}", msg, hint);
 
-	let selection = select(&prelude, &highlight_candidates, candidates)
-		.unwrap_or_else(|err| {
-			print_error(&format!("Selection failed: {}" , err));
-			exit(1);
-		});
+	let selection = select(&prelude, &highlight_candidates, candidates).unwrap_or_else(|err| {
+		print_error(&format!("Selection failed: {}", err));
+		exit(1);
+	});
 
 	let suggestion = candidates[selection].to_string();
 	data.update_suggest(&suggestion);
