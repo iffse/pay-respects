@@ -88,12 +88,21 @@ fn gen_match_rules(rules: &[Rule]) -> TokenStream {
 			let mut pattern_suggestions = Vec::new();
 			for suggest in suggests {
 				let (suggestion_no_condition, conditions) = parse_conditions(&suggest);
-				let suggest = eval_suggest(&suggestion_no_condition);
-				let suggestion = quote! {
-					if #(#conditions)&&* {
-						#suggest;
-					};
+
+				let suggestion = {
+					if let Some(conditions) = conditions {
+						let suggest = eval_suggest(&suggestion_no_condition);
+						let conditions = tokenize_conditions(&conditions);
+						quote! {
+							if #(#conditions)&&* {
+								#suggest;
+							};
+						}
+					} else {
+						eval_suggest(&suggestion_no_condition)
+					}
 				};
+
 				pattern_suggestions.push(suggestion);
 			}
 			let match_tokens = quote! {
@@ -137,8 +146,7 @@ fn parse_file(file: &Path) -> Rule {
 	toml::from_str(&file).expect("Failed to parse toml.")
 }
 
-fn parse_conditions(suggest: &str) -> (String, Vec<TokenStream2>) {
-	let mut eval_conditions = Vec::new();
+fn parse_conditions(suggest: &str) -> (String, Option<Vec<String>>) {
 	if suggest.starts_with('#') {
 		let mut lines = suggest.lines().collect::<Vec<&str>>();
 		let mut conditions = String::new();
@@ -154,33 +162,37 @@ fn parse_conditions(suggest: &str) -> (String, Vec<TokenStream2>) {
 			.trim_start_matches(['#', '['])
 			.trim_end_matches(']');
 		let conditions = split_unescaped_character(conditions, ',');
-
-		for condition in conditions {
-			let (mut condition, arg) = condition.split_once('(').unwrap();
-			condition = condition.trim();
-			// remove only the last character which is ')'
-			// other ')' are kept for regex
-			let arg = arg
-				.to_string()
-				.chars()
-				.take(arg.len() - 1)
-				.collect::<String>();
-
-			let reverse = match condition.starts_with('!') {
-				true => {
-					condition = condition.trim_start_matches('!');
-					true
-				}
-				false => false,
-			};
-			let evaluated_condition = eval_condition(condition, &arg);
-
-			eval_conditions.push(quote! {#evaluated_condition == !#reverse});
-		}
 		let suggest = lines.join("\n");
-		return (suggest, eval_conditions);
+		return (suggest, Some(conditions));
 	}
-	(suggest.to_owned(), vec![quote! {true}])
+	(suggest.to_owned(), None)
+}
+
+fn tokenize_conditions(conditions: &[String]) -> Vec<TokenStream2> {
+	let mut eval_conditions = Vec::new();
+	for condition in conditions {
+		let (mut condition, arg) = condition.split_once('(').unwrap();
+		condition = condition.trim();
+		// remove only the last character which is ')'
+		// other ')' are kept for regex
+		let arg = arg
+			.to_string()
+			.chars()
+			.take(arg.len() - 1)
+			.collect::<String>();
+
+		let reverse = match condition.starts_with('!') {
+			true => {
+				condition = condition.trim_start_matches('!');
+				true
+			}
+			false => false,
+		};
+		let evaluated_condition = eval_condition(condition, &arg);
+
+		eval_conditions.push(quote! {#evaluated_condition == !#reverse});
+	}
+	eval_conditions
 }
 
 fn eval_condition(condition: &str, arg: &str) -> TokenStream2 {
