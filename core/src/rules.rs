@@ -2,6 +2,9 @@ use crate::data::Data;
 use pay_respects_parser::parse_rules;
 use pay_respects_utils::evals::*;
 
+#[allow(unused)]
+use crate::rules_function::{rules_function, Functions::*};
+
 pub fn match_pattern(executable: &str, data: &Data) -> Option<Vec<String>> {
 	// variables to be used by parsed rules
 	let error_msg = &data.error;

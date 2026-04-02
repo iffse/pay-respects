@@ -89,20 +89,7 @@ fn gen_match_rules(rules: &[Rule]) -> TokenStream {
 			for suggest in suggests {
 				let (suggestion_no_condition, conditions) = parse_conditions(&suggest);
 
-				let suggestion = {
-					if let Some(conditions) = conditions {
-						let suggest = eval_suggest(&suggestion_no_condition);
-						let conditions = tokenize_conditions(&conditions);
-						quote! {
-							if #(#conditions)&&* {
-								#suggest;
-							};
-						}
-					} else {
-						eval_suggest(&suggestion_no_condition)
-					}
-				};
-
+				let suggestion = parse_suggestion(&suggestion_no_condition, conditions);
 				pattern_suggestions.push(suggestion);
 			}
 			let match_tokens = quote! {
@@ -193,6 +180,29 @@ fn tokenize_conditions(conditions: &[String]) -> Vec<TokenStream2> {
 		eval_conditions.push(quote! {#evaluated_condition == !#reverse});
 	}
 	eval_conditions
+}
+
+fn parse_suggestion(suggestion: &str, conditions: Option<Vec<String>>) -> TokenStream2 {
+	if conditions.is_none() {
+		return eval_suggest(suggestion);
+	}
+	let conditions = conditions.unwrap();
+
+	if conditions.len() == 1 && conditions[0] == "FUNCTION" {
+		let suggestion: TokenStream2 = suggestion.trim_matches('"').parse().unwrap();
+		quote! {
+			let suggestion = rules_function(#suggestion, &error_msg, &error_lower, &shell, &last_command, &executables, &split);
+			candidates.push(suggestion);
+		}
+	} else {
+		let suggest = eval_suggest(&suggestion);
+		let conditions = tokenize_conditions(&conditions);
+		quote! {
+			if #(#conditions)&&* {
+				#suggest;
+			};
+		}
+	}
 }
 
 fn eval_condition(condition: &str, arg: &str) -> TokenStream2 {
