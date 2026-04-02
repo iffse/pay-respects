@@ -3,7 +3,7 @@ use pay_respects_parser::parse_rules;
 use pay_respects_utils::evals::*;
 
 #[allow(unused)]
-use crate::rules_function::{rules_function, Functions::*};
+use crate::rules_function::{Functions::*, rules_function};
 
 pub fn match_pattern(executable: &str, data: &Data) -> Option<Vec<String>> {
 	// variables to be used by parsed rules

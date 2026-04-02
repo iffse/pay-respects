@@ -23,11 +23,11 @@ mod data;
 mod init;
 mod modes;
 mod rules;
+mod rules_function;
 mod shell;
 mod style;
 mod suggestions;
 mod system;
-mod rules_function;
 
 #[macro_use]
 extern crate rust_i18n;

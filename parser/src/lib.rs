@@ -191,11 +191,10 @@ fn parse_suggestion(suggestion: &str, conditions: Option<Vec<String>>) -> TokenS
 	if conditions.len() == 1 && conditions[0] == "FUNCTION" {
 		let suggestion: TokenStream2 = suggestion.trim_matches('"').parse().unwrap();
 		quote! {
-			let suggestion = rules_function(#suggestion, &error_msg, &error_lower, &shell, &last_command, &executables, &split);
-			candidates.push(suggestion);
+			rules_function(#suggestion, &error_msg, &error_lower, &shell, &last_command, &executables, &split, &mut candidates);
 		}
 	} else {
-		let suggest = eval_suggest(&suggestion);
+		let suggest = eval_suggest(suggestion);
 		let conditions = tokenize_conditions(&conditions);
 		quote! {
 			if #(#conditions)&&* {
