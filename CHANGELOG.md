@@ -11,6 +11,15 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- **`zoxide` integration**: Usable for both `cd` and `z` fixes, when `zoxide`
+is installed.
+- **Rust rules**: Now rules can be written in Rust natively for complex logics
+- `extends` field for rule files: Allows reusing existing rules of other files
+- `merge_commands` field for configuration files: Make multiple commands to use
+the same rules
+
 ## [0.8.0] - 2026-04-02
 
 ### Changed
