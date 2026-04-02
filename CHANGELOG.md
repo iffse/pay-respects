@@ -11,6 +11,12 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Introducing an in-house selection UI! Now we have a UI of a great taste (which was not possible with an external library)!
+	- Discrete highlighting between selected and non-selected suggestions
+	- Quick selection with shortcuts (keys from 1 to 9)
+
 ## [0.7.13] - 2026-04-02
 
 ### Changed
@@ -401,7 +407,8 @@ normalized to `--nocnf`
 
 History start.
 
-[unreleased]: https://github.com/iffse/pay-respects/compare/v0.7.13..HEAD
+[unreleased]: https://github.com/iffse/pay-respects/compare/v0.8.0..HEAD
+[0.8.0]: https://github.com/iffse/pay-respects/compare/v0.7.13..v0.8.0
 [0.7.13]: https://github.com/iffse/pay-respects/compare/v0.7.12..v0.7.13
 [0.7.12]: https://github.com/iffse/pay-respects/compare/v0.7.11..v0.7.12
 [0.7.11]: https://github.com/iffse/pay-respects/compare/v0.7.10..v0.7.11
