@@ -16,7 +16,10 @@
 
 mod replaces;
 mod rules;
+mod config;
 use pay_respects_utils::files::get_path_files;
+
+use crate::config::{load_config, get_target_rule};
 
 fn main() -> Result<(), std::io::Error> {
 	let executable = std::env::var("_PR_COMMAND").expect("_PR_COMMAND not set");
@@ -37,8 +40,11 @@ fn main() -> Result<(), std::io::Error> {
 	pay_respects_utils::shell::set_shell_type(&shell);
 	pay_respects_utils::settings::load_config();
 
+	let config = load_config();
+	let target_rule = get_target_rule(&executable, &config);
+
 	let mut runned_rules = vec![];
-	let mut pending_rules = vec![executable.clone()];
+	let mut pending_rules = vec![target_rule];
 
 	while let Some(executable) = pending_rules.pop() {
 		if runned_rules.contains(&executable) {
