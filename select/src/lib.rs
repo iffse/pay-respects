@@ -26,11 +26,6 @@ pub fn select(
 	};
 	let total_lines = lines + prelude.lines().count();
 
-	// TODO: support for pagination if there are more than 9 items
-	if lines > 9 {
-		return Err(format!("Too many items ({}). Pagnation not implemented.", lines).into());
-	}
-
 	let shortcut_max = min(active_items.len(), 9);
 	let mut current = 0;
 
@@ -101,11 +96,6 @@ pub fn select_simple(prelude: &str, items: &[String]) -> Result<usize, Box<dyn s
 	};
 	let total_lines = lines + prelude.lines().count();
 
-	// TODO: support for pagination if there are more than 9 items
-	if lines > 9 {
-		return Err(format!("Too many items ({}). Pagnation not implemented.", lines).into());
-	}
-
 	let shortcut_max = min(items.len(), 9);
 	let mut current = 0;
 
@@ -163,6 +153,14 @@ pub fn select_simple(prelude: &str, items: &[String]) -> Result<usize, Box<dyn s
 	Ok(current)
 }
 
+fn select_idx(idx: usize) -> String {
+	if idx < 9 {
+		format!("{}", idx + 1)
+	} else {
+		String::from("-")
+	}
+}
+
 fn draw(
 	stderr: &mut std::io::Stderr,
 	active_items: &[String],
@@ -172,11 +170,11 @@ fn draw(
 	for (i, item) in active_items.iter().enumerate() {
 		execute!(stderr, terminal::Clear(ClearType::CurrentLine))?;
 		if i == selected {
-			let prefix = format!("> {}) ", i + 1).cyan().bold();
+			let prefix = format!("> {}) ", select_idx(i)).cyan().bold();
 			let line = format!("{}{}", prefix, item);
 			eprint!("{}\r\n", line);
 		} else {
-			let prefix = format!("  {}) ", i + 1).cyan();
+			let prefix = format!("  {}) ", select_idx(i)).cyan();
 			let line = format!("{}{}", prefix, inactive_items.get(i).unwrap());
 			eprint!("{}\r\n", line);
 		}
@@ -204,11 +202,11 @@ fn draw_simple(
 	for (i, item) in items.iter().enumerate() {
 		execute!(stderr, terminal::Clear(ClearType::CurrentLine))?;
 		if i == selected {
-			let prefix = format!("> {}) ", i + 1).cyan().bold();
+			let prefix = format!("> {}) ", select_idx(i)).cyan().bold();
 			let line = format!("{}{}", prefix, item.cyan());
 			eprint!("{}\r\n", line);
 		} else {
-			let prefix = format!("  {}) ", i + 1).cyan();
+			let prefix = format!("  {}) ", select_idx(i)).cyan();
 			let line = format!("{}{}", prefix, item.normal());
 			eprint!("{}\r\n", line);
 		}
