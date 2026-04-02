@@ -212,20 +212,33 @@ fn parse_suggestion(suggestion: &str, conditions: Option<Vec<String>>) -> TokenS
 	if conditions.is_none() {
 		return eval_suggest(suggestion);
 	}
-	let conditions = conditions.unwrap();
+	let (conditions, is_function) = {
+		let mut conditions = conditions.unwrap();
+		if conditions[0] == "FUNCTION" {
+			conditions.remove(0);
+			(conditions, true)
+		} else {
+			(conditions, false)
+		}
+	};
 
-	if conditions.len() == 1 && conditions[0] == "FUNCTION" {
+	let suggest = if is_function {
 		let suggestion: TokenStream2 = suggestion.trim_matches('"').parse().unwrap();
 		quote! {
 			rules_function(#suggestion, &error_msg, &error_lower, &shell, &last_command, &executables, &split, &mut candidates);
 		}
 	} else {
-		let suggest = eval_suggest(suggestion);
-		let conditions = tokenize_conditions(&conditions);
-		quote! {
-			if #(#conditions)&&* {
-				#suggest;
-			};
+		eval_suggest(suggestion)
+	};
+
+	if conditions.is_empty() {
+		return suggest;
+	}
+
+	let conditions = tokenize_conditions(&conditions);
+	quote! {
+		if #(#conditions)&&* {
+			#suggest
 		}
 	}
 }
