@@ -60,9 +60,8 @@ pub fn get_path_files() -> Vec<String> {
 		.cloned()
 		.collect::<Vec<String>>()
 		.into_iter()
-		.map(|mut s| {
-			shell_path_post_processing(&mut s);
-			s
+		.map(|s| {
+			shell_path_post_processing(&s)
 		})
 		.collect()
 }
@@ -118,7 +117,7 @@ pub fn best_match_file(input: &str) -> Option<String> {
 		eprintln!("best_match_file final input: {input}");
 		eprintln!("shell type is: {:?}", get_shell_type());
 	}
-	shell_path_post_processing(&mut input);
+	let input = shell_path_post_processing(&input);
 	#[cfg(debug_assertions)]
 	eprintln!("best_match_file final input after shell postprocessing: {input}");
 	Some(input)

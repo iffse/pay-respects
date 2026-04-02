@@ -1,6 +1,6 @@
 use crate::shell::command_output;
 
-use pay_respects_utils::evals::compare_string;
+use pay_respects_utils::{evals::compare_string, shell::shell_path_post_processing};
 
 pub enum Functions {
 	ZoxideIntegration,
@@ -72,5 +72,6 @@ fn zoxide_integration(
 			min_idx = idx;
 		}
 	}
-	candidates.push(format!("cd {}", filtered_directories[min_idx]));
+	let directory = shell_path_post_processing(&filtered_directories[min_idx]);
+	candidates.push(format!("cd {}", directory));
 }
