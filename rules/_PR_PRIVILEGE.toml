@@ -13,6 +13,7 @@ pattern = [
 	"need root",
 	"non-root users cannot",
 	"not super-user",
+	"not superuser",
 	"only root can",
 	"operation not permitted",
 	"permission denied",
