@@ -1,5 +1,5 @@
 command = "cd"
-extends = ["z"]
+extends = ["z", "__zoxide_z"]
 
 [[match_err]]
 pattern = [
@@ -14,6 +14,14 @@ suggest = [
 #[FUNCTION]
 ZoxideIntegration
 ''',
+]
+
+[[match_err]]
+suggest = [
+'''
+#[FUNCTION, cmd_contains(^((z\s+)|(__zoxide_z\s+))), min_length(2)]
+ZoxideIntegration
+'''
 ]
 
 [[match_err]]
