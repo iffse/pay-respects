@@ -34,6 +34,7 @@ pub struct Data {
 	pub shell: String,
 	pub env: Option<String>,
 	pub command: String,
+	pub target_rule: Option<String>,
 	pub suggest: Option<String>,
 	pub candidates: Vec<String>,
 	pub split: Vec<String>,
@@ -142,6 +143,7 @@ impl Data {
 			shell,
 			env: None,
 			command,
+			target_rule: None,
 			suggest: None,
 			candidates: vec![],
 			alias,
@@ -260,6 +262,13 @@ impl Data {
 		}
 	}
 
+	pub fn get_executable(&self) -> &str {
+		self.split[0]
+			.rsplit(std::path::MAIN_SEPARATOR)
+			.next()
+			.unwrap()
+	}
+
 	pub fn update_error(&mut self, error: Option<String>) {
 		if let Some(error) = error {
 			self.error = error.split_whitespace().collect::<Vec<&str>>().join(" ");
@@ -271,6 +280,7 @@ impl Data {
 	pub fn update_command(&mut self, command: &str) {
 		self.command = command.to_string();
 		self.split();
+		self.update_target_rule();
 	}
 
 	pub fn update_suggest(&mut self, suggest: &str) {
@@ -281,5 +291,26 @@ impl Data {
 		} else {
 			self.suggest = Some(suggest.to_string());
 		};
+	}
+	pub fn update_target_rule(&mut self) {
+		if self.config.merge_commands.is_none() {
+			return;
+		}
+		let merge_commands = self.config.merge_commands.as_ref().unwrap();
+		let command = self.get_executable().to_string();
+		for merge_command in merge_commands {
+			if merge_command.contains(&command) {
+				self.target_rule = Some(merge_command[0].clone());
+				break;
+			}
+		}
+	}
+
+	pub fn get_target_rule(&self) -> &str {
+		if let Some(target_rule) = &self.target_rule {
+			target_rule
+		} else {
+			self.get_executable()
+		}
 	}
 }

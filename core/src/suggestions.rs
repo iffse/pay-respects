@@ -20,10 +20,7 @@ pub fn suggest_candidates(data: &mut Data) {
 		return;
 	}
 	let shell = &data.shell;
-	let executable = &data.split[0]
-		.rsplit(std::path::MAIN_SEPARATOR)
-		.next()
-		.unwrap();
+	let target_rule = data.get_target_rule();
 	let command = &data.command;
 	let privilege = &data.privilege;
 	let mut suggest_candidates = vec![];
@@ -54,7 +51,7 @@ pub fn suggest_candidates(data: &mut Data) {
 			}
 		});
 
-		if let Some(candidates) = match_pattern(executable, data) {
+		if let Some(candidates) = match_pattern(target_rule, data) {
 			add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
 		}
 		if let Some(candidates) = match_pattern("_PR_general", data) {
