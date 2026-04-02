@@ -3,6 +3,13 @@ name = "pay-respects-select"
 version = "0.1.0"
 edition = "2024"
 
+# for crates.io
+description = "Selection UI for the pay-respects CLI tool"
+homepage = "https://codeberg.org/iff/pay-respects"
+repository = "https://github.com/iffse/pay-respects"
+license = "MPL-2.0"
+include = ["**/*.rs"]
+
 [dependencies]
 colored = "3.1.1"
 crossterm = "0.29"
