@@ -506,3 +506,64 @@ pub fn damerau_levenshtein_chars(a: &[char], b: &[char]) -> usize {
 
 	matrix[a.len()][b.len()]
 }
+
+pub fn segment(input: &str, dict: &[String]) -> Vec<String> {
+	let n = input.len();
+	let mut best_at: Vec<Option<(f32, Vec<String>)>> = vec![None; n + 1];
+
+	best_at[0] = Some((0.0, vec![]));
+
+	for i in 1..=n {
+		for j in 0..i {
+			if let Some((prev_cost, prev_words)) = &best_at[j] {
+				let word = &input[j..i];
+
+				let cost = if dict.contains(&word.to_string()) {
+					0.0 // perfect match
+				} else {
+					// unknown word penalty
+					1.0 + (word.len() as f32 * 0.05)
+				};
+
+				let total_cost = prev_cost + cost;
+
+				let mut new_words = prev_words.clone();
+				new_words.push(word.to_string());
+
+				match &best_at[i] {
+					None => best_at[i] = Some((total_cost, new_words)),
+					Some((best_cost, _)) if total_cost < *best_cost => {
+						best_at[i] = Some((total_cost, new_words))
+					}
+					_ => {}
+				}
+			}
+		}
+	}
+
+	best_at[n]
+		.clone()
+		.map(|(_, words)| words)
+		.unwrap_or_else(|| vec![input.to_string()])
+}
+
+mod tests {
+	#[allow(unused_imports)]
+	use super::*;
+
+	#[test]
+	fn test_segment() {
+		let dict = vec!["git", "commit", "vim"]
+			.into_iter()
+			.map(String::from)
+			.collect::<Vec<String>>();
+
+		let input = "gitcommit";
+		let result = segment(input, &dict);
+		assert_eq!(result, vec!["git", "commit"]);
+
+		let input = "vimhelloworld";
+		let result = segment(input, &dict);
+		assert_eq!(result, vec!["vim", "helloworld"]);
+	}
+}
