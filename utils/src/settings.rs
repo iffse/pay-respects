@@ -18,7 +18,7 @@ use SearchType::*;
 const SEARCH_TYPE_DEFAULT: SearchType = TrigramDamerauLevenshtein;
 const SEARCH_THRESHOLD_DEFAULT: usize = 3;
 
-const TRIGRAM_MINIMUM_SCORE_DEFAULT: f32 = std::f32::consts::E * 0.1;
+const TRIGRAM_MINIMUM_SCORE_DEFAULT: f32 = 0.5;
 
 const DL_DISTANCE_MAX_DEFAULT: usize = 5;
 const DL_DISTANCE_MIN_DEFAULT: usize = 1;

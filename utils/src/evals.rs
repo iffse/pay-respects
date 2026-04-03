@@ -350,7 +350,7 @@ pub fn trigram_edit_fuzzy_score(query: &str, text: &str) -> f32 {
 		trigram_jaccard_score(&query, &text)
 	};
 	// early rejection
-	if !too_short && tri < 0.10 {
+	if !too_short && tri < 0.01 {
 		#[cfg(debug_assertions)]
 		{
 			eprintln!("Early rejection comparing\n - '{query}'\n - '{text}'\n score: {tri}");
@@ -381,9 +381,9 @@ pub fn trigram_edit_fuzzy_score(query: &str, text: &str) -> f32 {
 	};
 
 	let score = if too_short {
-		edit * 0.9 + bonus
+		edit + bonus
 	} else {
-		(tri * 0.3 + edit * 0.6 + bonus).min(1.0)
+		(tri * 0.3 + edit * 0.7 + bonus).min(1.0)
 	}
 	.min(1.0);
 
