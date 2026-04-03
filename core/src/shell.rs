@@ -17,14 +17,24 @@ use pay_respects_utils::remove_env_var;
 
 const PRIVILEGE_LIST: [&str; 2] = ["sudo", "doas"];
 
-/// Build a `Command` that runs `command` via the user's shell, adding
-/// `-NoProfile` for PowerShell to prevent profile output from contaminating
-/// stdout/stderr capture.
-fn shell_command(shell: &str, command: &str) -> std::process::Command {
+/// Run the command without any shell configuration files (noprofile, norc)
+fn clean_shell_command(shell: &str, command: &str) -> std::process::Command {
 	let mut cmd = std::process::Command::new(shell);
 	match shell {
+		"bash" => {
+			cmd.arg("--noprofile").arg("--norc").arg("-c").arg(command);
+		}
+		"zsh" => {
+			cmd.arg("--no-rcs").arg("-c").arg(command);
+		}
+		"fish" => {
+			cmd.arg("--no-config").arg("-c").arg(command);
+		}
 		"pwsh" | "powershell" => {
 			cmd.arg("-NoProfile").arg("-c").arg(command);
+		}
+		"nu" => {
+			cmd.arg("--no-config-file").arg("-c").arg(command);
 		}
 		_ => {
 			cmd.arg("-c").arg(command);
@@ -81,6 +91,9 @@ pub fn add_candidates_no_dup(
 }
 
 pub fn get_error(shell: &str, command: &str, data: &Data) -> String {
+	let current_locale = (*rust_i18n::locale()).to_string();
+	let in_tmux = std::env::var("TMUX").is_ok();
+
 	let error_msg = std::env::var("_PR_ERROR_MSG");
 	let error = if let Ok(error_msg) = error_msg {
 		remove_env_var!("_PR_ERROR_MSG");
@@ -101,7 +114,25 @@ pub fn get_error(shell: &str, command: &str, data: &Data) -> String {
 				return String::new();
 			}
 		}
-		error_output_threaded(shell, command, timeout)
+		if current_locale == "en" && in_tmux {
+			let capture_command = "tmux capture-pane -pS -";
+			let output = command_output(shell, capture_command);
+			if output.contains(command) {
+				// remove everything before the last occurrence of the command
+				if let Some(pos) = output.rfind(command) {
+					let output = output[pos + command.len()..].trim().to_string();
+					#[cfg(debug_assertions)]
+					eprintln!("Captured output from tmux: '{}'", output);
+					output
+				} else {
+					error_output_threaded(shell, command, timeout)
+				}
+			} else {
+				error_output_threaded(shell, command, timeout)
+			}
+		} else {
+			error_output_threaded(shell, command, timeout)
+		}
 	};
 	error.split_whitespace().collect::<Vec<&str>>().join(" ")
 }
@@ -113,7 +144,7 @@ pub fn error_output_threaded(shell: &str, command: &str, timeout: u64) -> String
 		s.spawn(|| {
 			sender
 				.send(
-					shell_command(shell, command)
+					clean_shell_command(shell, command)
 						.env("LC_ALL", "C")
 						.output()
 						.expect("failed to execute process"),
@@ -136,7 +167,7 @@ pub fn error_output_threaded(shell: &str, command: &str, timeout: u64) -> String
 }
 
 pub fn command_output(shell: &str, command: &str) -> String {
-	let output = shell_command(shell, command)
+	let output = clean_shell_command(shell, command)
 		.env("LC_ALL", "C")
 		.output()
 		.expect("failed to execute process");
@@ -151,7 +182,7 @@ pub fn command_output(shell: &str, command: &str) -> String {
 }
 
 pub fn command_output_or_error(shell: &str, command: &str) -> String {
-	let output = shell_command(shell, command)
+	let output = clean_shell_command(shell, command)
 		.env("LC_ALL", "C")
 		.output()
 		.expect("failed to execute process");
@@ -176,7 +207,7 @@ pub fn module_output(data: &Data, module: &str) -> Option<Vec<String>> {
 			"".to_string()
 		}
 	};
-	let output = shell_command(shell, module)
+	let output = clean_shell_command(shell, module)
 		.env("_PR_COMMAND", executable)
 		.env("_PR_SHELL", shell)
 		.env("_PR_LAST_COMMAND", last_command)

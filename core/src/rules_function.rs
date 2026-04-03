@@ -66,6 +66,9 @@ pub fn desperate_fuzzy_recovery(
 		command.push(split[0].to_string());
 	} else {
 		// we have a problem with the command itself
+		if split[0].len() <= 3 {
+			return;
+		}
 		if let Some(best_matches) = best_matches_path(&split[0], executables) {
 			for best_match in best_matches {
 				command.push(best_match);
