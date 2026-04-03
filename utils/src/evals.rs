@@ -554,17 +554,39 @@ pub fn segment(input: &str, dict: &[String]) -> Vec<String> {
 				let mut word = &input[j..i];
 
 				let mut best_cost = None;
+				let mut best_idx = None;
 
 				// fuzzy recovery: try to find a close match in the dictionary and use that instead of the original word
-				for dict_word in dict {
+				for (idx, dict_word) in dict.iter().enumerate() {
 					if let Some(cost) = fuzzy_match_cost(word, dict_word) {
+						#[cfg(debug_assertions)]
+						eprintln!(
+							"[segment fuzzy] cost between '{word}' and '{dict_word}': {cost}"
+						);
+
 						best_cost = match best_cost {
-							None => Some(cost),
-							Some(prev) => Some(prev.min(cost)),
+							None => {
+								best_idx = Some(idx);
+								Some(cost)
+							}
+							Some(prev) => {
+								// Some(prev.min(cost))
+								if cost < prev {
+									best_idx = Some(idx);
+									Some(cost)
+								} else {
+									Some(prev)
+								}
+							}
 						};
-						word = dict_word; // replace with best match from dict
 					}
 				}
+
+				word = if let Some(best_idx) = best_idx {
+					&dict[best_idx]
+				} else {
+					word
+				};
 
 				let cost = if let Some(c) = best_cost {
 					c

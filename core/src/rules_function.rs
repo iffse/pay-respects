@@ -1,7 +1,7 @@
 use crate::shell::command_output;
 
 use pay_respects_utils::{
-	evals::{compare_string, fuzzy_best_n, segment},
+	evals::{best_matches_path, compare_string, fuzzy_best_n, segment},
 	files::best_match_file,
 	lists::commond_arguments,
 	settings::get_trigram_minimum_score,
@@ -35,36 +35,86 @@ pub fn rules_function(
 	}
 }
 
-fn desperate_fuzzy_recovery(
+pub fn desperate_fuzzy_recovery(
 	executables: &[String],
 	split: &[String],
 	candidates: &mut Vec<String>,
 ) {
-	let mut segments = Vec::new();
+	let mut segments: Vec<String> = Vec::new();
+	let mut command: Vec<String> = Vec::new();
 
 	let dict = commond_arguments()
 		.iter()
 		.map(|s| s.to_string())
 		.collect::<Vec<String>>();
 
-	for split in split {
+	for split in split[1..].iter() {
 		let seg = segment(split, &dict);
 		for s in seg {
 			segments.push(s.to_string());
 		}
 	}
 
-	// command exists in path or a directory, just return
-	if executables.contains(&segments[0]) || segments[0].contains(std::path::MAIN_SEPARATOR) {
-		let suggestion = segments.join(" ");
-		candidates.push(suggestion);
-		return;
+	#[cfg(debug_assertions)]
+	eprintln!(
+		"split and segments:\n - split: {:?}\n - segments: {:?}",
+		split[1..].iter().collect::<Vec<&String>>(),
+		segments
+	);
+
+	if executables.contains(&split[0]) || split[0].contains(std::path::MAIN_SEPARATOR) {
+		command.push(split[0].to_string());
+	} else {
+		// we have a problem with the command itself
+		let full_dict = [executables, &dict].concat();
+		let command_segments = segment(&split[0], &full_dict);
+
+		#[cfg(debug_assertions)]
+		eprintln!("command segments: {:?}", command_segments);
+
+		if executables.contains(&command_segments[0]) {
+			command.push(command_segments.join(" "));
+		} else {
+			let best_matches = best_matches_path(&command_segments[0], executables);
+			if let Some(best_matches) = best_matches {
+				for best_match in best_matches {
+					let suggestion = format!("{} {}", best_match, command_segments[1..].join(" "));
+					command.push(suggestion);
+				}
+			} else {
+				// unfortunaly, non fixable
+				return;
+			}
+		}
+
+		for command in command.iter() {
+			let suggestion = format!("{} {}", command, segments.join(" "));
+			candidates.push(suggestion);
+		}
+
+		// if executables.contains(&command_segments[0]) {
+		// 	let suggestion = format!("{} {}", command_segments.join(" "), segments[1..].join(" "));
+		// 	candidates.push(suggestion);
+		// 	return;
+		// }
+		// let best_matches = best_matches_path(&segments[0], executables);
+		// if let Some(best_matches) = best_matches {
+		// 	for best_match in best_matches {
+		// 		let suggestion = format!("{} {} {}", best_match, command_segments[1..].join(" "), segments[1..].join(" "));
+		// 		candidates.push(suggestion);
+		// 	}
+		// }
 	}
 
-	// fuzzy segmentation for the command
-	let command_segments = segment(&segments[0], executables);
-	let suggestion = format!("{} {}", command_segments.join(" "), segments[1..].join(" "));
-	candidates.push(suggestion);
+	// for split in split[1..].iter() {
+	// 	let seg = segment(split, &dict);
+	// 	for s in seg {
+	// 		segments.push(s.to_string());
+	// 	}
+	// }
+
+	// let suggestion = format!("{} {}", segments[0], segments[1..].join(" "));
+	// candidates.push(suggestion);
 }
 
 fn desperate_file_look_up(split: &[String], candidates: &mut Vec<String>) {
