@@ -9,7 +9,7 @@ struct Rule {
 
 #[derive(serde::Deserialize)]
 struct MatchError {
-	pattern: Vec<String>,
+	pattern: Option<Vec<String>>,
 	suggest: Vec<String>,
 }
 
@@ -41,7 +41,11 @@ pub fn runtime_match(
 
 	let mut pure_suggest;
 	for match_err in rule.match_err {
-		for pattern in match_err.pattern {
+		let patterns = match match_err.pattern {
+			Some(patterns) => patterns,
+			None => vec!["".to_string()],
+		};
+		for pattern in patterns {
 			if error_lower.contains(&pattern) {
 				'suggest: for suggest in &match_err.suggest {
 					if suggest.starts_with('#') {
