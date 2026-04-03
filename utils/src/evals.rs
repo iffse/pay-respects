@@ -7,8 +7,8 @@ use crate::settings::*;
 use itertools::Itertools;
 use regex_lite::Regex;
 
-use std::collections::HashSet;
 use std::cmp::Ordering;
+use std::collections::HashSet;
 
 fn regex_captures(regex: &str, string: &str) -> Vec<String> {
 	let regex = Regex::new(regex).unwrap();
@@ -132,7 +132,7 @@ pub fn best_matches_path(typo: &str, executables: &[String]) -> Option<Vec<Strin
 
 pub fn get_initial_distance(str: &str) -> Option<usize> {
 	let percentage = get_dl_distance_percentage();
-	let threshold = get_dl_distance_threshold();
+	let threshold = get_search_threshold();
 	let max = get_dl_distance_max();
 	let min = get_dl_distance_min();
 
@@ -140,7 +140,7 @@ pub fn get_initial_distance(str: &str) -> Option<usize> {
 		return None;
 	}
 
-	let distance = (str.chars().count() as f64 * percentage / 100.0).round() as usize;
+	let distance = (str.chars().count() as f32 * percentage / 100.0).round() as usize;
 	if distance < min {
 		return None;
 	}
@@ -148,6 +148,30 @@ pub fn get_initial_distance(str: &str) -> Option<usize> {
 }
 
 pub fn find_similar(typo: &str, candidates: &[String]) -> Option<String> {
+	if typo.len() < get_search_threshold() {
+		return None;
+	}
+	match get_search_type() {
+		SearchType::DamerauLevenshtein => edit_distance_best(typo, candidates),
+		SearchType::TrigramDamerauLevenshtein => {
+			fuzzy_best(typo, candidates, get_trigram_minimum_score())
+		}
+	}
+}
+
+pub fn find_similars(typo: &str, candidates: &[String]) -> Option<Vec<String>> {
+	if typo.len() < get_search_threshold() {
+		return None;
+	}
+	match get_search_type() {
+		SearchType::DamerauLevenshtein => edit_distance_bests(typo, candidates),
+		SearchType::TrigramDamerauLevenshtein => {
+			fuzzy_best_n(typo, candidates, get_trigram_minimum_score(), 3)
+		}
+	}
+}
+
+pub fn edit_distance_best(typo: &str, candidates: &[String]) -> Option<String> {
 	let mut min_distance = get_initial_distance(typo)?;
 	let mut min_distance_index = None;
 	for (i, candidate) in candidates.iter().enumerate() {
@@ -173,9 +197,7 @@ pub fn find_similar(typo: &str, candidates: &[String]) -> Option<String> {
 	None
 }
 
-/// Similar to `find_similar`, but returns a vector of all candidates
-/// with the same minimum distance
-pub fn find_similars(typo: &str, candidates: &[String]) -> Option<Vec<String>> {
+pub fn edit_distance_bests(typo: &str, candidates: &[String]) -> Option<Vec<String>> {
 	let mut min_distance = get_initial_distance(typo)?;
 	let mut min_distance_index = vec![];
 	for (i, candidate) in candidates.iter().enumerate() {
@@ -244,6 +266,14 @@ pub fn trigram_fuzzy_score(query: &str, text: &str) -> f32 {
 	score.min(1.0)
 }
 
+pub fn fuzzy_best(query: &str, candidates: &[String], minimum_score: f32) -> Option<String> {
+	let results = fuzzy_best_n(query, candidates, minimum_score, 1);
+	if let Some(mut results) = results {
+		results.pop()
+	} else {
+		None
+	}
+}
 
 /// Result of a fuzzy search match
 #[derive(Debug)]
@@ -255,35 +285,49 @@ pub struct Match<'a> {
 /// Returns the top N candidates ranked by fuzzy similarity to the query
 pub fn fuzzy_best_n(
 	query: &str,
-	candidates: &[&str],
+	candidates: &[String],
+	minimum_score: f32,
 	limit: usize,
-) -> Vec<String> {
+) -> Option<Vec<String>> {
 	let mut results: Vec<Match> = candidates
 		.iter()
-		.filter_map(|&candidate| {
+		.filter_map(|candidate| {
 			let score = trigram_edit_fuzzy_score(query, candidate);
 
 			if score < 0.15 {
 				None
 			} else {
-				Some(Match { text: candidate, score })
+				Some(Match {
+					text: candidate,
+					score,
+				})
 			}
 		})
-	.collect();
+		.collect();
 
-	results.sort_unstable_by(|a, b| {
-		b.score
-			.partial_cmp(&a.score)
-			.unwrap_or(Ordering::Equal)
-	});
+	if results.is_empty() {
+		return None;
+	}
+
+	results.sort_unstable_by(|a, b| b.score.partial_cmp(&a.score).unwrap_or(Ordering::Equal));
 
 	let best = results.first().map(|m| m.score).unwrap();
+	if best < minimum_score {
+		return None;
+	}
 	// minimum tolerance allowed:
-	let bottom_line = (best - 0.15).max(0.0);
+	let bottom_line = (best - 0.15).max(minimum_score);
 
 	results.retain(|m| m.score >= bottom_line);
 	results.truncate(limit);
-	results.into_iter().map(|m| m.text.to_string()).collect()
+	#[cfg(debug_assertions)]
+	{
+		eprintln!("Fuzzy search results for query '{query}':");
+		for m in &results {
+			eprintln!(" - '{}' (score: {:.2})", m.text, m.score);
+		}
+	}
+	Some(results.into_iter().map(|m| m.text.to_string()).collect())
 }
 
 /// A more sophisticated fuzzy score that combines trigram similarity, edit
@@ -296,9 +340,21 @@ pub fn trigram_edit_fuzzy_score(query: &str, text: &str) -> f32 {
 	let query = query.to_lowercase();
 	let text = text.to_lowercase();
 
-	let tri = trigram_jaccard_score(&query, &text);
+	let mut too_short = false;
+	if query.chars().count() < 5 || text.chars().count() < 5 {
+		too_short = true;
+	}
+	let tri = if too_short {
+		0.0
+	} else {
+		trigram_jaccard_score(&query, &text)
+	};
 	// early rejection
-	if tri < 0.1 {
+	if !too_short && tri < 0.10 {
+		#[cfg(debug_assertions)]
+		{
+			eprintln!("Early rejection comparing\n - '{query}'\n - '{text}'\n score: {tri}");
+		}
 		return tri;
 	}
 
@@ -306,23 +362,39 @@ pub fn trigram_edit_fuzzy_score(query: &str, text: &str) -> f32 {
 	let mut bonus = 0.0;
 
 	if text.contains(&query) {
-		bonus += 0.4;
+		bonus += 0.04;
 	}
 	let words: Vec<&str> = text.split(|c: char| !c.is_alphanumeric()).collect();
 	// word boundaries
-	if words.iter()
-		.any(|w| w.ends_with(&query)) {
-		bonus += 0.2;
+	if words.iter().any(|w| w.ends_with(&query)) {
+		bonus += 0.03;
 	}
-	if words.iter()
-		.any(|w| w.starts_with(&query))
+	if words.iter().any(|w| w.starts_with(&query)) {
+		bonus += 0.03;
+	}
+
+	let edit = if !too_short {
+		best_substring_edit_score(&query, &text)
+	} else {
+		let dist = compare_string(&query, &text) as f32;
+		1.0 - dist / query.chars().count().max(text.chars().count()) as f32
+	};
+
+	let score = if too_short {
+		edit * 0.9 + bonus
+	} else {
+		(tri * 0.5 + edit * 0.4 + bonus).min(1.0)
+	}
+	.min(1.0);
+
+	#[cfg(debug_assertions)]
 	{
-		bonus += 0.2;
+		eprintln!(
+			"Comparing\n - '{query}'\n - '{text}'\n trigram score: {tri}\n edit score: {edit}\n bonus: {bonus}\n final score: {score}"
+		);
 	}
 
-	let edit = best_substring_edit_score(&query, &text);
-
-	(tri * 0.5 + edit * 0.4 + bonus).min(1.0)
+	score
 }
 
 fn trigrams(s: &str) -> HashSet<String> {
@@ -405,6 +477,7 @@ pub fn best_substring_edit_score(query: &str, text: &str) -> f32 {
 	1.0 - best_norm
 }
 
+#[allow(clippy::needless_range_loop)]
 pub fn damerau_levenshtein_chars(a: &[char], b: &[char]) -> usize {
 	let mut matrix = vec![vec![0; b.len() + 1]; a.len() + 1];
 
@@ -425,10 +498,7 @@ pub fn damerau_levenshtein_chars(a: &[char], b: &[char]) -> usize {
 				.min(matrix[i - 1][j - 1] + cost);
 
 			// transposition
-			if i > 1 && j > 1
-				&& a[i - 1] == b[j - 2]
-					&& a[i - 2] == b[j - 1]
-			{
+			if i > 1 && j > 1 && a[i - 1] == b[j - 2] && a[i - 2] == b[j - 1] {
 				matrix[i][j] = matrix[i][j].min(matrix[i - 2][j - 2] + 1);
 			}
 		}

@@ -1,6 +1,10 @@
 use crate::shell::command_output;
 
-use pay_respects_utils::{evals::{compare_string, fuzzy_best_n}, shell::shell_path_post_processing};
+use pay_respects_utils::{
+	evals::{compare_string, fuzzy_best_n},
+	settings::get_trigram_minimum_score,
+	shell::shell_path_post_processing,
+};
 
 pub enum Functions {
 	ZoxideIntegration,
@@ -76,14 +80,19 @@ fn zoxide_integration(
 		}
 		let directory = shell_path_post_processing(filtered_directories[min_idx]);
 		candidates.push(format!("cd {}", directory));
-		return;
 	} else {
-		let match_candidates = directories.clone().collect::<Vec<&str>>();
-		let directories = fuzzy_best_n(&joined_hints, &match_candidates, 3);
-
-		for directory in directories {
-			let directory = shell_path_post_processing(&directory);
-			candidates.push(format!("cd {}", directory.clone()));
+		let match_candidates = directories.map(|s| s.to_string()).collect::<Vec<String>>();
+		let directories = fuzzy_best_n(
+			&joined_hints,
+			&match_candidates,
+			get_trigram_minimum_score(),
+			3,
+		);
+		if let Some(directories) = directories {
+			for directory in directories {
+				let directory = shell_path_post_processing(&directory);
+				candidates.push(format!("cd {}", directory.clone()));
+			}
 		}
 	}
 }
