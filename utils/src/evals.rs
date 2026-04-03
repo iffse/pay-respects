@@ -477,6 +477,41 @@ pub fn best_substring_edit_score(query: &str, text: &str) -> f32 {
 	1.0 - best_norm
 }
 
+fn fuzzy_match_cost(word: &str, dict_word: &str) -> Option<f32> {
+	let dist = compare_string(word, dict_word);
+	let max_len = word.len().max(dict_word.len());
+
+	let norm = dist as f32 / max_len as f32;
+
+	// perfect match
+	if dist == 0 {
+		return Some(0.0);
+	}
+
+	// partial match penalties
+	if max_len <= 4 {
+		if dist <= 1 && norm <= 0.25 {
+			return Some(0.3);
+		} else {
+			return None;
+		}
+	}
+
+	if max_len <= 7 {
+		if dist <= 2 && norm <= 0.25 {
+			return Some(0.4);
+		} else {
+			return None;
+		}
+	}
+
+	if dist <= 2 && norm <= 0.25 {
+		return Some(0.5);
+	}
+
+	None
+}
+
 #[allow(clippy::needless_range_loop)]
 pub fn damerau_levenshtein_chars(a: &[char], b: &[char]) -> usize {
 	let mut matrix = vec![vec![0; b.len() + 1]; a.len() + 1];
@@ -516,14 +551,36 @@ pub fn segment(input: &str, dict: &[String]) -> Vec<String> {
 	for i in 1..=n {
 		for j in 0..i {
 			if let Some((prev_cost, prev_words)) = &best_at[j] {
-				let word = &input[j..i];
+				let mut word = &input[j..i];
 
-				let cost = if dict.contains(&word.to_string()) {
-					0.0 // perfect match
+				let mut best_cost = None;
+
+				// fuzzy recovery: try to find a close match in the dictionary and use that instead of the original word
+				for dict_word in dict {
+					if let Some(cost) = fuzzy_match_cost(word, dict_word) {
+						best_cost = match best_cost {
+							None => Some(cost),
+							Some(prev) => Some(prev.min(cost)),
+						};
+						word = dict_word; // replace with best match from dict
+					}
+				}
+
+				let cost = if let Some(c) = best_cost {
+					c
+				} else if dict.contains(&word.to_string()) {
+					0.0
 				} else {
 					// unknown word penalty
-					1.0 + (word.len() as f32 * 0.05)
+					1.0 + word.len() as f32 * 0.05
 				};
+
+				// let cost = if dict.contains(&word.to_string()) {
+				// 	0.0 // perfect match
+				// } else {
+				// 	// unknown word penalty
+				// 	1.0 + (word.len() as f32 * 0.05)
+				// };
 
 				let total_cost = prev_cost + cost;
 
@@ -562,6 +619,12 @@ mod tests {
 		let result = segment(input, &dict);
 		assert_eq!(result, vec!["git", "commit"]);
 
+		// test with typos
+		let input = "gitcomit";
+		let result = segment(input, &dict);
+		assert_eq!(result, vec!["git", "commit"]);
+
+		// preserve unknown words
 		let input = "vimhelloworld";
 		let result = segment(input, &dict);
 		assert_eq!(result, vec!["vim", "helloworld"]);
