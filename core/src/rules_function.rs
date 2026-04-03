@@ -1,7 +1,10 @@
 use crate::shell::command_output;
 
 use pay_respects_utils::{
-	evals::{compare_string, fuzzy_best_n}, files::best_match_file, settings::get_trigram_minimum_score, shell::shell_path_post_processing
+	evals::{compare_string, fuzzy_best_n},
+	files::best_match_file,
+	settings::get_trigram_minimum_score,
+	shell::shell_path_post_processing,
 };
 
 pub enum Functions {
@@ -25,23 +28,20 @@ pub fn rules_function(
 ) {
 	match function {
 		ZoxideIntegration => zoxide_integration(shell, executables, split, candidates),
-		DesperateFileLookUp => desperate_file_look_up(split, candidates)
+		DesperateFileLookUp => desperate_file_look_up(split, candidates),
 	}
 }
 
-fn desperate_file_look_up(
-	split: &[String],
-	candidates: &mut Vec<String>,
-) {
+fn desperate_file_look_up(split: &[String], candidates: &mut Vec<String>) {
 	let hints = split[1..]
 		.iter()
-		.map(|s|
+		.map(|s| {
 			if let Some(file) = best_match_file(s) {
 				file
 			} else {
 				s.to_string()
 			}
-			)
+		})
 		.collect::<Vec<String>>();
 
 	let joined_hints = hints.join(" ");

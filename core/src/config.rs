@@ -10,6 +10,7 @@ pub struct ConfigReader {
 	pub sudo: Option<String>,
 	pub merge_commands: Option<Vec<Vec<String>>>,
 	pub timeout: Option<u64>,
+	pub unrunnable_commands: Option<Vec<String>>,
 	pub eval_method: Option<EvalMethod>,
 	pub package_manager: Option<PackageManagerConfig>,
 }
@@ -40,6 +41,7 @@ pub struct Config {
 	pub sudo: Option<String>,
 	pub merge_commands: Option<Vec<Vec<String>>>,
 	pub timeout: u64,
+	pub unrunnable_commands: Option<Vec<String>>,
 	pub eval_method: EvalMethod,
 	pub package_manager: Option<String>,
 	pub install_method: InstallMethod,
@@ -51,6 +53,7 @@ impl Default for Config {
 			sudo: None,
 			merge_commands: None,
 			timeout: 3000,
+			unrunnable_commands: None,
 			eval_method: EvalMethod::Internal,
 			package_manager: None,
 			install_method: InstallMethod::Default,
@@ -60,7 +63,7 @@ impl Default for Config {
 
 impl Config {
 	pub fn merge(&mut self, reader: ConfigReader) {
-		merge_option!(self, reader, sudo, merge_commands);
+		merge_option!(self, reader, sudo, merge_commands, unrunnable_commands);
 		merge!(self, reader, timeout, eval_method);
 
 		if let Some(reader) = reader.package_manager {

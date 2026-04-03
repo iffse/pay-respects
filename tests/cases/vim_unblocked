@@ -1,0 +1,6 @@
+case="vim unblocked"
+command="vim filetobeopen"
+error=""
+expect="vim file-to-be-open"
+
+touch file-to-be-open

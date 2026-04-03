@@ -1,4 +1,5 @@
 use askama::Template;
+use pay_respects_utils::lists::unrunnable_commands;
 
 use std::process::{Stdio, exit};
 
@@ -83,11 +84,23 @@ pub fn get_error(shell: &str, command: &str, data: &Data) -> String {
 	let error_msg = std::env::var("_PR_ERROR_MSG");
 	let error = if let Ok(error_msg) = error_msg {
 		remove_env_var!("_PR_ERROR_MSG");
-		error_msg
+		return error_msg;
 	} else {
 		let timeout = data.config.timeout;
 		#[cfg(debug_assertions)]
 		eprintln!("timeout: {}", timeout);
+
+		let executable = data.get_executable();
+		if data.executables.contains(&executable.to_string()) {
+			if let Some(unrunnable) = &data.config.unrunnable_commands
+				&& unrunnable.contains(&executable.to_string())
+			{
+				return String::new();
+			}
+			if unrunnable_commands().contains(&executable) {
+				return String::new();
+			}
+		}
 		error_output_threaded(shell, command, timeout)
 	};
 	error.split_whitespace().collect::<Vec<&str>>().join(" ")
