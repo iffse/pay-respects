@@ -289,10 +289,29 @@ pub fn fuzzy_best_n(
 	minimum_score: f32,
 	limit: usize,
 ) -> Option<Vec<String>> {
+	fuzzy_best_n_main(query, candidates, minimum_score, limit, false)
+}
+
+pub fn fuzzy_best_n_substring(
+	query: &str,
+	candidates: &[String],
+	minimum_score: f32,
+	limit: usize,
+) -> Option<Vec<String>> {
+	fuzzy_best_n_main(query, candidates, minimum_score, limit, true)
+}
+
+pub fn fuzzy_best_n_main(
+	query: &str,
+	candidates: &[String],
+	minimum_score: f32,
+	limit: usize,
+	substring: bool,
+) -> Option<Vec<String>> {
 	let mut results: Vec<Match> = candidates
 		.iter()
 		.filter_map(|candidate| {
-			let score = trigram_edit_fuzzy_score(query, candidate);
+			let score = trigram_edit_fuzzy_score_main(query, candidate, substring);
 
 			if score < 0.01 {
 				None
@@ -330,9 +349,17 @@ pub fn fuzzy_best_n(
 	Some(results.into_iter().map(|m| m.text.to_string()).collect())
 }
 
+pub fn trigram_substring_edit_fuzzy_score(query: &str, text: &str) -> f32 {
+	trigram_edit_fuzzy_score_main(query, text, true)
+}
+
+pub fn trigram_edit_fuzzy_score(query: &str, text: &str) -> f32 {
+	trigram_edit_fuzzy_score_main(query, text, false)
+}
+
 /// A more sophisticated fuzzy score that combines trigram similarity, edit
 /// distance, and bonuses for substring matches
-pub fn trigram_edit_fuzzy_score(query: &str, text: &str) -> f32 {
+fn trigram_edit_fuzzy_score_main(query: &str, text: &str, substring: bool) -> f32 {
 	if query.is_empty() || text.is_empty() {
 		return 0.0;
 	}
@@ -341,9 +368,14 @@ pub fn trigram_edit_fuzzy_score(query: &str, text: &str) -> f32 {
 	let text = text.to_lowercase();
 
 	let mut too_short = false;
-	if query.chars().count() < 5 || text.chars().count() < 5 {
+	let q_len = query.chars().count();
+	let t_len = text.chars().count();
+
+	// not suitable for trigram
+	if q_len < 5 || t_len < 5 {
 		too_short = true;
 	}
+
 	let tri = if too_short {
 		0.0
 	} else {
@@ -373,11 +405,17 @@ pub fn trigram_edit_fuzzy_score(query: &str, text: &str) -> f32 {
 		bonus += 0.03;
 	}
 
-	let edit = if !too_short {
+	let edit = if substring && !too_short {
 		best_substring_edit_score(&query, &text)
 	} else {
 		let dist = compare_string(&query, &text) as f32;
-		1.0 - dist / query.chars().count().max(text.chars().count()) as f32
+		1.0 - dist / q_len.max(t_len) as f32
+	};
+
+	let edit = if edit < (1.0 - get_dl_distance_percentage()) / 100.0 {
+		0.5 * edit
+	} else {
+		edit
 	};
 
 	let score = if too_short {
@@ -390,7 +428,13 @@ pub fn trigram_edit_fuzzy_score(query: &str, text: &str) -> f32 {
 	#[cfg(debug_assertions)]
 	{
 		eprintln!(
-			"Comparing\n - '{query}'\n - '{text}'\n trigram score: {tri}\n edit score: {edit}\n bonus: {bonus}\n final score: {score}"
+			"Comparing
+- '{query}'
+- '{text}'
+ trigram score: {tri}
+ edit score: {edit}
+ bonus: {bonus}
+ final score: {score}"
 		);
 	}
 

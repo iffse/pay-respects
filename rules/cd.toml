@@ -36,7 +36,7 @@ suggest = [
 cd {{typo[1](file)}}
 ''',
 '''
-#[FUNCTION]
+#[FUNCTION, !cmd_contains(^((z\s+)|(__zoxide_z\s+)))]
 ZoxideIntegration
 ''',
 '''

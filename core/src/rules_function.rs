@@ -1,7 +1,7 @@
 use crate::shell::command_output;
 
 use pay_respects_utils::{
-	evals::{best_matches_path, compare_string, fuzzy_best_n, segment},
+	evals::{best_matches_path, compare_string, fuzzy_best_n_substring, segment},
 	files::best_match_file,
 	lists::commond_arguments,
 	settings::get_trigram_minimum_score,
@@ -172,7 +172,7 @@ fn zoxide_integration(
 		candidates.push(format!("cd {}", directory));
 	} else {
 		let match_candidates = directories.map(|s| s.to_string()).collect::<Vec<String>>();
-		let directories = fuzzy_best_n(
+		let directories = fuzzy_best_n_substring(
 			&joined_hints,
 			&match_candidates,
 			get_trigram_minimum_score(),

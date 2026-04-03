@@ -8,12 +8,13 @@ pattern = [
 	"is not recognized as a name of a cmdlet"
 ]
 suggest = [
-'''
-{{select[0](path)}} {{command[1:]}} ''',
+# Covered up by `DesperateFuzzyRecovery`
+# '''
+# {{select[0](path)}} {{command[1:]}} ''',
 # if command starts with `z `, it's likely using zoxide.
 # zoxide defines a function, therefore the output is unobtainable in a non-interactive shell.
 '''
-#[FUNCTION, cmd_contains(^(z\s+)(\S*)), min_length(2)]
+#[FUNCTION, cmd_contains(^(z\s+)), min_length(2)]
 ZoxideIntegration
 '''
 ]
