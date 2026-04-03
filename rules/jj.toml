@@ -2,29 +2,23 @@ command = "jj"
 
 [[match_err]]
 pattern = [
-	"pass `--ignore-immutable`"
+	"error: commit",
+	"is immutable`",
 ]
 suggest = [
 '''
-{{command}} --ignore-immutable'''
+{{command}} --ignore-immutable
+''',
 ]
 
 [[match_err]]
 pattern = [
-	"use --allow-new to push new bookmark"
+	"no bookmarks found in the default push revset",
 ]
 suggest = [
 '''
-{{command}} --allow-new'''
-]
-
-[[match_err]]
-pattern = [
-	"no bookmarks found in the default push revset"
-]
-suggest = [
-'''
-{{command}} --change @'''
+{{command}} --change @
+''',
 ]
 
 [[match_err]]
@@ -34,18 +28,10 @@ pattern = [
 ]
 suggest = [
 '''
-#[
-  err_contains(hint: run),
-  err_contains(and try again)
-]
-{{err::(?:hint: run `)(.*)(?:` and try again.)}} &&
+{{err::Hint: Run `(.*)` and try again.}} &&
 {{command}}
 ''',
 '''
-#[
-  err_contains(hint: run),
-  err_contains(and try again)
-]
-{{err::(?:hint: run `)(.*)(?:` and try again.)}}
-'''
+{{err::Hint: Run `(.*)` and try again.}}
+''',
 ]
