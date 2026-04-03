@@ -25,8 +25,8 @@ timeout = 3000
 # Apply existing rules to a set of commands. Every set will use the rule
 # corresponding to the first entry
 merge_commands = [
-	[ls, exa], # both using rules corresponding to `ls`
-	[grep, rg], # both using rules corresponding to `grep`
+	["ls", "exa"], # both using rules corresponding to `ls`
+	["grep", "rg"], # both using rules corresponding to `grep`
 ]
 
 # Commands that won't return any message when run,
@@ -38,16 +38,6 @@ blocking_commands = ["vim", "nano"]
 # - Internal: Commands are evaluated inside `pay-respects`
 # - Shell: Current working shell is responsible for execution
 eval_method = "Internal"
-
-[package_manager]
-# Preferred package manager
-package_manager = "pacman"
-
-# Preferred installation method, can be limited by the package manager
-# Available options are:
-# - System
-# - Shell (nix and guix only)
-install_method = "System"
 
 # Algorithm used for fuzzy searching
 # Options:
@@ -76,4 +66,14 @@ minimum_score = 0.271828182845904523536028747135266250
 percentage = 27.1828182845904523536028747135266250
 max = 5
 min = 1
+
+[package_manager]
+# Preferred package manager
+package_manager = "pacman"
+
+# Preferred installation method, can be limited by the package manager
+# Available options are:
+# - System
+# - Shell (nix and guix only)
+install_method = "System"
 ```
