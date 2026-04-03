@@ -20,12 +20,14 @@ pub static mut SHELL_TYPE: ShellType = Generic;
 
 pub fn shell_path_post_processing(path: &str) -> String {
 	let current_directory_prefix = format!(".{}", std::path::MAIN_SEPARATOR);
-	if path.starts_with(&current_directory_prefix) {
-		return path.replacen(&current_directory_prefix, "", 1);
-	}
+	let mut path = if path.starts_with(&current_directory_prefix) {
+		path.replacen(&current_directory_prefix, "", 1)
+	} else {
+		path.to_string()
+	};
 
 	if path.contains(' ') {
-		return format!("\"{}\"", path);
+		path = format!("\"{}\"", path);
 		// match get_shell_type() {
 		// 	Nu => {
 		// 		*path = format!("`{}`", path);
