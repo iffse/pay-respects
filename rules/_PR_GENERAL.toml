@@ -29,3 +29,11 @@ suggest = [
 chmod +x {{command[0]}} &&
 {{command}}'''
 ]
+
+[[match_err]]
+suggest = [
+'''
+#[FUNCTION, min_length(2)]
+DesperateFileLookUp
+'''
+]

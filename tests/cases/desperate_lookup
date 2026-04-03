@@ -1,0 +1,7 @@
+case="desperate_lookup"
+command="imadeitup hell godbye"
+error=""
+expect="imadeitup hello goodbye"
+
+mkdir -p hello
+mkdir -p goodbye
