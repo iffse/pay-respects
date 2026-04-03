@@ -8,6 +8,7 @@ use pay_respects_utils::evals::best_matches_path;
 use pay_respects_utils::files::best_match_file;
 
 use crate::data::Data;
+use crate::rules_function::desperate_fuzzy_recovery;
 use crate::shell::shell_evaluated_commands;
 use crate::style::highlight_difference;
 use crate::suggestions::suggest_candidates;
@@ -91,9 +92,9 @@ pub fn noconfirm(data: &mut Data) {
 
 pub fn cnf(data: &mut Data) {
 	let shell = data.shell.clone();
-	let mut split_command = data.split.clone();
+	let mut split = data.split.clone();
 
-	let executable = split_command[0].clone();
+	let executable = split[0].clone();
 	let shell_msg = format!("{}:", shell);
 	eprintln!(
 		"{} {}: {}\n",
@@ -101,6 +102,8 @@ pub fn cnf(data: &mut Data) {
 		t!("command-not-found"),
 		executable
 	);
+
+	desperate_fuzzy_recovery(&data.executables, &split, &mut data.candidates);
 
 	let best_matches = {
 		if executable.contains(std::path::MAIN_SEPARATOR) {
@@ -126,8 +129,8 @@ pub fn cnf(data: &mut Data) {
 			if best_match == executable {
 				continue;
 			}
-			split_command[0] = best_match;
-			let suggest = split_command.join(" ");
+			split[0] = best_match;
+			let suggest = split.join(" ");
 			data.candidates.push(suggest);
 		}
 	}
