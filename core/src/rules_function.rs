@@ -1,6 +1,6 @@
 use crate::shell::command_output;
 
-use pay_respects_utils::{evals::compare_string, shell::shell_path_post_processing};
+use pay_respects_utils::{evals::{compare_string, fuzzy_best_n}, shell::shell_path_post_processing};
 
 pub enum Functions {
 	ZoxideIntegration,
@@ -42,6 +42,11 @@ fn zoxide_integration(
 
 	let zoxide_output = command_output(shell, query_command);
 	let directories = zoxide_output.lines();
+
+	if directories.clone().count() == 0 {
+		return;
+	}
+
 	let mut filtered_directories = Vec::new();
 	for directory in directories.clone() {
 		let mut should_add = true;
@@ -56,22 +61,29 @@ fn zoxide_integration(
 		}
 	}
 
-	if filtered_directories.is_empty() {
-		return;
-	}
-
-	let mut min_distance = usize::MAX;
-	let mut min_idx = usize::MAX;
-	// wanted to priotize current directory, but doesn't seems to work well
-	// let joined_hints = format!("{}/{}", std::env::current_dir().unwrap().to_str().unwrap(), hints.join(" "));
 	let joined_hints = hints.join(" ");
-	for (idx, directory) in filtered_directories.iter().enumerate() {
-		let distance = compare_string(&joined_hints, directory);
-		if distance < min_distance {
-			min_distance = distance;
-			min_idx = idx;
+	if !filtered_directories.is_empty() {
+		let mut min_distance = usize::MAX;
+		let mut min_idx = usize::MAX;
+		// wanted to priotize current directory, but doesn't seems to work well
+		// let joined_hints = format!("{}/{}", std::env::current_dir().unwrap().to_str().unwrap(), hints.join(" "));
+		for (idx, directory) in filtered_directories.iter().enumerate() {
+			let distance = compare_string(&joined_hints, directory);
+			if distance < min_distance {
+				min_distance = distance;
+				min_idx = idx;
+			}
+		}
+		let directory = shell_path_post_processing(filtered_directories[min_idx]);
+		candidates.push(format!("cd {}", directory));
+		return;
+	} else {
+		let match_candidates = directories.clone().collect::<Vec<&str>>();
+		let directories = fuzzy_best_n(&joined_hints, &match_candidates, 3);
+
+		for directory in directories {
+			let directory = shell_path_post_processing(&directory);
+			candidates.push(format!("cd {}", directory.clone()));
 		}
 	}
-	let directory = shell_path_post_processing(filtered_directories[min_idx]);
-	candidates.push(format!("cd {}", directory));
 }

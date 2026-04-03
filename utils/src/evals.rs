@@ -7,6 +7,9 @@ use crate::settings::*;
 use itertools::Itertools;
 use regex_lite::Regex;
 
+use std::collections::HashSet;
+use std::cmp::Ordering;
+
 fn regex_captures(regex: &str, string: &str) -> Vec<String> {
 	let regex = Regex::new(regex).unwrap();
 
@@ -211,35 +214,225 @@ pub fn find_similars(typo: &str, candidates: &[String]) -> Option<Vec<String>> {
 	None
 }
 
-/// Damerau-Levenshtein distance algorithm
+/// Damerau-Levenshtein distance between two strings
 #[allow(clippy::needless_range_loop)]
 pub fn compare_string(a: &str, b: &str) -> usize {
-	let mut matrix = vec![vec![0; b.chars().count() + 1]; a.chars().count() + 1];
+	let a: Vec<char> = a.chars().collect();
+	let b: Vec<char> = b.chars().collect();
+	damerau_levenshtein_chars(&a, &b)
+}
 
-	for i in 0..a.chars().count() + 1 {
-		matrix[i][0] = i;
+/// Trigram fuzzy similarity score between two strings in [0.0, 1.0]
+pub fn trigram_fuzzy_score(query: &str, text: &str) -> f32 {
+	if query.is_empty() || text.is_empty() {
+		return 0.0;
 	}
-	for j in 0..b.chars().count() + 1 {
-		matrix[0][j] = j;
+
+	let q = query.to_lowercase();
+	let t = text.to_lowercase();
+
+	// a matching substring should have a higher score
+	let mut substring_bonus_score = 0.0;
+	if t.contains(&q) {
+		substring_bonus_score = 0.3;
 	}
 
-	for (i, ca) in a.chars().enumerate() {
-		for (j, cb) in b.chars().enumerate() {
-			let cost = if ca == cb { 0 } else { 1 };
-			matrix[i + 1][j + 1] = std::cmp::min(
-				std::cmp::min(matrix[i][j + 1] + 1, matrix[i + 1][j] + 1),
-				matrix[i][j] + cost,
-			);
+	let jaccard = trigram_jaccard_score(&q, &t);
 
-			// addition for optimal string alignment distance
-			if i > 0
-				&& j > 0 && ca == b.chars().nth(j - 1).unwrap()
-				&& a.chars().nth(i - 1).unwrap() == cb
-			{
-				matrix[i + 1][j + 1] =
-					std::cmp::min(matrix[i + 1][j + 1], matrix[i - 1][j - 1] + 1);
+	let score = jaccard * 0.7 + substring_bonus_score;
+
+	score.min(1.0)
+}
+
+
+/// Result of a fuzzy search match
+#[derive(Debug)]
+pub struct Match<'a> {
+	pub text: &'a str,
+	pub score: f32,
+}
+
+/// Returns the top N candidates ranked by fuzzy similarity to the query
+pub fn fuzzy_best_n(
+	query: &str,
+	candidates: &[&str],
+	limit: usize,
+) -> Vec<String> {
+	let mut results: Vec<Match> = candidates
+		.iter()
+		.filter_map(|&candidate| {
+			let score = trigram_edit_fuzzy_score(query, candidate);
+
+			if score < 0.15 {
+				None
+			} else {
+				Some(Match { text: candidate, score })
+			}
+		})
+	.collect();
+
+	results.sort_unstable_by(|a, b| {
+		b.score
+			.partial_cmp(&a.score)
+			.unwrap_or(Ordering::Equal)
+	});
+
+	let best = results.first().map(|m| m.score).unwrap();
+	// minimum tolerance allowed:
+	let bottom_line = (best - 0.15).max(0.0);
+
+	results.retain(|m| m.score >= bottom_line);
+	results.truncate(limit);
+	results.into_iter().map(|m| m.text.to_string()).collect()
+}
+
+/// A more sophisticated fuzzy score that combines trigram similarity, edit
+/// distance, and bonuses for substring matches
+pub fn trigram_edit_fuzzy_score(query: &str, text: &str) -> f32 {
+	if query.is_empty() || text.is_empty() {
+		return 0.0;
+	}
+
+	let query = query.to_lowercase();
+	let text = text.to_lowercase();
+
+	let tri = trigram_jaccard_score(&query, &text);
+	// early rejection
+	if tri < 0.1 {
+		return tri;
+	}
+
+	// bonuses
+	let mut bonus = 0.0;
+
+	if text.contains(&query) {
+		bonus += 0.4;
+	}
+	let words: Vec<&str> = text.split(|c: char| !c.is_alphanumeric()).collect();
+	// word boundaries
+	if words.iter()
+		.any(|w| w.ends_with(&query)) {
+		bonus += 0.2;
+	}
+	if words.iter()
+		.any(|w| w.starts_with(&query))
+	{
+		bonus += 0.2;
+	}
+
+	let edit = best_substring_edit_score(&query, &text);
+
+	(tri * 0.5 + edit * 0.4 + bonus).min(1.0)
+}
+
+fn trigrams(s: &str) -> HashSet<String> {
+	let mut set = HashSet::new();
+	let chars: Vec<char> = s.chars().collect();
+
+	if chars.len() < 3 {
+		set.insert(s.to_string());
+		return set;
+	}
+
+	for i in 0..=chars.len() - 3 {
+		let trigram: String = chars[i..i + 3].iter().collect();
+		set.insert(trigram);
+	}
+
+	set
+}
+
+fn trigram_jaccard_score(a: &str, b: &str) -> f32 {
+	let a_ngrams = trigrams(a);
+	let b_ngrams = trigrams(b);
+
+	let intersection = a_ngrams.intersection(&b_ngrams).count() as f32;
+	let union = a_ngrams.union(&b_ngrams).count() as f32;
+
+	if union == 0.0 {
+		return 0.0;
+	}
+
+	intersection / union
+}
+
+/// Returns a similarity score in [0.0, 1.0]
+/// by finding the best-matching substring of `text` against `query`.
+pub fn best_substring_edit_score(query: &str, text: &str) -> f32 {
+	let a: Vec<char> = query.chars().collect();
+	let b: Vec<char> = text.chars().collect();
+
+	let q_len = a.len();
+	let t_len = b.len();
+
+	if q_len == 0 || t_len == 0 {
+		return 0.0;
+	}
+
+	// too short, no substring
+	if t_len <= q_len {
+		let dist = damerau_levenshtein_chars(&a, &b) as f32;
+		return 1.0 - dist / q_len.max(t_len) as f32;
+	}
+
+	let mut best_norm = f32::MAX;
+
+	// small variations
+	let min_len = q_len.saturating_sub(2); // prevent underflow
+	let max_len = q_len + 2;
+
+	for start in 0..t_len {
+		for len in min_len..=max_len {
+			if start + len > t_len {
+				continue;
+			}
+
+			let slice = &b[start..start + len];
+			let dist = damerau_levenshtein_chars(&a, slice) as f32;
+			let norm = dist / q_len.max(len) as f32;
+
+			if norm < best_norm {
+				best_norm = norm;
+
+				// perfect match
+				if best_norm == 0.0 {
+					return 1.0;
+				}
 			}
 		}
 	}
-	matrix[a.chars().count()][b.chars().count()]
+
+	1.0 - best_norm
+}
+
+pub fn damerau_levenshtein_chars(a: &[char], b: &[char]) -> usize {
+	let mut matrix = vec![vec![0; b.len() + 1]; a.len() + 1];
+
+	for i in 0..=a.len() {
+		matrix[i][0] = i;
+	}
+	for j in 0..=b.len() {
+		matrix[0][j] = j;
+	}
+
+	for i in 1..=a.len() {
+		for j in 1..=b.len() {
+			let cost = if a[i - 1] == b[j - 1] { 0 } else { 1 };
+
+			// deletion, insertion, substitution
+			matrix[i][j] = (matrix[i - 1][j] + 1)
+				.min(matrix[i][j - 1] + 1)
+				.min(matrix[i - 1][j - 1] + cost);
+
+			// transposition
+			if i > 1 && j > 1
+				&& a[i - 1] == b[j - 2]
+					&& a[i - 2] == b[j - 1]
+			{
+				matrix[i][j] = matrix[i][j].min(matrix[i - 2][j - 2] + 1);
+			}
+		}
+	}
+
+	matrix[a.len()][b.len()]
 }
