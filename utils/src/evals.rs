@@ -383,7 +383,7 @@ pub fn trigram_edit_fuzzy_score(query: &str, text: &str) -> f32 {
 	let score = if too_short {
 		edit * 0.9 + bonus
 	} else {
-		(tri * 0.5 + edit * 0.4 + bonus).min(1.0)
+		(tri * 0.3 + edit * 0.6 + bonus).min(1.0)
 	}
 	.min(1.0);
 
