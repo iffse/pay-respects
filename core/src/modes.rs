@@ -9,7 +9,7 @@ use pay_respects_utils::files::best_match_file;
 
 use crate::data::Data;
 use crate::rules_function::desperate_fuzzy_recovery;
-use crate::shell::shell_evaluated_commands;
+use crate::shell::{add_candidates_no_dup, shell_evaluated_commands};
 use crate::style::highlight_difference;
 use crate::suggestions::suggest_candidates;
 use crate::system;
@@ -103,7 +103,8 @@ pub fn cnf(data: &mut Data) {
 		executable
 	);
 
-	desperate_fuzzy_recovery(&data.executables, &split, &mut data.candidates);
+	let mut candidates: Vec<String> = Vec::new();
+	desperate_fuzzy_recovery(&data.executables, &split, &mut candidates);
 
 	let best_matches = {
 		if executable.contains(std::path::MAIN_SEPARATOR) {
@@ -131,9 +132,11 @@ pub fn cnf(data: &mut Data) {
 			}
 			split[0] = best_match;
 			let suggest = split.join(" ");
-			data.candidates.push(suggest);
+			candidates.push(suggest);
 		}
 	}
+
+	add_candidates_no_dup(&data.command, &mut data.candidates, &candidates);
 
 	if !data.candidates.is_empty() {
 		suggestions::select_candidate(data);

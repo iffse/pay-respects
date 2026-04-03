@@ -66,55 +66,39 @@ pub fn desperate_fuzzy_recovery(
 		command.push(split[0].to_string());
 	} else {
 		// we have a problem with the command itself
-		let full_dict = [executables, &dict].concat();
-		let command_segments = segment(&split[0], &full_dict);
-
-		#[cfg(debug_assertions)]
-		eprintln!("command segments: {:?}", command_segments);
-
-		if executables.contains(&command_segments[0]) {
-			command.push(command_segments.join(" "));
+		if let Some(best_matches) = best_matches_path(&split[0], executables) {
+			for best_match in best_matches {
+				command.push(best_match);
+			}
 		} else {
-			let best_matches = best_matches_path(&command_segments[0], executables);
-			if let Some(best_matches) = best_matches {
-				for best_match in best_matches {
-					let suggestion = format!("{} {}", best_match, command_segments[1..].join(" "));
-					command.push(suggestion);
-				}
+			let command_segments = segment(&split[0], executables);
+
+			#[cfg(debug_assertions)]
+			eprintln!("command segments: {:?}", command_segments);
+
+			let trailing_seg = command_segments[1..].join("");
+			if executables.contains(&command_segments[0]) {
+				command.push(format!("{} {}", command_segments[0], trailing_seg));
 			} else {
-				// unfortunaly, non fixable
-				return;
+				let best_matches = best_matches_path(&command_segments[0], executables);
+				if let Some(best_matches) = best_matches {
+					let segs = segment(&trailing_seg, &dict);
+					for best_match in best_matches {
+						let suggestion = format!("{} {}", best_match, segs.join(" "));
+						command.push(suggestion);
+					}
+				} else {
+					// unfortunaly, non fixable
+					return;
+				}
 			}
 		}
-
-		for command in command.iter() {
-			let suggestion = format!("{} {}", command, segments.join(" "));
-			candidates.push(suggestion);
-		}
-
-		// if executables.contains(&command_segments[0]) {
-		// 	let suggestion = format!("{} {}", command_segments.join(" "), segments[1..].join(" "));
-		// 	candidates.push(suggestion);
-		// 	return;
-		// }
-		// let best_matches = best_matches_path(&segments[0], executables);
-		// if let Some(best_matches) = best_matches {
-		// 	for best_match in best_matches {
-		// 		let suggestion = format!("{} {} {}", best_match, command_segments[1..].join(" "), segments[1..].join(" "));
-		// 		candidates.push(suggestion);
-		// 	}
-		// }
 	}
 
-	// for split in split[1..].iter() {
-	// 	let seg = segment(split, &dict);
-	// 	for s in seg {
-	// 		segments.push(s.to_string());
-	// 	}
-	// }
-
-	// let suggestion = format!("{} {}", segments[0], segments[1..].join(" "));
-	// candidates.push(suggestion);
+	for command in command.iter() {
+		let suggestion = format!("{} {}", command, segments.join(" "));
+		candidates.push(suggestion);
+	}
 }
 
 fn desperate_file_look_up(split: &[String], candidates: &mut Vec<String>) {
