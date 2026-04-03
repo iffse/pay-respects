@@ -1,5 +1,5 @@
 use askama::Template;
-use pay_respects_utils::lists::unrunnable_commands;
+use pay_respects_utils::lists::blocking_commands;
 
 use std::process::{Stdio, exit};
 
@@ -92,12 +92,12 @@ pub fn get_error(shell: &str, command: &str, data: &Data) -> String {
 
 		let executable = data.get_executable();
 		if data.executables.contains(&executable.to_string()) {
-			if let Some(unrunnable) = &data.config.unrunnable_commands
+			if let Some(unrunnable) = &data.config.blocking_commands
 				&& unrunnable.contains(&executable.to_string())
 			{
 				return String::new();
 			}
-			if unrunnable_commands().contains(&executable) {
+			if blocking_commands().contains(&executable) {
 				return String::new();
 			}
 		}

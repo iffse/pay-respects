@@ -29,6 +29,10 @@ merge_commands = [
 	[grep, rg], # both using rules corresponding to `grep`
 ]
 
+# Commands that won't return any message when run,
+# which is most of the interactive commands
+blocking_commands = ["vim", "nano"]
+
 # How suggestions are evaluated after being confirmed
 # Options can be:
 # - Internal: Commands are evaluated inside `pay-respects`
