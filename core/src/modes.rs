@@ -11,7 +11,7 @@ use crate::data::Data;
 use crate::rules_function::desperate_fuzzy_recovery;
 use crate::shell::{add_candidates_no_dup, shell_evaluated_commands};
 use crate::style::highlight_difference;
-use crate::suggestions::suggest_candidates;
+use crate::suggestions::{inline_suggestion, suggest_candidates};
 use crate::system;
 use crate::{config, suggestions};
 
@@ -45,6 +45,15 @@ pub fn suggestion(data: &mut Data) {
 		t!("contribute"),
 		option_env!("CARGO_PKG_REPOSITORY").unwrap_or("https://github.com/iffse/pay-respects/")
 	);
+}
+
+pub fn inline(data: &mut Data) {
+	inline_suggestion(data);
+
+	if data.candidates.is_empty() {
+		return;
+	}
+	println!("{}", data.candidates[0]);
 }
 
 pub fn echo(data: &mut Data) {

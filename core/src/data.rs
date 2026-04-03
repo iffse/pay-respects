@@ -26,6 +26,7 @@ pub const PRIVILEGE_LIST: [&str; 2] = ["sudo", "doas"];
 #[derive(PartialEq)]
 pub enum Mode {
 	Suggestion,
+	Inline,
 	Echo,
 	NoConfirm,
 	Cnf,
@@ -160,7 +161,7 @@ impl Data {
 		init.split();
 		init.extract_env();
 		init.expand_command();
-		if init.mode != Mode::Cnf {
+		if init.mode != Mode::Cnf || init.mode != Mode::Inline {
 			init.update_error(None);
 		}
 

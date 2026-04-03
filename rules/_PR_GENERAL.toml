@@ -34,11 +34,11 @@ chmod +x {{command[0]}} &&
 [[match_err]]
 suggest = [
 '''
-#[FUNCTION, min_length(2)]
+#[FUNCTION, min_length(2), INLINE]
 DesperateFileLookUp
 ''',
 '''
-#[FUNCTION]
+#[FUNCTION, INLINE]
 DesperateFuzzyRecovery
 ''',
 ]

@@ -165,6 +165,31 @@ pub fn confirm_suggestion(data: &Data) -> Result<(), String> {
 	}
 }
 
+pub fn inline_suggestion(data: &mut Data) {
+	if data.split.is_empty() {
+		return;
+	}
+	let shell = &data.shell;
+	let target_rule = data.get_target_rule();
+	let command = &data.command;
+
+	let mut suggest_candidates = vec![];
+
+	if let Some(candidates) = match_pattern(target_rule, data) {
+		add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
+	}
+	if let Some(candidates) = match_pattern("_PR_general", data) {
+		add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
+	}
+
+	if !suggest_candidates.is_empty() {
+		data.candidates = suggest_candidates
+			.iter()
+			.map(|s| shell_syntax(shell, s))
+			.collect();
+	}
+}
+
 pub fn run_suggestion(data: &Data, command: &str) -> std::process::ExitStatus {
 	let shell = &data.shell;
 	let privilege = &data.privilege;

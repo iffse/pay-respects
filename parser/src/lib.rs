@@ -18,6 +18,12 @@ pub fn parse_rules(input: TokenStream) -> TokenStream {
 	gen_match_rules(&rules)
 }
 
+#[proc_macro]
+pub fn parse_inline_rules(input: TokenStream) -> TokenStream {
+	let rules = get_rules(input.to_string().trim_matches('"'));
+	gen_inline_rules(&rules)
+}
+
 #[derive(serde::Deserialize)]
 struct Rule {
 	command: String,
@@ -53,52 +59,8 @@ fn get_rules(directory: &str) -> Vec<Rule> {
 }
 
 fn gen_match_rules(rules: &[Rule]) -> TokenStream {
-	let command = rules
-		.iter()
-		.map(|x| {
-			if let Some(extends) = &x.extends {
-				format!(
-					"\"{}\"|{}",
-					x.command,
-					extends
-						.iter()
-						.map(|x| format!("\"{}\"", x))
-						.collect::<Vec<String>>()
-						.join("|")
-				)
-				.parse()
-				.unwrap()
-			} else {
-				format!("\"{}\"", x.command).parse().unwrap()
-			}
-		})
-		.collect::<Vec<TokenStream2>>();
-
-	let command_matches = rules
-		.iter()
-		.map(|x| {
-			x.match_err
-				.iter()
-				.map(|x| {
-					let pattern = if let Some(pattern) = &x.pattern {
-						let pattern = pattern
-							.iter()
-							.map(|x| x.to_lowercase())
-							.collect::<Vec<String>>();
-						Some(pattern)
-					} else {
-						None
-					};
-					let suggests = x
-						.suggest
-						.iter()
-						.map(|x| x.to_string())
-						.collect::<Vec<String>>();
-					(pattern, suggests)
-				})
-				.collect::<Vec<(Option<Vec<String>>, Vec<String>)>>()
-		})
-		.collect::<Vec<Vec<(Option<Vec<String>>, Vec<String>)>>>();
+	let command = rule_commands(rules);
+	let command_matches = parse_match_err(rules);
 
 	let mut matches_tokens = Vec::new();
 
@@ -109,7 +71,10 @@ fn gen_match_rules(rules: &[Rule]) -> TokenStream {
 			// let mut match_condition = Vec::new();
 			let mut pattern_suggestions = Vec::new();
 			for suggest in suggests {
-				let (suggestion_no_condition, conditions) = parse_conditions(&suggest);
+				let (suggestion_no_condition, mut conditions) = parse_conditions(&suggest);
+				if let Some(conditions) = &mut conditions {
+					conditions.retain(|x| x != "INLINE");
+				}
 
 				let suggestion = parse_suggestion(&suggestion_no_condition, conditions);
 				pattern_suggestions.push(suggestion);
@@ -154,6 +119,117 @@ fn gen_match_rules(rules: &[Rule]) -> TokenStream {
 	.into()
 }
 
+fn gen_inline_rules(rules: &[Rule]) -> TokenStream {
+	let command = rule_commands(rules);
+	let command_matches = parse_match_err(rules);
+
+	let mut matches_tokens = Vec::new();
+
+	for match_err in command_matches {
+		let mut suggestion_tokens = Vec::new();
+		for (_, suggests) in match_err {
+			// let mut match_condition = Vec::new();
+			let mut pattern_suggestions = Vec::new();
+			for suggest in suggests {
+				let (suggestion_no_condition, mut conditions) = parse_conditions(&suggest);
+				if conditions.is_none() {
+					continue;
+				}
+				if let Some(conditions) = &mut conditions {
+					if !conditions.contains(&"INLINE".to_string()) {
+						continue;
+					}
+					conditions.retain(|x| {
+						x != "INLINE"
+							&& x != "FUNCTION" && !x.starts_with("err")
+							&& !x.starts_with("!err")
+					});
+				}
+
+				let suggestion = parse_suggestion(&suggestion_no_condition, conditions);
+				pattern_suggestions.push(suggestion);
+			}
+			let match_tokens = quote! {
+				#(#pattern_suggestions)*
+			};
+
+			if match_tokens.is_empty() {
+				continue;
+			}
+			suggestion_tokens.push(match_tokens);
+		}
+
+		matches_tokens.push(quote! {
+			#(
+				#suggestion_tokens;
+			)*
+		})
+	}
+	quote! {
+		let mut last_command = last_command.to_string();
+		match executable {
+			#(
+			#command => {
+				#matches_tokens
+				}
+				)*
+				_ => {}
+		};
+	}
+	.into()
+}
+
+fn parse_match_err(rules: &[Rule]) -> Vec<Vec<(Option<Vec<String>>, Vec<String>)>> {
+	rules
+		.iter()
+		.map(|x| {
+			x.match_err
+				.iter()
+				.map(|x| {
+					let pattern = if let Some(pattern) = &x.pattern {
+						let pattern = pattern
+							.iter()
+							.map(|x| x.to_lowercase())
+							.collect::<Vec<String>>();
+						Some(pattern)
+					} else {
+						None
+					};
+					let suggests = x
+						.suggest
+						.iter()
+						.map(|x| x.to_string())
+						.collect::<Vec<String>>();
+					(pattern, suggests)
+				})
+				.collect::<Vec<(Option<Vec<String>>, Vec<String>)>>()
+		})
+		.collect::<Vec<Vec<(Option<Vec<String>>, Vec<String>)>>>()
+}
+
+fn rule_commands(rules: &[Rule]) -> Vec<TokenStream2> {
+	rules
+		.iter()
+		.map(|x| {
+			if let Some(extends) = &x.extends {
+				format!(
+					"\"{}\"|{}",
+					x.command,
+					extends
+						.iter()
+						.map(|x| format!("\"{}\"", x))
+						.collect::<Vec<String>>()
+						.join("|")
+				)
+				.parse()
+				.unwrap()
+			} else {
+				format!("\"{}\"", x.command).parse().unwrap()
+			}
+		})
+		.collect::<Vec<TokenStream2>>()
+}
+
 fn parse_file(file: &Path) -> Rule {
 	let file = std::fs::read_to_string(file).expect("Failed to read file.");
 	toml::from_str(&file).expect("Failed to parse toml.")
@@ -174,7 +250,10 @@ fn parse_conditions(suggest: &str) -> (String, Option<Vec<String>>) {
 		let conditions = conditions
 			.trim_start_matches(['#', '['])
 			.trim_end_matches(']');
-		let conditions = split_unescaped_character(conditions, ',');
+		let conditions = split_unescaped_character(conditions, ',')
+			.into_iter()
+			.map(|x| x.trim().to_string())
+			.collect::<Vec<String>>();
 		let suggest = lines.join("\n");
 		return (suggest, Some(conditions));
 	}
@@ -214,8 +293,8 @@ fn parse_suggestion(suggestion: &str, conditions: Option<Vec<String>>) -> TokenS
 	}
 	let (conditions, is_function) = {
 		let mut conditions = conditions.unwrap();
-		if conditions[0] == "FUNCTION" {
-			conditions.remove(0);
+		if conditions.contains(&"FUNCTION".to_string()) {
+			conditions.retain(|x| x != "FUNCTION");
 			(conditions, true)
 		} else {
 			(conditions, false)
