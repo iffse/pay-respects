@@ -45,6 +45,20 @@ package_manager = "pacman"
 # - Shell (nix and guix only)
 install_method = "System"
 
+# Algorithm used for fuzzy searching
+# Options:
+# - TrigramDamerauLevenshtein: More computationally expensive
+# - DamerauLevenshtein: Fast
+search_type = "TrigramDamerauLevenshtein"
+
+# Minimum characters required to start seaching
+# Avoids false positive when input strings are too short
+seach_threshold = 3
+
+# Minimum score for the result to be valid: [0,1]
+[trigram]
+minimum_score = 0.271828182845904523536028747135266250
+
 # Configuring the linguistic distance (Damerau-Levenshtein)
 # - Percentage: How many characters can be different in the suggestion, rounded
 #   to the nearest integer.
@@ -56,7 +70,6 @@ install_method = "System"
 #   obtained after the percentage calculation is above or equal to this value.
 [dl_distance]
 percentage = 27.1828182845904523536028747135266250
-threshold = 3
 max = 5
 min = 1
 ```
