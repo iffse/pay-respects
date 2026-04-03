@@ -16,6 +16,10 @@ The format is based on [Keep a Changelog], and this project adheres to
 - **`zoxide` integration**: Usable for both `cd` and `z` fixes, when `zoxide`
 is installed.
 - **Rust rules**: Now rules can be written in Rust natively for complex logics
+- **Trigram search**: New default search algorithm, with higher precision
+- **Suggestions for blocking commands**: Now if a command is in a given list of
+blocking commands, it won't try to run (e.g. interactive commands that do not
+return anything). This allows fixing commands such as `vim file-with-typo`
 - `extends` field for rule files: Allows reusing existing rules of other files
 - `merge_commands` field for configuration files: Make multiple commands to use
 the same rules
