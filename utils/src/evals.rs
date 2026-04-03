@@ -626,11 +626,9 @@ pub fn segment(input: &str, dict: &[String]) -> Vec<String> {
 					}
 				}
 
-				word = if let Some(best_idx) = best_idx {
-					&dict[best_idx]
-				} else {
-					word
-				};
+				if let Some(best_idx) = best_idx {
+					word = &dict[best_idx];
+				}
 
 				let cost = if let Some(c) = best_cost {
 					c
@@ -641,12 +639,83 @@ pub fn segment(input: &str, dict: &[String]) -> Vec<String> {
 					1.0 + word.len() as f32 * 0.05
 				};
 
-				// let cost = if dict.contains(&word.to_string()) {
-				// 	0.0 // perfect match
-				// } else {
-				// 	// unknown word penalty
-				// 	1.0 + (word.len() as f32 * 0.05)
-				// };
+				let total_cost = prev_cost + cost;
+
+				let mut new_words = prev_words.clone();
+				new_words.push(word.to_string());
+
+				match &best_at[i] {
+					None => best_at[i] = Some((total_cost, new_words)),
+					Some((best_cost, _)) if total_cost < *best_cost => {
+						best_at[i] = Some((total_cost, new_words))
+					}
+					_ => {}
+				}
+			}
+		}
+	}
+
+	best_at[n]
+		.clone()
+		.map(|(_, words)| words)
+		.unwrap_or_else(|| vec![input.to_string()])
+}
+
+/// segment but only for the first word, to recover the command itself, not the arguments
+pub fn segment_1(input: &str, dict: &[String]) -> Vec<String> {
+	let n = input.len();
+	let mut best_at: Vec<Option<(f32, Vec<String>)>> = vec![None; n + 1];
+
+	best_at[0] = Some((0.0, vec![]));
+
+	for i in 1..=n {
+		for j in 0..i {
+			if let Some((prev_cost, prev_words)) = &best_at[j] {
+				let mut word = &input[j..i];
+
+				let mut best_cost = None;
+				let mut best_idx = None;
+
+				// fuzzy recovery: try to find a close match in the dictionary and use that instead of the original word
+				for (idx, dict_word) in dict.iter().enumerate() {
+					if let Some(cost) = fuzzy_match_cost(word, dict_word) {
+						#[cfg(debug_assertions)]
+						eprintln!(
+							"[segment fuzzy] cost between '{word}' and '{dict_word}': {cost}"
+						);
+
+						best_cost = match best_cost {
+							None => {
+								best_idx = Some(idx);
+								Some(cost)
+							}
+							Some(prev) => {
+								// Some(prev.min(cost))
+								if cost < prev {
+									best_idx = Some(idx);
+									Some(cost)
+								} else {
+									Some(prev)
+								}
+							}
+						};
+					}
+				}
+
+				if let Some(best_idx) = best_idx
+					&& best_at[i].is_none()
+				{
+					word = &dict[best_idx];
+				}
+
+				let cost = if let Some(c) = best_cost {
+					c
+				} else if dict.contains(&word.to_string()) {
+					0.0
+				} else {
+					// unknown word penalty
+					1.0 + word.len() as f32 * 0.05
+				};
 
 				let total_cost = prev_cost + cost;
 

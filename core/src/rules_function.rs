@@ -1,7 +1,7 @@
 use crate::shell::command_output;
 
 use pay_respects_utils::{
-	evals::{best_matches_path, compare_string, fuzzy_best_n_substring, segment},
+	evals::{best_matches_path, compare_string, fuzzy_best_n_substring, segment, segment_1},
 	files::best_match_file,
 	lists::commond_arguments,
 	settings::get_trigram_minimum_score,
@@ -66,7 +66,7 @@ pub fn desperate_fuzzy_recovery(
 		command.push(split[0].to_string());
 	} else {
 		// we have a problem with the command itself
-		if split[0].len() <= 3 {
+		if split[0].len() < 3 {
 			return;
 		}
 		if let Some(best_matches) = best_matches_path(&split[0], executables) {
@@ -74,7 +74,9 @@ pub fn desperate_fuzzy_recovery(
 				command.push(best_match);
 			}
 		} else {
-			let command_segments = segment(&split[0], executables);
+			// introduces some false possitive
+			// gitpush -> git pwsh because pwsh is in executables
+			let command_segments = segment_1(&split[0], executables);
 
 			#[cfg(debug_assertions)]
 			eprintln!("command segments: {:?}", command_segments);
