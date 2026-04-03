@@ -647,9 +647,9 @@ dependencies = [
 
 [[package]]
 name = "indexmap"
-version = "2.13.0"
+version = "2.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7714e70437a7dc3ac8eb7e6f8df75fd8eb422675fc7678aff7364301092b1017"
+checksum = "45a8a2b9cb3e0b0c1803dbb0758ffac5de2f425b23c28f518faabd9d805342ff"
 dependencies = [
  "equivalent",
  "hashbrown",
@@ -816,7 +816,7 @@ dependencies = [
 
 [[package]]
 name = "pay-respects"
-version = "0.8.0"
+version = "0.8.1"
 dependencies = [
  "askama",
  "colored",
@@ -850,7 +850,7 @@ dependencies = [
 
 [[package]]
 name = "pay-respects-module-runtime-rules"
-version = "0.1.11"
+version = "0.1.12"
 dependencies = [
  "pay-respects-utils",
  "regex-lite",
@@ -860,7 +860,7 @@ dependencies = [
 
 [[package]]
 name = "pay-respects-parser"
-version = "0.3.10"
+version = "0.3.11"
 dependencies = [
  "itertools 0.14.0",
  "pay-respects-utils",
@@ -881,7 +881,7 @@ dependencies = [
 
 [[package]]
 name = "pay-respects-utils"
-version = "0.1.10"
+version = "0.1.11"
 dependencies = [
  "colored",
  "itertools 0.14.0",
@@ -2192,9 +2192,9 @@ checksum = "d7249219f66ced02969388cf2bb044a09756a083d0fab1e566056b04d9fbcaa5"
 
 [[package]]
 name = "writeable"
-version = "0.6.2"
+version = "0.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9edde0db4769d2dc68579893f2306b26c6ecfbe0ef499b013d731b7b9247e0b9"
+checksum = "1ffae5123b2d3fc086436f8834ae3ab053a283cfac8fe0a0b8eaae044768a4c4"
 
 [[package]]
 name = "yoke"

@@ -11,6 +11,8 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-04-03
+
 ### Added
 
 - **`zoxide` integration**: Usable for both `cd` and `z` fixes, when `zoxide`
@@ -422,7 +424,8 @@ normalized to `--nocnf`
 
 History start.
 
-[unreleased]: https://github.com/iffse/pay-respects/compare/v0.8.0..HEAD
+[unreleased]: https://github.com/iffse/pay-respects/compare/v0.8.1..HEAD
+[0.8.1]: https://github.com/iffse/pay-respects/compare/v0.8.0..v0.8.1
 [0.8.0]: https://github.com/iffse/pay-respects/compare/v0.7.13..v0.8.0
 [0.7.13]: https://github.com/iffse/pay-respects/compare/v0.7.12..v0.7.13
 [0.7.12]: https://github.com/iffse/pay-respects/compare/v0.7.11..v0.7.12
