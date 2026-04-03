@@ -35,5 +35,9 @@ suggest = [
 '''
 #[FUNCTION, min_length(2)]
 DesperateFileLookUp
+''',
 '''
+#[FUNCTION]
+DesperateFuzzyRecovery
+''',
 ]

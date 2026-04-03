@@ -1,13 +1,15 @@
 use crate::shell::command_output;
 
 use pay_respects_utils::{
-	evals::{compare_string, fuzzy_best_n},
+	evals::{compare_string, fuzzy_best_n, segment},
 	files::best_match_file,
+	lists::commond_arguments,
 	settings::get_trigram_minimum_score,
 	shell::shell_path_post_processing,
 };
 
 pub enum Functions {
+	DesperateFuzzyRecovery,
 	DesperateFileLookUp,
 	ZoxideIntegration,
 }
@@ -27,9 +29,42 @@ pub fn rules_function(
 	candidates: &mut Vec<String>,
 ) {
 	match function {
+		DesperateFuzzyRecovery => desperate_fuzzy_recovery(executables, split, candidates),
 		ZoxideIntegration => zoxide_integration(shell, executables, split, candidates),
 		DesperateFileLookUp => desperate_file_look_up(split, candidates),
 	}
+}
+
+fn desperate_fuzzy_recovery(
+	executables: &[String],
+	split: &[String],
+	candidates: &mut Vec<String>,
+) {
+	let mut segments = Vec::new();
+
+	let dict = commond_arguments()
+		.iter()
+		.map(|s| s.to_string())
+		.collect::<Vec<String>>();
+
+	for split in split {
+		let seg = segment(split, &dict);
+		for s in seg {
+			segments.push(s.to_string());
+		}
+	}
+
+	// command exists in path or a directory, just return
+	if executables.contains(&segments[0]) || segments[0].contains(std::path::MAIN_SEPARATOR) {
+		let suggestion = segments.join(" ");
+		candidates.push(suggestion);
+		return;
+	}
+
+	// fuzzy segmentation for the command
+	let command_segments = segment(&segments[0], executables);
+	let suggestion = format!("{} {}", command_segments.join(" "), segments[1..].join(" "));
+	candidates.push(suggestion);
 }
 
 fn desperate_file_look_up(split: &[String], candidates: &mut Vec<String>) {
