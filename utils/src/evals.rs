@@ -294,7 +294,7 @@ pub fn fuzzy_best_n(
 		.filter_map(|candidate| {
 			let score = trigram_edit_fuzzy_score(query, candidate);
 
-			if score < 0.15 {
+			if score < 0.01 {
 				None
 			} else {
 				Some(Match {
