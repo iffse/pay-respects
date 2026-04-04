@@ -4,7 +4,7 @@ use pay_respects_utils::strings::print_error;
 use std::path::Path;
 use std::process::exit;
 
-use pay_respects_utils::evals::best_matches_path;
+use pay_respects_utils::evals::best_matches;
 use pay_respects_utils::files::best_match_file;
 
 use crate::data::Data;
@@ -130,7 +130,7 @@ pub fn cnf(data: &mut Data) {
 				None
 			}
 		} else {
-			best_matches_path(&executable, &data.executables)
+			best_matches(&executable, &data.executables)
 		}
 	};
 

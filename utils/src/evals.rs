@@ -122,12 +122,12 @@ pub fn suggest_typo(typos: &[String], candidates: &[String], executables: &[Stri
 	suggestions.join(" ")
 }
 
-pub fn best_match_path(typo: &str, executables: &[String]) -> Option<String> {
-	find_similar(typo, executables)
+pub fn best_match(query: &str, dict: &[String]) -> Option<String> {
+	find_similar(query, dict)
 }
 
-pub fn best_matches_path(typo: &str, executables: &[String]) -> Option<Vec<String>> {
-	find_similars(typo, executables)
+pub fn best_matches(query: &str, dict: &[String]) -> Option<Vec<String>> {
+	find_similars(query, dict)
 }
 
 pub fn get_initial_distance(str: &str) -> Option<usize> {

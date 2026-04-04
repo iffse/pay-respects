@@ -1,7 +1,7 @@
 use crate::shell::command_output;
 
 use pay_respects_utils::{
-	evals::{best_matches_path, compare_string, fuzzy_best_n_substring, segment, segment_1},
+	evals::{best_match, best_matches, compare_string, fuzzy_best_n_substring, segment, segment_1},
 	files::best_match_file,
 	lists::commond_arguments,
 	settings::{get_search_threshold, get_trigram_minimum_score},
@@ -45,7 +45,7 @@ pub fn desperate_fuzzy_recovery(
 		if executables.contains(&split[0]) || split[0].contains(std::path::MAIN_SEPARATOR) {
 			return;
 		}
-		let best_matches = best_matches_path(&split[0], executables);
+		let best_matches = best_matches(&split[0], executables);
 		if let Some(best_matches) = best_matches {
 			for best_match in best_matches {
 				candidates.push(format!("{} {}", best_match, split[1..].join(" ")));
@@ -90,9 +90,53 @@ pub fn desperate_fuzzy_recovery(
 	}
 
 	for split in split[1..].iter() {
-		let seg = segment(split, &dict);
-		for s in seg {
-			segments.push(s.to_string());
+		// don't segment if it's a string (quoted), or a flag that contains `-`, `=`, or `=` after the first two characters (e.g., `--flag=value` or `-f=value`)
+		let is_string = split.starts_with('"')
+			|| split.starts_with('\'')
+			|| split.starts_with('`')
+			|| split.contains(std::path::MAIN_SEPARATOR);
+		if is_string {
+			segments.push(split.to_string());
+			continue;
+		}
+
+		let prefix_dash_count = split.chars().take_while(|&c| c == '-').count();
+		let is_flag = prefix_dash_count > 0 && prefix_dash_count <= 2;
+		let is_flag_with_value = is_flag && split[2..].contains("=");
+
+		// if is_flag_with_value {
+		// 	segments.push(split.to_string());
+		// 	continue;
+		// }
+
+		if is_flag_with_value {
+			// split into flag and value, find the best match for the flag, and then rejoin them
+			let flag_part = &split[..split.find('=').unwrap()];
+			let value_part = &split[split.find('=').unwrap() + 1..];
+			let best_match = best_match(&flag_part[prefix_dash_count - 1..], &dict);
+			if let Some(best_match) = best_match {
+				segments.push(format!(
+					"{}{}={}",
+					&flag_part[..prefix_dash_count],
+					best_match,
+					value_part
+				));
+			} else {
+				segments.push(split.to_string());
+			}
+		} else if is_flag {
+			// don't segment but find the best match
+			let best_match = best_match(&split[prefix_dash_count - 1..], &dict);
+			if let Some(best_match) = best_match {
+				segments.push(format!("{}{}", &split[..prefix_dash_count], best_match));
+			} else {
+				segments.push(split.to_string());
+			}
+		} else {
+			let seg = segment(split, &dict);
+			for s in seg {
+				segments.push(s.to_string());
+			}
 		}
 	}
 
@@ -110,7 +154,7 @@ pub fn desperate_fuzzy_recovery(
 		if split[0].len() < get_search_threshold() {
 			return;
 		}
-		if let Some(best_matches) = best_matches_path(&split[0], executables) {
+		if let Some(best_matches) = best_matches(&split[0], executables) {
 			for best_match in best_matches {
 				command.push(best_match);
 			}
