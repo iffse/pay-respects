@@ -8,7 +8,6 @@ use pay_respects_utils::evals::best_matches_path;
 use pay_respects_utils::files::best_match_file;
 
 use crate::data::Data;
-use crate::rules_function::desperate_fuzzy_recovery;
 use crate::shell::{add_candidates_no_dup, shell_evaluated_commands};
 use crate::style::highlight_difference;
 use crate::suggestions::{inline_suggestion, suggest_candidates};
@@ -113,7 +112,8 @@ pub fn cnf(data: &mut Data) {
 	);
 
 	let mut candidates: Vec<String> = Vec::new();
-	desperate_fuzzy_recovery(&data.executables, &split, &mut candidates);
+	// too aggresive
+	// desperate_fuzzy_recovery(&data.executables, &split, &mut candidates);
 
 	let best_matches = {
 		if executable.contains(std::path::MAIN_SEPARATOR) {
