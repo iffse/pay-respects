@@ -4,6 +4,7 @@ command = "jj"
 pattern = [
 	"error: commit",
 	"is immutable`",
+	"pass `--ignore-immutable`", # deprecated
 ]
 suggest = [
 '''
@@ -34,4 +35,14 @@ suggest = [
 '''
 {{err::Hint: Run `(.*)` and try again.}}
 ''',
+]
+
+# deprecated
+[[match_err]]
+pattern = [
+	"use --allow-new to push new bookmark"
+]
+suggest = [
+'''
+{{command}} --allow-new'''
 ]
