@@ -6,6 +6,11 @@ export _PR_LIB=""
 export _PR_MODE="echo"
 export TMP=$(mktemp -d)
 
+# can take a while in debug builds
+# export _PR_NO_DESPERATE=1
+# export _PR_NO_ZOXIDE=1
+# export _PR_NO_TMUX=1
+
 PASSED=0
 FAILED=0
 export green='\033[0;32m'
@@ -30,7 +35,7 @@ run_test() {
 run_case() {
 	(
 		source $1
-		run_test "$case" "$command" "$error" "$expect"
+		run_test
 	)
 
 	if [[ $? == 0 ]]; then

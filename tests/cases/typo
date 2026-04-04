@@ -1,4 +1,4 @@
-case="command typo"
+case="typo: command"
 command="echp"
 error="command not found"
 expect="echo"

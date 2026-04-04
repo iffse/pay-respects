@@ -1,4 +1,4 @@
-case="vim unblocked"
+case="blocking commands: vim"
 command="vim filetobeopen"
 error=""
 expect="vim file-to-be-open"

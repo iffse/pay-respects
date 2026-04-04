@@ -33,6 +33,9 @@ install-all:
 	cargo install --path module-request-ai
 
 test-suggestions: build
-	cd tests && bash main.sh
+	cd tests && bash test.sh
 
 test: test-rust test-suggestions
+
+benchmark: release
+	cd tests && bash benchmark.sh
