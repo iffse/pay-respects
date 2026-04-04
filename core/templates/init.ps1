@@ -37,6 +37,9 @@ function Invoke-PRInline {
 			[Microsoft.PowerShell.PSConsoleReadLine]::Replace(0, $line.Length, $output)
 			[Microsoft.PowerShell.PSConsoleReadLine]::SetCursorPosition($output.Length)
 		}
+	if ($env:_PR_MODE -eq 'inline') {
+		$env:_PR_MODE = $null;
+	}
 }
 
 Set-PSReadLineKeyHandler -Chord Ctrl+x,Ctrl+x -ScriptBlock { Invoke-PRInline }
