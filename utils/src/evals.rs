@@ -394,22 +394,22 @@ fn trigram_edit_fuzzy_score_main(query: &str, text: &str, substring: bool) -> f3
 	let mut bonus = 0.0;
 
 	if text.contains(&query) {
-		bonus += 0.04;
+		bonus += 0.05;
 	}
 	let words: Vec<&str> = text.split(|c: char| !c.is_alphanumeric()).collect();
 	// word boundaries
 	if words.iter().any(|w| w.ends_with(&query)) {
-		bonus += 0.03;
+		bonus += 0.05;
 	}
 	if words.iter().any(|w| w.starts_with(&query)) {
-		bonus += 0.03;
+		bonus += 0.05;
 	}
 
 	let edit = if substring && !too_short {
 		best_substring_edit_score(&query, &text)
 	} else {
 		let dist = compare_string(&query, &text) as f32;
-		1.0 - dist / q_len.max(t_len) as f32
+		(1.0 - dist / q_len.min(t_len) as f32).max(0.0)
 	};
 
 	let edit = if edit < (1.0 - get_dl_distance_percentage()) / 100.0 {
