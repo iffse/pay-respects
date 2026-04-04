@@ -1,0 +1,9 @@
+command = "vim"
+extends = ["vi", "nvim", "hx", "helix", "nano", "micro"]
+
+[[match_err]]
+suggest = [
+'''
+#[INLINE, min_length(2)]
+{{command[0]}} {{typo[1:](file)}} '''
+]
