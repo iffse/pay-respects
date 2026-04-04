@@ -4,7 +4,7 @@ use pay_respects_utils::{
 	evals::{best_matches_path, compare_string, fuzzy_best_n_substring, segment, segment_1},
 	files::best_match_file,
 	lists::commond_arguments,
-	settings::get_trigram_minimum_score,
+	settings::{get_search_threshold, get_trigram_minimum_score},
 	shell::shell_path_post_processing,
 };
 
@@ -40,6 +40,7 @@ pub fn desperate_fuzzy_recovery(
 	split: &[String],
 	candidates: &mut Vec<String>,
 ) {
+	let mut split = split.to_vec();
 	let mut segments: Vec<String> = Vec::new();
 	let mut command: Vec<String> = Vec::new();
 
@@ -47,6 +48,32 @@ pub fn desperate_fuzzy_recovery(
 		.iter()
 		.map(|s| s.to_string())
 		.collect::<Vec<String>>();
+
+	let mut valid_command =
+		executables.contains(&split[0]) || split[0].contains(std::path::MAIN_SEPARATOR);
+
+	let mut head = split[0].clone();
+	if !valid_command && head.len() < get_search_threshold() {
+		// append head until its length is greater than the threshold
+		for i in 2..split.len() + 1 {
+			head = split[..i].join("");
+
+			#[cfg(debug_assertions)]
+			eprintln!("i: {}, head: {}, lengh: {}", i, head, head.len());
+
+			if head.len() >= get_search_threshold() {
+				split = std::iter::once(&head)
+					.chain(split[i..].iter())
+					.cloned()
+					.collect::<Vec<String>>();
+
+				#[cfg(debug_assertions)]
+				eprintln!("split: {:?}", split);
+				break;
+			}
+		}
+		valid_command = executables.contains(&split[0]);
+	}
 
 	for split in split[1..].iter() {
 		let seg = segment(split, &dict);
@@ -62,11 +89,11 @@ pub fn desperate_fuzzy_recovery(
 		segments
 	);
 
-	if executables.contains(&split[0]) || split[0].contains(std::path::MAIN_SEPARATOR) {
+	if valid_command {
 		command.push(split[0].to_string());
 	} else {
 		// we have a problem with the command itself
-		if split[0].len() < 3 {
+		if split[0].len() < get_search_threshold() {
 			return;
 		}
 		if let Some(best_matches) = best_matches_path(&split[0], executables) {
