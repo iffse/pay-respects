@@ -136,8 +136,6 @@ fn parse_output(command: &str, output: &str) -> Option<String> {
 	// remove everything before the last occurrence of the command
 	if let Some(pos) = output.rfind(command) {
 		let output = output[pos + command.len()..].trim().to_string();
-		#[cfg(debug_assertions)]
-		eprintln!("Captured output from tmux: '{}'", output);
 		Some(output)
 	} else {
 		None

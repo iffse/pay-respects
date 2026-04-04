@@ -2,8 +2,7 @@
 
 Typed a wrong command or don't know what to do? Pay Respects will suggest a fix to your console command by simply pressing `F`!
 
-- 🚀 **Blazing fast suggestion**: You won't notice any delay for asking
-suggestions!
+- 🚀 **Blazing fast suggestion**: Sub-millisecond (<1ms) performance!
 - 🎯 **Accurate results**: Suggestions are verified before being prompted to
 the user, no `sudo` suggestions when you are using `doas`!
 - ✏️ **Easy to write rules**: You don't need to know Rust. The rules are
@@ -134,15 +133,18 @@ Please follow the instruction for your shell:
 > 	)
 > }
 > ```
->
+
 > Relating to features:
 >
 > - `_PR_NO_DESPERATE`: Disable desperate functions, which are slow but can give
 > better results
-> - `_PR_NO_ZOXIDE`: Disable `zoxide` integration
-> - `_PR_NO_TMUX`: Disable `tmux` integration
-> - `_PR_NO_SCREEN`: Disable `screen` integration
-> - `_PR_NO_ZELLIJ`: Disable `ZELLIJ` integration
+> - Disabling integrations:
+> 	- `_PR_NO_ZOXIDE`
+> 	- `_PR_NO_TMUX`
+> 	- `_PR_NO_SCREEN`
+> 	- `_PR_NO_ZELLIJ`
+> 	- `_PR_NO_WEZTERM`
+> 	- `_PR_NO_KITTY`
 
 </details>
 
@@ -318,12 +320,17 @@ are the results on my potato computer, you can expect better results on yours.
 | Case            | Results             |
 |-----------------|---------------------|
 | Initialization  | 503.4 µs ±  48.5 µs |
+| Privilege       | 704.3 µs ±  65.4 µs |
 | Typo: Command   | 5.4 ms ±   0.4 ms   |
 | Typo: File path | 3.4 ms ±   0.2 ms   |
-| Privilege       | 704.3 µs ±  65.4 µs |
 | Command: RegEx  | 3.4 ms ±   0.3 ms   |
 | Error: RegEx    | 3.4 ms ±   0.3 ms   |
 | Error: Options  | 3.4 ms ±   0.3 ms   |
+
+Caveats:
+
+- Integrations are turned off: In real usage you may feel a delay due to the initialization of `zoxide` itself, for instance.
+- Desperate functions are turned off, so only the execution time of rules are included.
 
 ## Flowchart
 
