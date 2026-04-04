@@ -120,6 +120,7 @@ Please follow the instruction for your shell:
 > You can specify different modes to run with `_PR_MODE`:
 >
 > - `noconfirm`: Execute suggestions without confirm
+> - `inline`: Returns best fix with no execution
 > - `echo`: Print suggestions to `stdout` without executing
 > - `cnf`: Used for command not found hook
 >
@@ -139,6 +140,16 @@ Please follow the instruction for your shell:
 You can now **[Press `F` to Pay Respects]**!
 
 [Press `F` to Pay Respects]: https://en.wikipedia.org/wiki/Press_F_to_pay_respects
+
+You will also have a key-binding available on `Ctrl+X` for **experimental inline mode**, on-the-fly correction with no execution:
+
+- `gitcommit` + `C-X` `C-X` → `git commit`
+- `z payrespe` + `C-X` `C-X` → `cd /home/iff/Code/pay-respectse`
+
+Integrations with other tools:
+
+- **tmux**: Command log capturing inside tmux session without the need to rerun commands to get error messages. Requires English locale to guarantee correct logs.
+- **zoxide**: Uses zoxide's database to navigate through directories.
 
 ## Installing
 

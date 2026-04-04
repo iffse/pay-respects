@@ -11,6 +11,17 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- **`tmux` integration**: No longer needs to rerun your command if you are inside
+a tmux session with English locale.
+- **Inline fixes**: Fixing commands on the fly, with no execution:
+	- All supported shell now have a new key-binding on `Ctrl-X`
+	- Fixes current typed command as good as possible:
+		- `gitcommit` + `C-X` `C-X` → `git commit`
+		- `z payrespe` + `C-X` `C-X` → `cd /home/iff/Code/pay-respectse`
+- Better search algorithm including: Segmentation, fuzzy search, etc.
+
 ## [0.8.1] - 2026-04-03
 
 ### Added

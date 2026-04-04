@@ -51,7 +51,7 @@ seach_threshold = 3
 
 # Minimum score for the result to be valid: [0,1]
 [trigram]
-minimum_score = 0.271828182845904523536028747135266250
+minimum_score = 0.5
 
 # Configuring the linguistic distance (Damerau-Levenshtein)
 # - Percentage: How many characters can be different in the suggestion, rounded
