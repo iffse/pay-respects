@@ -9,6 +9,7 @@ use crate::shell::command_output;
 use tempfile::NamedTempFile;
 
 pub fn get_error_from_multiplexer(shell: &str, command: &str) -> Option<String> {
+	// terminal multiplexers, higher priority
 	if let Some(error) = get_error_from_tmux(shell, command) {
 		#[cfg(debug_assertions)]
 		eprintln!("Error captured from tmux: '{}'", error);
@@ -22,6 +23,18 @@ pub fn get_error_from_multiplexer(shell: &str, command: &str) -> Option<String> 
 	if let Some(error) = get_error_from_zellij(shell, command) {
 		#[cfg(debug_assertions)]
 		eprintln!("Error captured from zellij: '{}'", error);
+		return Some(error);
+	}
+
+	// terminals that support capturing output
+	if let Some(error) = get_error_from_kitty(shell, command) {
+		#[cfg(debug_assertions)]
+		eprintln!("Error captured from kitty: '{}'", error);
+		return Some(error);
+	}
+	if let Some(error) = get_error_from_wezterm(shell, command) {
+		#[cfg(debug_assertions)]
+		eprintln!("Error captured from wezterm: '{}'", error);
 		return Some(error);
 	}
 	None
@@ -76,6 +89,40 @@ fn get_error_from_zellij(shell: &str, command: &str) -> Option<String> {
 	}
 
 	let capture_command = "zellij action dump-screen --full";
+	let output = command_output(shell, capture_command);
+
+	parse_output(command, &output)
+}
+
+fn get_error_from_kitty(shell: &str, command: &str) -> Option<String> {
+	if std::env::var("_PR_NO_KITTY").is_ok() {
+		return None;
+	}
+	if std::env::var("KITTY_PID").is_err() {
+		return None;
+	}
+	if rust_i18n::locale().to_string() != "en" {
+		return None;
+	}
+
+	let capture_command = "kitty @ get-text --extent=all";
+	let output = command_output(shell, capture_command);
+
+	parse_output(command, &output)
+}
+
+fn get_error_from_wezterm(shell: &str, command: &str) -> Option<String> {
+	if std::env::var("_PR_NO_WEZTERM").is_ok() {
+		return None;
+	}
+	if std::env::var("WEZTERM_PANE").is_err() {
+		return None;
+	}
+	if rust_i18n::locale().to_string() != "en" {
+		return None;
+	}
+
+	let capture_command = "wezterm cli get-text --start-line -10000";
 	let output = command_output(shell, capture_command);
 
 	parse_output(command, &output)

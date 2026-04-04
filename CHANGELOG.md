@@ -13,7 +13,7 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ### Added
 
-- **GNU Screen** and **Zellij** integrations
+- **GNU Screen**, **Zellij**, **WezTerm**, and **kitty** integrations
 - Short command fixes: `gi tpush` can now be fixed into `git push`.
 - Fuzzy recovery now provides support for options. Instead of `ls
 --group-directories-first --color`, was suggesting `ls group directory first
