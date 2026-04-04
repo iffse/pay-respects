@@ -45,8 +45,8 @@ module["Module suggestions"] --> suggest
 
 %% fallback modules loop
 found -->|No| fallback["Fallback modules"]
-fallback --> |If gives suggestions| suggest
 fallback --> |If no suggestions| exit
+fallback --> |If gives suggestions, prompt fixes| success
 
 %% found -->|Yes| success
 success -->|No| err
