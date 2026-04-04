@@ -34,10 +34,19 @@ pub fn highlight_difference(data: &Data, suggested_command: &str, active: bool) 
 		}
 	}
 
+	// skip everything after # comment
+	let mut skip = false;
 	// let mut highlighted = suggested_command.to_string();
 	'next: for entry in split_suggested_command.iter_mut() {
 		if entry == "\n" {
+			skip = false;
 			continue;
+		}
+		if skip {
+			continue;
+		}
+		if entry == "#" {
+			skip = true;
 		}
 		for old in &old_entries {
 			if old == entry {
