@@ -11,6 +11,29 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Short command fixes: `gi tpush` can now be fixed into `git push`.
+- Fuzzy recovery now provides support for options. Instead of `ls
+--group-directories-first --color`, was suggesting `ls group directory first
+color`
+
+### Changed
+
+- Logic for CNF is restored to the one used during older versions, as the
+aggressive fuzzy search created too many false positives. E.g. instead of
+installing `fastfetch`, was suggesting `last fetch`
+
+### Fixed
+
+- `err` placeholder changes during [0.7.13] wasn't adapted to all codebase,
+such that error messages obtained through retries are still in lower cases.
+- `tmux` integration wasn't complete like the point above, which wasn't being
+used when retrying.
+- The introduction of Inline mode on [0.8.1] come with a bug that will rerun
+the previous command even on Inline and CNF modes. Shouldn't be a big problem
+most of the time, excepting performance penalty.
+
 ## [0.8.2] - 2026-04-04
 
 ### Added

@@ -310,7 +310,7 @@ most comfortable with:
 ## Benchmarks
 
 Benchmark script can be executed with `make benchmark` using `hyperfine`. Here
-are the result on my potato computer, you can expect better result in yours.
+are the results on my potato computer, you can expect better results on yours.
 
 | Case            | Results             |
 |-----------------|---------------------|
