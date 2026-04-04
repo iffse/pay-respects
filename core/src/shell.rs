@@ -13,6 +13,7 @@ use pay_respects_utils::files::path_convert;
 
 use crate::data::{Data, Mode};
 use crate::init::Init;
+use crate::integrations::get_error_from_multiplexer;
 use pay_respects_utils::remove_env_var;
 
 const PRIVILEGE_LIST: [&str; 2] = ["sudo", "doas"];
@@ -111,42 +112,13 @@ pub fn get_error(shell: &str, command: &str, data: &Data) -> String {
 				return String::new();
 			}
 		}
-		if let Some(error) = get_error_from_tmux(shell, command) {
+		if let Some(error) = get_error_from_multiplexer(shell, command) {
 			error
 		} else {
 			error_output_threaded(shell, command, timeout)
 		}
 	};
 	error.split_whitespace().collect::<Vec<&str>>().join(" ")
-}
-
-pub fn get_error_from_tmux(shell: &str, command: &str) -> Option<String> {
-	if std::env::var("_PR_NO_TMUX").is_ok() {
-		return None;
-	}
-	if std::env::var("TMUX").is_err() {
-		return None;
-	}
-	if rust_i18n::locale().to_string() != "en" {
-		return None;
-	}
-
-	let capture_command = "tmux capture-pane -pS -";
-	let output = command_output(shell, capture_command);
-
-	if output.contains(command) {
-		// remove everything before the last occurrence of the command
-		if let Some(pos) = output.rfind(command) {
-			let output = output[pos + command.len()..].trim().to_string();
-			#[cfg(debug_assertions)]
-			eprintln!("Captured output from tmux: '{}'", output);
-			Some(output)
-		} else {
-			None
-		}
-	} else {
-		None
-	}
 }
 
 pub fn error_output_threaded(shell: &str, command: &str, timeout: u64) -> String {

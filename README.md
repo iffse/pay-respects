@@ -141,6 +141,8 @@ Please follow the instruction for your shell:
 > better results
 > - `_PR_NO_ZOXIDE`: Disable `zoxide` integration
 > - `_PR_NO_TMUX`: Disable `tmux` integration
+> - `_PR_NO_SCREEN`: Disable `screen` integration
+> - `_PR_NO_ZELLIJ`: Disable `ZELLIJ` integration
 
 </details>
 
@@ -155,7 +157,7 @@ You will also have a key-binding available on `Ctrl+X` for **experimental inline
 
 Integrations with other tools:
 
-- **tmux**: Command log capturing inside tmux session without the need to rerun commands to get error messages. Requires English locale to guarantee correct logs.
+- **tmux**, **GNU Screen**, **Zellij**: Command log capturing inside the session without the need to rerun commands to get error messages. Requires English locale to guarantee correct logs.
 - **zoxide**: Uses zoxide's database to navigate through directories.
 
 ## Installing

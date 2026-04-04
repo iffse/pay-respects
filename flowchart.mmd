@@ -21,11 +21,20 @@ init --> err --> suggest --> found -->|Yes, prompt fixes| success -->|Yes| exit
 subgraph errsource["Error sources"]
 direction TB
 from_env["Environment variable"]
-from_tmux["`tmux`"]
+from_multiplexer["`Terminal multiplexer
+(tmux, GNU Screen, Zellij)`"]
+%% subgraph multiplexer["Terminal multiplexers"]
+%% direction LR
+%% from_tmux["tmux"]
+%% from_screen["GNU Screen"]
+%% from_zellij["Zellij"]
+%% end
 from_execution["Last command execution"]
 end
 
-from_env --- from_tmux --- from_execution
+from_env --> from_multiplexer --> from_execution
+
+%% from_tmux --- from_screen --- from_zellij
 
 errsource --> err
 %% from_env["Enviroment variable"] --> err

@@ -21,6 +21,7 @@ mod args;
 mod config;
 mod data;
 mod init;
+mod integrations;
 mod modes;
 mod rules;
 mod rules_function;

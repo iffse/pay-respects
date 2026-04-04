@@ -28,6 +28,7 @@ serde = { version = "1.0", features = ["derive"] }
 pay-respects-parser = { version = "0.3", path = "../parser" }
 pay-respects-utils = { version ="0.1", path = "../utils"}
 pay-respects-select = { version ="0.1", path = "../select"}
+tempfile = "3.27.0"
 
 [package.metadata.deb]
 assets = [

@@ -9,10 +9,10 @@ use pay_respects_utils::strings::print_error;
 
 use crate::config;
 use crate::data::Data;
+use crate::integrations::get_error_from_multiplexer;
 use crate::rules::match_pattern;
 use crate::shell::{
-	add_candidates_no_dup, add_privilege, get_error_from_tmux, module_output,
-	shell_evaluated_commands, shell_syntax,
+	add_candidates_no_dup, add_privilege, module_output, shell_evaluated_commands, shell_syntax,
 };
 use crate::style::highlight_difference;
 
@@ -237,7 +237,7 @@ pub fn shell_suggestion(data: &Data, command: &str) {
 
 fn suggestion_err(data: &Data, command: &str) -> Result<(), String> {
 	let shell = &data.shell;
-	if let Some(err) = get_error_from_tmux(shell, command) {
+	if let Some(err) = get_error_from_multiplexer(shell, command) {
 		return Err(err);
 	}
 
