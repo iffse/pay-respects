@@ -22,6 +22,25 @@ function {{ alias }} {
 	}
 }
 
+function Invoke-PRInline {
+	$line = $null
+		$cursor = $null
+		[Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
+
+	$env:_PR_MODE = 'inline';
+	$env:_PR_LAST_COMMAND = $line;
+	$env:_PR_SHELL = 'pwsh';
+
+	$output = & '{{ binary_path }}'
+
+		if (-not [string]::IsNullOrWhiteSpace($output)) {
+			[Microsoft.PowerShell.PSConsoleReadLine]::Replace(0, $line.Length, $output)
+			[Microsoft.PowerShell.PSConsoleReadLine]::SetCursorPosition($output.Length)
+		}
+}
+
+Set-PSReadLineKeyHandler -Chord Ctrl+x,Ctrl+x -ScriptBlock { Invoke-PRInline }
+
 {%- if cnf %}
 # Uncomment this block to enable command not found hook
 # It's not useful as we can't retrieve arguments,
