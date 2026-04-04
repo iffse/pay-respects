@@ -121,6 +121,9 @@ pub fn get_error(shell: &str, command: &str, data: &Data) -> String {
 }
 
 pub fn get_error_from_tmux(shell: &str, command: &str) -> Option<String> {
+	if std::env::var("_PR_NO_TMUX").is_ok() {
+		return None;
+	}
 	if std::env::var("TMUX").is_err() {
 		return None;
 	}

@@ -40,6 +40,20 @@ pub fn desperate_fuzzy_recovery(
 	split: &[String],
 	candidates: &mut Vec<String>,
 ) {
+	// naive approach for executable only
+	if std::env::var("_PR_NO_DESPERATE").is_ok() {
+		if executables.contains(&split[0]) || split[0].contains(std::path::MAIN_SEPARATOR) {
+			return;
+		}
+		let best_matches = best_matches_path(&split[0], executables);
+		if let Some(best_matches) = best_matches {
+			for best_match in best_matches {
+				candidates.push(format!("{} {}", best_match, split[1..].join(" ")));
+			}
+		}
+		return;
+	}
+
 	let mut split = split.to_vec();
 	let mut segments: Vec<String> = Vec::new();
 	let mut command: Vec<String> = Vec::new();
@@ -122,6 +136,9 @@ pub fn desperate_fuzzy_recovery(
 }
 
 fn desperate_file_look_up(split: &[String], candidates: &mut Vec<String>) {
+	if std::env::var("_PR_NO_DESPERATE").is_ok() {
+		return;
+	}
 	let hints = split[1..]
 		.iter()
 		.map(|s| {
@@ -145,6 +162,9 @@ fn zoxide_integration(
 	split: &[String],
 	candidates: &mut Vec<String>,
 ) {
+	if std::env::var("_PR_NO_ZOXIDE").is_ok() {
+		return;
+	}
 	if !executables.contains(&"zoxide".to_string()) {
 		return;
 	}
