@@ -179,6 +179,7 @@ fn gen_inline_rules(rules: &[Rule]) -> TokenStream {
 	.into()
 }
 
+#[allow(clippy::type_complexity)]
 fn parse_match_err(rules: &[Rule]) -> Vec<Vec<(Option<Vec<String>>, Vec<String>)>> {
 	rules
 		.iter()
