@@ -1,0 +1,52 @@
+flowchart TD
+
+init{{"Start"}}
+err["Get error message"]
+suggest["Match suggestion"]
+found{"Got suggestions?"}
+success{"Execution successful?"}
+exit{{"Exit"}}
+
+init --> err --> suggest --> found -->|Yes, prompt fixes| success -->|Yes| exit
+
+%% subgraph "Main Flow"
+%% init
+%% err
+%% suggest
+%% found
+%% success
+%% exit
+%% end
+
+subgraph errsource["Error sources"]
+direction TB
+from_env["Environment variable"]
+from_tmux["`tmux`"]
+from_execution["Last command execution"]
+end
+
+from_env --- from_tmux --- from_execution
+
+errsource --> err
+%% from_env["Enviroment variable"] --> err
+%% from_tmux["`tmux`"] --> err
+%% from_execution["Last command execution"] --> err
+
+subgraph suggestsource["Suggestion sources"]
+direction LR
+builtin
+module
+fallback
+end
+
+%% suggestsource --> suggest
+builtin["Compiled suggestions"] --> suggest
+module["Module suggestions"] --> suggest
+
+%% fallback modules loop
+found -->|No| fallback["Fallback modules"]
+fallback --> |If gives suggestions| suggest
+fallback --> |If no suggestions| exit
+
+%% found -->|Yes| success
+success -->|No| err

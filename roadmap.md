@@ -8,6 +8,7 @@
 
 | Feature           | Bash | Zsh | Fish | Nush | Pwsh   |
 |-------------------|------|-----|------|------|--------|
+| Inline mode       | ✅   | ✅  | ✅   | ✅   | ✅     |
 | Get other alias   | ✅   | ✅  | ✅   | ✅   | ❌     |
 | Command not found | ✅   | ✅  | ✅   | ❌   | ⚠️ [^1] |
 

@@ -134,6 +134,13 @@ Please follow the instruction for your shell:
 > 	)
 > }
 > ```
+>
+> Relating to features:
+>
+> - `_PR_NO_DESPERATE`: Disable desperate functions, which are slow but can give
+> better results
+> - `_PR_NO_ZOXIDE`: Disable `zoxide` integration
+> - `_PR_NO_TMUX`: Disable `tmux` integration
 
 </details>
 
@@ -299,3 +306,9 @@ most comfortable with:
 	- Core and modules
 - **Libraries**: MPL-2.0
 	- Parser and utils
+
+## Flowchart
+
+Here's a flowchart on how this program works:
+
+![flowchart](https://raw.githubusercontent.com/iffse/static-assets/refs/heads/main/pay-respects/flowchart.svg)
