@@ -307,6 +307,21 @@ most comfortable with:
 - **Libraries**: MPL-2.0
 	- Parser and utils
 
+## Benchmarks
+
+Benchmark script can be executed with `make benchmark` using `hyperfine`. Here
+are the result on my potato computer, you can expect better result in yours.
+
+| Case            | Results             |
+|-----------------|---------------------|
+| Initialization  | 503.4 µs ±  48.5 µs |
+| Typo: Command   | 5.4 ms ±   0.4 ms   |
+| Typo: File path | 3.4 ms ±   0.2 ms   |
+| Privilege       | 704.3 µs ±  65.4 µs |
+| Command: RegEx  | 3.4 ms ±   0.3 ms   |
+| Error: RegEx    | 3.4 ms ±   0.3 ms   |
+| Error: Options  | 3.4 ms ±   0.3 ms   |
+
 ## Flowchart
 
 Here's a flowchart on how this program works:
