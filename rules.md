@@ -128,6 +128,12 @@ supported (using `,` requires escaping, i.e. `\,`)
 - `max_length`: Check if the given command has at most the length of the argument
 - `shell`: Check if the current running shell is the argument
 
+## Identifiers
+
+Identifiers are used to reuse rules for specific purposes:
+
+- `INLINE`: Reuse the rule for `inline` mode. Patterns are ignored.
+
 ## Other Considerations
 
 When suggesting a chained command with `&&`, try to break it into multiple lines.
