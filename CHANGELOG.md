@@ -11,6 +11,8 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+## [0.8.2] - 2026-04-04
+
 ### Added
 
 - **`tmux` integration**: No longer needs to rerun your command if you are inside
@@ -435,7 +437,8 @@ normalized to `--nocnf`
 
 History start.
 
-[unreleased]: https://github.com/iffse/pay-respects/compare/v0.8.1..HEAD
+[unreleased]: https://github.com/iffse/pay-respects/compare/v0.8.2..HEAD
+[0.8.2]: https://github.com/iffse/pay-respects/compare/v0.8.1..v0.8.2
 [0.8.1]: https://github.com/iffse/pay-respects/compare/v0.8.0..v0.8.1
 [0.8.0]: https://github.com/iffse/pay-respects/compare/v0.7.13..v0.8.0
 [0.7.13]: https://github.com/iffse/pay-respects/compare/v0.7.12..v0.7.13

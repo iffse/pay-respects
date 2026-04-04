@@ -1,6 +1,6 @@
 [package]
 name = "pay-respects-parser"
-version = "0.3.11"
+version = "0.3.12"
 edition = "2024"
 
 # for crates.io
