@@ -23,7 +23,7 @@ use crate::shell::run_mode;
 
 pub const PRIVILEGE_LIST: [&str; 2] = ["sudo", "doas"];
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Debug)]
 pub enum Mode {
 	Suggestion,
 	Inline,
@@ -161,7 +161,7 @@ impl Data {
 		init.split();
 		init.extract_env();
 		init.expand_command();
-		if init.mode != Mode::Cnf || init.mode != Mode::Inline {
+		if !(init.mode == Mode::Cnf || init.mode == Mode::Inline) {
 			init.update_error(None);
 		}
 
@@ -178,6 +178,7 @@ impl Data {
 			eprintln!("error: {}", init.error);
 			eprintln!("modules: {:?}", init.modules);
 			eprintln!("fallbacks: {:?}", init.fallbacks);
+			eprintln!("mode: {:?}", init.mode);
 		}
 
 		init
