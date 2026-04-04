@@ -534,7 +534,7 @@ fn fuzzy_match_cost(word: &str, dict_word: &str) -> Option<f32> {
 
 	// partial match penalties
 	if max_len <= 4 {
-		if dist <= 1 && norm <= 0.25 {
+		if dist <= 1 && norm <= 0.35 {
 			return Some(0.3);
 		} else {
 			return None;
@@ -542,14 +542,14 @@ fn fuzzy_match_cost(word: &str, dict_word: &str) -> Option<f32> {
 	}
 
 	if max_len <= 7 {
-		if dist <= 2 && norm <= 0.25 {
+		if dist <= 2 && norm <= 0.3 {
 			return Some(0.4);
 		} else {
 			return None;
 		}
 	}
 
-	if dist <= 2 && norm <= 0.25 {
+	if dist <= 3 && norm <= 0.25 {
 		return Some(0.5);
 	}
 
@@ -662,81 +662,49 @@ pub fn segment(input: &str, dict: &[String]) -> Vec<String> {
 }
 
 /// segment but only for the first word, to recover the command itself, not the arguments
-pub fn segment_1(input: &str, dict: &[String]) -> Vec<String> {
-	let n = input.len();
-	let mut best_at: Vec<Option<(f32, Vec<String>)>> = vec![None; n + 1];
+pub fn segment_1(input: &str, dict: &[String]) -> Vec<Vec<String>> {
+	let mut candidates: Vec<(f32, Vec<String>)> = Vec::new();
 
-	best_at[0] = Some((0.0, vec![]));
+	for split in 1..input.len() {
+		let head = &input[..split];
+		let tail = &input[split..];
 
-	for i in 1..=n {
-		for j in 0..i {
-			if let Some((prev_cost, prev_words)) = &best_at[j] {
-				let mut word = &input[j..i];
+		for dict_word in dict {
+			if let Some(cost) = fuzzy_match_cost(head, dict_word) {
+				let tail_penalty = tail.len() as f32 * 0.05;
 
-				let mut best_cost = None;
-				let mut best_idx = None;
-
-				// fuzzy recovery: try to find a close match in the dictionary and use that instead of the original word
-				for (idx, dict_word) in dict.iter().enumerate() {
-					if let Some(cost) = fuzzy_match_cost(word, dict_word) {
-						#[cfg(debug_assertions)]
-						eprintln!(
-							"[segment fuzzy] cost between '{word}' and '{dict_word}': {cost}"
-						);
-
-						best_cost = match best_cost {
-							None => {
-								best_idx = Some(idx);
-								Some(cost)
-							}
-							Some(prev) => {
-								// Some(prev.min(cost))
-								if cost < prev {
-									best_idx = Some(idx);
-									Some(cost)
-								} else {
-									Some(prev)
-								}
-							}
-						};
-					}
-				}
-
-				if let Some(best_idx) = best_idx
-					&& best_at[i].is_none()
-				{
-					word = &dict[best_idx];
-				}
-
-				let cost = if let Some(c) = best_cost {
-					c
-				} else if dict.contains(&word.to_string()) {
-					0.0
-				} else {
-					// unknown word penalty
-					1.0 + word.len() as f32 * 0.05
-				};
-
-				let total_cost = prev_cost + cost;
-
-				let mut new_words = prev_words.clone();
-				new_words.push(word.to_string());
-
-				match &best_at[i] {
-					None => best_at[i] = Some((total_cost, new_words)),
-					Some((best_cost, _)) if total_cost < *best_cost => {
-						best_at[i] = Some((total_cost, new_words))
-					}
-					_ => {}
-				}
+				let total_cost = cost + tail_penalty;
+				candidates.push((total_cost, vec![dict_word.clone(), tail.to_string()]));
 			}
 		}
 	}
 
-	best_at[n]
-		.clone()
+	// full match
+	for dict_word in dict {
+		if let Some(cost) = fuzzy_match_cost(input, dict_word) {
+			candidates.push((cost, vec![dict_word.clone()]));
+		}
+	}
+
+	// no match at all
+	if candidates.is_empty() {
+		return vec![vec![input.to_string()]];
+	}
+
+	candidates.sort_unstable_by(|a, b| a.0.partial_cmp(&b.0).unwrap_or(Ordering::Equal));
+
+	let best_cost = candidates.first().map(|c| c.0).unwrap_or(0.0);
+	// filter candidates that are significantly worse than the best
+	let baseline = best_cost + 0.1; // allow some tolerance
+	candidates.retain(|c| c.0 <= baseline);
+
+	let limit = 9;
+
+	candidates
+		.into_iter()
+		.take(limit)
 		.map(|(_, words)| words)
-		.unwrap_or_else(|| vec![input.to_string()])
+		.collect()
 }
 
 mod tests {

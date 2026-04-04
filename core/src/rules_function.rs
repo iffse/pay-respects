@@ -78,24 +78,12 @@ pub fn desperate_fuzzy_recovery(
 			// gitpush -> git pwsh because pwsh is in executables
 			let command_segments = segment_1(&split[0], executables);
 
-			#[cfg(debug_assertions)]
-			eprintln!("command segments: {:?}", command_segments);
-
-			let trailing_seg = command_segments[1..].join("");
-			if executables.contains(&command_segments[0]) {
-				command.push(format!("{} {}", command_segments[0], trailing_seg));
-			} else {
-				let best_matches = best_matches_path(&command_segments[0], executables);
-				if let Some(best_matches) = best_matches {
-					let segs = segment(&trailing_seg, &dict);
-					for best_match in best_matches {
-						let suggestion = format!("{} {}", best_match, segs.join(" "));
-						command.push(suggestion);
-					}
-				} else {
-					// unfortunaly, non fixable
-					return;
+			if !command_segments.is_empty() {
+				for segments in &command_segments {
+					command.push(segments.join(" "))
 				}
+			} else {
+				return;
 			}
 		}
 	}
