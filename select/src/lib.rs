@@ -151,7 +151,7 @@ pub fn select_simple(prelude: &str, items: &[String]) -> Result<usize, Box<dyn s
 	cleanup(total_lines)?;
 	terminal::disable_raw_mode()?;
 
-	eprintln!("{}", items[current]);
+	eprintln!("{}", items[current].cyan());
 	Ok(current)
 }
 
