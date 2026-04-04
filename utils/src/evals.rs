@@ -65,6 +65,9 @@ pub fn eval_shell_command(shell: &str, command: &str) -> Vec<String> {
 
 /// Split the full command into command and arguments
 pub fn split_command(command: &str) -> Vec<String> {
+	if command.is_empty() {
+		return vec!["".to_string()];
+	}
 	#[cfg(debug_assertions)]
 	eprintln!("command: {command}");
 	// this regex splits the command separated by spaces, except when the space

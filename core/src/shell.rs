@@ -102,6 +102,9 @@ pub fn get_error(shell: &str, command: &str, data: &Data) -> String {
 		eprintln!("timeout: {}", timeout);
 
 		let executable = data.get_executable();
+		if executable.is_empty() {
+			return String::new();
+		}
 		if data.executables.contains(&executable.to_string()) {
 			if let Some(unrunnable) = &data.config.blocking_commands
 				&& unrunnable.contains(&executable.to_string())
@@ -181,7 +184,8 @@ pub fn command_output_or_error(shell: &str, command: &str) -> String {
 pub fn module_output(data: &Data, module: &str) -> Option<Vec<String>> {
 	let shell = &data.shell;
 	let executable = &data.split[0];
-	let last_command = &data.command;
+	let mut last_command = data.command.clone();
+	let comments = data.comments.clone();
 	let error_msg = &data.error;
 	let executables = {
 		let exes = data.executables.clone().join(" ");
@@ -191,6 +195,11 @@ pub fn module_output(data: &Data, module: &str) -> Option<Vec<String>> {
 			"".to_string()
 		}
 	};
+
+	if let Some(comments) = comments {
+		last_command = format!("{} {}", last_command, comments);
+	}
+
 	let output = clean_shell_command(shell, module)
 		.env("_PR_COMMAND", executable)
 		.env("_PR_SHELL", shell)

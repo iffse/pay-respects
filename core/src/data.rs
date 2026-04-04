@@ -39,6 +39,7 @@ pub struct Data {
 	pub suggest: Option<String>,
 	pub candidates: Vec<String>,
 	pub split: Vec<String>,
+	pub comments: Option<String>,
 	pub alias: Option<HashMap<String, String>>,
 	pub privilege: Option<String>,
 	pub error: String,
@@ -149,6 +150,7 @@ impl Data {
 			candidates: vec![],
 			alias,
 			split: vec![],
+			comments: None,
 			privilege: None,
 			error: "".to_string(),
 			executables,
@@ -210,13 +212,28 @@ impl Data {
 
 	pub fn split(&mut self) {
 		self.extract_privilege();
-		let split = split_command(&self.command);
+		let mut split = split_command(&self.command);
 		#[cfg(debug_assertions)]
 		eprintln!("split: {:?}", split);
 		if split.is_empty() {
 			eprintln!("{}", t!("empty-command"));
 			exit(1);
 		}
+
+		if split.contains(&"#".to_string()) {
+			// remove everything after the first # and store it in comments
+			let index = split.iter().position(|s| s == "#").unwrap();
+			let comments = split.split_off(index);
+			self.command = split.join(" ");
+			self.comments = Some(comments.join(" "));
+			split.pop();
+			if split.is_empty() {
+				split = vec!["".to_string()];
+			}
+		} else {
+			self.comments = None;
+		}
+
 		self.split = split;
 	}
 
@@ -265,6 +282,9 @@ impl Data {
 	}
 
 	pub fn get_executable(&self) -> &str {
+		if self.split.is_empty() {
+			return "";
+		}
 		self.split[0]
 			.rsplit(std::path::MAIN_SEPARATOR)
 			.next()

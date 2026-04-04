@@ -17,14 +17,14 @@
 mod config;
 mod replaces;
 mod rules;
-use pay_respects_utils::files::get_path_files;
+use pay_respects_utils::{evals::split_command, files::get_path_files};
 
 use crate::config::{get_target_rule, load_config};
 
 fn main() -> Result<(), std::io::Error> {
 	let executable = std::env::var("_PR_COMMAND").expect("_PR_COMMAND not set");
 	let shell = std::env::var("_PR_SHELL").expect("_PR_SHELL not set");
-	let last_command = std::env::var("_PR_LAST_COMMAND").expect("_PR_LAST_COMMAND not set");
+	let mut last_command = std::env::var("_PR_LAST_COMMAND").expect("_PR_LAST_COMMAND not set");
 	let error_msg = std::env::var("_PR_ERROR_MSG").expect("_PR_ERROR_MSG not set");
 	let executables: Vec<String> = get_path_files();
 
@@ -35,6 +35,15 @@ fn main() -> Result<(), std::io::Error> {
 		eprintln!("last_command: {}", last_command);
 		eprintln!("error_msg: {}", error_msg);
 		eprintln!("executables: {:?}", executables);
+	}
+
+	let split = split_command(&last_command);
+	if split.contains(&"#".to_string()) {
+		last_command = split
+			.into_iter()
+			.take_while(|s| s != "#")
+			.collect::<Vec<String>>()
+			.join(" ");
 	}
 
 	pay_respects_utils::shell::set_shell_type(&shell);

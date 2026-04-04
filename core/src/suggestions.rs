@@ -17,7 +17,7 @@ use crate::shell::{
 use crate::style::highlight_difference;
 
 pub fn suggest_candidates(data: &mut Data) {
-	if data.split.is_empty() {
+	if data.split.is_empty() && data.comments.is_none() {
 		return;
 	}
 	let shell = &data.shell;
