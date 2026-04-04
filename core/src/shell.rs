@@ -91,9 +91,6 @@ pub fn add_candidates_no_dup(
 }
 
 pub fn get_error(shell: &str, command: &str, data: &Data) -> String {
-	let current_locale = (*rust_i18n::locale()).to_string();
-	let in_tmux = std::env::var("TMUX").is_ok();
-
 	let error_msg = std::env::var("_PR_ERROR_MSG");
 	let error = if let Ok(error_msg) = error_msg {
 		remove_env_var!("_PR_ERROR_MSG");
@@ -114,27 +111,39 @@ pub fn get_error(shell: &str, command: &str, data: &Data) -> String {
 				return String::new();
 			}
 		}
-		if current_locale == "en" && in_tmux {
-			let capture_command = "tmux capture-pane -pS -";
-			let output = command_output(shell, capture_command);
-			if output.contains(command) {
-				// remove everything before the last occurrence of the command
-				if let Some(pos) = output.rfind(command) {
-					let output = output[pos + command.len()..].trim().to_string();
-					#[cfg(debug_assertions)]
-					eprintln!("Captured output from tmux: '{}'", output);
-					output
-				} else {
-					error_output_threaded(shell, command, timeout)
-				}
-			} else {
-				error_output_threaded(shell, command, timeout)
-			}
+		if let Some(error) = get_error_from_tmux(shell, command) {
+			error
 		} else {
 			error_output_threaded(shell, command, timeout)
 		}
 	};
 	error.split_whitespace().collect::<Vec<&str>>().join(" ")
+}
+
+pub fn get_error_from_tmux(shell: &str, command: &str) -> Option<String> {
+	if std::env::var("TMUX").is_err() {
+		return None;
+	}
+	if rust_i18n::locale().to_string() != "en" {
+		return None;
+	}
+
+	let capture_command = "tmux capture-pane -pS -";
+	let output = command_output(shell, capture_command);
+
+	if output.contains(command) {
+		// remove everything before the last occurrence of the command
+		if let Some(pos) = output.rfind(command) {
+			let output = output[pos + command.len()..].trim().to_string();
+			#[cfg(debug_assertions)]
+			eprintln!("Captured output from tmux: '{}'", output);
+			Some(output)
+		} else {
+			None
+		}
+	} else {
+		None
+	}
 }
 
 pub fn error_output_threaded(shell: &str, command: &str, timeout: u64) -> String {

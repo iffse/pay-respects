@@ -11,7 +11,8 @@ use crate::config;
 use crate::data::Data;
 use crate::rules::match_pattern;
 use crate::shell::{
-	add_candidates_no_dup, add_privilege, module_output, shell_evaluated_commands, shell_syntax,
+	add_candidates_no_dup, add_privilege, get_error_from_tmux, module_output,
+	shell_evaluated_commands, shell_syntax,
 };
 use crate::style::highlight_difference;
 
@@ -236,6 +237,10 @@ pub fn shell_suggestion(data: &Data, command: &str) {
 
 fn suggestion_err(data: &Data, command: &str) -> Result<(), String> {
 	let shell = &data.shell;
+	if let Some(err) = get_error_from_tmux(shell, command) {
+		return Err(err);
+	}
+
 	let privilege = &data.privilege;
 	let command = if let Some(env) = &data.env {
 		format!("{env} {command}")
@@ -258,8 +263,8 @@ fn suggestion_err(data: &Data, command: &str) -> Result<(), String> {
 			.expect("failed to execute process"),
 	};
 	let error_msg = match process.stderr.is_empty() {
-		true => String::from_utf8_lossy(&process.stdout).to_lowercase(),
-		false => String::from_utf8_lossy(&process.stderr).to_lowercase(),
+		true => String::from_utf8_lossy(&process.stdout),
+		false => String::from_utf8_lossy(&process.stderr),
 	};
 	Err(error_msg.to_string())
 }
