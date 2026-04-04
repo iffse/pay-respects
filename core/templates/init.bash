@@ -4,8 +4,7 @@ __pr_inline() {
 	local input="$READLINE_LINE"
 
 	local output
-	export _PR_MODE="inline"
-	output="$(_PR_LAST_COMMAND="$input" _PR_ALIAS="`alias`" _PR_SHELL="zsh" "{{ binary_path }}")"
+	output="$(_PR_MODE="inline" _PR_LAST_COMMAND="$input" _PR_ALIAS="`alias`" _PR_SHELL="zsh" "{{ binary_path }}")"
 
 	{% raw %}
 	if [[ -n "$output" ]]; then

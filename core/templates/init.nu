@@ -6,8 +6,7 @@ def --env {{ alias }} [] {
 def __pr_inline [] {
 	let input = (commandline)
 
-	$env._PR_MODE = "inline"
-	let output = (with-env { _PR_LAST_COMMAND: $input, _PR_ALIAS: (help aliases | select name expansion | each ({ |row| $row.name + "=" + $row.expansion }) | str join (char nl)), _PR_SHELL: nu } { `{{ binary_path }}` })
+	let output = (with-env { _PR_MODE = "inline", _PR_LAST_COMMAND: $input, _PR_ALIAS: (help aliases | select name expansion | each ({ |row| $row.name + "=" + $row.expansion }) | str join (char nl)), _PR_SHELL: nu } { `{{ binary_path }}` })
 
 	if ($output | is-not-empty) {
 		commandline edit --replace $output
