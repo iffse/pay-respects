@@ -19,7 +19,7 @@ a tmux session with English locale.
 	- All supported shell now have a new key-binding on `Ctrl-X`
 	- Fixes current typed command as good as possible:
 		- `gitcommit` + `C-X` `C-X` → `git commit`
-		- `z payrespe` + `C-X` `C-X` → `cd /home/iff/Code/pay-respectse`
+		- `z payrespe` + `C-X` `C-X` → `cd /home/iff/Code/pay-respects`
 - Better search algorithm including: Segmentation, fuzzy search, etc.
 
 ## [0.8.1] - 2026-04-03

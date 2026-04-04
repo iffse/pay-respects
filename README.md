@@ -144,7 +144,7 @@ You can now **[Press `F` to Pay Respects]**!
 You will also have a key-binding available on `Ctrl+X` for **experimental inline mode**, on-the-fly correction with no execution:
 
 - `gitcommit` + `C-X` `C-X` → `git commit`
-- `z payrespe` + `C-X` `C-X` → `cd /home/iff/Code/pay-respectse`
+- `z payrespe` + `C-X` `C-X` → `cd /home/iff/Code/pay-respects`
 
 Integrations with other tools:
 
