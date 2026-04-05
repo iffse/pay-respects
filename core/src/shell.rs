@@ -11,7 +11,7 @@ use std::time::Duration;
 #[cfg(windows)]
 use pay_respects_utils::files::path_convert;
 
-use crate::data::{Data, Mode};
+use crate::data::Data;
 use crate::init::Init;
 use crate::integrations::get_error_from_multiplexer;
 use pay_respects_utils::remove_env_var;
@@ -245,23 +245,6 @@ pub fn last_command(shell: &str) -> String {
 		"fish" => last_command,
 		"nu" => last_command,
 		_ => last_command,
-	}
-}
-
-pub fn run_mode() -> Mode {
-	match std::env::var("_PR_MODE") {
-		Ok(mode) => match mode.as_str() {
-			"suggestion" => Mode::Suggestion,
-			"inline" => Mode::Inline,
-			"cnf" => Mode::Cnf,
-			"noconfirm" => Mode::NoConfirm,
-			"echo" => Mode::Echo,
-			_ => {
-				eprintln!("Invalid mode: {}", mode);
-				exit(1);
-			}
-		},
-		Err(_) => Mode::Suggestion,
 	}
 }
 

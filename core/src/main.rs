@@ -56,7 +56,7 @@ fn main() -> Result<(), std::io::Error> {
 		init.ok().unwrap()
 	};
 
-	use data::Mode::*;
+	use pay_respects_utils::modes::Mode::*;
 	match data.mode {
 		Suggestion => modes::suggestion(&mut data),
 		Inline => modes::inline(&mut data),

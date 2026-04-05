@@ -21,25 +21,43 @@ pub fn suggest_candidates(data: &mut Data) {
 		return;
 	}
 	let shell = &data.shell;
+	let command = &data.command;
+	let mut final_candidates = vec![];
+
+	let fallbacks = &data.fallbacks;
+
+	if let Some(candidates) = get_standard_suggestions(data) {
+		add_candidates_no_dup(command, &mut final_candidates, &candidates);
+		data.candidates = final_candidates
+			.iter()
+			.map(|s| shell_syntax(shell, s))
+			.collect();
+		return;
+	}
+
+	for fallback in fallbacks {
+		let candidates = module_output(data, fallback);
+		if let Some(candidates) = candidates {
+			add_candidates_no_dup(command, &mut final_candidates, &candidates);
+			data.candidates = final_candidates
+				.iter()
+				.map(|s| shell_syntax(shell, s))
+				.collect();
+			return;
+		}
+	}
+}
+
+fn get_standard_suggestions(data: &Data) -> Option<Vec<String>> {
 	let target_rule = data.get_target_rule();
 	let command = &data.command;
 	let privilege = &data.privilege;
+
 	let mut suggest_candidates = vec![];
 	let mut module_candidates = vec![];
 	let mut final_candidates = vec![];
 
 	let modules = &data.modules;
-	let fallbacks = &data.fallbacks;
-
-	#[cfg(debug_assertions)]
-	{
-		eprintln!("/// suggest_candidates");
-		eprintln!("split: {:?}", data.split);
-		eprintln!("command: {command}");
-		eprintln!("privilege: {privilege:?}");
-		eprintln!("modules: {modules:?}");
-		eprintln!("fallbacks: {fallbacks:?}");
-	}
 
 	thread::scope(|s| {
 		s.spawn(|| {
@@ -73,33 +91,14 @@ pub fn suggest_candidates(data: &mut Data) {
 	}
 
 	if !final_candidates.is_empty() {
-		data.candidates = final_candidates
-			.iter()
-			.map(|s| shell_syntax(shell, s))
-			.collect();
-		return;
+		return Some(final_candidates);
 	}
 
 	if let Some(candidates) = match_pattern("_PR_fallback", data) {
 		add_candidates_no_dup(command, &mut final_candidates, &candidates);
-		data.candidates = final_candidates
-			.iter()
-			.map(|s| shell_syntax(shell, s))
-			.collect();
-		return;
+		return Some(final_candidates);
 	}
-
-	for fallback in fallbacks {
-		let candidates = module_output(data, fallback);
-		if let Some(candidates) = candidates {
-			add_candidates_no_dup(command, &mut final_candidates, &candidates);
-			data.candidates = final_candidates
-				.iter()
-				.map(|s| shell_syntax(shell, s))
-				.collect();
-			return;
-		}
-	}
+	None
 }
 
 pub fn select_candidate(data: &mut Data) {
@@ -180,23 +179,11 @@ pub fn inline_suggestion(data: &mut Data) {
 	if data.split.is_empty() {
 		return;
 	}
-	let shell = &data.shell;
-	let target_rule = data.get_target_rule();
-	let command = &data.command;
 
-	let mut suggest_candidates = vec![];
-
-	if let Some(candidates) = match_pattern(target_rule, data) {
-		add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
-	}
-	if let Some(candidates) = match_pattern("_PR_general", data) {
-		add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
-	}
-
-	if !suggest_candidates.is_empty() {
-		data.candidates = suggest_candidates
+	if let Some(candidates) = get_standard_suggestions(data) {
+		data.candidates = candidates
 			.iter()
-			.map(|s| shell_syntax(shell, s))
+			.map(|s| shell_syntax(&data.shell, s))
 			.collect();
 	}
 }

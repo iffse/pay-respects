@@ -2,6 +2,8 @@ use pay_respects_utils::evals::split_command;
 use pay_respects_utils::evals::split_comment;
 use pay_respects_utils::files::get_path_files;
 use pay_respects_utils::files::path_env_sep;
+use pay_respects_utils::modes::Mode;
+use pay_respects_utils::modes::run_mode;
 
 use itertools::Itertools;
 
@@ -20,18 +22,9 @@ use crate::shell::expand_alias_multiline;
 use crate::shell::get_error;
 use crate::shell::get_shell;
 use crate::shell::last_command;
-use crate::shell::run_mode;
 
 pub const PRIVILEGE_LIST: [&str; 2] = ["sudo", "doas"];
 
-#[derive(PartialEq, Debug)]
-pub enum Mode {
-	Suggestion,
-	Inline,
-	Echo,
-	NoConfirm,
-	Cnf,
-}
 pub struct Data {
 	pub shell: String,
 	pub env: Option<String>,

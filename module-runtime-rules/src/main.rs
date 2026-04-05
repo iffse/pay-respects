@@ -20,6 +20,7 @@ mod rules;
 use pay_respects_utils::{
 	evals::{split_command, split_comment},
 	files::get_path_files,
+	modes::{Mode, run_mode},
 };
 
 use crate::config::{get_target_rule, load_config};
@@ -30,6 +31,12 @@ fn main() -> Result<(), std::io::Error> {
 	let mut last_command = std::env::var("_PR_LAST_COMMAND").expect("_PR_LAST_COMMAND not set");
 	let error_msg = std::env::var("_PR_ERROR_MSG").expect("_PR_ERROR_MSG not set");
 	let executables: Vec<String> = get_path_files();
+
+	let mode = run_mode();
+	// unimlemented yet
+	if mode == Mode::Inline {
+		return Ok(());
+	}
 
 	#[cfg(debug_assertions)]
 	{
