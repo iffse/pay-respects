@@ -86,9 +86,9 @@ fn gen_match_rules(rules: &[Rule]) -> TokenStream {
 			suggestion_tokens.push(match_tokens);
 
 			if let Some(pattern) = pattern {
-				let string_patterns = pattern.join("\", \"");
+				let string_patterns = pattern.join("\"###, r###\"");
 				let string_patterns: TokenStream2 =
-					format!("[\"{}\"]", string_patterns).parse().unwrap();
+					format!("[r###\"{}\"###]", string_patterns).parse().unwrap();
 				patterns_tokens.push(string_patterns);
 			} else {
 				patterns_tokens.push("[\"\"]".parse().unwrap());
