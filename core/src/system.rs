@@ -9,6 +9,8 @@ use std::process::Stdio;
 
 use crate::config::InstallMethod;
 
+use colored::*;
+
 pub fn get_package_manager(data: &mut Data) -> Option<String> {
 	if let Ok(package_manager) = std::env::var("_PR_PACKAGE_MANAGER") {
 		if package_manager.is_empty() {
@@ -275,6 +277,13 @@ pub fn install_package(data: &mut Data, package_manager: &str, install: &str) ->
 	#[cfg(debug_assertions)]
 	eprintln!("install: {}", install);
 
+	let output = if let Some(prefix) = &data.prompt_prefix {
+		format!("{} {}", prefix, install)
+	} else {
+		install.clone()
+	};
+	eprintln!("{}", output.cyan().bold());
+
 	let result = Command::new(shell)
 		.arg("-c")
 		.arg(install)
@@ -286,8 +295,15 @@ pub fn install_package(data: &mut Data, package_manager: &str, install: &str) ->
 	result.success()
 }
 
-pub fn shell_package(data: &Data, package_manager: &str, install: &str) -> String {
+pub fn install_package_shell(data: &Data, package_manager: &str, install: &str) -> String {
 	let command = data.command.clone();
+
+	let output = if let Some(prefix) = &data.prompt_prefix {
+		format!("{} {}", prefix, install)
+	} else {
+		install.to_string()
+	};
+	eprintln!("{}", output.cyan().bold());
 
 	match package_manager {
 		"guix" => format!("{} -- {}", install, command),

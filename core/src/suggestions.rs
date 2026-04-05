@@ -141,6 +141,14 @@ pub fn select_candidate(data: &mut Data) {
 			exit(1);
 		});
 
+	let selected = active_candidates[selection].to_string();
+	let output = if let Some(prefix) = &data.prompt_prefix {
+		format!("{} {}", prefix, selected)
+	} else {
+		selected
+	};
+	eprintln!("{}", output);
+
 	let suggestion = candidates[selection].to_string();
 	data.update_suggest(&suggestion);
 	data.expand_suggest();
@@ -148,7 +156,7 @@ pub fn select_candidate(data: &mut Data) {
 	data.candidates.clear();
 }
 
-pub fn confirm_suggestion(data: &Data) -> Result<(), String> {
+pub fn execute_suggestion(data: &Data) -> Result<(), String> {
 	let shell = &data.shell;
 	let command = &data.suggest.clone().unwrap();
 	#[cfg(debug_assertions)]
@@ -156,7 +164,7 @@ pub fn confirm_suggestion(data: &Data) -> Result<(), String> {
 
 	let eval_method = &data.config.eval_method;
 	if eval_method == &config::EvalMethod::Shell {
-		shell_suggestion(data, command);
+		shell_execution(data, command);
 		return Ok(());
 	};
 
@@ -196,6 +204,14 @@ pub fn run_suggestion(data: &Data, command: &str) -> std::process::ExitStatus {
 	} else {
 		command.to_string()
 	};
+
+	let output = if let Some(prefix) = &data.prompt_prefix {
+		format!("{} {}", prefix, command)
+	} else {
+		command.clone()
+	};
+	eprintln!("{}", output.cyan().bold());
+
 	match privilege {
 		Some(sudo) => std::process::Command::new(sudo)
 			.arg(shell)
@@ -215,7 +231,7 @@ pub fn run_suggestion(data: &Data, command: &str) -> std::process::ExitStatus {
 	}
 }
 
-pub fn shell_suggestion(data: &Data, command: &str) {
+pub fn shell_execution(data: &Data, command: &str) {
 	let shell = &data.shell;
 	let privilege = &data.privilege;
 	let command = if let Some(env) = &data.env {
@@ -223,6 +239,13 @@ pub fn shell_suggestion(data: &Data, command: &str) {
 	} else {
 		command.to_string()
 	};
+
+	let output = if let Some(prefix) = &data.prompt_prefix {
+		format!("{} {}", prefix, command)
+	} else {
+		command.clone()
+	};
+	eprintln!("{}", output.cyan().bold());
 
 	let command = if let Some(privilege) = privilege {
 		add_privilege(shell, privilege, &command)
@@ -234,7 +257,7 @@ pub fn shell_suggestion(data: &Data, command: &str) {
 
 fn suggestion_err(data: &Data, command: &str) -> Result<(), String> {
 	let shell = &data.shell;
-	if let Some(err) = get_error_from_multiplexer(shell, command) {
+	if let Some(err) = get_error_from_multiplexer(shell, &data.prompt_prefix, command) {
 		return Err(err);
 	}
 

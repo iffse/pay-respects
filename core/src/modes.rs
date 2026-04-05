@@ -26,7 +26,7 @@ pub fn suggestion(data: &mut Data) {
 
 		suggestions::select_candidate(data);
 
-		let execution = suggestions::confirm_suggestion(data);
+		let execution = suggestions::execute_suggestion(data);
 		if execution.is_ok() {
 			return;
 		} else {
@@ -78,7 +78,7 @@ pub fn noconfirm(data: &mut Data) {
 		data.update_suggest(&candidate);
 		data.candidates.clear();
 
-		let execution = suggestions::confirm_suggestion(data);
+		let execution = suggestions::execute_suggestion(data);
 		if execution.is_ok() {
 			return;
 		} else {
@@ -150,7 +150,7 @@ pub fn cnf(data: &mut Data) {
 	if !data.candidates.is_empty() {
 		suggestions::select_candidate(data);
 
-		let status = suggestions::confirm_suggestion(data);
+		let status = suggestions::execute_suggestion(data);
 		if status.is_err() {
 			let suggest = data.suggest.clone().unwrap();
 			data.update_command(&suggest);
@@ -226,7 +226,7 @@ pub fn cnf(data: &mut Data) {
 			// environment with the package installed
 			println!(
 				"{}",
-				system::shell_package(data, &package_manager, &package)
+				system::install_package_shell(data, &package_manager, &package)
 			);
 			return;
 		}

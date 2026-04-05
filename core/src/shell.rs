@@ -115,8 +115,8 @@ pub fn get_error(shell: &str, command: &str, data: &Data) -> String {
 				return String::new();
 			}
 		}
-		if let Some(error) = get_error_from_multiplexer(shell, command) {
-			error
+		if let Some(error) = get_error_from_multiplexer(shell, &data.prompt_prefix, command) {
+			return error;
 		} else {
 			error_output_threaded(shell, command, timeout)
 		}

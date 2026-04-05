@@ -28,6 +28,7 @@ pub const PRIVILEGE_LIST: [&str; 2] = ["sudo", "doas"];
 pub struct Data {
 	pub shell: String,
 	pub env: Option<String>,
+	pub prompt_prefix: Option<String>,
 	pub command: String,
 	pub target_rule: Option<String>,
 	pub suggest: Option<String>,
@@ -57,6 +58,12 @@ impl Data {
 			} else {
 				option_env!("_DEF_PR_LIB").map(|dir| dir.to_string())
 			}
+		};
+
+		let prompt_prefix = if let Ok(prompt_prefix) = std::env::var("_PR_PREFIX") {
+			Some(prompt_prefix)
+		} else {
+			None
 		};
 
 		#[cfg(debug_assertions)]
@@ -138,6 +145,7 @@ impl Data {
 		let mut init = Data {
 			shell,
 			env: None,
+			prompt_prefix,
 			command,
 			target_rule: None,
 			suggest: None,

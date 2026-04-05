@@ -1,7 +1,5 @@
 use pay_respects_utils::{
-	evals::{compare_string, fuzzy_best_n_substring},
-	settings::get_trigram_minimum_score,
-	shell::shell_path_post_processing,
+	evals::{compare_string, fuzzy_best_n_substring}, log::dlog, settings::get_trigram_minimum_score, shell::shell_path_post_processing
 };
 
 use crate::shell::command_output;
@@ -10,7 +8,7 @@ use tempfile::NamedTempFile;
 
 #[allow(unreachable_code)]
 #[allow(unused_variables)]
-pub fn get_error_from_multiplexer(shell: &str, command: &str) -> Option<String> {
+pub fn get_error_from_multiplexer(shell: &str, prompt_prefix: &Option<String>, command: &str) -> Option<String> {
 	// in debug mode the output is not clear due to logs
 	#[cfg(debug_assertions)]
 	{
@@ -21,30 +19,36 @@ pub fn get_error_from_multiplexer(shell: &str, command: &str) -> Option<String> 
 		return None;
 	}
 
+	let command = if let Some(prefix) = prompt_prefix {
+		format!("{} {}", prefix, command)
+	} else {
+		return None;
+	};
+
 	// terminal multiplexers, higher priority
-	if let Some(error) = get_error_from_tmux(shell, command) {
+	if let Some(error) = get_error_from_tmux(shell, &command) {
 		#[cfg(debug_assertions)]
 		eprintln!("Error captured from tmux: '{}'", error);
 		return Some(error);
 	}
-	if let Some(error) = get_error_from_screen(shell, command) {
+	if let Some(error) = get_error_from_screen(shell, &command) {
 		#[cfg(debug_assertions)]
 		eprintln!("Error captured from screen: '{}'", error);
 		return Some(error);
 	}
-	if let Some(error) = get_error_from_zellij(shell, command) {
+	if let Some(error) = get_error_from_zellij(shell, &command) {
 		#[cfg(debug_assertions)]
 		eprintln!("Error captured from zellij: '{}'", error);
 		return Some(error);
 	}
 
 	// terminals that support capturing output
-	if let Some(error) = get_error_from_kitty(shell, command) {
+	if let Some(error) = get_error_from_kitty(shell, &command) {
 		#[cfg(debug_assertions)]
 		eprintln!("Error captured from kitty: '{}'", error);
 		return Some(error);
 	}
-	if let Some(error) = get_error_from_wezterm(shell, command) {
+	if let Some(error) = get_error_from_wezterm(shell, &command) {
 		#[cfg(debug_assertions)]
 		eprintln!("Error captured from wezterm: '{}'", error);
 		return Some(error);
@@ -141,6 +145,11 @@ fn get_error_from_wezterm(shell: &str, command: &str) -> Option<String> {
 }
 
 fn parse_output(command: &str, output: &str) -> Option<String> {
+	let output = output.split_whitespace().collect::<Vec<&str>>().join(" ");
+
+	let message = format!("Captured output from multiplexer: '{}'", output);
+	dlog(5, &message);
+
 	if !output.contains(command) {
 		return None;
 	}
