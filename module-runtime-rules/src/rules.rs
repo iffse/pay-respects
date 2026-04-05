@@ -1,5 +1,9 @@
 use crate::replaces;
-use pay_respects_utils::{evals::*, strings::split_unescaped_character};
+use pay_respects_utils::{
+	evals::*,
+	modes::Mode,
+	strings::{print_error, split_unescaped_character},
+};
 
 #[derive(serde::Deserialize)]
 struct Rule {
@@ -14,6 +18,26 @@ struct MatchError {
 }
 
 pub fn runtime_match(
+	mode: &Mode,
+	executable: &str,
+	shell: &str,
+	last_command: &str,
+	error_msg: &str,
+	executables: &[String],
+) -> Option<Vec<String>> {
+	match mode {
+		Mode::Suggestion => {
+			suggestion_match(executable, shell, last_command, error_msg, executables)
+		}
+		Mode::Inline => inline_match(executable, shell, last_command, error_msg, executables),
+		_ => {
+			print_error("Unknown mode in runtime rules");
+			None
+		}
+	}
+}
+
+pub fn suggestion_match(
 	executable: &str,
 	shell: &str,
 	last_command: &str,
@@ -61,7 +85,8 @@ pub fn runtime_match(
 						let conditions = conditions
 							.trim_start_matches(['#', '['])
 							.trim_end_matches(']');
-						let conditions = split_unescaped_character(conditions, ',');
+						let mut conditions = split_unescaped_character(conditions, ',');
+						conditions.retain(|c| c.trim() != "INLINE");
 
 						for condition in conditions {
 							let (mut condition, arg) = condition.split_once('(').unwrap();
@@ -109,6 +134,106 @@ pub fn runtime_match(
 					}
 				}
 				break;
+			}
+		}
+	}
+
+	rule.extends
+}
+
+pub fn inline_match(
+	executable: &str,
+	shell: &str,
+	last_command: &str,
+	error_msg: &str,
+	executables: &[String],
+) -> Option<Vec<String>> {
+	let file_path = get_rule(executable)?;
+	let file = match std::fs::read_to_string(&file_path) {
+		Ok(content) => content,
+		Err(e) => {
+			eprintln!("runtime-rules: Failed to read {}: {}", file_path, e);
+			return None;
+		}
+	};
+	let rule: Rule = match toml::from_str(&file) {
+		Ok(rule) => rule,
+		Err(e) => {
+			eprintln!("runtime-rules: Failed to parse {}: {}", file_path, e);
+			return None;
+		}
+	};
+	let split_command = split_command(last_command);
+
+	let error_lower = error_msg.to_lowercase();
+
+	let mut pure_suggest;
+	for match_err in rule.match_err {
+		'suggest: for suggest in &match_err.suggest {
+			if suggest.starts_with('#') {
+				let mut lines = suggest.lines().collect::<Vec<&str>>();
+				let mut conditions = String::new();
+				for (i, line) in lines[0..].iter().enumerate() {
+					conditions.push_str(line);
+					if line.ends_with(']') {
+						lines = lines[i + 1..].to_vec();
+						break;
+					}
+				}
+				let conditions = conditions
+					.trim_start_matches(['#', '['])
+					.trim_end_matches(']');
+				let mut conditions = split_unescaped_character(conditions, ',');
+				for condition in &mut conditions {
+					*condition = condition.trim().to_string();
+				}
+				if !conditions.contains(&"INLINE".to_string()) {
+					continue;
+				}
+				conditions.retain(|c| c != "INLINE");
+
+				for condition in conditions {
+					let (mut condition, arg) = condition.split_once('(').unwrap();
+					condition = condition.trim();
+					let arg = arg
+						.to_string()
+						.chars()
+						.take(arg.len() - 1)
+						.collect::<String>();
+					let reverse = match condition.starts_with('!') {
+						true => {
+							condition = condition.trim_start_matches('!');
+							true
+						}
+						false => false,
+					};
+					if eval_condition(
+						condition,
+						&arg,
+						shell,
+						last_command,
+						&error_lower,
+						&split_command,
+						executables,
+					) == reverse
+					{
+						continue 'suggest;
+					}
+				}
+
+				pure_suggest = lines.join("\n").to_owned();
+			} else {
+				pure_suggest = suggest.to_owned();
+			}
+
+			// replacing placeholders
+			if pure_suggest.contains("{{command}}") {
+				pure_suggest = pure_suggest.replace("{{command}}", last_command);
+			}
+			let suggests = eval_suggest(&pure_suggest, last_command, error_msg, executables, shell);
+			for suggest in suggests {
+				print!("{}", suggest);
+				print!("<_PR_BR>");
 			}
 		}
 	}

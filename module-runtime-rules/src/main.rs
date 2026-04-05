@@ -20,7 +20,7 @@ mod rules;
 use pay_respects_utils::{
 	evals::{split_command, split_comment},
 	files::get_path_files,
-	modes::{Mode, run_mode},
+	modes::run_mode,
 };
 
 use crate::config::{get_target_rule, load_config};
@@ -33,10 +33,6 @@ fn main() -> Result<(), std::io::Error> {
 	let executables: Vec<String> = get_path_files();
 
 	let mode = run_mode();
-	// unimlemented yet
-	if mode == Mode::Inline {
-		return Ok(());
-	}
 
 	#[cfg(debug_assertions)]
 	{
@@ -66,8 +62,14 @@ fn main() -> Result<(), std::io::Error> {
 			continue;
 		}
 		runned_rules.push(executable.clone());
-		let extends =
-			rules::runtime_match(&executable, &shell, &last_command, &error_msg, &executables);
+		let extends = rules::runtime_match(
+			&mode,
+			&executable,
+			&shell,
+			&last_command,
+			&error_msg,
+			&executables,
+		);
 		if let Some(extends) = extends {
 			for extend in extends {
 				if !runned_rules.contains(&extend) {
@@ -77,6 +79,7 @@ fn main() -> Result<(), std::io::Error> {
 		}
 	}
 	rules::runtime_match(
+		&mode,
 		"_PR_GENERAL",
 		&shell,
 		&last_command,
