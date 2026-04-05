@@ -164,3 +164,40 @@ suggest = [
 #[cmd_contains(branch -d)]
 {{command[:1]}} -D {{command[3:]}} ''',
 ]
+
+[[match_err]]
+pattern = [
+	"Changes not staged for commit"
+]
+suggest = [
+'''
+git add . '''
+]
+
+[[match_err]]
+pattern = [
+	"use \"git push\" to publish your local commits"
+]
+suggest = [
+'''
+git push ''',
+]
+
+[[match_err]]
+pattern = [
+	"Nothing specified"
+]
+suggest = [
+'''
+#[cmd_contains(add)]
+git add . ''',
+]
+
+[[match_err]]
+pattern = [
+	"fatal: not a git repository"
+]
+suggest = [
+'''
+git init''',
+]
