@@ -20,13 +20,13 @@ use sys_locale::get_locale;
 mod args;
 mod config;
 mod data;
+mod highlighting;
 mod init;
 mod integrations;
 mod modes;
 mod rules;
 mod rules_function;
 mod shell;
-mod style;
 mod suggestions;
 mod system;
 

@@ -17,7 +17,10 @@
 mod config;
 mod replaces;
 mod rules;
-use pay_respects_utils::{evals::split_command, files::get_path_files};
+use pay_respects_utils::{
+	evals::{split_command, split_comment},
+	files::get_path_files,
+};
 
 use crate::config::{get_target_rule, load_config};
 
@@ -37,13 +40,9 @@ fn main() -> Result<(), std::io::Error> {
 		eprintln!("executables: {:?}", executables);
 	}
 
-	let split = split_command(&last_command);
-	if split.contains(&"#".to_string()) {
-		last_command = split
-			.into_iter()
-			.take_while(|s| s != "#")
-			.collect::<Vec<String>>()
-			.join(" ");
+	let mut split = split_command(&last_command);
+	if split_comment(&mut split).is_some() {
+		last_command = split.join(" ");
 	}
 
 	pay_respects_utils::shell::set_shell_type(&shell);

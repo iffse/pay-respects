@@ -9,15 +9,15 @@ use pay_respects_utils::strings::print_error;
 
 use crate::config;
 use crate::data::Data;
+use crate::highlighting::highlight_difference;
 use crate::integrations::get_error_from_multiplexer;
 use crate::rules::match_pattern;
 use crate::shell::{
 	add_candidates_no_dup, add_privilege, module_output, shell_evaluated_commands, shell_syntax,
 };
-use crate::style::highlight_difference;
 
 pub fn suggest_candidates(data: &mut Data) {
-	if data.split.is_empty() && data.comments.is_none() {
+	if data.split.is_empty() {
 		return;
 	}
 	let shell = &data.shell;

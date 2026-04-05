@@ -84,6 +84,20 @@ pub fn split_command(command: &str) -> Vec<String> {
 		.collect::<Vec<String>>()
 }
 
+pub fn split_comment(split: &mut Vec<String>) -> Option<String> {
+	let mut comments: Option<String> = None;
+	if split.contains(&"#".to_string()) {
+		// remove everything after the first # and store it in comments
+		let index = split.iter().position(|s| s == "#").unwrap();
+		let comments_vec = split.split_off(index);
+		comments = Some(comments_vec.join(" "));
+		if split.is_empty() {
+			*split = vec!["".to_string()];
+		}
+	}
+	comments
+}
+
 pub fn suggest_typo(typos: &[String], candidates: &[String], executables: &[String]) -> String {
 	let mut suggestions = Vec::new();
 	for typo in typos {

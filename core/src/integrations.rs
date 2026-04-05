@@ -8,7 +8,15 @@ use crate::shell::command_output;
 
 use tempfile::NamedTempFile;
 
+#[allow(unreachable_code)]
+#[allow(unused_variables)]
 pub fn get_error_from_multiplexer(shell: &str, command: &str) -> Option<String> {
+	// in debug mode the output is not clear due to logs
+	#[cfg(debug_assertions)]
+	{
+		return None;
+	}
+
 	// terminal multiplexers, higher priority
 	if let Some(error) = get_error_from_tmux(shell, command) {
 		#[cfg(debug_assertions)]

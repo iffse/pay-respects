@@ -1,7 +1,7 @@
 use crate::data::Data;
 use crate::shell::is_privileged;
 use colored::*;
-use pay_respects_utils::evals::split_command;
+use pay_respects_utils::evals::{split_command, split_comment};
 
 // to_string() is necessary here, otherwise there won't be color in the output
 #[warn(clippy::unnecessary_to_owned)]
@@ -11,6 +11,8 @@ pub fn highlight_difference(data: &Data, suggested_command: &str, active: bool) 
 	let last_command = &data.command;
 	let mut split_suggested_command = split_command(suggested_command);
 	let split_last_command = split_command(last_command);
+
+	let comment = split_comment(&mut split_suggested_command);
 
 	if split_suggested_command == split_last_command {
 		return None;
@@ -34,19 +36,10 @@ pub fn highlight_difference(data: &Data, suggested_command: &str, active: bool) 
 		}
 	}
 
-	// skip everything after # comment
-	let mut skip = false;
 	// let mut highlighted = suggested_command.to_string();
 	'next: for entry in split_suggested_command.iter_mut() {
 		if entry == "\n" {
-			skip = false;
 			continue;
-		}
-		if skip {
-			continue;
-		}
-		if entry == "#" {
-			skip = true;
 		}
 		for old in &old_entries {
 			if old == entry {
@@ -83,9 +76,12 @@ pub fn highlight_difference(data: &Data, suggested_command: &str, active: bool) 
 		split_suggested_command.insert(0, color_same(&sudo, active));
 	}
 
-	let highlighted = split_suggested_command.join(" ");
+	let highlighted = split_suggested_command.join(" ").replace(" \n ", "\n");
 
-	Some(highlighted.replace(" \n ", "\n"))
+	if let Some(comment) = comment {
+		return Some(format!("{} {}", highlighted, comment));
+	}
+	Some(highlighted)
 }
 
 fn color_same(str: &str, active: bool) -> String {

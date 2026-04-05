@@ -21,5 +21,5 @@ pattern = [
 suggest = [
 '''
 #[cmd_contains(-S)]
-{{command[0]}} -Syu''',
+{{command[0]}} -Syu # Complete system upgrade''',
 ]

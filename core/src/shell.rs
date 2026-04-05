@@ -197,7 +197,7 @@ pub fn module_output(data: &Data, module: &str) -> Option<Vec<String>> {
 	};
 
 	if let Some(comments) = comments {
-		last_command = format!("{} {}", last_command, comments);
+		last_command = format!("{} # {}", last_command, comments);
 	}
 
 	let output = clean_shell_command(shell, module)

@@ -8,8 +8,8 @@ use pay_respects_utils::evals::best_matches;
 use pay_respects_utils::files::best_match_file;
 
 use crate::data::Data;
+use crate::highlighting::highlight_difference;
 use crate::shell::{add_candidates_no_dup, shell_evaluated_commands};
-use crate::style::highlight_difference;
 use crate::suggestions::{inline_suggestion, suggest_candidates};
 use crate::system;
 use crate::{config, suggestions};

@@ -142,7 +142,7 @@ pub fn desperate_fuzzy_recovery(
 	#[cfg(debug_assertions)]
 	eprintln!(
 		"split and segments:\n - split: {:?}\n - segments: {:?}",
-		split[1..].iter().collect::<Vec<&String>>(),
+		split[0..].iter().collect::<Vec<&String>>(),
 		segments
 	);
 

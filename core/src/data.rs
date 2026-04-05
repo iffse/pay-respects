@@ -1,4 +1,5 @@
 use pay_respects_utils::evals::split_command;
+use pay_respects_utils::evals::split_comment;
 use pay_respects_utils::files::get_path_files;
 use pay_respects_utils::files::path_env_sep;
 
@@ -220,18 +221,10 @@ impl Data {
 			exit(1);
 		}
 
-		if split.contains(&"#".to_string()) {
-			// remove everything after the first # and store it in comments
-			let index = split.iter().position(|s| s == "#").unwrap();
-			let comments = split.split_off(index);
+		let comments = split_comment(&mut split);
+		if let Some(comments) = comments {
 			self.command = split.join(" ");
-			self.comments = Some(comments.join(" "));
-			split.pop();
-			if split.is_empty() {
-				split = vec!["".to_string()];
-			}
-		} else {
-			self.comments = None;
+			self.comments = Some(comments);
 		}
 
 		self.split = split;
@@ -308,7 +301,7 @@ impl Data {
 	pub fn update_suggest(&mut self, suggest: &str) {
 		let split = split_command(suggest);
 		if PRIVILEGE_LIST.contains(&split[0].as_str()) {
-			self.suggest = Some(suggest.replacen(&split[0], "", 1));
+			self.suggest = Some(suggest.replacen(&split[0], "", 1).trim().to_string());
 			self.privilege = Some(split[0].clone())
 		} else {
 			self.suggest = Some(suggest.to_string());
