@@ -151,17 +151,16 @@ fn get_error_from_wezterm(shell: &str, prefix: &str, command: &str) -> Option<St
 }
 
 fn parse_output(prefix: &str, command: &str, output: &str) -> Option<String> {
-	let first_line = if command.contains("\n") {
-		command.split_once("\n").unwrap().0
-	} else {
-		command
-	};
-
 	// find the last line that starts with the prefix
 	// return everything after that line as the error message
 	let lines = output.lines().collect::<Vec<&str>>();
 	for (idx, line) in lines.iter().enumerate().rev() {
-		if line.starts_with(prefix) && line.contains(first_line) {
+		// must have
+		if line.contains(prefix) {
+			let tail = line.split(prefix).nth(1)?.trim();
+			if !command.contains(tail) {
+				continue;
+			}
 			let error = lines[idx + 1..].join("\n").trim().to_string();
 			return Some(error);
 		}
