@@ -205,13 +205,6 @@ pub fn run_suggestion(data: &Data, command: &str) -> std::process::ExitStatus {
 		command.to_string()
 	};
 
-	let output = if let Some(prefix) = &data.prompt_prefix {
-		format!("{} {}", prefix, command)
-	} else {
-		command.clone()
-	};
-	eprintln!("{}", output.cyan().bold());
-
 	match privilege {
 		Some(sudo) => std::process::Command::new(sudo)
 			.arg(shell)
@@ -239,13 +232,6 @@ pub fn shell_execution(data: &Data, command: &str) {
 	} else {
 		command.to_string()
 	};
-
-	let output = if let Some(prefix) = &data.prompt_prefix {
-		format!("{} {}", prefix, command)
-	} else {
-		command.clone()
-	};
-	eprintln!("{}", output.cyan().bold());
 
 	let command = if let Some(privilege) = privilege {
 		add_privilege(shell, privilege, &command)
