@@ -164,7 +164,16 @@ You will also have a key-binding available on `Ctrl+X` for **experimental inline
 Integrations with other tools:
 
 - **tmux**, **GNU Screen**, **Zellij**, **WezTerm**, **kitty**:
-	- Command log capturing inside the session without the need to rerun commands to get error messages. Requires English locale to guarantee correct logs.
+	- Command log capturing inside the session without the need to rerun commands
+to get error messages. **Requires English locale** (actually `LANG=C`, which
+output is used for matching) to guarantee correct logs.
+	- **Requires prompt prefix**: You need to have something identifiable before
+your command and set to the environment variable `_PR_PREFIX`. Some example values
+are:
+		- `❯`: Starship default
+		- `$`: Bash default
+		- `%`: Zsh default
+		- `>`: Fish and Nushell default
 - **zoxide**: Uses zoxide's database to navigate through directories.
 
 ## Installing
