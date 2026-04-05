@@ -60,11 +60,7 @@ impl Data {
 			}
 		};
 
-		let prompt_prefix = if let Ok(prompt_prefix) = std::env::var("_PR_PREFIX") {
-			Some(prompt_prefix)
-		} else {
-			None
-		};
+		let prompt_prefix = std::env::var("_PR_PREFIX").ok();
 
 		#[cfg(debug_assertions)]
 		eprintln!("lib_dir: {:?}", lib_dir);

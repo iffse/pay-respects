@@ -1,5 +1,7 @@
 use pay_respects_utils::{
-	evals::{compare_string, fuzzy_best_n_substring}, log::dlog, settings::get_trigram_minimum_score, shell::shell_path_post_processing
+	evals::{compare_string, fuzzy_best_n_substring},
+	settings::get_trigram_minimum_score,
+	shell::shell_path_post_processing,
 };
 
 use crate::shell::command_output;
@@ -8,7 +10,11 @@ use tempfile::NamedTempFile;
 
 #[allow(unreachable_code)]
 #[allow(unused_variables)]
-pub fn get_error_from_multiplexer(shell: &str, prompt_prefix: &Option<String>, command: &str) -> Option<String> {
+pub fn get_error_from_multiplexer(
+	shell: &str,
+	prompt_prefix: &Option<String>,
+	command: &str,
+) -> Option<String> {
 	// in debug mode the output is not clear due to logs
 	#[cfg(debug_assertions)]
 	{
@@ -19,36 +25,36 @@ pub fn get_error_from_multiplexer(shell: &str, prompt_prefix: &Option<String>, c
 		return None;
 	}
 
-	let command = if let Some(prefix) = prompt_prefix {
-		format!("{} {}", prefix, command)
+	let prefix = if let Some(prefix) = prompt_prefix {
+		prefix
 	} else {
 		return None;
 	};
 
 	// terminal multiplexers, higher priority
-	if let Some(error) = get_error_from_tmux(shell, &command) {
+	if let Some(error) = get_error_from_tmux(shell, prefix, command) {
 		#[cfg(debug_assertions)]
 		eprintln!("Error captured from tmux: '{}'", error);
 		return Some(error);
 	}
-	if let Some(error) = get_error_from_screen(shell, &command) {
+	if let Some(error) = get_error_from_screen(shell, prefix, command) {
 		#[cfg(debug_assertions)]
 		eprintln!("Error captured from screen: '{}'", error);
 		return Some(error);
 	}
-	if let Some(error) = get_error_from_zellij(shell, &command) {
+	if let Some(error) = get_error_from_zellij(shell, prefix, command) {
 		#[cfg(debug_assertions)]
 		eprintln!("Error captured from zellij: '{}'", error);
 		return Some(error);
 	}
 
 	// terminals that support capturing output
-	if let Some(error) = get_error_from_kitty(shell, &command) {
+	if let Some(error) = get_error_from_kitty(shell, prefix, command) {
 		#[cfg(debug_assertions)]
 		eprintln!("Error captured from kitty: '{}'", error);
 		return Some(error);
 	}
-	if let Some(error) = get_error_from_wezterm(shell, &command) {
+	if let Some(error) = get_error_from_wezterm(shell, prefix, command) {
 		#[cfg(debug_assertions)]
 		eprintln!("Error captured from wezterm: '{}'", error);
 		return Some(error);
@@ -56,7 +62,7 @@ pub fn get_error_from_multiplexer(shell: &str, prompt_prefix: &Option<String>, c
 	None
 }
 
-fn get_error_from_tmux(shell: &str, command: &str) -> Option<String> {
+fn get_error_from_tmux(shell: &str, prefix: &str, command: &str) -> Option<String> {
 	if std::env::var("_PR_NO_TMUX").is_ok() {
 		return None;
 	}
@@ -70,10 +76,10 @@ fn get_error_from_tmux(shell: &str, command: &str) -> Option<String> {
 	let capture_command = "tmux capture-pane -pS -";
 	let output = command_output(shell, capture_command);
 
-	parse_output(command, &output)
+	parse_output(prefix, command, &output)
 }
 
-fn get_error_from_screen(shell: &str, command: &str) -> Option<String> {
+fn get_error_from_screen(shell: &str, prefix: &str, command: &str) -> Option<String> {
 	if std::env::var("_PR_NO_SCREEN").is_ok() {
 		return None;
 	}
@@ -90,10 +96,10 @@ fn get_error_from_screen(shell: &str, command: &str) -> Option<String> {
 	let _ = command_output(shell, &capture_command);
 	let output = std::fs::read_to_string(path).ok()?;
 
-	parse_output(command, &output)
+	parse_output(prefix, command, &output)
 }
 
-fn get_error_from_zellij(shell: &str, command: &str) -> Option<String> {
+fn get_error_from_zellij(shell: &str, prefix: &str, command: &str) -> Option<String> {
 	if std::env::var("_PR_NO_ZELLIJ").is_ok() {
 		return None;
 	}
@@ -107,10 +113,10 @@ fn get_error_from_zellij(shell: &str, command: &str) -> Option<String> {
 	let capture_command = "zellij action dump-screen --full";
 	let output = command_output(shell, capture_command);
 
-	parse_output(command, &output)
+	parse_output(prefix, command, &output)
 }
 
-fn get_error_from_kitty(shell: &str, command: &str) -> Option<String> {
+fn get_error_from_kitty(shell: &str, prefix: &str, command: &str) -> Option<String> {
 	if std::env::var("_PR_NO_KITTY").is_ok() {
 		return None;
 	}
@@ -124,10 +130,10 @@ fn get_error_from_kitty(shell: &str, command: &str) -> Option<String> {
 	let capture_command = "kitty @ get-text --extent=all";
 	let output = command_output(shell, capture_command);
 
-	parse_output(command, &output)
+	parse_output(prefix, command, &output)
 }
 
-fn get_error_from_wezterm(shell: &str, command: &str) -> Option<String> {
+fn get_error_from_wezterm(shell: &str, prefix: &str, command: &str) -> Option<String> {
 	if std::env::var("_PR_NO_WEZTERM").is_ok() {
 		return None;
 	}
@@ -141,26 +147,26 @@ fn get_error_from_wezterm(shell: &str, command: &str) -> Option<String> {
 	let capture_command = "wezterm cli get-text --start-line -10000";
 	let output = command_output(shell, capture_command);
 
-	parse_output(command, &output)
+	parse_output(prefix, command, &output)
 }
 
-fn parse_output(command: &str, output: &str) -> Option<String> {
-	let output = output.split_whitespace().collect::<Vec<&str>>().join(" ");
-
-	let message = format!("Captured output from multiplexer: '{}'", output);
-	dlog(5, &message);
-
-	if !output.contains(command) {
-		return None;
-	}
-
-	// remove everything before the last occurrence of the command
-	if let Some(pos) = output.rfind(command) {
-		let output = output[pos + command.len()..].trim().to_string();
-		Some(output)
+fn parse_output(prefix: &str, command: &str, output: &str) -> Option<String> {
+	let first_line = if command.contains("\n") {
+		command.split_once("\n").unwrap().0
 	} else {
-		None
+		command
+	};
+
+	// find the last line that starts with the prefix
+	// return everything after that line as the error message
+	let lines = output.lines().collect::<Vec<&str>>();
+	for (idx, line) in lines.iter().enumerate().rev() {
+		if line.starts_with(prefix) && line.contains(first_line) {
+			let error = lines[idx + 1..].join("\n").trim().to_string();
+			return Some(error);
+		}
 	}
+	None
 }
 
 pub fn zoxide_integration(

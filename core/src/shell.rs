@@ -1,5 +1,6 @@
 use askama::Template;
 use pay_respects_utils::lists::blocking_commands;
+use pay_respects_utils::log::dlog;
 
 use std::process::{Stdio, exit};
 
@@ -116,7 +117,9 @@ pub fn get_error(shell: &str, command: &str, data: &Data) -> String {
 			}
 		}
 		if let Some(error) = get_error_from_multiplexer(shell, &data.prompt_prefix, command) {
-			return error;
+			let message = format!("Captured output from multiplexer: '{}'", error);
+			dlog(5, &message);
+			error
 		} else {
 			error_output_threaded(shell, command, timeout)
 		}

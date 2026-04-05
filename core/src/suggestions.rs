@@ -5,6 +5,7 @@ use std::time::{Duration, Instant};
 
 use colored::Colorize;
 use pay_respects_select::select;
+use pay_respects_utils::log::dlog;
 use pay_respects_utils::strings::print_error;
 
 use crate::config;
@@ -179,7 +180,7 @@ pub fn execute_suggestion(data: &Data) -> Result<(), String> {
 		if now.elapsed() > Duration::from_secs(3) {
 			exit(1);
 		}
-		suggestion_err(data, command)
+		get_suggestion_error(data, command)
 	}
 }
 
@@ -241,9 +242,11 @@ pub fn shell_execution(data: &Data, command: &str) {
 	println!("{}", command);
 }
 
-fn suggestion_err(data: &Data, command: &str) -> Result<(), String> {
+fn get_suggestion_error(data: &Data, command: &str) -> Result<(), String> {
 	let shell = &data.shell;
 	if let Some(err) = get_error_from_multiplexer(shell, &data.prompt_prefix, command) {
+		let message = format!("Captured output from multiplexer: '{}'", err);
+		dlog(5, &message);
 		return Err(err);
 	}
 
