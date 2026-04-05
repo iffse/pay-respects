@@ -24,6 +24,7 @@ color`
 - Logic for CNF is restored to the one used during older versions, as the
 aggressive fuzzy search created too many false positives. E.g. instead of
 installing `fastfetch`, was suggesting `last fetch`
+- Difference highlighting no longer highlights comments.
 
 ### Fixed
 
@@ -34,6 +35,8 @@ used when retrying.
 - The introduction of Inline mode on [0.8.1] come with a bug that will rerun
 the previous command even on Inline and CNF modes. Shouldn't be a big problem
 most of the time, excepting performance penalty.
+- Comments are no longer part of the command to be fixed. However, modules will
+still get the command with the comments.
 
 ## [0.8.2] - 2026-04-04
 
