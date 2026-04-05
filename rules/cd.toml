@@ -33,7 +33,7 @@ pattern = [
 suggest = [
 '''
 #[length(2)]
-cd {{typo[1](file)}}
+{{command[0]}} {{typo[1](file)}}
 ''',
 '''
 #[FUNCTION, !cmd_contains(^((z\s+)|(__zoxide_z\s+)))]
