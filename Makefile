@@ -37,5 +37,5 @@ test-suggestions: build
 
 test: test-rust test-suggestions
 
-benchmark: release
+benchmark: release-all
 	cd tests && bash benchmark.sh
