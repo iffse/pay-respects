@@ -9,3 +9,5 @@ pub mod lists;
 pub mod settings;
 pub mod shell;
 pub mod strings;
+
+pub mod log;

@@ -18,6 +18,14 @@ pub fn unexpected_format(message: &str) {
 	print_error(&format!("Unexpected format: {}", message));
 }
 
+pub fn log_string(debug_level: usize, message: &str) -> String {
+	format!("[{}]: {}", debug_level.to_string().blue(), message)
+}
+
+pub fn log_plain(debug_level: usize, message: &str) -> String {
+	format!("[{}]: {}", debug_level, message)
+}
+
 /// Replaces all occurrences of the target character in the input string with
 /// the replacement string, but only if the target character is not escaped
 /// by an **odd number** of backslashes.
