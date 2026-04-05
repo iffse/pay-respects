@@ -294,7 +294,7 @@ pub fn select(suggest: &mut String, select_list: &mut Vec<TokenStream2>) {
 		} else if selection_list[0] == "path" {
 			quote! {
 				let selects = {
-					let res = best_matches_path(&split[#index], executables);
+					let res = best_matches(&split[#index], executables);
 					if res.is_none() {
 						vec![split[#index].clone()]
 					} else {

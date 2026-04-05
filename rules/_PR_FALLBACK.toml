@@ -1,0 +1,13 @@
+command = "_PR_fallback"
+
+[[match_err]]
+suggest = [
+'''
+#[FUNCTION, min_length(2), INLINE]
+DesperateFileLookUp
+''',
+'''
+#[FUNCTION, INLINE]
+DesperateFuzzyRecovery
+''',
+]

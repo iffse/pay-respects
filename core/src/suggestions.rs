@@ -79,6 +79,16 @@ pub fn suggest_candidates(data: &mut Data) {
 			.collect();
 		return;
 	}
+
+	if let Some(candidates) = match_pattern("_PR_fallback", data) {
+		add_candidates_no_dup(command, &mut final_candidates, &candidates);
+		data.candidates = final_candidates
+			.iter()
+			.map(|s| shell_syntax(shell, s))
+			.collect();
+		return;
+	}
+
 	for fallback in fallbacks {
 		let candidates = module_output(data, fallback);
 		if let Some(candidates) = candidates {

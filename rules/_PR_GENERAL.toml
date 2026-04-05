@@ -8,9 +8,8 @@ pattern = [
 	"is not recognized as a name of a cmdlet"
 ]
 suggest = [
-# Covered up by `DesperateFuzzyRecovery`
-# '''
-# {{select[0](path)}} {{command[1:]}} ''',
+'''
+{{select[0](path)}} {{command[1:]}} ''',
 # if command starts with `z `, it's likely using zoxide.
 # zoxide defines a function, therefore the output is unobtainable in a non-interactive shell.
 '''
@@ -29,16 +28,4 @@ suggest = [
 #[cmd_contains((?m)^(\S*)\/(\S*))]
 chmod +x {{command[0]}} &&
 {{command}}'''
-]
-
-[[match_err]]
-suggest = [
-'''
-#[FUNCTION, min_length(2), INLINE]
-DesperateFileLookUp
-''',
-'''
-#[FUNCTION, INLINE]
-DesperateFuzzyRecovery
-''',
 ]
