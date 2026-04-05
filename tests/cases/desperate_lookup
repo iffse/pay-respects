@@ -1,0 +1,6 @@
+case="desperate: file look up"
+command="foocommand imadethisup"
+error=""
+expect="foocommand i-made-this-up"
+
+touch i-made-this-up
