@@ -144,7 +144,7 @@ pub fn select_candidate(data: &mut Data) {
 
 	let selected = active_candidates[selection].to_string();
 	let output = if let Some(prefix) = &data.prompt_prefix {
-		format!("{} {}", prefix, selected)
+		format!("{} {}", prefix.cyan().bold(), selected)
 	} else {
 		selected
 	};
