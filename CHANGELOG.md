@@ -11,6 +11,20 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Inline mode rule support for runtime rules
+
+### Changed
+
+- **Terminal multiplexer integration now requires configuration**
+- Desperate functions are now only executed when no previous suggestion is
+found, improving performance
+
+### Fixed
+
+- Compile time parser now supports quotes in patterns
+
 ## [0.8.3] - 2026-04-05
 
 ### Added
