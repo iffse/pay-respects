@@ -1,9 +1,5 @@
 use crate::replaces;
-use pay_respects_utils::{
-	evals::*,
-	modes::Mode,
-	strings::{print_error, split_unescaped_character},
-};
+use pay_respects_utils::{evals::*, modes::Mode, strings::split_unescaped_character};
 
 #[derive(serde::Deserialize)]
 struct Rule {
@@ -30,10 +26,7 @@ pub fn runtime_match(
 			suggestion_match(executable, shell, last_command, error_msg, executables)
 		}
 		Mode::Inline => inline_match(executable, shell, last_command, error_msg, executables),
-		_ => {
-			print_error("Unknown mode in runtime rules");
-			None
-		}
+		_ => suggestion_match(executable, shell, last_command, error_msg, executables),
 	}
 }
 
@@ -170,61 +163,61 @@ pub fn inline_match(
 	let mut pure_suggest;
 	for match_err in rule.match_err {
 		'suggest: for suggest in &match_err.suggest {
-			if suggest.starts_with('#') {
-				let mut lines = suggest.lines().collect::<Vec<&str>>();
-				let mut conditions = String::new();
-				for (i, line) in lines[0..].iter().enumerate() {
-					conditions.push_str(line);
-					if line.ends_with(']') {
-						lines = lines[i + 1..].to_vec();
-						break;
-					}
-				}
-				let conditions = conditions
-					.trim_start_matches(['#', '['])
-					.trim_end_matches(']');
-				let mut conditions = split_unescaped_character(conditions, ',');
-				for condition in &mut conditions {
-					*condition = condition.trim().to_string();
-				}
-				if !conditions.contains(&"INLINE".to_string()) {
-					continue;
-				}
-				conditions.retain(|c| c != "INLINE");
-
-				for condition in conditions {
-					let (mut condition, arg) = condition.split_once('(').unwrap();
-					condition = condition.trim();
-					let arg = arg
-						.to_string()
-						.chars()
-						.take(arg.len() - 1)
-						.collect::<String>();
-					let reverse = match condition.starts_with('!') {
-						true => {
-							condition = condition.trim_start_matches('!');
-							true
-						}
-						false => false,
-					};
-					if eval_condition(
-						condition,
-						&arg,
-						shell,
-						last_command,
-						&error_lower,
-						&split_command,
-						executables,
-					) == reverse
-					{
-						continue 'suggest;
-					}
-				}
-
-				pure_suggest = lines.join("\n").to_owned();
-			} else {
-				pure_suggest = suggest.to_owned();
+			if !suggest.starts_with('#') {
+				continue 'suggest;
 			}
+
+			let mut lines = suggest.lines().collect::<Vec<&str>>();
+			let mut conditions = String::new();
+			for (i, line) in lines[0..].iter().enumerate() {
+				conditions.push_str(line);
+				if line.ends_with(']') {
+					lines = lines[i + 1..].to_vec();
+					break;
+				}
+			}
+			let conditions = conditions
+				.trim_start_matches(['#', '['])
+				.trim_end_matches(']');
+			let mut conditions = split_unescaped_character(conditions, ',');
+			for condition in &mut conditions {
+				*condition = condition.trim().to_string();
+			}
+			if !conditions.contains(&"INLINE".to_string()) {
+				continue 'suggest;
+			}
+			conditions.retain(|c| c != "INLINE");
+
+			for condition in conditions {
+				let (mut condition, arg) = condition.split_once('(').unwrap();
+				condition = condition.trim();
+				let arg = arg
+					.to_string()
+					.chars()
+					.take(arg.len() - 1)
+					.collect::<String>();
+				let reverse = match condition.starts_with('!') {
+					true => {
+						condition = condition.trim_start_matches('!');
+						true
+					}
+					false => false,
+				};
+				if eval_condition(
+					condition,
+					&arg,
+					shell,
+					last_command,
+					&error_lower,
+					&split_command,
+					executables,
+				) == reverse
+				{
+					continue 'suggest;
+				}
+			}
+
+			pure_suggest = lines.join("\n").to_owned();
 
 			// replacing placeholders
 			if pure_suggest.contains("{{command}}") {
