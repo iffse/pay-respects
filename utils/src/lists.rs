@@ -26,6 +26,7 @@ pub fn commond_arguments() -> Vec<&'static str> {
 		"lock","unlock","grant","revoke","permit","deny",
 		"mount","unmount","attach","detach",
 		"scan","index","reindex",
+		"short",
 		"resolve","link","unlink","install-deps","deps","dependencies",
 		"init-db","drop-db","reset-db","migrate-db",
 		"cache","clear-cache","warm-cache","invalidate-cache",
