@@ -7,9 +7,14 @@ export _PR_MODE="echo"
 export TMP=$(mktemp -d)
 
 # can take a while in debug builds
+# required for desperate checks
 # export _PR_NO_DESPERATE=1
-# export _PR_NO_ZOXIDE=1
-# export _PR_NO_TMUX=1
+
+# zoxide is too slow
+export _PR_NO_ZOXIDE=1
+
+export _PR_NO_CONFIG=1
+export _PR_NO_MULTIPLEXER=1
 
 PASSED=0
 FAILED=0
@@ -52,6 +57,7 @@ main() {
 	cd $TMP
 	for case in $WORKDIR/cases/*; do
 		run_case $case
+		rm -rf ./*
 	done
 	
 	echo "-----------------------------------------"

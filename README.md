@@ -2,7 +2,8 @@
 
 Typed a wrong command or don't know what to do? Pay Respects will suggest a fix to your console command by simply pressing `F`!
 
-- 🚀 **Blazing fast suggestion**: Sub-millisecond (<1ms) performance!
+- 🚀 **Blazing fast suggestion**: Sub-millisecond (<1ms) performance! See
+[benchmarks](#benchmarks).
 - 🎯 **Accurate results**: Suggestions are verified before being prompted to
 the user, no `sudo` suggestions when you are using `doas`!
 - ✏️ **Easy to write rules**: You don't need to know Rust. The rules are
@@ -138,13 +139,16 @@ Please follow the instruction for your shell:
 >
 > - `_PR_NO_DESPERATE`: Disable desperate functions, which are slow but can give
 > better results
+> - `_PR_NO_CONFIG`: Don't load configurations
 > - Disabling integrations:
 > 	- `_PR_NO_ZOXIDE`
-> 	- `_PR_NO_TMUX`
-> 	- `_PR_NO_SCREEN`
-> 	- `_PR_NO_ZELLIJ`
-> 	- `_PR_NO_WEZTERM`
-> 	- `_PR_NO_KITTY`
+> 	- `_PR_NO_MULTIPLEXER`: Equivalent of turning all the followings:
+> 		- `_PR_NO_TMUX`
+> 		- `_PR_NO_SCREEN`
+> 		- `_PR_NO_ZELLIJ`
+> 		- `_PR_NO_WEZTERM`
+> 		- `_PR_NO_KITTY`
+
 
 </details>
 
@@ -310,27 +314,35 @@ most comfortable with:
 - **Binaries**: AGPL-3.0
 	- Core and modules
 - **Libraries**: MPL-2.0
-	- Parser and utils
+	- Parser, utils, and select
 
 ## Benchmarks
 
 Benchmark script can be executed with `make benchmark` using `hyperfine`. Here
-are the results on my potato computer, you can expect better results on yours.
+are the results on my potato computer (AMD Ryzen 5 5600X, DDR4 2400 MHz, HDD
+7200 RPM with Btrfs transparent compression), you can expect better results on
+yours.
 
-| Case            | Results             |
-|-----------------|---------------------|
-| Initialization  | 503.4 µs ±  48.5 µs |
-| Privilege       | 704.3 µs ±  65.4 µs |
-| Typo: Command   | 5.4 ms ±   0.4 ms   |
-| Typo: File path | 3.4 ms ±   0.2 ms   |
-| Command: RegEx  | 3.4 ms ±   0.3 ms   |
-| Error: RegEx    | 3.4 ms ±   0.3 ms   |
-| Error: Options  | 3.4 ms ±   0.3 ms   |
+| Case                      | Results             |
+|---------------------------|---------------------|
+| Initialization            | 493.7 µs ±  38.1 µs |
+| Privilege                 | 655.0 µs ± 100.4 µs |
+| Typo: Command             | 5.1 ms ±   0.2 ms   |
+| Typo: File path           | 3.6 ms ±   0.4 ms   |
+| RegEx: Command            | 3.3 ms ±   0.1 ms   |
+| RegEx: Options            | 3.3 ms ±   0.2 ms   |
+| RegEx: Error              | 3.3 ms ±   0.1 ms   |
+| Desperate: Fuzzy recovery | 3.3 ms ±   0.2 ms   |
+| Desperate: File look up   | 10.8 ms ±   0.9 ms  |
 
 Caveats:
 
-- Integrations are turned off: In real usage you may feel a delay due to the initialization of `zoxide` itself, for instance.
-- Desperate functions are turned off, so only the execution time of rules are included.
+- **Integrations are turned off**: In real usage you may feel a delay due to the
+execution of `zoxide` itself, for instance, which takes 50ms.
+- Binaries are **optimized for size, not speed**. The same applies to
+dependencies, using regex-lite instead of regex because it's smaller,
+although slower. A smaller binary helps in loading times, specially for cold
+runs.
 
 ## Flowchart
 

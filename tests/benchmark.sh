@@ -6,9 +6,10 @@ export _PR_LIB=""
 export _PR_MODE="echo"
 export TMP=$(mktemp -d)
 
-export _PR_NO_DESPERATE=1
 export _PR_NO_ZOXIDE=1
-export _PR_NO_TMUX=1
+export _PR_NO_DESPERATE=1
+export _PR_NO_CONFIG=1
+export _PR_NO_MULTIPLEXER=1
 
 benchmark() {
 	hyperfine --warmup 10 \
