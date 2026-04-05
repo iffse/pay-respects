@@ -17,6 +17,10 @@ pub fn get_error_from_multiplexer(shell: &str, command: &str) -> Option<String> 
 		return None;
 	}
 
+	if std::env::var("_PR_NO_MULTIPLEXER").is_ok() {
+		return None;
+	}
+
 	// terminal multiplexers, higher priority
 	if let Some(error) = get_error_from_tmux(shell, command) {
 		#[cfg(debug_assertions)]

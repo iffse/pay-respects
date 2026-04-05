@@ -88,6 +88,10 @@ impl Config {
 }
 
 pub fn load_config() -> Config {
+	if std::env::var("_PR_NO_CONFIG").is_ok() {
+		return Config::default();
+	}
+
 	let mut config = Config::default();
 
 	for file in config_files() {

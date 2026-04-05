@@ -138,6 +138,10 @@ impl Config {
 // }
 
 pub fn load_config() {
+	if std::env::var("_PR_NO_CONFIG").is_ok() {
+		return;
+	}
+
 	let mut config = Config::default();
 
 	for file in config_files() {
@@ -157,47 +161,41 @@ pub fn load_config() {
 pub fn set_search_type(search_type: SearchType) {
 	static_write!(SEARCH_TYPE, search_type);
 }
+pub fn get_search_type() -> SearchType {
+	static_read!(SEARCH_TYPE)
+}
 
 pub fn set_search_threshold(threshold: usize) {
 	static_write!(SEARCH_THRESHOLD, threshold);
+}
+pub fn get_search_threshold() -> usize {
+	static_read!(SEARCH_THRESHOLD)
 }
 
 pub fn set_trigram_minimum_score(minimum_score: f32) {
 	static_write!(TRIGRAM_MINIMUM_SCORE, minimum_score);
 }
+pub fn get_trigram_minimum_score() -> f32 {
+	static_read!(TRIGRAM_MINIMUM_SCORE)
+}
 
 pub fn set_dl_distance_max(max: usize) {
 	static_write!(DL_DISTANCE_MAX, max);
+}
+pub fn get_dl_distance_max() -> usize {
+	static_read!(DL_DISTANCE_MAX)
 }
 
 pub fn set_dl_distance_min(min: usize) {
 	static_write!(DL_DISTANCE_MIN, min);
 }
-
-pub fn set_dl_distance_percentage(percentage: f32) {
-	static_write!(DL_DISTANCE_PERCENTAGE, percentage);
-}
-
-pub fn get_search_type() -> SearchType {
-	static_read!(SEARCH_TYPE)
-}
-
-pub fn get_search_threshold() -> usize {
-	static_read!(SEARCH_THRESHOLD)
-}
-
-pub fn get_trigram_minimum_score() -> f32 {
-	static_read!(TRIGRAM_MINIMUM_SCORE)
-}
-
-pub fn get_dl_distance_max() -> usize {
-	static_read!(DL_DISTANCE_MAX)
-}
-
 pub fn get_dl_distance_min() -> usize {
 	static_read!(DL_DISTANCE_MIN)
 }
 
+pub fn set_dl_distance_percentage(percentage: f32) {
+	static_write!(DL_DISTANCE_PERCENTAGE, percentage);
+}
 pub fn get_dl_distance_percentage() -> f32 {
 	static_read!(DL_DISTANCE_PERCENTAGE)
 }
