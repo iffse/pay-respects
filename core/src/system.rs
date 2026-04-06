@@ -1,7 +1,7 @@
 use crate::data::Data;
 use crate::shell::command_output_or_error;
 use crate::shell::{command_output, elevate};
-use pay_respects_utils::strings::{print_warning, unexpected_format};
+use pay_respects_utils::strings::{format_prefix, print_warning, unexpected_format};
 
 use std::io::stderr;
 use std::process::Command;
@@ -278,11 +278,11 @@ pub fn install_package(data: &mut Data, package_manager: &str, install: &str) ->
 	eprintln!("install: {}", install);
 
 	let output = if let Some(prefix) = &data.prompt_prefix {
-		format!("{} {}", prefix, install)
+		format_prefix(prefix, &install)
 	} else {
 		install.clone()
 	};
-	eprintln!("{}", output.cyan().bold());
+	eprintln!("{}", output.cyan());
 
 	let result = Command::new(shell)
 		.arg("-c")
@@ -299,11 +299,11 @@ pub fn install_package_shell(data: &Data, package_manager: &str, install: &str) 
 	let command = data.command.clone();
 
 	let output = if let Some(prefix) = &data.prompt_prefix {
-		format!("{} {}", prefix, install)
+		format_prefix(prefix, install)
 	} else {
 		install.to_string()
 	};
-	eprintln!("{}", output.cyan().bold());
+	eprintln!("{}", output.cyan());
 
 	match package_manager {
 		"guix" => format!("{} -- {}", install, command),

@@ -6,7 +6,7 @@ use std::time::{Duration, Instant};
 use colored::Colorize;
 use pay_respects_select::select;
 use pay_respects_utils::log::dlog;
-use pay_respects_utils::strings::print_error;
+use pay_respects_utils::strings::{format_prefix, print_error, remove_color_codes};
 
 use crate::config;
 use crate::data::Data;
@@ -144,22 +144,13 @@ pub fn select_candidate(data: &mut Data) {
 
 	let selected = active_candidates[selection].to_string();
 	let output = if let Some(prefix) = &data.prompt_prefix {
-		format!("{} {}", prefix.cyan().bold(), selected)
+		let nocolor = remove_color_codes(&selected);
+		data.input_command = nocolor;
+		format_prefix(prefix, &selected)
 	} else {
 		selected
 	};
 	eprintln!("{}", output);
-
-	// data.input_command = output.normal().to_string();
-	// eprintln!("{}", data.input_command);
-	// normal does not work, removing manually
-	if data.prompt_prefix.is_some() {
-		let re = regex_lite::Regex::new(r"\x1b\[[0-9;]*m").unwrap();
-		let nocolor = re
-			.replace_all(&inactive_candidates[selection], "")
-			.to_string();
-		data.input_command = nocolor;
-	}
 
 	let suggestion = candidates[selection].to_string();
 	data.update_suggest(&suggestion);

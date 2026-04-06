@@ -1,6 +1,6 @@
 use colored::Colorize;
 use pay_respects_select::select_simple;
-use pay_respects_utils::strings::print_error;
+use pay_respects_utils::strings::{format_prefix, print_error, remove_color_codes};
 use std::path::Path;
 use std::process::exit;
 
@@ -74,7 +74,15 @@ pub fn noconfirm(data: &mut Data) {
 		};
 
 		let candidate = data.candidates[0].clone();
-		eprintln!("{}", highlight_difference(data, &candidate, true).unwrap());
+		let highlighted = highlight_difference(data, &candidate, true).unwrap();
+
+		let output = if let Some(prefix) = &data.prompt_prefix {
+			data.input_command = remove_color_codes(&highlighted);
+			format_prefix(prefix, &highlighted)
+		} else {
+			candidate.clone()
+		};
+		eprintln!("{}", output);
 		data.update_suggest(&candidate);
 		data.candidates.clear();
 
@@ -234,7 +242,7 @@ pub fn cnf(data: &mut Data) {
 		// retry after installing package
 		if system::install_package(data, &package_manager, &package) {
 			let output = if let Some(prefix) = &data.prompt_prefix {
-				format!("{} {}", prefix.bold(), data.input_command)
+				format_prefix(prefix, &data.input_command)
 			} else {
 				data.input_command.clone()
 			};

@@ -26,6 +26,19 @@ pub fn log_plain(debug_level: usize, message: &str) -> String {
 	format!("[{}]: {}", debug_level, message)
 }
 
+pub fn format_prefix(prefix: &str, string: &str) -> String {
+	let indent_count = prefix.chars().count();
+	let indent = format!("{} ", " ".repeat(indent_count));
+	let stripped = string.lines().map(|line| line.trim()).collect::<Vec<_>>().join("\n");
+	let string = stripped.replace("\n", &format!("\n{}", indent));
+	format!("{} {}", prefix.cyan().bold(), string)
+}
+
+pub fn remove_color_codes(input: &str) -> String {
+	let re = regex_lite::Regex::new(r"\x1b\[[0-9;]*m").unwrap();
+	re.replace_all(input, "").to_string()
+}
+
 /// Replaces all occurrences of the target character in the input string with
 /// the replacement string, but only if the target character is not escaped
 /// by an **odd number** of backslashes.
