@@ -11,6 +11,8 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+## [0.8.4] - 2026-04-06
+
 ### Added
 
 - Inline mode rule support for runtime rules
@@ -480,8 +482,9 @@ normalized to `--nocnf`
 
 History start.
 
-[unreleased]: https://github.com/iffse/pay-respects/compare/v0.8.3..HEAD
-[0.8.3]: https://github.com/iffse/pay-respects/compare/v0.8.1..v0.8.3
+[unreleased]: https://github.com/iffse/pay-respects/compare/v0.8.4..HEAD
+[0.8.4]: https://github.com/iffse/pay-respects/compare/v0.8.3..v0.8.4
+[0.8.3]: https://github.com/iffse/pay-respects/compare/v0.8.2..v0.8.3
 [0.8.2]: https://github.com/iffse/pay-respects/compare/v0.8.1..v0.8.2
 [0.8.1]: https://github.com/iffse/pay-respects/compare/v0.8.0..v0.8.1
 [0.8.0]: https://github.com/iffse/pay-respects/compare/v0.7.13..v0.8.0
