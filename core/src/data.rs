@@ -6,6 +6,7 @@ use pay_respects_utils::modes::Mode;
 use pay_respects_utils::modes::run_mode;
 
 use itertools::Itertools;
+use pay_respects_utils::strings::remove_color_codes;
 
 use std::process::exit;
 
@@ -61,7 +62,19 @@ impl Data {
 			}
 		};
 
-		let prompt_prefix = std::env::var("_PR_PREFIX").ok();
+		// let prompt_prefix = std::env::var("_PR_PREFIX").ok();
+		let prompt_prefix = match std::env::var("_PR_PREFIX") {
+			Ok(prefix) => {
+				let nocolor = remove_color_codes(&prefix).trim().to_string();
+				// get the last non-empty whitespace character
+				let char = nocolor
+					.chars()
+					.rev()
+					.find(|c| !c.is_whitespace() && !c.is_control());
+				char.map(|char| char.to_string())
+			}
+			Err(_) => None,
+		};
 		let input_command = if prompt_prefix.is_some() {
 			command.clone()
 		} else {

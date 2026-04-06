@@ -1,5 +1,10 @@
 function {{ alias }} -d "Suggest fixes to the previous command"
-	eval $(_PR_LAST_COMMAND="$(builtin history | head -n 1)" _PR_ALIAS="$(alias)" _PR_SHELL="fish" "{{ binary_path }}")
+	eval $(__pr_base "suggest" (builtin history | head -n 1))
+end
+
+function __pr_base -a mode last_command
+	set prefix $(fish_prompt)
+	_PR_MODE="$mode" _PR_PREFIX="$prefix" _PR_LAST_COMMAND="$last_command" _PR_ALIAS="$(alias)" _PR_SHELL="fish" "{{ binary_path }}"
 end
 
 function __pr_inline
@@ -19,7 +24,7 @@ end
 {%if cnf %}
 if status is-interactive
 	function fish_command_not_found --on-event fish_command_not_found
-		eval $(_PR_LAST_COMMAND="$argv" _PR_ALIAS="$(alias)" _PR_SHELL="fish" _PR_MODE="cnf" "{{ binary_path }}")
+		eval $(__pr_base "cnf" "$argv")
 	end
 end
 {% endif %}

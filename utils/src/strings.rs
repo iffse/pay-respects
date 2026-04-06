@@ -29,7 +29,11 @@ pub fn log_plain(debug_level: usize, message: &str) -> String {
 pub fn format_prefix(prefix: &str, string: &str) -> String {
 	let indent_count = prefix.chars().count();
 	let indent = format!("{} ", " ".repeat(indent_count));
-	let stripped = string.lines().map(|line| line.trim()).collect::<Vec<_>>().join("\n");
+	let stripped = string
+		.lines()
+		.map(|line| line.trim())
+		.collect::<Vec<_>>()
+		.join("\n");
 	let string = stripped.replace("\n", &format!("\n{}", indent));
 	format!("{} {}", prefix.cyan().bold(), string)
 }

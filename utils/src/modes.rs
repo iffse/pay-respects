@@ -12,7 +12,7 @@ pub enum Mode {
 pub fn run_mode() -> Mode {
 	match std::env::var("_PR_MODE") {
 		Ok(mode) => match mode.as_str() {
-			"suggestion" => Mode::Suggestion,
+			"suggest" => Mode::Suggestion,
 			"inline" => Mode::Inline,
 			"cnf" => Mode::Cnf,
 			"noconfirm" => Mode::NoConfirm,

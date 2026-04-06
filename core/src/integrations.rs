@@ -2,6 +2,7 @@ use pay_respects_utils::{
 	evals::{compare_string, fuzzy_best_n_substring},
 	settings::get_trigram_minimum_score,
 	shell::shell_path_post_processing,
+	strings::remove_color_codes,
 };
 
 use crate::shell::command_output;
@@ -163,8 +164,9 @@ fn parse_output(prefix: &str, input_command: &str, capture: &str) -> Option<Stri
 
 	// no space and newline, to make it more robust
 	let command = input_command.replace(|c: char| c.is_whitespace(), "");
+	let prefix = remove_color_codes(prefix);
 
-	let mut start_pos = capture.rfind(prefix)?;
+	let mut start_pos = capture.rfind(&prefix)?;
 	let mut end_pos = capture.len();
 	loop {
 		let tail =
@@ -174,7 +176,7 @@ fn parse_output(prefix: &str, input_command: &str, capture: &str) -> Option<Stri
 				.trim()
 				.to_string();
 			return Some(error);
-		} else if let Some(pos) = capture[..start_pos].rfind(prefix) {
+		} else if let Some(pos) = capture[..start_pos].rfind(&prefix) {
 			end_pos = start_pos;
 			start_pos = pos;
 		} else {

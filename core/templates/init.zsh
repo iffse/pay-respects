@@ -1,14 +1,19 @@
 alias {{ alias }}='eval $(__pr_main)'
 
 function __pr_main() {
-	_PR_LAST_COMMAND="$(fc -ln -1)" _PR_ALIAS="`alias`" _PR_SHELL="zsh" "{{ binary_path }}"
+	__pr_base "suggest" "$(fc -ln -1)"
+}
+
+function __pr_base() {
+	prefix=$(print -P "$PROMPT")
+	_PR_MODE="$1" _PR_PREFIX="$prefix" _PR_LAST_COMMAND="$2" _PR_ALIAS="`alias`" _PR_SHELL="zsh" "{{ binary_path }}"
 }
 
 function __pr_inline() {
 	local input="$BUFFER"
 	local output
 
-	output="$(_PR_MODE="inline" _PR_LAST_COMMAND="$input" _PR_ALIAS="`alias`" _PR_SHELL="zsh" "{{ binary_path }}")"
+	output=$(_pr_base "inline" "$input")
 
 	{% raw %}
 	if [[ -n "$output" ]]; then
@@ -23,6 +28,6 @@ bindkey '^X^X' __pr_inline
 
 {%- if cnf %}
 command_not_found_handler() {
-	eval $(_PR_LAST_COMMAND="$@" _PR_SHELL="zsh" _PR_ALIAS="`alias`" _PR_MODE="cnf" "{{ binary_path }}")
+	eval $(__pr_base "cnf" "$@")
 }
 {% endif %}
