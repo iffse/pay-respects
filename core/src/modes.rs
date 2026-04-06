@@ -238,7 +238,7 @@ pub fn cnf(data: &mut Data) {
 			} else {
 				data.input_command.clone()
 			};
-			eprintln!("{}", output.cyan());
+			eprintln!("\n{}", output.cyan());
 			let status = suggestions::run_suggestion(data, &data.command);
 			if status.success() {
 				shell_evaluated_commands(&shell, &data.command, true);
