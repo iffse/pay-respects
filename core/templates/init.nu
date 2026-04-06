@@ -6,7 +6,7 @@ def --env {{ alias }} [] {
 
 def __pr_base [mode: string, command: string] {
 	let alias = (help aliases | select name expansion | each ({ |row| $row.name + "=" + $row.expansion }) | str join (char nl))
-	let prefix = (do $env.PROMPT_COMMAND)
+	let prefix = if ($env.PROMPT_INDICATOR | is-not-empty) { $env.PROMPT_INDICATOR } else { do $env.PROMPT_COMMAND }
 	with-env { _PR_MODE: $mode, _PR_PREFIX: $prefix, _PR_LAST_COMMAND: $command, _PR_ALIAS: $alias, _PR_SHELL: nu } {
 		`{{ binary_path }}`
 	}
