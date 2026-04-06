@@ -64,34 +64,14 @@ impl Buffer {
 			return buffered;
 		}
 
-		let split = buffered.split_once("<suggestions>");
-		if let Some((first, last)) = split {
-			eprint!("{}", first);
-			std::io::stdout().flush().unwrap();
-			return last.to_string();
-		}
 		"".to_string()
 	}
 
 	fn proc_write(&mut self, data: &str) {
-		if !data.contains("\n") {
-			self.buf.push_str(data);
-			let buffered = self.buf.trim().to_string();
-			let filled = fill(&buffered);
-			if let Some(filled) = filled {
-				self.buf.clear();
-				let formatted = clear_format(&filled);
-				eprint!("{}", formatted);
-				self.buf.push_str(formatted.split_once("\n").unwrap().1);
-				std::io::stdout().flush().unwrap();
-				return;
-			}
-			eprint!("{}", data);
-			std::io::stdout().flush().unwrap();
-			return;
-		}
-
 		let mut data = data.to_string();
+
+		fix_data(&mut data);
+
 		while data.contains("\n") {
 			let lines = data.split_once("\n").unwrap();
 			let first = lines.0;
@@ -146,8 +126,10 @@ impl Buffer {
 	}
 
 	fn proc_think(&mut self, data: &str) {
+		let mut data = data.to_string();
+		fix_data(&mut data);
 		if !data.contains("\n") {
-			self.buf.push_str(data);
+			self.buf.push_str(&data);
 			let buffered = self.buf.trim().to_string();
 			let filled = fill(&buffered);
 			if let Some(filled) = filled {
@@ -163,7 +145,6 @@ impl Buffer {
 			return;
 		}
 
-		let mut data = data.to_string();
 		while data.contains("\n") {
 			let lines = data.split_once("\n").unwrap();
 			let first = lines.0;
@@ -186,5 +167,38 @@ impl Buffer {
 			data = last.to_string();
 		}
 		eprint!("{}", data);
+	}
+}
+
+fn fix_data(data: &mut String) {
+	let tag_list = ["<note>", "</note>", "<think>", "</think>", "```"];
+	for tag in tag_list.iter() {
+		if data.contains(tag) {
+			let mut new_data = String::new();
+			let mut remaining = data.as_str();
+			while let Some(pos) = remaining.find(tag) {
+				let (head, tail) = remaining.split_at(pos + tag.len());
+				new_data.push_str(head);
+				if !tail.starts_with("\n") {
+					new_data.push('\n');
+				}
+				remaining = tail;
+			}
+			new_data.push_str(remaining);
+			*data = new_data;
+		}
+	}
+}
+
+#[allow(unused)]
+mod tests {
+	use super::*;
+
+	#[test]
+	fn test_fix_data() {
+		let mut data = "hello<note>foo</note>bar".to_string();
+		fix_data(&mut data);
+		let expected = "hello<note>\nfoo</note>\nbar".to_string();
+		assert_eq!(data, expected);
 	}
 }
