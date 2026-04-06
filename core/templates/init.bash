@@ -1,4 +1,8 @@
-alias {{ alias }}='eval $(_PR_LAST_COMMAND="$(fc -ln -1)" _PR_ALIAS="`alias`" _PR_SHELL="bash" "{{ binary_path }}")'
+alias {{ alias }}='eval $(__pr_main)'
+
+__pr_main() {
+	_PR_LAST_COMMAND="$(fc -ln -1)" _PR_ALIAS="`alias`" _PR_SHELL="bash" "{{ binary_path }}"
+}
 
 __pr_inline() {
 	local input="$READLINE_LINE"
