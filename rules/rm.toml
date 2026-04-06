@@ -12,6 +12,15 @@ suggest = [
 
 [[match_err]]
 pattern = [
+	"write-protected",
+]
+suggest = [
+'''
+{{command[0]}} -f {{command[1:]}} '''
+]
+
+[[match_err]]
+pattern = [
 	"no such file or directory",
 	"file(s) not found"
 ]
