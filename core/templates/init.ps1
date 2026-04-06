@@ -1,14 +1,17 @@
 function {{ alias }} {
 	try {
-# fetch command and error from session history only when not in cnf mode
+		$env:_PR_PREFIX = (prompt)
+		# fetch command and error from session history only when not in cnf mode
 		if ($env:_PR_MODE -ne 'cnf') {
 			$env:_PR_LAST_COMMAND = (Get-History | Select-Object -Last 1 | ForEach-Object {$_.CommandLine});
-			if ($PSVersionTable.PSVersion.Major -ge 7) {
-				$err = Get-Error;
-				if ($env:_PR_LAST_COMMAND -eq $err.InvocationInfo.Line) {
-					$env:_PR_ERROR_MSG = $err.Exception.Message
-				}
-			}
+			# Probabily slower than screen capture
+			# Uncomment if you want to get error message from powershell
+			# if ($PSVersionTable.PSVersion.Major -ge 7) {
+			# 	$err = Get-Error;
+			# 	if ($env:_PR_LAST_COMMAND -eq $err.InvocationInfo.Line) {
+			# 		$env:_PR_ERROR_MSG = $err.Exception.Message
+			# 	}
+			# }
 		}
 		$env:_PR_SHELL = 'pwsh';
 		&'{{ binary_path }}' | Invoke-Expression;
