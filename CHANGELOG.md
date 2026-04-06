@@ -11,6 +11,8 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+## [0.8.5] - 2026-04-07
+
 ### Added
 
 - **Automatic shell prefix detection**, no longer requires manually setting
@@ -491,7 +493,8 @@ normalized to `--nocnf`
 
 History start.
 
-[unreleased]: https://github.com/iffse/pay-respects/compare/v0.8.4..HEAD
+[unreleased]: https://github.com/iffse/pay-respects/compare/v0.8.5..HEAD
+[0.8.5]: https://github.com/iffse/pay-respects/compare/v0.8.4..v0.8.5
 [0.8.4]: https://github.com/iffse/pay-respects/compare/v0.8.3..v0.8.4
 [0.8.3]: https://github.com/iffse/pay-respects/compare/v0.8.2..v0.8.3
 [0.8.2]: https://github.com/iffse/pay-respects/compare/v0.8.1..v0.8.2
