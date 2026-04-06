@@ -5,11 +5,6 @@ man-src := \
 	pay-respects-rules.5.md \
 	pay-respects-modules.5.md \
 
-man-outputs := \
-	pay-respects.1 \
-	pay-respects-rules.5 \
-	pay-respects-modules.5
-
 build:
 	cargo build
 
