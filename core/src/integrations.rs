@@ -241,34 +241,52 @@ pub fn zoxide_integration(
 		}
 	}
 
+	let current_dir = std::env::current_dir().unwrap_or_else(|_| std::path::PathBuf::from(""));
+
 	let joined_hints = hints.join(" ");
 	if !filtered_directories.is_empty() {
 		let mut min_distance = usize::MAX;
-		let mut min_idx = usize::MAX;
-		// wanted to priotize current directory, but doesn't seems to work well
-		// let joined_hints = format!("{}/{}", std::env::current_dir().unwrap().to_str().unwrap(), hints.join(" "));
-		for (idx, directory) in filtered_directories.iter().enumerate() {
+		let mut bests = Vec::new();
+
+		for directory in filtered_directories {
 			let distance = compare_string(&joined_hints, directory);
 			if distance < min_distance {
 				min_distance = distance;
-				min_idx = idx;
+				bests.clear();
+				bests.push(directory.to_string());
+			} else if distance == min_distance {
+				bests.push(directory.to_string());
 			}
 		}
-		let directory = shell_path_post_processing(filtered_directories[min_idx]);
-		candidates.push(format!("cd {}", directory));
-	} else {
-		let match_candidates = directories.map(|s| s.to_string()).collect::<Vec<String>>();
-		let directories = fuzzy_best_n_substring(
-			&joined_hints,
-			&match_candidates,
-			get_trigram_minimum_score(),
-			3,
-		);
-		if let Some(directories) = directories {
-			for directory in directories {
-				let directory = shell_path_post_processing(&directory);
-				candidates.push(format!("cd {}", directory.clone()));
+
+		let mut valid = false;
+		for directory in bests {
+			if directory == current_dir.to_str().unwrap() {
+				continue;
 			}
+			valid = true;
+			let directory = shell_path_post_processing(&directory);
+			candidates.push(format!("cd {}", directory.clone()));
+		}
+		if valid {
+			return;
+		}
+	}
+
+	let match_candidates = directories.map(|s| s.to_string()).collect::<Vec<String>>();
+	let directories = fuzzy_best_n_substring(
+		&joined_hints,
+		&match_candidates,
+		get_trigram_minimum_score(),
+		3,
+	);
+	if let Some(directories) = directories {
+		for directory in directories {
+			if directory == current_dir.to_str().unwrap() {
+				continue;
+			}
+			let directory = shell_path_post_processing(&directory);
+			candidates.push(format!("cd {}", directory.clone()));
 		}
 	}
 }
