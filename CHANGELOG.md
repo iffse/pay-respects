@@ -11,6 +11,15 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- **Automatic shell prefix detection**, no longer requires manually setting
+`_PR_PREFIX` for multiplexer supports
+
+### Fixed
+
+- Wrong indentation and wrong capture when using multiplexer integrations
+
 ## [0.8.4] - 2026-04-06
 
 ### Added

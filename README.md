@@ -137,9 +137,11 @@ Please follow the instruction for your shell:
 
 > Relating to features:
 >
-> - `_PR_NO_DESPERATE`: Disable desperate functions, which are slow but can give
-> better results
 > - `_PR_NO_CONFIG`: Don't load configurations
+> - `_PR_NO_DESPERATE`: Disable desperate functions, which are slow but might
+> give better results
+> - `_PR_PREFIX`: Shell prefix before the command acting as identifier.
+> Required for multiplexer command log capturing
 > - Disabling integrations:
 > 	- `_PR_NO_ZOXIDE`
 > 	- `_PR_NO_MULTIPLEXER`: Equivalent of turning all the followings:
@@ -167,13 +169,6 @@ Integrations with other tools:
 	- Command log capturing inside the session without the need to rerun commands
 to get error messages. **Requires English locale** (actually `LANG=C`, which
 output is used for matching) to guarantee correct logs.
-	- **Requires prompt prefix**: You need to have something identifiable before
-your command and set to the environment variable `_PR_PREFIX`. Some example values
-are:
-		- `❯`: Starship default
-		- `$`: Bash default
-		- `%`: Zsh default
-		- `>`: Fish and Nushell default
 - **zoxide**: Uses zoxide's database to navigate through directories.
 
 ## Installing
@@ -249,7 +244,7 @@ See the following pages:
 AI suggestions should work out of the box with `request-ai` module installed.
 You can disable it by setting `_PR_AI_DISABLE`:
 ```sh
-export _PR_AI_DISABLE=''
+export _PR_AI_DISABLE=1
 ```
 
 An API key is included with the source (your distribution might have stripped
@@ -257,7 +252,7 @@ them out). It should always work unless I can no longer afford this public servi
 limits are reached.
 
 [I don't track nor store
-anything.](https://github.com/iffse/pay-respects-serverless/blob/main/src/lib.rs)
+anything.](https://github.com/iffse/pay-respects-serverless)
 If it's useful to you, consider making a donation:
 
 <div>
