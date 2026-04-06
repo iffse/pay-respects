@@ -109,6 +109,7 @@ jobs:
         run: >
           tar --zstd -cf pay-respects-${{ steps.version.outputs.VERSION }}-${{ matrix.target }}.tar.zst
           LICENSE
+          man
           -C target/${{ matrix.target }}/release
           pay-respects
           _pay-respects-module-100-runtime-rules
@@ -118,7 +119,9 @@ jobs:
         if: runner.os == 'Windows'
         run: >
           7z a pay-respects-${{ steps.version.outputs.VERSION }}-${{ matrix.target }}.zip
+          -mx=9
           ./LICENSE
+          ./man
           ./target/${{ matrix.target }}/release/pay-respects.exe
           ./target/${{ matrix.target }}/release/_pay-respects-module-100-runtime-rules.exe
           ./target/${{ matrix.target }}/release/_pay-respects-fallback-100-request-ai.exe

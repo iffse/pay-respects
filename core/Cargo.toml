@@ -35,6 +35,10 @@ assets = [
 	["target/release/pay-respects", "usr/bin/", "755"],
 	["target/release/_pay-respects-module-100-runtime-rules", "usr/bin/", "755"],
 	["target/release/_pay-respects-fallback-100-request-ai", "usr/bin/", "755"],
+	["man/pay-respects.1", "usr/share/man/man1/", "644"],
+	["man/pay-respects-rules.5", "usr/share/man/man5/", "644"],
+	["man/pay-respects-modules.5", "usr/share/man/man5/", "644"],
+	["LICENSE", "usr/share/doc/pay-respects/", "644"],
 ]
 priority = "optional"
 section = "utils"
@@ -44,4 +48,8 @@ assets = [
 	{ source = "target/release/pay-respects", dest = "/usr/bin/", mode = "755"},
 	{ source = "target/release/_pay-respects-module-100-runtime-rules", dest = "/usr/bin/", mode = "755"},
 	{ source = "target/release/_pay-respects-fallback-100-request-ai", dest = "/usr/bin/", mode = "755"},
+	{ source = "man/pay-respects.1", dest = "/usr/share/man/man1/", mode = "644"},
+	{ source = "man/pay-respects-rules.5", dest = "/usr/share/man/man5/", mode = "644"},
+	{ source = "man/pay-respects-modules.5", dest = "/usr/share/man/man5/", mode = "644"},
+	{ source = "LICENSE", dest = "/usr/share/doc/pay-respects/", mode = "644"},
 ]
