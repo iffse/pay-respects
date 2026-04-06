@@ -13,7 +13,7 @@ function __pr_inline() {
 	local input="$BUFFER"
 	local output
 
-	output=$(_pr_base "inline" "$input")
+	output=$(__pr_base "inline" "$input")
 
 	{% raw %}
 	if [[ -n "$output" ]]; then
