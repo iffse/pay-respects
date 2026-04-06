@@ -47,10 +47,11 @@ cd {{command[1]}} ''',
 
 [[match_err]]
 pattern = [
-	"nu::shell::directory_not_found"
+	"Directory not found"
 ]
 suggest = [
 '''
+#[shell(nu), length(2)]
 mkdir {{command[1]}} and \
 cd {{command[1]}} '''
 ]
