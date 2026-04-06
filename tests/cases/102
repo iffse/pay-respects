@@ -1,4 +1,4 @@
-case="desperate: fuzzy recovery"
+case="Desperate: Fuzzy recovery"
 command="gi tcommit"
 error=""
 expect="git commit"

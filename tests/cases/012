@@ -1,4 +1,4 @@
-case="regex: error"
+case="RegEx: Error"
 command="cargo built"
 error="
 error: no such command: \`built\`

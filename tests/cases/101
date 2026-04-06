@@ -1,4 +1,4 @@
-case="desperate: file look up"
+case="Desperate: File look up"
 command="foocommand imadethisup"
 error=""
 expect="foocommand i-made-this-up"

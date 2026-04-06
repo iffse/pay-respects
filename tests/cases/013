@@ -1,4 +1,4 @@
-case="regex: options"
+case="RegEx: Options"
 command="rm correc -r"
 error="no such file or directory"
 expect="rm -r correct"

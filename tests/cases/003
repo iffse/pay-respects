@@ -1,4 +1,4 @@
-case="typo: file path"
+case="Typo: File path"
 command="cd correc"
 error="no such file or directory"
 expect="cd correct"

@@ -1,5 +1,5 @@
 # helix is used to also check for extends
-case="blocking commands: vim"
+case="Blocking commands: vim"
 command="hx filetobeopen"
 error=""
 expect="hx file-to-be-open"

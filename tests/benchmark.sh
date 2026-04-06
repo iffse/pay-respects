@@ -40,7 +40,8 @@ main() {
 	echo "Benchmark: Initialization"
 	echo "$PR bash"
 	benchmark "$PR bash"
-	for case in $WORKDIR/cases/*; do
+	CASES=$(ls $WORKDIR/cases/* | sort -V)
+	for case in $CASES; do
 		run_case $case
 		rm -rf ./*
 	done
