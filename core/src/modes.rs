@@ -233,6 +233,12 @@ pub fn cnf(data: &mut Data) {
 
 		// retry after installing package
 		if system::install_package(data, &package_manager, &package) {
+			let output = if let Some(prefix) = &data.prompt_prefix {
+				format!("{} {}", prefix.bold(), data.input_command)
+			} else {
+				data.input_command.clone()
+			};
+			eprintln!("{}", output.cyan());
 			let status = suggestions::run_suggestion(data, &data.command);
 			if status.success() {
 				shell_evaluated_commands(&shell, &data.command, true);

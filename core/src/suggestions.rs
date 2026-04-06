@@ -150,6 +150,17 @@ pub fn select_candidate(data: &mut Data) {
 	};
 	eprintln!("{}", output);
 
+	// data.input_command = output.normal().to_string();
+	// eprintln!("{}", data.input_command);
+	// normal does not work, removing manually
+	if data.prompt_prefix.is_some() {
+		let re = regex_lite::Regex::new(r"\x1b\[[0-9;]*m").unwrap();
+		let nocolor = re
+			.replace_all(&inactive_candidates[selection], "")
+			.to_string();
+		data.input_command = nocolor;
+	}
+
 	let suggestion = candidates[selection].to_string();
 	data.update_suggest(&suggestion);
 	data.expand_suggest();
@@ -244,7 +255,7 @@ pub fn shell_execution(data: &Data, command: &str) {
 
 fn get_suggestion_error(data: &Data, command: &str) -> Result<(), String> {
 	let shell = &data.shell;
-	if let Some(err) = get_error_from_multiplexer(shell, &data.prompt_prefix, command) {
+	if let Some(err) = get_error_from_multiplexer(shell, &data.prompt_prefix, &data.input_command) {
 		let message = format!("Captured output from multiplexer: '{}'", err);
 		dlog(5, &message);
 		return Err(err);

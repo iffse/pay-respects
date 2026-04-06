@@ -116,7 +116,9 @@ pub fn get_error(shell: &str, command: &str, data: &Data) -> String {
 				return String::new();
 			}
 		}
-		if let Some(error) = get_error_from_multiplexer(shell, &data.prompt_prefix, command) {
+		if let Some(error) =
+			get_error_from_multiplexer(shell, &data.prompt_prefix, &data.input_command)
+		{
 			let message = format!("Captured output from multiplexer: '{}'", error);
 			dlog(5, &message);
 			error

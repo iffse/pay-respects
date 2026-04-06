@@ -29,6 +29,7 @@ pub struct Data {
 	pub shell: String,
 	pub env: Option<String>,
 	pub prompt_prefix: Option<String>,
+	pub input_command: String,
 	pub command: String,
 	pub target_rule: Option<String>,
 	pub suggest: Option<String>,
@@ -61,6 +62,11 @@ impl Data {
 		};
 
 		let prompt_prefix = std::env::var("_PR_PREFIX").ok();
+		let input_command = if prompt_prefix.is_some() {
+			command.clone()
+		} else {
+			"".to_string()
+		};
 
 		#[cfg(debug_assertions)]
 		eprintln!("lib_dir: {:?}", lib_dir);
@@ -142,6 +148,7 @@ impl Data {
 			shell,
 			env: None,
 			prompt_prefix,
+			input_command,
 			command,
 			target_rule: None,
 			suggest: None,
