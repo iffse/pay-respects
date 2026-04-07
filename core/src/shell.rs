@@ -17,7 +17,7 @@ use crate::init::Init;
 use crate::integrations::get_error_from_multiplexer;
 use pay_respects_utils::remove_env_var;
 
-const PRIVILEGE_LIST: [&str; 3] = ["sudo", "doas", "run0"];
+const PRIVILEGE_LIST: [&str; 4] = ["sudo", "doas", "run0", "sudo-rs"];
 
 /// Run the command without any shell configuration files (noprofile, norc)
 fn clean_shell_command(shell: &str, command: &str) -> std::process::Command {
