@@ -1,34 +1,18 @@
 command = "_PR_privilege"
 
 [[match_err]]
+# aggresive approach
 pattern = [
-	"as root",
-	"as super-user",
-	"authentication is required",
-	"be root",
-	"be superuser",
-	"can not open a temporary file",
-	"cannot access",
-	"eacces",
-	"edspermissionerror",
-	"insufficient privileges",
-	"need root",
-	"non-root users cannot",
-	"not super-user",
-	"not superuser",
-	"only root can",
-	"operation not permitted",
-	"permission denied",
-	"requires root",
-	"root privilege",
-	"root user",
-	"sudorequirederror",
-	"superuser access",
-	"superuser privilege",
-	"unless you are root",
-	"use `sudo`",
-	"you don't have access",
-	"you don't have write permissions"
+	"access",
+	"can not",
+	"cannot",
+	"permission",
+	"permitted",
+	"privilege",
+	"root",
+	"sudo",
+	"super-user",
+	"superuser",
 ]
 suggest = [
 '''
@@ -38,3 +22,32 @@ sudo {{command}} ''',
 #[executable(doas)]
 doas {{command}} '''
 ]
+
+# old patterns
+# "as root",
+# "as super-user",
+# "authentication is required",
+# "be root",
+# "be superuser",
+# "can not open a temporary file",
+# "cannot access",
+# "eacces",
+# "edspermissionerror",
+# "insufficient privileges",
+# "need root",
+# "non-root users cannot",
+# "not super-user",
+# "not superuser",
+# "only root can",
+# "operation not permitted",
+# "permission denied",
+# "requires root",
+# "root privilege",
+# "root user",
+# "sudorequirederror",
+# "superuser access",
+# "superuser privilege",
+# "unless you are root",
+# "use `sudo`",
+# "you don't have access",
+# "you don't have write permissions"
