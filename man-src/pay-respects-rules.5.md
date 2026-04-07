@@ -1,4 +1,4 @@
-% PAY_RESPECTS(5) pay-respects 0.8.4 | Configuration File
+% PAY_RESPECTS(5) pay-respects 0.8.4 | Rule File
 % iff
 % April 2026
 

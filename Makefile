@@ -1,9 +1,6 @@
 .PHONY: man
 
-man-src := \
-	pay-respects.1.md \
-	pay-respects-rules.5.md \
-	pay-respects-modules.5.md \
+man-src := $(wildcard man-src/*.md)
 
 build:
 	cargo build
@@ -49,7 +46,7 @@ benchmark: release-all
 
 man:
 	@for i in $(man-src); do \
-		output=$$(echo $$i | sed 's/\.md$$//'); \
-		pandoc -s -t man man-src/$$i -o man/$$output; \
+		output=$$(echo $$i | sed 's/\.md$$//' | sed 's/^man-src\///'); \
+		pandoc -s -t man $$i -o man/$$output; \
 		echo "Generated man page: $$output"; \
 	done
