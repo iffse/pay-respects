@@ -5,6 +5,7 @@ __pr_main() {
 }
 
 __pr_base() {
+	prefix="${PS1@P}"
 	_PR_MODE="$1" _PR_PREFIX="$prefix" _PR_LAST_COMMAND="$2" _PR_ALIAS="`alias`" _PR_SHELL="bash" "{{ binary_path }}"
 }
 
