@@ -24,7 +24,7 @@ use crate::shell::get_error;
 use crate::shell::get_shell;
 use crate::shell::last_command;
 
-pub const PRIVILEGE_LIST: [&str; 2] = ["sudo", "doas"];
+pub const PRIVILEGE_LIST: [&str; 3] = ["sudo", "doas", "run0"];
 
 pub struct Data {
 	pub shell: String,
@@ -178,6 +178,7 @@ impl Data {
 			mode,
 		};
 
+		init.extract_privilege();
 		init.split();
 		init.extract_env();
 		init.expand_command();
@@ -229,14 +230,12 @@ impl Data {
 	}
 
 	pub fn split(&mut self) {
-		self.extract_privilege();
-		let mut split = split_command(&self.command);
-		#[cfg(debug_assertions)]
-		eprintln!("split: {:?}", split);
-		if split.is_empty() {
+		self.command = self.command.trim().to_string();
+		if self.command.is_empty() {
 			eprintln!("{}", t!("empty-command"));
 			exit(1);
 		}
+		let mut split = split_command(&self.command);
 
 		let comments = split_comment(&mut split);
 		if let Some(comments) = comments {
@@ -256,18 +255,36 @@ impl Data {
 				return;
 			}
 		};
-		if let Some(sudo) = self.config.sudo.as_ref() {
-			if command == *sudo {
-				self.privilege = Some(command.to_string());
-				self.command = self.command.replacen(sudo, "", 1).trim().to_string();
-			}
+
+		let privileges = if let Some(sudo) = self.config.sudo.as_ref() {
+			PRIVILEGE_LIST
+				.iter()
+				.cloned()
+				.chain(std::iter::once(sudo.as_str()))
+				.collect::<Vec<&str>>()
+		} else {
+			PRIVILEGE_LIST.to_vec()
+		};
+
+		if !privileges.contains(&command.as_str()) {
 			return;
 		}
-		if PRIVILEGE_LIST.contains(&command.as_str()) {
-			self.privilege = Some(command.to_string());
-			let sudo = split_command(&self.command)[0].clone();
-			self.command = self.command.replacen(&sudo, "", 1).trim().to_string();
+
+		// already with privilege, simply remove it from command
+		if let Some(_) = self.privilege.as_ref() {
+			if privileges.contains(&command.as_str()) {
+				self.command = self.command.replacen(&command, "", 1).trim().to_string();
+			}
 		}
+		// set to user defined privilege
+		if let Some(sudo) = self.config.sudo.as_ref() {
+			self.privilege = Some(sudo.to_string());
+			self.command = self.command.replacen(&command, "", 1).trim().to_string();
+			return;
+		}
+		// set to default privilege
+		self.privilege = Some(command.to_string());
+		self.command = self.command.replacen(&command, "", 1).trim().to_string();
 	}
 
 	pub fn extract_env(&mut self) {
@@ -311,7 +328,9 @@ impl Data {
 
 	pub fn update_command(&mut self, command: &str) {
 		self.command = command.to_string();
+		self.extract_privilege();
 		self.split();
+		self.extract_env();
 		self.update_target_rule();
 	}
 

@@ -1,4 +1,4 @@
-use crate::integrations::zoxide_integration;
+use crate::{data::{Data, PRIVILEGE_LIST}, integrations::zoxide_integration};
 
 use pay_respects_utils::{
 	evals::{best_match, best_matches, segment, segment_1},
@@ -8,8 +8,9 @@ use pay_respects_utils::{
 };
 
 pub enum Functions {
-	DesperateFuzzyRecovery,
 	DesperateFileLookUp,
+	DesperateFuzzyRecovery,
+	SetPrivilege,
 	ZoxideIntegration,
 }
 
@@ -26,12 +27,31 @@ pub fn rules_function(
 	executables: &[String],
 	split: &[String],
 	candidates: &mut Vec<String>,
+	data: &Data,
 ) {
 	match function {
 		DesperateFileLookUp => desperate_file_look_up(split, candidates),
 		DesperateFuzzyRecovery => desperate_fuzzy_recovery(executables, split, candidates),
+		SetPrivilege => set_privilege(data, executables, last_command, candidates),
 		ZoxideIntegration => zoxide_integration(shell, executables, split, candidates),
 	}
+}
+
+fn set_privilege(data: &Data, executables: &[String], last_command: &str, candidates: &mut Vec<String>) {
+	if data.privilege.is_some() {
+		return;
+	}
+
+	if let Some(sudo) = &data.config.sudo {
+		candidates.push(format!("{} {}", sudo, last_command));
+		return;
+	}
+
+	PRIVILEGE_LIST.iter().for_each(|privilege| {
+		if executables.contains(&privilege.to_string()) {
+			candidates.push(format!("{} {}", privilege, last_command));
+		}
+	});
 }
 
 pub fn desperate_fuzzy_recovery(

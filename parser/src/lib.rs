@@ -305,7 +305,7 @@ fn parse_suggestion(suggestion: &str, conditions: Option<Vec<String>>) -> TokenS
 	let suggest = if is_function {
 		let suggestion: TokenStream2 = suggestion.trim_matches('"').parse().unwrap();
 		quote! {
-			rules_function(#suggestion, &error_msg, &error_lower, &shell, &last_command, &executables, &split, &mut candidates);
+			rules_function(#suggestion, &error_msg, &error_lower, &shell, &last_command, &executables, &split, &mut candidates, data);
 		}
 	} else {
 		eval_suggest(suggestion)

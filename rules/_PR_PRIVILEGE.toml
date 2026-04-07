@@ -16,11 +16,16 @@ pattern = [
 ]
 suggest = [
 '''
-#[executable(sudo)]
-sudo {{command}} ''',
+#[FUNCTION]
+SetPrivilege
 '''
-#[executable(doas)]
-doas {{command}} '''
+
+# '''
+# #[executable(sudo)]
+# sudo {{command}} ''',
+# '''
+# #[executable(doas)]
+# doas {{command}} '''
 ]
 
 # old patterns

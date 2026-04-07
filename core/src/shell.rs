@@ -17,7 +17,7 @@ use crate::init::Init;
 use crate::integrations::get_error_from_multiplexer;
 use pay_respects_utils::remove_env_var;
 
-const PRIVILEGE_LIST: [&str; 2] = ["sudo", "doas"];
+const PRIVILEGE_LIST: [&str; 3] = ["sudo", "doas", "run0"];
 
 /// Run the command without any shell configuration files (noprofile, norc)
 fn clean_shell_command(shell: &str, command: &str) -> std::process::Command {
@@ -461,7 +461,7 @@ pub fn shell_syntax(shell: &str, command: &str) -> String {
 }
 
 pub fn add_privilege(shell: &str, privilege: &str, command: &str) -> String {
-	if command.contains("&&") || command.contains("||") || command.contains('>') {
+	if command.contains("&") || command.contains("|") || command.contains('>') || command.contains('|') || command.contains('&') || command.contains(';') {
 		format!(
 			"{} {} -c \"{}\"",
 			privilege,

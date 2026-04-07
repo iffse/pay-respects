@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ### Added
 
+- Added `run0` to internal privilege elevation list
 - Alias expansion for PowerShell
 
 ### Changed
