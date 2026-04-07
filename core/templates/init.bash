@@ -13,7 +13,7 @@ __pr_inline() {
 	local input="$READLINE_LINE"
 
 	local output
-	output=$(_pr_base "inline" "$input")
+	output=$(__pr_base "inline" "$input")
 
 	{% raw %}
 	if [[ -n "$output" ]]; then
