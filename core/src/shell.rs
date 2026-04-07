@@ -50,8 +50,8 @@ pub fn elevate(data: &mut Data, command: &mut String) {
 	if is_privileged(data, first_command) {
 		return;
 	}
-	if let Some(sudo) = &data.config.sudo {
-		*command = format!("{} {}", sudo, command);
+	if let Some(privilege) = &data.config.privilege {
+		*command = format!("{} {}", privilege, command);
 		return;
 	}
 	for privilege in PRIVILEGE_LIST.iter() {
@@ -63,8 +63,8 @@ pub fn elevate(data: &mut Data, command: &mut String) {
 }
 
 pub fn is_privileged(data: &Data, command: &str) -> bool {
-	if let Some(sudo) = &data.config.sudo {
-		return sudo == command;
+	if let Some(privilege) = &data.config.privilege {
+		return privilege == command;
 	}
 	PRIVILEGE_LIST.contains(&command)
 }

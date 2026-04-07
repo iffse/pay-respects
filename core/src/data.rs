@@ -256,11 +256,11 @@ impl Data {
 			}
 		};
 
-		let privileges = if let Some(sudo) = self.config.sudo.as_ref() {
+		let privileges = if let Some(privilege) = self.config.privilege.as_ref() {
 			PRIVILEGE_LIST
 				.iter()
 				.cloned()
-				.chain(std::iter::once(sudo.as_str()))
+				.chain(std::iter::once(privilege.as_str()))
 				.collect::<Vec<&str>>()
 		} else {
 			PRIVILEGE_LIST.to_vec()
@@ -277,8 +277,8 @@ impl Data {
 			}
 		}
 		// set to user defined privilege
-		if let Some(sudo) = self.config.sudo.as_ref() {
-			self.privilege = Some(sudo.to_string());
+		if let Some(privilege) = self.config.privilege.as_ref() {
+			self.privilege = Some(privilege.to_string());
 			self.command = self.command.replacen(&command, "", 1).trim().to_string();
 			return;
 		}

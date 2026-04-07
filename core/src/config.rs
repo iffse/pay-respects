@@ -7,7 +7,7 @@ use pay_respects_utils::{merge, merge_option};
 #[allow(dead_code)]
 #[derive(Deserialize, Default)]
 pub struct ConfigReader {
-	pub sudo: Option<String>,
+	pub privilege: Option<String>,
 	pub merge_commands: Option<Vec<Vec<String>>>,
 	pub timeout: Option<u64>,
 	pub blocking_commands: Option<Vec<String>>,
@@ -38,7 +38,7 @@ pub enum EvalMethod {
 }
 
 pub struct Config {
-	pub sudo: Option<String>,
+	pub privilege: Option<String>,
 	pub merge_commands: Option<Vec<Vec<String>>>,
 	pub timeout: u64,
 	pub blocking_commands: Option<Vec<String>>,
@@ -50,7 +50,7 @@ pub struct Config {
 impl Default for Config {
 	fn default() -> Self {
 		Self {
-			sudo: None,
+			privilege: None,
 			merge_commands: None,
 			timeout: 3000,
 			blocking_commands: None,
@@ -63,7 +63,7 @@ impl Default for Config {
 
 impl Config {
 	pub fn merge(&mut self, reader: ConfigReader) {
-		merge_option!(self, reader, sudo, merge_commands, blocking_commands);
+		merge_option!(self, reader, privilege, merge_commands, blocking_commands);
 		merge!(self, reader, timeout, eval_method);
 
 		if let Some(reader) = reader.package_manager {

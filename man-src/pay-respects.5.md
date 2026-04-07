@@ -23,6 +23,9 @@ With the same directory structure, e.g. `/etc/xdg/pay-respects/config.toml`
 
 All available options are listed in the following example file:
 ```toml
+# Preferred command for privileged acesses
+privilege = "sudo"
+
 # Maximum time in milliseconds for getting previous output
 timeout = 3000
 

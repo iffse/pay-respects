@@ -42,8 +42,8 @@ fn set_privilege(data: &Data, executables: &[String], last_command: &str, candid
 		return;
 	}
 
-	if let Some(sudo) = &data.config.sudo {
-		candidates.push(format!("{} {}", sudo, last_command));
+	if let Some(privilege) = &data.config.privilege {
+		candidates.push(format!("{} {}", privilege, last_command));
 		return;
 	}
 
