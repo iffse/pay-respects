@@ -82,14 +82,14 @@ Please follow the instruction for your shell:
 <details>
 	<summary>Custom initialization for arbitrary shell</summary>
 
-> pay-respects only requires 2 environment variables to function:
+> pay-respects only requires 2 environment variables to work:
 >
 > - `_PR_SHELL`: The binary name of the current working shell
 > - `_PR_LAST_COMMAND`: The last command
 >
-> pay-respects echos back, if applicable, a `cd` command that can be evaluated
-> by the current working shell.
-
+> pay-respects echos back, if applicable, commands that should be evaluated by
+> the working shell, such as `cd` commands to change the directory
+>
 > General example:
 > ```sh
 > eval $(_PR_SHELL=sh _PR_LAST_COMMAND="git comit" pay-respects)
@@ -101,9 +101,33 @@ Please follow the instruction for your shell:
 > - `_PR_ALIAS`: A list of aliases to commands. Separated by newlines with
 > zsh-like formatting, e.g. `gc=git commit`
 > - `_PR_ERROR_MSG`: Error message from the previous command. `pay-respects`
-> will rerun previous command to get the error message if absent
+> will capture output from multiplexers or rerun previous command to get the
+> error message if absent
 > - `_PR_EXECUTABLES`: A space separated list of commands/executables.
 > `pay-respects` will search for `$PATH` if absent
+
+</details>
+
+You can now **[Press `F` to Pay Respects]**!
+
+[Press `F` to Pay Respects]: https://en.wikipedia.org/wiki/Press_F_to_pay_respects
+
+You will also have a key-binding available on `Ctrl+X` for **experimental
+inline mode**, on-the-fly correction with no execution:
+
+- `gitcommit` + `C-X` `C-X` → `git commit`
+- `z payrespe` + `C-X` `C-X` → `cd /home/iff/Code/pay-respects`
+
+<details>
+	<summary>Integrations with other tools</summary>
+
+> - **tmux**, **GNU Screen**, **Zellij**, **WezTerm**, **kitty**:
+> 	- Command log capturing inside the session without the need to rerun commands
+> to get error messages. **Requires English locale** (actually `LANG=C`, which
+> output is used for matching) to guarantee correct logs.
+> 	- Requires a prompt prefix before your command. Initialization templates
+> set it for you automatically.
+> - **zoxide**: Uses zoxide's database to navigate through directories.
 
 </details>
 
@@ -127,6 +151,10 @@ Please follow the instruction for your shell:
 > Example usage with `noconfirm`:
 >
 > ```sh
+> # new versions
+> alias ff="__pr_main noconfirm"
+>
+> # old versions
 > function ff() {
 > 	(
 > 		export _PR_MODE="noconfirm"
@@ -134,7 +162,7 @@ Please follow the instruction for your shell:
 > 	)
 > }
 > ```
-
+>
 > Relating to features:
 >
 > - `_PR_NO_CONFIG`: Don't load configurations
@@ -151,25 +179,7 @@ Please follow the instruction for your shell:
 > 		- `_PR_NO_WEZTERM`
 > 		- `_PR_NO_KITTY`
 
-
 </details>
-
-You can now **[Press `F` to Pay Respects]**!
-
-[Press `F` to Pay Respects]: https://en.wikipedia.org/wiki/Press_F_to_pay_respects
-
-You will also have a key-binding available on `Ctrl+X` for **experimental inline mode**, on-the-fly correction with no execution:
-
-- `gitcommit` + `C-X` `C-X` → `git commit`
-- `z payrespe` + `C-X` `C-X` → `cd /home/iff/Code/pay-respects`
-
-Integrations with other tools:
-
-- **tmux**, **GNU Screen**, **Zellij**, **WezTerm**, **kitty**:
-	- Command log capturing inside the session without the need to rerun commands
-to get error messages. **Requires English locale** (actually `LANG=C`, which
-output is used for matching) to guarantee correct logs.
-- **zoxide**: Uses zoxide's database to navigate through directories.
 
 ## Installing
 

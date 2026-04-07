@@ -11,6 +11,14 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Alias expansion for PowerShell
+
+### Changed
+
+- All initialization templates have been reworked
+
 ## [0.8.5] - 2026-04-07
 
 ### Added
