@@ -163,8 +163,10 @@ fn parse_output(prefix: &str, input_command: &str, capture: &str) -> Option<Stri
 			capture[start_pos + prefix.len()..end_pos].replace(|c: char| c.is_whitespace(), "");
 		if tail.starts_with(&command) {
 			let cmderr = capture[start_pos + prefix.len()..].trim();
-			let error = cmderr[input_command.trim_start().len()..].trim().to_string();
-			return Some(error)
+			let error = cmderr[input_command.trim_start().len()..]
+				.trim()
+				.to_string();
+			return Some(error);
 		} else if let Some(pos) = capture[..start_pos].rfind(&prefix) {
 			end_pos = start_pos;
 			start_pos = pos;
@@ -174,7 +176,6 @@ fn parse_output(prefix: &str, input_command: &str, capture: &str) -> Option<Stri
 		}
 	}
 	None
-
 }
 
 pub fn zoxide_integration(

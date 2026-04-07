@@ -459,7 +459,13 @@ pub fn shell_syntax(shell: &str, command: &str) -> String {
 }
 
 pub fn add_privilege(shell: &str, privilege: &str, command: &str) -> String {
-	if command.contains("&") || command.contains("|") || command.contains('>') || command.contains('|') || command.contains('&') || command.contains(';') {
+	if command.contains("&")
+		|| command.contains("|")
+		|| command.contains('>')
+		|| command.contains('|')
+		|| command.contains('&')
+		|| command.contains(';')
+	{
 		format!(
 			"{} {} -c \"{}\"",
 			privilege,

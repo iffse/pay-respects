@@ -270,10 +270,8 @@ impl Data {
 		}
 
 		// already with privilege, simply remove it from command
-		if let Some(_) = self.privilege.as_ref() {
-			if privileges.contains(&command.as_str()) {
-				self.command = self.command.replacen(&command, "", 1).trim().to_string();
-			}
+		if self.privilege.as_ref().is_some() && privileges.contains(&command.as_str()) {
+			self.command = self.command.replacen(&command, "", 1).trim().to_string();
 		}
 		// set to user defined privilege
 		if let Some(privilege) = self.config.privilege.as_ref() {

@@ -1,4 +1,4 @@
-use crate::{data::{Data}, integrations::zoxide_integration};
+use crate::{data::Data, integrations::zoxide_integration};
 
 use pay_respects_utils::{
 	evals::{best_match, best_matches, segment, segment_1},
@@ -37,7 +37,12 @@ pub fn rules_function(
 	}
 }
 
-fn set_privilege(data: &Data, executables: &[String], last_command: &str, candidates: &mut Vec<String>) {
+fn set_privilege(
+	data: &Data,
+	executables: &[String],
+	last_command: &str,
+	candidates: &mut Vec<String>,
+) {
 	if data.privilege.is_some() {
 		return;
 	}

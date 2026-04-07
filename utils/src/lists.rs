@@ -1,11 +1,6 @@
 /// Privilege escalation commands
 pub fn privilege_list() -> Vec<&'static str> {
-	vec![
-		"sudo",
-		"doas",
-		"run0",
-		"sudo-rs",
-	]
+	vec!["sudo", "doas", "run0", "sudo-rs"]
 }
 
 /// List of commands that are not runnable (e.g. TUI commands that hangs)
