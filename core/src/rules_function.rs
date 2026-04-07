@@ -1,9 +1,9 @@
-use crate::{data::{Data, PRIVILEGE_LIST}, integrations::zoxide_integration};
+use crate::{data::{Data}, integrations::zoxide_integration};
 
 use pay_respects_utils::{
 	evals::{best_match, best_matches, segment, segment_1},
 	files::best_match_file,
-	lists::commond_arguments,
+	lists::{commond_arguments, privilege_list},
 	settings::get_search_threshold,
 };
 
@@ -47,7 +47,7 @@ fn set_privilege(data: &Data, executables: &[String], last_command: &str, candid
 		return;
 	}
 
-	PRIVILEGE_LIST.iter().for_each(|privilege| {
+	privilege_list().iter().for_each(|privilege| {
 		if executables.contains(&privilege.to_string()) {
 			candidates.push(format!("{} {}", privilege, last_command));
 		}

@@ -1,5 +1,5 @@
 use askama::Template;
-use pay_respects_utils::lists::blocking_commands;
+use pay_respects_utils::lists::{blocking_commands, privilege_list};
 use pay_respects_utils::log::dlog;
 
 use std::process::{Stdio, exit};
@@ -16,8 +16,6 @@ use crate::data::Data;
 use crate::init::Init;
 use crate::integrations::get_error_from_multiplexer;
 use pay_respects_utils::remove_env_var;
-
-const PRIVILEGE_LIST: [&str; 4] = ["sudo", "doas", "run0", "sudo-rs"];
 
 /// Run the command without any shell configuration files (noprofile, norc)
 fn clean_shell_command(shell: &str, command: &str) -> std::process::Command {
@@ -54,7 +52,7 @@ pub fn elevate(data: &mut Data, command: &mut String) {
 		*command = format!("{} {}", privilege, command);
 		return;
 	}
-	for privilege in PRIVILEGE_LIST.iter() {
+	for privilege in privilege_list().iter() {
 		if data.executables.contains(&privilege.to_string()) {
 			*command = format!("{} {}", privilege, command);
 			break;
@@ -66,7 +64,7 @@ pub fn is_privileged(data: &Data, command: &str) -> bool {
 	if let Some(privilege) = &data.config.privilege {
 		return privilege == command;
 	}
-	PRIVILEGE_LIST.contains(&command)
+	privilege_list().contains(&command)
 }
 
 pub fn add_candidates_no_dup(

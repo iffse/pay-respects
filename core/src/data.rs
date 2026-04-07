@@ -2,6 +2,7 @@ use pay_respects_utils::evals::split_command;
 use pay_respects_utils::evals::split_comment;
 use pay_respects_utils::files::get_path_files;
 use pay_respects_utils::files::path_env_sep;
+use pay_respects_utils::lists::privilege_list;
 use pay_respects_utils::modes::Mode;
 use pay_respects_utils::modes::run_mode;
 
@@ -23,8 +24,6 @@ use crate::shell::expand_alias_multiline;
 use crate::shell::get_error;
 use crate::shell::get_shell;
 use crate::shell::last_command;
-
-pub const PRIVILEGE_LIST: [&str; 3] = ["sudo", "doas", "run0"];
 
 pub struct Data {
 	pub shell: String,
@@ -257,13 +256,13 @@ impl Data {
 		};
 
 		let privileges = if let Some(privilege) = self.config.privilege.as_ref() {
-			PRIVILEGE_LIST
+			privilege_list()
 				.iter()
 				.cloned()
 				.chain(std::iter::once(privilege.as_str()))
 				.collect::<Vec<&str>>()
 		} else {
-			PRIVILEGE_LIST.to_vec()
+			privilege_list().to_vec()
 		};
 
 		if !privileges.contains(&command.as_str()) {
@@ -336,7 +335,7 @@ impl Data {
 
 	pub fn update_suggest(&mut self, suggest: &str) {
 		let split = split_command(suggest);
-		if PRIVILEGE_LIST.contains(&split[0].as_str()) {
+		if privilege_list().contains(&split[0].as_str()) {
 			self.suggest = Some(suggest.replacen(&split[0], "", 1).trim().to_string());
 			self.privilege = Some(split[0].clone())
 		} else {
