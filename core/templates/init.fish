@@ -4,7 +4,7 @@ end
 
 function __pr_main -a mode
 	set command (builtin history | head -n 1)
-	eval $(__pr_base "$mode" "$command")
+	eval (__pr_base "$mode" "$command")
 end
 
 function __pr_base -a mode last_command
@@ -14,8 +14,7 @@ end
 
 function __pr_inline
 	set input (commandline)
-
-	set output $(__pr_base "inline" "$input")
+	set output (__pr_base "inline" "$input")
 
 	if test -n "$output"
 		commandline --replace "$output"
@@ -29,7 +28,7 @@ end
 {%if cnf %}
 if status is-interactive
 	function fish_command_not_found --on-event fish_command_not_found
-		eval $(__pr_base "cnf" "$argv")
+		eval (__pr_base "cnf" "$argv")
 	end
 end
 {% endif %}
