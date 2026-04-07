@@ -1,5 +1,10 @@
 function {{ alias }} -d "Suggest fixes to the previous command"
-	eval $(__pr_base "suggest" (builtin history | head -n 1))
+	__pr_main suggest
+end
+
+function __pr_main -a mode
+	set command (builtin history | head -n 1)
+	eval $(__pr_base "$mode" "$command")
 end
 
 function __pr_base -a mode last_command
@@ -10,7 +15,7 @@ end
 function __pr_inline
 	set input (commandline)
 
-	set output __pr_base "inline" "$input"
+	set output $(__pr_base "inline" "$input")
 
 	if test -n "$output"
 		commandline --replace "$output"

@@ -1,6 +1,10 @@
 def --env {{ alias }} [] {
+	__pr_main suggest
+}
+
+def --env __pr_main [mode: string] {
 	let command = (history | last).command
-	let dir = (__pr_base suggest $command)
+	let dir = (__pr_base $mode $command)
 	cd $dir
 }
 

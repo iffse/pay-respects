@@ -1,7 +1,7 @@
-alias {{ alias }}='eval $(__pr_main)'
+alias {{ alias }}="__pr_main suggest"
 
 function __pr_main() {
-	__pr_base "suggest" "$(fc -ln -1)"
+	eval $(__pr_base "$1" "$(fc -ln -1)")
 }
 
 function __pr_base() {

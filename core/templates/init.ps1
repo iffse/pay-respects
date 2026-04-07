@@ -1,40 +1,49 @@
 function {{ alias }} {
+	__pr_main suggest
+}
+
+function __pr_main {
+	param(
+			[string]$mode
+			)
+
+		$Command = (Get-History -Count 1).CommandLine
+		Invoke-Expression (__pr_base $mode $Command)
+}
+
+function __pr_base {
+	param(
+			[string]$mode,
+			[string]$Command
+			)
+
 	try {
 		$env:_PR_PREFIX = (prompt)
-		# fetch command and error from session history only when not in cnf mode
-		if ($env:_PR_MODE -ne 'cnf') {
-			$env:_PR_LAST_COMMAND = (Get-History | Select-Object -Last 1 | ForEach-Object {$_.CommandLine});
-			# Probabily slower than screen capture
-			# Uncomment if you want to get error message from powershell
-			# if ($PSVersionTable.PSVersion.Major -ge 7) {
-			# 	$err = Get-Error;
-			# 	if ($env:_PR_LAST_COMMAND -eq $err.InvocationInfo.Line) {
-			# 		$env:_PR_ERROR_MSG = $err.Exception.Message
-			# 	}
-			# }
-		}
-		$env:_PR_SHELL = 'pwsh';
-		&'{{ binary_path }}' | Invoke-Expression;
-	}
-	finally {
-# restore mode from cnf
-		if ($env:_PR_MODE -eq 'cnf') {
-			$env:_PR_MODE = $env:_PR_PWSH_ORIGIN_MODE;
-			$env:_PR_PWSH_ORIGIN_MODE = $null;
-		}
+		$env:_PR_MODE = $mode
+		$env:_PR_LAST_COMMAND = $Command
+		# $env:_PR_ALIAS = (Get-Alias | Out-String)
+		$env:_PR_SHELL = "pwsh"
+
+		& '{{ binary_path }}'
+
+	} finally {
+		$env_PR_PREFIX = $null;
+		$env:_PR_MODE = $null;
+		$env:_PR_LAST_COMMAND = $null;
+		# $env:_PR_ALIAS = $null;
+		$env:_PR_SHELL = $null;
 	}
 }
 
-function Invoke-PRInline {
+function __pr_inline {
 	$line = $null
 		$cursor = $null
 		[Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
 
-	$env:_PR_MODE = 'inline';
-	$env:_PR_LAST_COMMAND = $line;
-	$env:_PR_SHELL = 'pwsh';
+		$mode = 'inline'
+		$command = $line
 
-	$output = & '{{ binary_path }}'
+	$output = __pr_base $mode $command
 
 		if (-not [string]::IsNullOrWhiteSpace($output)) {
 			[Microsoft.PowerShell.PSConsoleReadLine]::Replace(0, $line.Length, $output)
@@ -45,28 +54,30 @@ function Invoke-PRInline {
 	}
 }
 
-Set-PSReadLineKeyHandler -Chord Ctrl+x,Ctrl+x -ScriptBlock { Invoke-PRInline }
+Set-PSReadLineKeyHandler -Chord Ctrl+x,Ctrl+x -ScriptBlock { __pr_inline }
+
+# Uncomment this block to enable command not found hook
+# It's not very useful as we can't retrieve arguments,
 
 {%- if cnf %}
-# Uncomment this block to enable command not found hook
-# It's not useful as we can't retrieve arguments,
-# and it seems to be a recursion bug
+# function __pr_invoke {
+# 	try {
+# 		&'{{ binary_path }}' | Invoke-Expression;
+# 	} finally {
+# 		$env:_PR_MODE = $env:null;
+# 		$env:_PR_LAST_COMMAND = $env:null;
+# 		$env:_PR_SHELL = $env:null;
+# 	}
+# }
 
-# $ExecutionContext.InvokeCommand.CommandNotFoundAction =
-# {
-# 	param(
-# 		[string]
-# 		$commandName,
-# 		[System.Management.Automation.CommandLookupEventArgs]
-# 		$eventArgs
-# 	)
-# 	# powershell does not support run command with specific environment variables
-# 	# but you must set global variables. so we are memorizing the current mode and the alias function will reset it later.
-# 	$env:_PR_PWSH_ORIGIN_MODE=$env:_PR_MODE;
-# 	$env:_PR_MODE='cnf';
-# 	# powershell may search command with prefix 'get-' or '.\' first when this hook is hit, strip them
-# 	$env:_PR_LAST_COMMAND=$commandName -replace '^get-|\.\\','';
-# 	$eventArgs.Command = (Get-Command {{ alias }});
+# $ExecutionContext.InvokeCommand.CommandNotFoundAction = {
+# 	param($commandName, $eventArgs)
+
+# 	$env:_PR_LAST_COMMAND = $commandName -replace '^get-|\.\\','';
+# 	$env:_PR_SHELL = 'pwsh';
+# 	$env:_PR_MODE = 'cnf';
+
+# 	$eventArgs.Command = (Get-Command __pr_invoke);
 # 	$eventArgs.StopSearch = $True;
 # }
 {% endif %}
