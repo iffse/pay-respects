@@ -8,7 +8,7 @@ function __pr_main {
 			)
 
 		$Command = (Get-History -Count 1).CommandLine
-		Invoke-Expression (__pr_base $mode $Command)
+		__pr_base $mode $Command | Invoke-Expression
 }
 
 function __pr_base {
@@ -21,7 +21,7 @@ function __pr_base {
 		$env:_PR_PREFIX = (prompt)
 		$env:_PR_MODE = $mode
 		$env:_PR_LAST_COMMAND = $Command
-		# $env:_PR_ALIAS = (Get-Alias | Out-String)
+		$env:_PR_ALIAS = (Get-Alias | Out-String)
 		$env:_PR_SHELL = "pwsh"
 
 		& '{{ binary_path }}'
@@ -30,7 +30,7 @@ function __pr_base {
 		$env_PR_PREFIX = $null;
 		$env:_PR_MODE = $null;
 		$env:_PR_LAST_COMMAND = $null;
-		# $env:_PR_ALIAS = $null;
+		$env:_PR_ALIAS = $null;
 		$env:_PR_SHELL = $null;
 	}
 }

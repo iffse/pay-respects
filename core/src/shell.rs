@@ -291,6 +291,17 @@ pub fn alias_map(shell: &str) -> Option<HashMap<String, String>> {
 				alias_map.insert(alias.to_string(), command.to_string());
 			}
 		}
+		"pwsh" | "powershell" | "ps" => {
+			for line in env.lines() {
+				if !line.starts_with("Alias ") {
+					continue;
+				}
+				let line = line.replacen("Alias ", "", 1);
+				let (alias, command) = line.split_once("->").unwrap();
+				let command = command.split_whitespace().next().unwrap_or("");
+				alias_map.insert(alias.trim().to_string(), command.trim().to_string());
+			}
+		}
 		"nu" | _ => {
 			for line in env.lines() {
 				let (alias, command) = line.split_once('=').unwrap();
