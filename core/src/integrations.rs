@@ -2,7 +2,7 @@ use pay_respects_utils::{
 	evals::{compare_string, fuzzy_best_n_substring},
 	settings::get_trigram_minimum_score,
 	shell::shell_path_post_processing,
-	strings::remove_color_codes,
+	strings::{print_error, remove_color_codes},
 };
 
 use crate::shell::command_output;
@@ -152,16 +152,6 @@ fn get_error_from_wezterm(shell: &str, prefix: &str, command: &str) -> Option<St
 }
 
 fn parse_output(prefix: &str, input_command: &str, capture: &str) -> Option<String> {
-	// a better approach:
-	// - find the position of last occurrence of the prefix
-	// - get the output after that position
-	// - remove all spaces and newlines
-	// - compare with command
-	//
-	// objective to solve:
-	// - the capture may contain multiple occurrences of the prefix
-	// - the command may be split into multiple lines in the capture (screen too small or long command)
-
 	// no space and newline, to make it more robust
 	let command = input_command.replace(|c: char| c.is_whitespace(), "");
 	let prefix = remove_color_codes(prefix);
@@ -172,34 +162,19 @@ fn parse_output(prefix: &str, input_command: &str, capture: &str) -> Option<Stri
 		let tail =
 			capture[start_pos + prefix.len()..end_pos].replace(|c: char| c.is_whitespace(), "");
 		if tail.starts_with(&command) {
-			let error = capture[start_pos + prefix.len() + input_command.len()..]
-				.trim()
-				.to_string();
-			return Some(error);
+			let cmderr = capture[start_pos + prefix.len()..].trim();
+			let error = cmderr[input_command.trim_start().len()..].trim().to_string();
+			return Some(error)
 		} else if let Some(pos) = capture[..start_pos].rfind(&prefix) {
 			end_pos = start_pos;
 			start_pos = pos;
 		} else {
+			print_error("Failed to capture output from multiplexer.");
 			break;
 		}
 	}
 	None
 
-	// // find the last line that starts with the prefix
-	// // return everything after that line as the error message
-	// let lines = output.lines().collect::<Vec<&str>>();
-	// for (idx, line) in lines.iter().enumerate().rev() {
-	// 	// must have
-	// 	if line.contains(prefix) {
-	// 		let tail = line.split(prefix).nth(1)?.trim();
-	// 		if !command.contains(tail) {
-	// 			continue;
-	// 		}
-	// 		let error = lines[idx + 1..].join("\n").trim().to_string();
-	// 		return Some(error);
-	// 	}
-	// }
-	// None
 }
 
 pub fn zoxide_integration(

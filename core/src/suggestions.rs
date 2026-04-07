@@ -144,9 +144,9 @@ pub fn select_candidate(data: &mut Data) {
 
 	let selected = active_candidates[selection].to_string();
 	let output = if let Some(prefix) = &data.prompt_prefix {
-		let nocolor = remove_color_codes(&selected);
-		data.input_command = nocolor;
-		format_prefix(prefix, &selected)
+		let output = format_prefix(prefix, &selected);
+		data.input_command = remove_color_codes(&output).trim_start_matches(*&prefix).to_string();
+		output
 	} else {
 		selected
 	};
