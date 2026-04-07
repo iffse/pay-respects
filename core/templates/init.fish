@@ -3,14 +3,14 @@ function {{ alias }} -d "Suggest fixes to the previous command"
 end
 
 function __pr_base -a mode last_command
-	set prefix $(fish_prompt)
+	set prefix (set -q SHELL_PROMPT_SUFFIX; and echo $SHELL_PROMPT_SUFFIX; or fish_prompt)
 	_PR_MODE="$mode" _PR_PREFIX="$prefix" _PR_LAST_COMMAND="$last_command" _PR_ALIAS="$(alias)" _PR_SHELL="fish" "{{ binary_path }}"
 end
 
 function __pr_inline
 	set input (commandline)
 
-	set output $(_PR_MODE="inline" _PR_LAST_COMMAND="$input" _PR_ALIAS="$(alias)" _PR_SHELL="fish" "{{ binary_path }}")
+	set output __pr_base "inline" "$input"
 
 	if test -n "$output"
 		commandline --replace "$output"
