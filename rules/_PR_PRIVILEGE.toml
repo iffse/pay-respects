@@ -3,10 +3,11 @@ command = "_PR_privilege"
 [[match_err]]
 pattern = [
 	"as root",
+	"as super-user",
 	"authentication is required",
 	"be root",
 	"be superuser",
-	"as super-user",
+	"can not open a temporary file",
 	"cannot access",
 	"eacces",
 	"edspermissionerror",
@@ -22,9 +23,9 @@ pattern = [
 	"root privilege",
 	"root user",
 	"sudorequirederror",
+	"superuser access",
 	"superuser privilege",
 	"unless you are root",
-	"can not open a temporary file",
 	"use `sudo`",
 	"you don't have access",
 	"you don't have write permissions"
