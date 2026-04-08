@@ -56,10 +56,10 @@ pub fn highlight_difference(data: &Data, suggested_command: &str, active: bool) 
 			|| suggested_command.contains('>'))
 	{
 		split_suggested_command[1] =
-			color_diff(&format!("{} -c \"", shell), active) + &split_suggested_command[1];
+			color_diff(&format!("{} -c \"\n", shell), active) + &split_suggested_command[1];
 		let len = split_suggested_command.len() - 1;
 		split_suggested_command[len] =
-			split_suggested_command[len].clone() + color_diff("\"", active).as_str();
+			split_suggested_command[len].clone() + color_diff("\n\"", active).as_str();
 	}
 
 	if let Some(sudo) = data.privilege.clone() {
@@ -68,10 +68,10 @@ pub fn highlight_difference(data: &Data, suggested_command: &str, active: bool) 
 			|| suggested_command.contains('>')
 		{
 			split_suggested_command[0] =
-				color_same(&format!("{} -c \"", shell), active) + &split_suggested_command[0];
+				color_same(&format!("{} -c \"\n", shell), active) + &split_suggested_command[0];
 			let len = split_suggested_command.len() - 1;
 			split_suggested_command[len] =
-				split_suggested_command[len].clone() + color_same("\"", active).as_str();
+				split_suggested_command[len].clone() + color_same("\n\"", active).as_str();
 		}
 		split_suggested_command.insert(0, color_same(&sudo, active));
 	}
