@@ -1,0 +1,22 @@
+command = "_PR_privilege_aggresive"
+
+[[match_err]]
+pattern = [
+	"access",
+	"can not",
+	"cannot",
+	"permission",
+	"permitted",
+	"privilege",
+	"protected",
+	"root",
+	"sudo",
+	"super-user",
+	"superuser",
+]
+suggest = [
+'''
+#[FUNCTION]
+SetPrivilege
+'''
+]

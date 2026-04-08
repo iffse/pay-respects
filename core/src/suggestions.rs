@@ -99,6 +99,10 @@ fn get_standard_suggestions(data: &Data) -> Option<Vec<String>> {
 		add_candidates_no_dup(command, &mut final_candidates, &candidates);
 		return Some(final_candidates);
 	}
+	if let Some(candidates) = match_pattern("_PR_privilege_aggresive", data) {
+		add_candidates_no_dup(command, &mut final_candidates, &candidates);
+		return Some(final_candidates);
+	}
 	None
 }
 
