@@ -1,5 +1,5 @@
 use askama::Template;
-use pay_respects_utils::lists::{blocking_commands, privilege_list};
+use pay_respects_utils::lists::{alias_skip_expand, blocking_commands, privilege_list};
 use pay_respects_utils::log::dlog;
 
 use std::process::{Stdio, exit};
@@ -317,6 +317,9 @@ pub fn expand_alias(map: &HashMap<String, String>, command: &str) -> Option<Stri
 	} else {
 		(command, "")
 	};
+	if alias_skip_expand().contains(&command) {
+		return None;
+	}
 	map.get(command)
 		.map(|expand| format!("{} {}", expand, args))
 }
@@ -483,12 +486,17 @@ pub fn shell_evaluated_commands(shell: &str, command: &str, success: bool) {
 		.map(|line| line.trim().trim_end_matches(['\\', ';', '|', '&']))
 		.collect::<Vec<&str>>();
 
+	let prefixes = vec!["cd ", "Set-Location "];
+
 	let cd = if success {
 		let dirs = {
 			let mut dirs = Vec::new();
 			for line in lines {
-				if let Some(dir) = line.strip_prefix("cd ") {
-					dirs.push(dir.to_string());
+				for prefix in &prefixes {
+					if let Some(dir) = line.strip_prefix(prefix) {
+						dirs.push(dir.to_string());
+						break;
+					}
 				}
 			}
 			dirs.join("")

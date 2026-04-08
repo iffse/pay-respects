@@ -1,6 +1,19 @@
 /// Privilege escalation commands
+#[rustfmt::skip]
 pub fn privilege_list() -> Vec<&'static str> {
-	vec!["sudo", "doas", "run0", "sudo-rs"]
+	vec![
+		"sudo",
+		"doas",
+		"run0",
+		"sudo-rs",
+	]
+}
+
+#[rustfmt::skip]
+pub fn alias_skip_expand() -> Vec<&'static str> {
+	vec![
+		"cd",
+	]
 }
 
 /// List of commands that are not runnable (e.g. TUI commands that hangs)

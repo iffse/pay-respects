@@ -1,5 +1,5 @@
 command = "cd"
-extends = ["z", "__zoxide_z"]
+extends = ["z", "__zoxide_z", "Set-Location"]
 
 [[match_err]]
 pattern = [
@@ -33,7 +33,7 @@ pattern = [
 suggest = [
 '''
 #[length(2)]
-{{command[0]}} {{typo[1](file)}}
+cd {{typo[1](file)}}
 ''',
 '''
 #[FUNCTION, !cmd_contains(^((z\s+)|(__zoxide_z\s+)))]
