@@ -9,6 +9,7 @@ pattern = [
 	"permission",
 	"permitted",
 	"privilege",
+	"protected",
 	"root",
 	"sudo",
 	"super-user",
