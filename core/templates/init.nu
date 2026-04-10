@@ -4,8 +4,20 @@ def --env {{ alias }} [] {
 
 def --env __pr_main [mode: string] {
 	let command = (history | last).command
-	let dir = (__pr_base $mode $command)
-	cd $dir
+	let output = (__pr_base $mode $command)
+	if ($output | str trim | is-empty) { return }
+	let data = (try { $output | from json } catch { null })
+	if $data == null { return }
+	if $data.command != "" {
+		if $env.config.history.file_format == "plaintext" {
+			$"($data.command)\n" | save --append $nu.history-path
+		} else {
+			[$data.command] | history import
+		}
+	}
+	if $data.cd != "" {
+		cd $data.cd
+	}
 }
 
 def __pr_base [mode: string, command: string] {

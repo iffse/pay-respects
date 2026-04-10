@@ -1,3 +1,1 @@
-{%- if let Some(cd) = self.cd %}
-{{ cd }}
-{% endif %}
+{ "cd": "{{ cd }}", "command": "{{ command }}" }

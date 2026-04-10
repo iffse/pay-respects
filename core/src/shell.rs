@@ -538,6 +538,13 @@ pub fn shell_evaluated_commands(shell: &str, command: &str, success: bool) {
 	#[derive(Template)]
 	#[template(path = "eval.nu", escape = "none")]
 	struct NuTemplate<'a> {
+		command: &'a str,
+		cd: &'a str,
+	}
+	#[derive(Template)]
+	#[template(path = "eval.ps1", escape = "none")]
+	struct PwshTemplate<'a> {
+		command: &'a str,
 		cd: Option<&'a str>,
 	}
 	#[derive(Template)]
@@ -581,7 +588,29 @@ pub fn shell_evaluated_commands(shell: &str, command: &str, success: bool) {
 			template.render().unwrap()
 		}
 		"nu" => {
-			let template = NuTemplate { cd: cd.as_deref() };
+			// JSON-escape the fields so init.nu can parse the output with `from json`
+			let escape_json = |s: &str| {
+				s.replace('\\', "\\\\")
+					.replace('"', "\\\"")
+					.replace('\n', "\\n")
+					.replace('\r', "\\r")
+					.replace('\t', "\\t")
+			};
+			let command = escape_json(command);
+			let cd_escaped = cd.as_deref().map(escape_json).unwrap_or_default();
+			let template = NuTemplate {
+				command: &command,
+				cd: &cd_escaped,
+			};
+			template.render().unwrap()
+		}
+		"pwsh" | "powershell" | "ps" => {
+			// Single-quoted PowerShell string: only ' needs escaping (doubled).
+			let command = command.replace('\'', "''");
+			let template = PwshTemplate {
+				command: &command,
+				cd: cd.as_deref(),
+			};
 			template.render().unwrap()
 		}
 		_ => {

@@ -15,6 +15,9 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 - Added `run0` and`sudo-rs` to internal privilege elevation list
 - Alias expansion for PowerShell
+- Accepted suggestions are now appended to the shell history on Nushell
+and PowerShell, matching the existing behavior for Bash, Zsh, and Fish
+(codeberg #36).
 
 ### Changed
 
