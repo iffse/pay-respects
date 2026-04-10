@@ -19,7 +19,17 @@ main() {
 	echo "Detected architecture: ${_arch}"
 
 	local _bin_name="pay-respects"
-	local _modules="_pay-respects-module-100-runtime-rules _pay-respects-fallback-100-request-ai"
+	local _modules="_pay-respects-module-100-runtime-rules"
+
+	echo ""
+	echo "pay-respects has an optional AI module to provide suggestions when no rules match"
+	echo "The module works out-of-the-box with no data collection"
+	echo "Do you want to install the AI module? [Y/n]"
+	read -r _install_AI
+	if [ "${_install_AI}" = "Y" ] || [ "${_install_AI}" = "y" ] || [ -z "${_install_AI}" ]; then
+		_modules="${_modules} _pay-respects-fallback-100-request-ai"
+	fi
+
 	case "${_arch}" in
 	*windows*)
 		_bin_name="${_bin_name}.exe"
@@ -64,11 +74,12 @@ main() {
 	ensure try_sudo mkdir -p -- "${BIN_DIR}"
 	ensure try_sudo cp -- "${_bin_name}" "${BIN_DIR}/${_bin_name}"
 	ensure try_sudo chmod +x "${BIN_DIR}/${_bin_name}"
+	echo "Installed pay-respects to ${BIN_DIR}"
 	for _module in ${_modules}; do
 		ensure try_sudo cp -- "${_module}" "${BIN_DIR}/${_module}"
 		ensure try_sudo chmod +x "${BIN_DIR}/${_module}"
+		echo "Installed module (${_module}) to ${BIN_DIR}"
 	done
-	echo "Installed pay-respects to ${BIN_DIR}"
 
 	# Print success message and check $PATH.
 	echo ""
