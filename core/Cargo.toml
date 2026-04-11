@@ -16,7 +16,7 @@ include = ["**/*.rs", "**/*.toml", "templates/**/*"]
 [dependencies]
 colored = "3"
 sys-locale = "0.3"
-rust-i18n = "3"
+rust-i18n = "4"
 regex-lite = "0.1"
 askama = "0.15"
 itertools = "0.14.0"
