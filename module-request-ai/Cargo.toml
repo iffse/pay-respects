@@ -12,7 +12,7 @@ include = ["**/*.rs", "templates/*"]
 [dependencies]
 colored = "3"
 sys-locale = "0.3"
-rust-i18n = "3"
+rust-i18n = "4"
 serde_json = { version = "1.0" }
 serde = { version = "1.0", features = ["derive"]}
 textwrap = "0.16"
