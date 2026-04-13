@@ -2,6 +2,35 @@ command = "jj"
 
 [[match_err]]
 pattern = [
+	"There is no jj repo in \".\"",
+]
+suggest = [
+'''
+{{command[0]}} git init
+''',
+]
+
+[[match_err]]
+pattern = [
+	"unrecognized subcommand",
+]
+suggest = [
+'''
+#[err_contains('git')]
+{{command[0]}} git {{command[2:]}}
+''',
+'''
+#[cmd_contains(\s((push)|(fetch)|(clone)|(init)|(remote))), INLINE]
+{{command[0]}} git {{command[1:]}}
+''',
+'''
+#[cmd_contains(\s(pull)), INLINE]
+{{command[0]}} git fetch
+''',
+]
+
+[[match_err]]
+pattern = [
 	"error: commit",
 	"is immutable`",
 	"pass `--ignore-immutable`", # deprecated
