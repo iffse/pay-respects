@@ -13,6 +13,7 @@ export TMP=$(mktemp -d)
 # zoxide is too slow
 export _PR_NO_ZOXIDE=1
 
+export _PR_EXECUTABLES=""
 export _PR_NO_CONFIG=1
 export _PR_NO_MULTIPLEXER=1
 

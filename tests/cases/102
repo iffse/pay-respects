@@ -2,3 +2,5 @@ case="Desperate: Fuzzy recovery"
 command="gi tcommit"
 error=""
 expect="git commit"
+
+export _PR_EXECUTABLES="git"
