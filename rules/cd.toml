@@ -11,7 +11,7 @@ pattern = [
 	]
 suggest = [
 '''
-#[FUNCTION]
+#[FUNCTION, INLINE]
 ZoxideIntegration
 ''',
 ]
@@ -19,7 +19,7 @@ ZoxideIntegration
 [[match_err]]
 suggest = [
 '''
-#[FUNCTION, cmd_contains(^((z\s+)|(__zoxide_z\s+))), min_length(2)]
+#[FUNCTION, INLINE, cmd_contains(^((z\s+)|(__zoxide_z\s+))), min_length(2)]
 ZoxideIntegration
 '''
 ]
@@ -32,7 +32,7 @@ pattern = [
 ]
 suggest = [
 '''
-#[length(2)]
+#[INLINE, length(2)]
 cd {{typo[1](file)}}
 ''',
 '''
