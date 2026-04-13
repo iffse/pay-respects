@@ -12,7 +12,7 @@ use crate::config;
 use crate::data::Data;
 use crate::highlighting::highlight_difference;
 use crate::integrations::get_error_from_multiplexer;
-use crate::rules::match_pattern;
+use crate::rules::{match_inline, match_pattern};
 use crate::shell::{
 	add_candidates_no_dup, add_privilege, module_output, shell_evaluated_commands, shell_syntax,
 };
@@ -100,6 +100,63 @@ fn get_standard_suggestions(data: &Data) -> Option<Vec<String>> {
 		return Some(final_candidates);
 	}
 	if let Some(candidates) = match_pattern("_PR_privilege_aggresive", data) {
+		add_candidates_no_dup(command, &mut final_candidates, &candidates);
+		return Some(final_candidates);
+	}
+	None
+}
+
+fn get_inline_suggestions(data: &Data) -> Option<Vec<String>> {
+	let target_rule = data.get_target_rule();
+	let command = &data.command;
+	let privilege = &data.privilege;
+
+	let mut suggest_candidates = vec![];
+	let mut module_candidates = vec![];
+	let mut final_candidates = vec![];
+
+	let modules = &data.modules;
+
+	thread::scope(|s| {
+		s.spawn(|| {
+			for module in modules {
+				let new_candidates = module_output(data, module);
+
+				if let Some(candidates) = new_candidates {
+					add_candidates_no_dup(command, &mut module_candidates, &candidates);
+				}
+			}
+		});
+
+		if let Some(candidates) = match_inline(target_rule, data) {
+			add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
+		}
+		if let Some(candidates) = match_inline("_PR_general", data) {
+			add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
+		}
+		if privilege.is_none()
+			&& let Some(candidates) = match_inline("_PR_privilege", data)
+		{
+			add_candidates_no_dup(command, &mut suggest_candidates, &candidates);
+		}
+	});
+
+	if !module_candidates.is_empty() {
+		add_candidates_no_dup(command, &mut final_candidates, &module_candidates);
+	}
+	if !suggest_candidates.is_empty() {
+		add_candidates_no_dup(command, &mut final_candidates, &suggest_candidates);
+	}
+
+	if !final_candidates.is_empty() {
+		return Some(final_candidates);
+	}
+
+	if let Some(candidates) = match_inline("_PR_fallback", data) {
+		add_candidates_no_dup(command, &mut final_candidates, &candidates);
+		return Some(final_candidates);
+	}
+	if let Some(candidates) = match_inline("_PR_privilege_aggresive", data) {
 		add_candidates_no_dup(command, &mut final_candidates, &candidates);
 		return Some(final_candidates);
 	}
@@ -197,7 +254,7 @@ pub fn inline_suggestion(data: &mut Data) {
 		return;
 	}
 
-	if let Some(candidates) = get_standard_suggestions(data) {
+	if let Some(candidates) = get_inline_suggestions(data) {
 		data.candidates = candidates
 			.iter()
 			.map(|s| shell_syntax(&data.shell, s))
