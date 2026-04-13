@@ -13,6 +13,7 @@ pub fn privilege_list() -> Vec<&'static str> {
 pub fn alias_skip_expand() -> Vec<&'static str> {
 	vec![
 		"cd",
+		"z",
 	]
 }
 
