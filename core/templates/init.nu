@@ -6,17 +6,22 @@ def --env __pr_main [mode: string] {
 	let command = (history | last).command
 	let output = (__pr_base $mode $command)
 	if ($output | str trim | is-empty) { return }
-	let data = (try { $output | from json } catch { null })
+
+	let wrapped = ('[' + ($output | str replace -r '}\s*{' '},{') + ']')
+	let data = (try { $wrapped | from json } catch { null })
 	if $data == null { return }
-	if $data.command != "" {
-		if $env.config.history.file_format == "plaintext" {
-			$"($data.command)\n" | save --append $nu.history-path
-		} else {
-			[$data.command] | history import
+
+	for d in $data {
+		if ($d.command != "") {
+			if $env.config.history.file_format == "plaintext" {
+				$"($d.command)\n" | save --append $nu.history-path
+			} else {
+				[$d.command] | history import
+			}
 		}
-	}
-	if $data.cd != "" {
-		cd $data.cd
+		if ($d.cd != "") {
+			cd $d.cd
+		}
 	}
 }
 
