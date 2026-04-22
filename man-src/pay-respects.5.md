@@ -1,4 +1,4 @@
-% PAY_RESPECTS(5) pay-respects 0.8.4 | Configuration File
+% PAY_RESPECTS(5) pay-respects 0.8.6 | Configuration File
 % iff
 % April 2026
 
@@ -70,7 +70,7 @@ minimum_score = 0.5
 # - Min: Minimum strating distance required. Seach only starts if the distance
 #   obtained after the percentage calculation is above or equal to this value.
 [dl_distance]
-percentage = 27.1828182845904523536028747135266250
+percentage = 27.18281828459045235360.8.67135266250
 max = 5
 min = 1
 

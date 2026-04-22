@@ -11,6 +11,8 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+## [0.8.6]
+
 ### Added
 
 - Added `run0` and`sudo-rs` to internal privilege elevation list
@@ -510,7 +512,8 @@ normalized to `--nocnf`
 
 History start.
 
-[unreleased]: https://github.com/iffse/pay-respects/compare/v0.8.5..HEAD
+[unreleased]: https://github.com/iffse/pay-respects/compare/v0.8.6..HEAD
+[0.8.6]: https://github.com/iffse/pay-respects/compare/v0.8.5..v0.8.6
 [0.8.5]: https://github.com/iffse/pay-respects/compare/v0.8.4..v0.8.5
 [0.8.4]: https://github.com/iffse/pay-respects/compare/v0.8.3..v0.8.4
 [0.8.3]: https://github.com/iffse/pay-respects/compare/v0.8.2..v0.8.3

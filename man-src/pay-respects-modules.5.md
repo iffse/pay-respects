@@ -1,4 +1,4 @@
-% PAY_RESPECTS(5) pay-respects 0.8.4 | Modules
+% PAY_RESPECTS(5) pay-respects 0.8.6 | Modules
 % iff
 % April 2026
 
