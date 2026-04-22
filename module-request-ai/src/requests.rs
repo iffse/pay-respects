@@ -107,7 +107,6 @@ pub async fn ai_suggestion(last_command: &str, error_msg: &str, locale: &str) {
 	#[cfg(debug_assertions)]
 	eprintln!("AI module: AI prompt: {}", ai_prompt);
 
-	// let res;
 	let body = Messages {
 		messages: vec![Input {
 			role: "user".to_string(),
@@ -144,57 +143,23 @@ pub async fn ai_suggestion(last_command: &str, error_msg: &str, locale: &str) {
 		let item = item.unwrap();
 		let str = std::str::from_utf8(&item).unwrap();
 
-		if json_buffer.is_empty() {
-			json_buffer.push_str(str);
+		json_buffer.push_str(str);
+
+		if !json_buffer.contains("\n\ndata: ") {
 			continue;
 		}
 
-		if !str.contains("\n\ndata: {") {
-			json_buffer.push_str(str);
-			continue;
+		while json_buffer.contains("\n\ndata: ") {
+			proc_stream_buffer(&mut json_buffer, &mut buffer);
 		}
-		let data_loc = str.find("\n\ndata: {").unwrap();
-		let split = str.split_at(data_loc);
-		json_buffer.push_str(split.0);
-		let working_str = json_buffer.clone();
-		json_buffer.clear();
-		json_buffer.push_str(split.1);
+	}
+	// remaining buffer
+	json_buffer.push_str("\n\ndata: "); // hackey
+	while json_buffer.contains("\n\ndata: ") {
+		proc_stream_buffer(&mut json_buffer, &mut buffer);
+	}
 
-		for part in working_str.split("\n\n") {
-			if let Some(data) = part.strip_prefix("data: ") {
-				if data == "[DONE]" {
-					break;
-				}
-				let json = serde_json::from_str::<ChatCompletion>(data).unwrap_or_else(|_| {
-					panic!("AI module: Failed to parse JSON content: {}", data)
-				});
-				let choice = json.choices.first().expect("AI module: No choices found");
-				if let Some(content) = &choice.delta.content {
-					buffer.proc(content);
-				}
-			}
-		}
-	}
-	if !json_buffer.is_empty() {
-		let working_str = json_buffer.clone();
-		for part in working_str.split("\n\n") {
-			if let Some(data) = part.strip_prefix("data: ") {
-				if data == "[DONE]" {
-					break;
-				}
-				let json = serde_json::from_str::<ChatCompletion>(data).unwrap_or_else(|_| {
-					panic!("AI module: Failed to parse JSON content: {}", data)
-				});
-				let choice = json.choices.first().expect("AI module: No choices found");
-				if let Some(content) = &choice.delta.content {
-					buffer.proc(content);
-				}
-			}
-		}
-		json_buffer.clear();
-	}
-	let suggestions = buffer
-		.print_return_remain()
+	let suggestions = buffer.buf
 		.trim()
 		.trim_end_matches("```")
 		.trim()
@@ -203,6 +168,31 @@ pub async fn ai_suggestion(last_command: &str, error_msg: &str, locale: &str) {
 		.replace("<br>", "<_PR_BR>");
 
 	println!("{}", suggestions);
+}
+
+fn proc_stream_buffer(json_buffer: &mut String, buffer: &mut buffer::Buffer) {
+	let data_loc = json_buffer.find("\n\ndata: ").unwrap();
+	let binding = json_buffer.clone();
+	let split = binding.split_at(data_loc);
+	let json = split.0;
+	*json_buffer = split.1.trim_start().to_string();
+
+	proc_json(json, buffer);
+}
+
+fn proc_json(res: &str, buffer: &mut buffer::Buffer) {
+	if let Some(data) = res.trim().strip_prefix("data: ") {
+		if data == "[DONE]" {
+			return;
+		}
+		let json = serde_json::from_str::<ChatCompletion>(data).unwrap_or_else(|_| {
+			panic!("AI module: Failed to parse JSON content: {}", data)
+		});
+		let choice = json.choices.first().expect("AI module: No choices found");
+		if let Some(content) = &choice.delta.content {
+			buffer.proc(content);
+		}
+	}
 }
 
 impl Conf {
