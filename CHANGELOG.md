@@ -23,6 +23,11 @@ and PowerShell, matching the existing behavior for Bash, Zsh, and Fish
 
 - All initialization templates have been reworked
 
+### Fixed
+
+- Fallback modules not being called
+- More robust tag parsing for AI module
+
 ## [0.8.5] - 2026-04-07
 
 ### Added

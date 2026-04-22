@@ -159,7 +159,8 @@ pub async fn ai_suggestion(last_command: &str, error_msg: &str, locale: &str) {
 		proc_stream_buffer(&mut json_buffer, &mut buffer);
 	}
 
-	let suggestions = buffer.buf
+	let suggestions = buffer
+		.buf
 		.trim()
 		.trim_end_matches("```")
 		.trim()
@@ -185,9 +186,8 @@ fn proc_json(res: &str, buffer: &mut buffer::Buffer) {
 		if data == "[DONE]" {
 			return;
 		}
-		let json = serde_json::from_str::<ChatCompletion>(data).unwrap_or_else(|_| {
-			panic!("AI module: Failed to parse JSON content: {}", data)
-		});
+		let json = serde_json::from_str::<ChatCompletion>(data)
+			.unwrap_or_else(|_| panic!("AI module: Failed to parse JSON content: {}", data));
 		let choice = json.choices.first().expect("AI module: No choices found");
 		if let Some(content) = &choice.delta.content {
 			buffer.proc(content);

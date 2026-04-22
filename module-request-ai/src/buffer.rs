@@ -13,8 +13,8 @@ fn termwidth() -> usize {
 
 fn fill(str: &mut str) -> String {
 	let width = termwidth();
-	let filled = textwrap_fill(str, width);
-	filled
+	
+	textwrap_fill(str, width)
 }
 
 fn clear_format(str: &str) -> String {
@@ -84,7 +84,8 @@ impl Buffer {
 				let tag = "```";
 				let clear = " ".repeat(tag.len()).to_string();
 				print = format!("\r{}\n", clear);
-			} else { // just a new line
+			} else {
+				// just a new line
 				print = clear_format(&buf);
 			}
 		}
@@ -110,7 +111,8 @@ impl Buffer {
 				let tag = "</think>";
 				let clear = " ".repeat(tag.len());
 				print = format!("\r{}\n", clear);
-			} else { // just a new line
+			} else {
+				// just a new line
 				print = clear_format(&buf);
 			}
 		}
@@ -130,10 +132,10 @@ fn fix_data(data: &mut String) {
 				let split_before = &remaining[..pos].trim_end();
 				let split_after = &remaining[pos + tag.len()..].trim_start();
 				new_data.push_str(split_before);
-				new_data.push_str("\n");
+				new_data.push('\n');
 				new_data.push_str(tag);
-				new_data.push_str("\n");
-				
+				new_data.push('\n');
+
 				remaining = split_after;
 			}
 			new_data.push_str(remaining);
