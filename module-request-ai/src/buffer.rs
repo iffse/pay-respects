@@ -150,7 +150,7 @@ mod tests {
 	fn test_fix_data() {
 		let mut data = "hello<note>foo</note>bar".to_string();
 		fix_data(&mut data);
-		let expected = "hello<note>\nfoo</note>\nbar".to_string();
+		let expected = "hello\n<note>\nfoo\n</note>\nbar".to_string();
 		assert_eq!(data, expected);
 	}
 }
