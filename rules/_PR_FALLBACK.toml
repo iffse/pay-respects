@@ -1,6 +1,25 @@
 command = "_PR_fallback"
 
 [[match_err]]
+pattern = [
+	"access",
+	"permission",
+	"permitted",
+	"privilege",
+	"protected",
+	"root",
+	"sudo",
+	"super-user",
+	"superuser",
+]
+suggest = [
+'''
+#[FUNCTION]
+SetPrivilege
+'''
+]
+
+[[match_err]]
 suggest = [
 '''
 #[FUNCTION, min_length(2), INLINE]

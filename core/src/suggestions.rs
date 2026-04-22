@@ -87,24 +87,18 @@ fn get_standard_suggestions(data: &Data) -> Option<Vec<String>> {
 		}
 	});
 
-	if !module_candidates.is_empty() {
-		add_candidates_no_dup(command, &mut final_candidates, &module_candidates);
-	}
-	if !suggest_candidates.is_empty() {
-		add_candidates_no_dup(command, &mut final_candidates, &suggest_candidates);
-	}
+	add_candidates_no_dup(command, &mut final_candidates, &module_candidates);
+	add_candidates_no_dup(command, &mut final_candidates, &suggest_candidates);
 
 	if !final_candidates.is_empty() {
 		return Some(final_candidates);
 	}
 
-	if let Some(candidates) = match_pattern("_PR_fallback", data) {
-		add_candidates_no_dup(command, &mut final_candidates, &candidates);
-		return Some(final_candidates);
-	}
-	if let Some(candidates) = match_pattern("_PR_privilege_aggresive", data) {
-		add_candidates_no_dup(command, &mut final_candidates, &candidates);
-		return Some(final_candidates);
+	if !std::env::var("_PR_NO_DESPERATE").is_ok() {
+		if let Some(candidates) = match_pattern("_PR_fallback", data) {
+			add_candidates_no_dup(command, &mut final_candidates, &candidates);
+			return Some(final_candidates);
+		}
 	}
 	None
 }

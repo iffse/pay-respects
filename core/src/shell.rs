@@ -72,6 +72,9 @@ pub fn add_candidates_no_dup(
 	candidates: &mut Vec<String>,
 	new_candidates: &[String],
 ) {
+	if new_candidates.is_empty() {
+		return;
+	}
 	#[cfg(debug_assertions)]
 	{
 		eprintln!("Adding candidates for command: '{}'", command);
