@@ -62,8 +62,8 @@ pub async fn ai_suggestion(last_command: &str, error_msg: &str, locale: &str) {
 		}
 	};
 
-	let error_msg = if error_msg.len() > 300 {
-		&error_msg[..300]
+	let error_msg = if error_msg.chars().count() > 300 {
+		&error_msg.chars().take(300).collect::<String>()
 	} else {
 		error_msg
 	};

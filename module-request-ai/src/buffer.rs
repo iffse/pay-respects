@@ -13,14 +13,13 @@ fn termwidth() -> usize {
 
 fn fill(str: &mut str) -> String {
 	let width = termwidth();
-	
 	textwrap_fill(str, width)
 }
 
-fn clear_format(str: &str) -> String {
+fn clear_line() {
 	let width = termwidth();
 	let whitespace = " ".repeat(width);
-	format!("\r{}\r{}", whitespace, str)
+	eprint!("\r{}\r", whitespace);
 }
 
 use colored::Colorize;
@@ -53,72 +52,84 @@ impl Buffer {
 	}
 
 	fn proc_write(&mut self, data: &str) {
-		let mut print = data.to_string();
 		self.buf.push_str(data);
 		fix_data(&mut self.buf);
 		self.buf = fill(&mut self.buf);
 
-		while self.buf.contains("\n") {
-			let buf = self.buf.to_string();
-			let lines = buf.split_once("\n").unwrap();
-
-			let line = lines.0; // line before the newline
-			self.buf = lines.1.to_string(); // remaining
-
-			if line.ends_with("<note>") {
-				let warn = format!("{}:", t!("ai-suggestion"))
-					.bold()
-					.blue()
-					.to_string();
-				print = format!("\r{}\n", warn);
-			} else if line.ends_with("</note>") || line.ends_with("<suggest>") {
-				self.state = State::Buf;
-				let tag = "</note>";
-				let clear = " ".repeat(tag.len()).to_string();
-				print = format!("\r{}\n", clear);
-			} else if line.ends_with("<think>") {
-				self.state = State::Think;
-				let warn = format!("{}:", t!("ai-thinking")).bold().blue().to_string();
-				print = format!("\r{}\n", warn);
-			} else if line.ends_with("```") {
-				let tag = "```";
-				let clear = " ".repeat(tag.len()).to_string();
-				print = format!("\r{}\n", clear);
-			} else {
-				// just a new line
-				print = clear_format(&buf);
-			}
+		if !self.buf.contains("\n") {
+			eprint!("{}", data);
+			std::io::stderr().flush().unwrap();
+			return;
 		}
-		eprint!("{}", print);
-		std::io::stdout().flush().unwrap();
+
+		let slice = self.buf.split('\n').collect::<Vec<&str>>();
+
+		for (idx, line) in slice.iter().enumerate() {
+			clear_line();
+
+			match line.trim() {
+				"<note>" => {
+					let warn = format!("{}:", t!("ai-suggestion"))
+						.bold()
+						.blue()
+						.to_string();
+					eprintln!("{}", warn);
+				}
+				"</note>" | "<suggest>" => {
+					self.state = State::Buf;
+				}
+				"<think>" => {
+					self.state = State::Think;
+					let warn = format!("{}:", t!("ai-thinking")).bold().blue().to_string();
+					eprintln!("{}", warn);
+				}
+				"```" => {}
+				_ => {
+					// just a new line
+					if idx == slice.len() - 1 {
+						eprint!("{}", line);
+					} else {
+						eprintln!("{}", line);
+					}
+				}
+			}
+			std::io::stderr().flush().unwrap();
+		}
+		self.buf = slice.last().unwrap().to_string();
 	}
 
 	fn proc_think(&mut self, data: &str) {
-		let mut print = data.to_string();
 		self.buf.push_str(data);
 		fix_data(&mut self.buf);
 		self.buf = fill(&mut self.buf);
 
-		while self.buf.contains("\n") {
-			let buf = self.buf.to_string();
-			let lines = buf.split_once("\n").unwrap();
-
-			let line = lines.0; // line before the newline
-			self.buf = lines.1.to_string(); // remaining
-
-			if line.ends_with("</think>") {
-				self.state = State::Write;
-				let tag = "</think>";
-				let clear = " ".repeat(tag.len());
-				print = format!("\r{}\n", clear);
-			} else {
-				// just a new line
-				print = clear_format(&buf);
-			}
+		if !self.buf.contains("\n") {
+			eprint!("{}", data);
+			std::io::stderr().flush().unwrap();
+			return;
 		}
 
-		eprint!("{}", print);
-		std::io::stdout().flush().unwrap();
+		let slice = self.buf.split('\n').collect::<Vec<&str>>();
+
+		for (idx, line) in slice.iter().enumerate() {
+			clear_line();
+
+			match line.trim() {
+				"</think>" => {
+					self.state = State::Write;
+				}
+				_ => {
+					// just a new line
+					if idx == slice.len() - 1 {
+						eprint!("{}", line);
+					} else {
+						eprintln!("{}", line);
+					}
+				}
+			}
+			std::io::stderr().flush().unwrap();
+		}
+		self.buf = slice.last().unwrap().to_string();
 	}
 }
 
