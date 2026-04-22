@@ -33,6 +33,9 @@ pub fn suggest_candidates(data: &mut Data) {
 			.iter()
 			.map(|s| shell_syntax(shell, s))
 			.collect();
+	}
+
+	if !final_candidates.is_empty() {
 		return;
 	}
 
