@@ -94,12 +94,11 @@ fn get_standard_suggestions(data: &Data) -> Option<Vec<String>> {
 		return Some(final_candidates);
 	}
 
-	if !std::env::var("_PR_NO_DESPERATE").is_ok() {
-		if let Some(candidates) = match_pattern("_PR_fallback", data) {
+	if std::env::var("_PR_NO_DESPERATE").is_err()
+		&& let Some(candidates) = match_pattern("_PR_fallback", data) {
 			add_candidates_no_dup(command, &mut final_candidates, &candidates);
 			return Some(final_candidates);
 		}
-	}
 	None
 }
 
