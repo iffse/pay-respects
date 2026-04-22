@@ -11,21 +11,16 @@ fn termwidth() -> usize {
 	}
 }
 
-fn fill(str: &str) -> Option<String> {
+fn fill(str: &mut str) -> String {
 	let width = termwidth();
 	let filled = textwrap_fill(str, width);
-	if filled.contains('\n') {
-		Some(filled)
-	} else {
-		None
-	}
+	filled
 }
 
 fn clear_format(str: &str) -> String {
 	let width = termwidth();
 	let whitespace = " ".repeat(width);
-	let filled = textwrap_fill(str, width);
-	format!("\r{}\r{}", whitespace, filled)
+	format!("\r{}\r{}", whitespace, str)
 }
 
 use colored::Colorize;
@@ -61,6 +56,7 @@ impl Buffer {
 		let mut print = data.to_string();
 		self.buf.push_str(data);
 		fix_data(&mut self.buf);
+		self.buf = fill(&mut self.buf);
 
 		while self.buf.contains("\n") {
 			let buf = self.buf.to_string();
@@ -75,7 +71,7 @@ impl Buffer {
 					.blue()
 					.to_string();
 				print = format!("\r{}\n", warn);
-			} else if line.ends_with("</note>") {
+			} else if line.ends_with("</note>") || line.ends_with("<suggest>") {
 				self.state = State::Buf;
 				let tag = "</note>";
 				let clear = " ".repeat(tag.len()).to_string();
@@ -88,6 +84,8 @@ impl Buffer {
 				let tag = "```";
 				let clear = " ".repeat(tag.len()).to_string();
 				print = format!("\r{}\n", clear);
+			} else { // just a new line
+				print = clear_format(&buf);
 			}
 		}
 		eprint!("{}", print);
@@ -98,6 +96,7 @@ impl Buffer {
 		let mut print = data.to_string();
 		self.buf.push_str(data);
 		fix_data(&mut self.buf);
+		self.buf = fill(&mut self.buf);
 
 		while self.buf.contains("\n") {
 			let buf = self.buf.to_string();
@@ -111,6 +110,8 @@ impl Buffer {
 				let tag = "</think>";
 				let clear = " ".repeat(tag.len());
 				print = format!("\r{}\n", clear);
+			} else { // just a new line
+				print = clear_format(&buf);
 			}
 		}
 
@@ -126,12 +127,14 @@ fn fix_data(data: &mut String) {
 			let mut new_data = String::new();
 			let mut remaining = data.as_str();
 			while let Some(pos) = remaining.find(tag) {
-				let (head, tail) = remaining.split_at(pos + tag.len());
-				new_data.push_str(head);
-				if !tail.starts_with("\n") {
-					new_data.push('\n');
-				}
-				remaining = tail;
+				let split_before = &remaining[..pos].trim_end();
+				let split_after = &remaining[pos + tag.len()..].trim_start();
+				new_data.push_str(split_before);
+				new_data.push_str("\n");
+				new_data.push_str(tag);
+				new_data.push_str("\n");
+				
+				remaining = split_after;
 			}
 			new_data.push_str(remaining);
 			*data = new_data;
