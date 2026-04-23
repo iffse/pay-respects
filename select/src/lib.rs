@@ -20,7 +20,6 @@ pub fn select(
 ) -> Result<usize, Box<dyn std::error::Error>> {
 	terminal::enable_raw_mode()?;
 
-	#[cfg(target_os = "windows")]
 	drain_input();
 
 	execute!(stderr(), cursor::Hide)?;
@@ -80,6 +79,7 @@ pub fn select(
 
 			redraw(active_items, inactive_items, current, lines)?;
 		}
+		drain_input();
 	}
 
 	// Cleanup
@@ -92,7 +92,6 @@ pub fn select(
 pub fn select_simple(prelude: &str, items: &[String]) -> Result<usize, Box<dyn std::error::Error>> {
 	terminal::enable_raw_mode()?;
 
-	#[cfg(target_os = "windows")]
 	drain_input();
 
 	execute!(stderr(), cursor::Hide)?;
@@ -152,6 +151,7 @@ pub fn select_simple(prelude: &str, items: &[String]) -> Result<usize, Box<dyn s
 
 			redraw_simple(items, current, lines)?;
 		}
+		drain_input();
 	}
 
 	// Cleanup
@@ -249,8 +249,8 @@ fn quit() -> ! {
 	std::process::exit(0);
 }
 
-#[cfg(target_os = "windows")]
 fn drain_input() {
+	#[cfg(target_os = "windows")]
 	while event::poll(std::time::Duration::from_millis(10)).unwrap() {
 		event::read().unwrap();
 	}
