@@ -41,7 +41,12 @@ pub fn get_path_files() -> Vec<String> {
 			let mut file_name = file.file_name().into_string().unwrap();
 
 			#[cfg(windows)]
-			strip_extension(&mut file_name);
+			{
+				if file_name.ends_with(".dll") {
+					continue;
+				}
+				strip_extension(&mut file_name);
+			}
 
 			all_executable.push(file_name);
 		}
@@ -207,21 +212,14 @@ pub fn path_convert(path: &str) -> String {
 }
 
 #[cfg(windows)]
-fn strip_extension(file_name: &str) -> String {
-	let mut file_name = file_name.to_owned();
+fn strip_extension(file_name: &mut String) {
 	let suffixies = [".exe", ".sh", ".ps1"];
 	for suffix in suffixies {
 		if let Some(file_name_strip) = file_name.strip_suffix(suffix) {
-			file_name = file_name_strip.to_owned();
+			*file_name = file_name_strip.to_owned();
 			break;
 		}
 	}
-
-	if !file_name.contains(".") {
-		file_name = file_name.to_owned();
-	}
-
-	file_name
 }
 
 #[cfg(not(windows))]
