@@ -6,6 +6,7 @@ export _PR_LIB=""
 export _PR_MODE="echo"
 export TMP=$(mktemp -d)
 
+export _PR_EXECUTABLES=""
 export _PR_NO_ZOXIDE=1
 export _PR_NO_DESPERATE=1
 export _PR_NO_CONFIG=1
