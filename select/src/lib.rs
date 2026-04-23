@@ -9,10 +9,7 @@ use crossterm::{
 	execute,
 	terminal::{self, ClearType},
 };
-use std::{
-	io::{Write, stderr},
-	os,
-};
+use std::io::{Write, stderr};
 
 use std::cmp::min;
 

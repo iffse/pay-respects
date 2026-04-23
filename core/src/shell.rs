@@ -39,7 +39,7 @@ fn clean_shell_command(shell: &str, command: &str) -> std::process::Command {
 			cmd.arg("-NoProfile")
 				.arg("-c")
 				.arg(invariant_culture_command);
-			}
+		}
 		"nu" => {
 			cmd.arg("--no-config-file").arg("-c").arg(command);
 		}

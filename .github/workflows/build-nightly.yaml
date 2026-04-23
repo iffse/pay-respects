@@ -125,3 +125,4 @@ jobs:
           overwrite: true
           default_release_name: Nightly
           default_release_body: Nightly builds.
+          tag_name: nightly
