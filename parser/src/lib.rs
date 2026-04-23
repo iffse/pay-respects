@@ -140,9 +140,7 @@ fn gen_inline_rules(rules: &[Rule]) -> TokenStream {
 						continue;
 					}
 					conditions.retain(|x| {
-						x != "INLINE"
-							&& x != "FUNCTION" && !x.starts_with("err")
-							&& !x.starts_with("!err")
+						x != "INLINE" && !x.starts_with("err") && !x.starts_with("!err")
 					});
 				}
 
