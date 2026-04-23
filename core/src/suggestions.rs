@@ -53,8 +53,12 @@ pub fn suggest_candidates(data: &mut Data) {
 }
 
 fn get_standard_suggestions(data: &Data) -> Option<Vec<String>> {
-	let target_rule = data.get_target_rule();
 	let command = &data.command;
+	// likely comment only
+	if command.is_empty() {
+		return None;
+	}
+	let target_rule = data.get_target_rule();
 	let privilege = &data.privilege;
 
 	let mut suggest_candidates = vec![];
