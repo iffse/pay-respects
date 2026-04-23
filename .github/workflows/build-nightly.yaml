@@ -1,6 +1,9 @@
 name: Build-Nightly
 
 on:
+  push:
+    tags:
+      - nightly
   workflow_dispatch:
 
 permissions:
@@ -117,12 +120,14 @@ jobs:
           ./target/${{ matrix.target }}/release/_pay-respects-fallback-100-request-ai.exe
 
       - name: Uploading to release
-        uses: xresloader/upload-to-github-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: ncipollo/release-action@v1
         with:
-          file: "*.tar.zst;*.zip;*.deb;*.rpm"
-          overwrite: true
-          default_release_name: Nightly
-          default_release_body: Nightly builds.
-          tag_name: nightly
+          name: Nightly build
+          tag: nightly
+          artifacts: |
+            *.tar.zst
+            *.zip
+            *.deb
+            *.rpm
+          allowUpdates: true
+          makeLatest: false
