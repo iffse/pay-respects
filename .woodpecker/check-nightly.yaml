@@ -1,0 +1,37 @@
+steps:
+  - name: nightly-tag
+    image: alpine
+    when:
+      event: cron
+      cron: "nightly build"
+    environment:
+      GIT_NAME: iff
+      GIT_EMAIL: iff@ik.me
+      KEY:
+        from_secret: Codeberg-CI
+    commands:
+      - apk add --no-cache git
+      - git fetch --tags origin
+      - LAST_COMMIT_TS=$(git log -1 --format=%ct)
+      - NOW_TS=$(date +%s)
+      - DIFF=$((NOW_TS - LAST_COMMIT_TS))
+      - |
+        if [ "$DIFF" -le 86400 ]; then
+          echo "Updating nightly tag"
+
+          git tag -f nightly
+
+          apk add --no-cache openssh-client
+          mkdir -p ~/.ssh
+          echo "$KEY" > ~/.ssh/key
+          chmod 600 ~/.ssh/key
+          ssh-keyscan codeberg.org >> ~/.ssh/known_hosts
+          echo "Host codeberg.org" > ~/.ssh/config
+          echo "  IdentityFile ~/.ssh/key" >> ~/.ssh/config
+
+          git config --global user.name "$GIT_NAME"
+          git config --global user.email "$GIT_EMAIL"
+
+          git push git@codeberg.org:iff/pay-respects.git --tags --force
+        fi
+
