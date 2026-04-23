@@ -31,8 +31,15 @@ fn clean_shell_command(shell: &str, command: &str) -> std::process::Command {
 			cmd.arg("--no-config").arg("-c").arg(command);
 		}
 		"pwsh" | "powershell" => {
-			cmd.arg("-NoProfile").arg("-c").arg(command);
-		}
+			// omg powershell
+			let invariant_culture_command = format!(
+				"$CurrentCulture = [System.Globalization.CultureInfo]::InvariantCulture; $CurrentUICulture = [System.Globalization.CultureInfo]::InvariantCulture; {}",
+				command
+			);
+			cmd.arg("-NoProfile")
+				.arg("-c")
+				.arg(invariant_culture_command);
+			}
 		"nu" => {
 			cmd.arg("--no-config-file").arg("-c").arg(command);
 		}
