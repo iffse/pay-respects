@@ -1,0 +1,13 @@
+name: Rule Request
+description: File a rule request
+title: '[Rule Request]: '
+labels:
+  - rules
+body:
+  - type: textarea
+    id: rule-request-content
+    attributes:
+      label: What rules do you want us to work on?
+      description: Please let us know what do you think
+    validations:
+      required: true
