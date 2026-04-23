@@ -1,4 +1,5 @@
 use askama::Template;
+use serde_json::Value;
 use std::collections::HashMap;
 
 use futures_util::StreamExt;
@@ -23,6 +24,7 @@ struct Messages {
 	messages: Vec<Input>,
 	model: String,
 	stream: bool,
+	extra_body: Option<Value>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -107,6 +109,12 @@ pub async fn ai_suggestion(last_command: &str, error_msg: &str, locale: &str) {
 	#[cfg(debug_assertions)]
 	eprintln!("AI module: AI prompt: {}", ai_prompt);
 
+	let extra_body: Option<Value> = if let Ok(extra_body) = std::env::var("_PR_AI_EXTRA_BODY") {
+		Some(serde_json::from_str(&extra_body).unwrap())
+	} else {
+		None
+	};
+
 	let body = Messages {
 		messages: vec![Input {
 			role: "user".to_string(),
@@ -114,6 +122,7 @@ pub async fn ai_suggestion(last_command: &str, error_msg: &str, locale: &str) {
 		}],
 		model: conf.model,
 		stream: true,
+		extra_body,
 	};
 
 	let client = reqwest::Client::new();
