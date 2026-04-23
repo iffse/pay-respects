@@ -9,7 +9,10 @@ use crossterm::{
 	execute,
 	terminal::{self, ClearType},
 };
-use std::{io::{Write, stderr}, os};
+use std::{
+	io::{Write, stderr},
+	os,
+};
 
 use std::cmp::min;
 
@@ -19,6 +22,10 @@ pub fn select(
 	inactive_items: &[String],
 ) -> Result<usize, Box<dyn std::error::Error>> {
 	terminal::enable_raw_mode()?;
+
+	#[cfg(target_os = "windows")]
+	drain_input();
+
 	execute!(stderr(), cursor::Hide)?;
 	eprint!("{}\r\n", prelude);
 
