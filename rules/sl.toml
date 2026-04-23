@@ -1,0 +1,8 @@
+command = "sl"
+
+[[match_err]]
+suggest = [
+'''
+#[INLINE, !executable(sl)]
+ls {{command[1:]}} '''
+]
