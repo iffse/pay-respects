@@ -12,6 +12,7 @@ Configuration is done via environment variables:
 	- `https://api.groq.com/openai/v1/chat/completions`: GroqCloud
 	- `http://localhost:11434/v1/chat/completions`: Local Ollama
 - `_PR_AI_MODEL`: Model used. Reasoning models are also supported
+- `_PR_AI_EXTRA_BODY`: A Json object for the extra field, e.g. `{"chat_template_kwargs": {"enable_thinking": False}}`
 - `_PR_AI_DISABLE`: Setting to any value disables AI integration
 - `_PR_AI_LOCALE`: Locale in which the AI explains the suggestion. Defaults to user system locale. Useful when you use small models that speak only English, for example.
 - `_PR_AI_ADDITIONAL_PROMPT`: Additional prompts to be included. (Yes, you can include role-playing prompts you pervert)
@@ -70,7 +71,7 @@ If default values were not provided, pay-respects' own values will be used. Your
 
 For non-trivial suggestions, you can add more context as comments (for Bash and Zsh, interactive comments needs to be explicitly enabled):
 ```sh
-pacman -S # how do I install Rust?
+rustup # how do I setup nightly toolchain?
 ```
 Or just a comment:
 ```sh

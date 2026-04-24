@@ -1,17 +1,5 @@
 # Modules
 
-`pay-respects` followed a very stupid approach &mdash;or better said, *Keep It Simple, Stupid*&mdash; when it comes to implementing the module / plugin system:
-
-- Modules interacts with core program by passing **messages through processes**. In other words, we are sending necessary information to the module, so it can return the required suggestion.
-- This approach is the most extendable way, as it has the least amount of limitations compared to:
-	- Dynamic libraries (Safe): Requires the module to be compiled in the same compiler version as the core, which also limits the language available
-	- FFI (Unsafe): Requires overloading of dynamic libraries, limits to C types, and not extendable as it's overloading a library instead of appending
-	- Embedding a runtime: Unnecessary binary sizes if never used
-- `pay-respects` takes the message passing approach as its core is blazing fast without observable delay so having a small overhead is acceptable. This allows:
-	- **Modules in any language**: Regardless of compiled binary or interpreted scripts, just make them executable and that's a module!
-	- **Extendable**: As many modules as you want
-	- **Performance or ease? Both!**: Write in a compiled language if it's something computational heavy, or just use a shell script as module right away
-
 ## Creating a Module
 
 There are 2 types of modules:

@@ -90,7 +90,10 @@ pub fn select(
 }
 
 pub fn select_simple(prelude: &str, items: &[String]) -> Result<usize, Box<dyn std::error::Error>> {
-	let active_items = items.into_iter().map(|s| s.cyan().to_string()).collect::<Vec<String>>();
+	let active_items = items
+		.iter()
+		.map(|s| s.cyan().to_string())
+		.collect::<Vec<String>>();
 	select(prelude, &active_items, items)
 }
 

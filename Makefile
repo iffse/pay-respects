@@ -41,7 +41,7 @@ test-suggestions: build
 
 test: test-rust test-suggestions
 
-benchmark: release-all
+bench: release-all
 	cd tests && bash benchmark.sh
 
 man:

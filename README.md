@@ -332,10 +332,10 @@ most comfortable with:
 
 ## Benchmarks
 
-Benchmark script can be executed with `make benchmark` using `hyperfine`. Here
-are the results on my potato computer (AMD Ryzen 5 5600X, DDR4 2400 MHz, HDD
-7200 RPM with Btrfs transparent compression), you can expect better results on
-yours.
+Benchmark script can be executed with `make bench` using `hyperfine`. Here are
+the results on my potato computer (AMD Ryzen 5 5600X, DDR4 2400 MHz, HDD 7200
+RPM with Btrfs transparent compression, glibc build), you can expect better
+results on yours.
 
 | Case                      | Results             |
 |---------------------------|---------------------|
@@ -346,17 +346,16 @@ yours.
 | RegEx: Command            | 3.3 ms ±   0.1 ms   |
 | RegEx: Options            | 3.3 ms ±   0.2 ms   |
 | RegEx: Error              | 3.3 ms ±   0.1 ms   |
-| Desperate: Fuzzy recovery | 3.3 ms ±   0.2 ms   |
-| Desperate: File look up   | 10.8 ms ±   0.9 ms  |
+| Desperate: Fuzzy recovery | 703.5 µs ±  65.9 µs |
+| Desperate: File look up   | 3.4 ms ±   0.2 ms   |
 
 Caveats:
 
 - **Integrations are turned off**: In real usage you may feel a delay due to the
 execution of `zoxide` itself, for instance, which takes 50ms.
-- Binaries are **optimized for size, not speed**. The same applies to
-dependencies, using regex-lite instead of regex because it's smaller,
-although slower. A smaller binary helps in loading times, specially for cold
-runs.
+- Binaries are **optimized for size, not speed**, using regex-lite instead of
+regex because it's smaller, although slower. A smaller binary helps in
+loading times, specially for cold runs.
 
 ## Flowchart
 
