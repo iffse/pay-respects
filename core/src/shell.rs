@@ -363,6 +363,7 @@ pub fn initialization(init: &mut Init) {
 	#[derive(Template)]
 	#[template(path = "init.bash", escape = "none")]
 	struct BashTemplate<'a> {
+		shell: &'a str,
 		alias: &'a str,
 		binary_path: &'a str,
 		cnf: bool,
@@ -370,6 +371,7 @@ pub fn initialization(init: &mut Init) {
 	#[derive(Template)]
 	#[template(path = "init.zsh", escape = "none")]
 	struct ZshTemplate<'a> {
+		shell: &'a str,
 		alias: &'a str,
 		binary_path: &'a str,
 		cnf: bool,
@@ -377,6 +379,7 @@ pub fn initialization(init: &mut Init) {
 	#[derive(Template)]
 	#[template(path = "init.fish", escape = "none")]
 	struct FishTemplate<'a> {
+		shell: &'a str,
 		alias: &'a str,
 		binary_path: &'a str,
 		cnf: bool,
@@ -384,6 +387,7 @@ pub fn initialization(init: &mut Init) {
 	#[derive(Template)]
 	#[template(path = "init.ps1", escape = "none")]
 	struct PowershellTemplate<'a> {
+		shell: &'a str,
 		alias: &'a str,
 		binary_path: &'a str,
 		cnf: bool,
@@ -391,12 +395,14 @@ pub fn initialization(init: &mut Init) {
 	#[derive(Template)]
 	#[template(path = "init.nu", escape = "none")]
 	struct NuTemplate<'a> {
+		shell: &'a str,
 		alias: &'a str,
 		binary_path: &'a str,
 	}
 
 	let initialize = match shell.as_str() {
 		"bash" => BashTemplate {
+			shell,
 			alias,
 			binary_path,
 			cnf,
@@ -404,6 +410,7 @@ pub fn initialization(init: &mut Init) {
 		.render()
 		.unwrap(),
 		"zsh" => ZshTemplate {
+			shell,
 			alias,
 			binary_path,
 			cnf,
@@ -411,6 +418,7 @@ pub fn initialization(init: &mut Init) {
 		.render()
 		.unwrap(),
 		"fish" => FishTemplate {
+			shell,
 			alias,
 			binary_path,
 			cnf,
@@ -418,13 +426,20 @@ pub fn initialization(init: &mut Init) {
 		.render()
 		.unwrap(),
 		"pwsh" | "powershell" | "ps" => PowershellTemplate {
+			shell,
 			alias,
 			binary_path,
 			cnf,
 		}
 		.render()
 		.unwrap(),
-		"nu" | "nush" | "nushell" => NuTemplate { alias, binary_path }.render().unwrap(),
+		"nu" | "nush" | "nushell" => NuTemplate {
+			shell,
+			alias,
+			binary_path,
+		}
+		.render()
+		.unwrap(),
 		_ => {
 			eprintln!("{}: {}", t!("unknown-shell"), shell);
 			exit(1);
@@ -597,7 +612,7 @@ pub fn shell_evaluated_commands(shell: &str, command: &str, success: bool) {
 			};
 			template.render().unwrap()
 		}
-		"nu" => {
+		"nu" | "nush" | "nushell" => {
 			// JSON-escape the fields so init.nu can parse the output with `from json`
 			let escape_json = |s: &str| {
 				s.replace('\\', "\\\\")

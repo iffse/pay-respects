@@ -22,7 +22,7 @@ function __pr_base {
 		$env:_PR_MODE = $mode
 		$env:_PR_LAST_COMMAND = $Command
 		$env:_PR_ALIAS = (Get-Alias | Out-String)
-		$env:_PR_SHELL = "pwsh"
+		$env:_PR_SHELL = "{{ shell }}"
 
 		& '{{ binary_path }}'
 

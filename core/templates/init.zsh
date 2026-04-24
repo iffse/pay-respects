@@ -6,7 +6,7 @@ function __pr_main() {
 
 function __pr_base() {
 	prefix=$(print -P "$PROMPT")
-	_PR_MODE="$1" _PR_PREFIX="$prefix" _PR_LAST_COMMAND="$2" _PR_ALIAS="`alias`" _PR_SHELL="zsh" "{{ binary_path }}"
+	_PR_MODE="$1" _PR_PREFIX="$prefix" _PR_LAST_COMMAND="$2" _PR_ALIAS="`alias`" _PR_SHELL="{{ shell }}" "{{ binary_path }}"
 }
 
 function __pr_inline() {

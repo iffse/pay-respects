@@ -9,7 +9,7 @@ end
 
 function __pr_base -a mode last_command
 	set prefix (set -q SHELL_PROMPT_SUFFIX; and echo $SHELL_PROMPT_SUFFIX; or fish_prompt)
-	_PR_MODE="$mode" _PR_PREFIX="$prefix" _PR_LAST_COMMAND="$last_command" _PR_ALIAS="$(alias)" _PR_SHELL="fish" "{{ binary_path }}"
+	_PR_MODE="$mode" _PR_PREFIX="$prefix" _PR_LAST_COMMAND="$last_command" _PR_ALIAS="$(alias)" _PR_SHELL="{{ shell }}" "{{ binary_path }}"
 end
 
 function __pr_inline
