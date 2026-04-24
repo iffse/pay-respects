@@ -50,12 +50,13 @@ Please follow the instruction for your shell:
 
 > Add the following output to your configuration file:
 > ```sh
-> pay-respects nushell --alias [<alias>]
+> # replace `nu` for `nush` or `nushell` if your executable is named differently
+> pay-respects nu --alias [<alias>]
 > ```
 
 > Or save it as a file:
 > ```sh
-> pay-respects nushell --alias [<alias>] | save -f ~/.pay-respects.nu
+> pay-respects nu --alias [<alias>] | save -f ~/.pay-respects.nu
 > ```
 > and source from your config file:
 > ```sh
@@ -69,6 +70,7 @@ Please follow the instruction for your shell:
 
 > Append the following output to your profile:
 > ```pwsh
+> # replace `pwsh` for `powershell` if your executable is named differently
 > pay-respects pwsh --alias [<alias>]
 > ```
 
