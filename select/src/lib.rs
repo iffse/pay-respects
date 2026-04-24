@@ -90,75 +90,8 @@ pub fn select(
 }
 
 pub fn select_simple(prelude: &str, items: &[String]) -> Result<usize, Box<dyn std::error::Error>> {
-	terminal::enable_raw_mode()?;
-
-	drain_input();
-
-	execute!(stderr(), cursor::Hide)?;
-	eprint!("{}\r\n", prelude);
-
-	let lines = {
-		let mut lines = 0;
-		for item in items {
-			lines += item.lines().count();
-		}
-		lines
-	};
-	let total_lines = lines + prelude.lines().count();
-
-	let shortcut_max = min(items.len(), 9);
-	let mut current = 0;
-
-	// Initial draw
-	draw_simple(items, current)?;
-
-	loop {
-		if let Event::Key(key) = event::read()? {
-			match key.code {
-				// Navigation keys
-				KeyCode::Char('j') | KeyCode::Down => {
-					current = (current + 1) % items.len();
-				}
-				KeyCode::Char('k') | KeyCode::Up => {
-					current = if current == 0 {
-						items.len() - 1
-					} else {
-						current - 1
-					};
-				}
-				// Shortcut keys (1-9)
-				KeyCode::Char(c) if c.is_ascii_digit() => {
-					let idx = c.to_digit(10).unwrap() as usize - 1;
-					if idx < shortcut_max {
-						current = idx;
-						break;
-					}
-				}
-				// Quit keys
-				KeyCode::Char('c') | KeyCode::Char('d') => {
-					if key.modifiers.contains(event::KeyModifiers::CONTROL) {
-						cleanup(total_lines)?;
-						quit();
-					}
-				}
-				KeyCode::Esc | KeyCode::Char('q') => {
-					cleanup(total_lines)?;
-					quit()
-				}
-				KeyCode::Enter => break,
-				_ => {}
-			}
-
-			redraw_simple(items, current, lines)?;
-		}
-		drain_input();
-	}
-
-	// Cleanup
-	cleanup(total_lines)?;
-	terminal::disable_raw_mode()?;
-
-	Ok(current)
+	let active_items = items.into_iter().map(|s| s.cyan().to_string()).collect::<Vec<String>>();
+	select(prelude, &active_items, items)
 }
 
 fn select_idx(idx: usize) -> String {
@@ -198,32 +131,6 @@ fn redraw(
 ) -> Result<(), Box<dyn std::error::Error>> {
 	execute!(stderr(), cursor::MoveUp(lines as u16))?;
 	draw(active_items, inactive_items, selected)
-}
-
-fn draw_simple(items: &[String], selected: usize) -> Result<(), Box<dyn std::error::Error>> {
-	for (i, item) in items.iter().enumerate() {
-		execute!(stderr(), terminal::Clear(ClearType::CurrentLine))?;
-		if i == selected {
-			let prefix = format!("> {}) ", select_idx(i)).cyan().bold();
-			let line = format!("{}{}", prefix, item.cyan());
-			eprint!("{}\r\n", line);
-		} else {
-			let prefix = format!("  {}) ", select_idx(i)).cyan();
-			let line = format!("{}{}", prefix, item.normal());
-			eprint!("{}\r\n", line);
-		}
-	}
-	stderr().flush()?;
-	Ok(())
-}
-
-fn redraw_simple(
-	items: &[String],
-	selected: usize,
-	lines: usize,
-) -> Result<(), Box<dyn std::error::Error>> {
-	execute!(stderr(), cursor::MoveUp(lines as u16))?;
-	draw_simple(items, selected)
 }
 
 fn cleanup(lines: usize) -> Result<(), Box<dyn std::error::Error>> {
