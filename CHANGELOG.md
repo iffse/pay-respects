@@ -11,6 +11,18 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Windows:
+	- Not actually stripping extensions
+	- Not getting non-localized outputs
+	- Draining terminal inputs
+- Recovered commits that were supposed to be included in the last release
+
+### Added
+
+- AI module: `extra_body` field for model customization
+
 ## [0.8.6]
 
 ### Added
