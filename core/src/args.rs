@@ -55,15 +55,15 @@ fn print_help() {
 		t!(
 			"help",
 			usage = "pay-respects <shell> [--alias [<alias>]] [--nocnf]",
-			eval = "Bash / Zsh / Fish".bold(),
+			eval = "Bash / Zsh / Fish".bold().to_string(),
 			eval_examples = r#"
 eval "$(pay-respects bash)"
 eval "$(pay-respects zsh)"
 pay-respects fish | source
 "#,
-			manual = "Nushell / PowerShell".bold(),
+			manual = "Nushell / PowerShell".bold().to_string(),
 			manual_examples = r#"
-pay-respects nushell
+pay-respects nu
 pay-respects pwsh
 "#
 		)

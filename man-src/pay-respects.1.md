@@ -39,20 +39,21 @@ pay-respects fish --alias | source
 
 ## Nushell / PowerShell
 
-Add the following output to your configuration file
+Add the following output to your configuration file. Replace the shell with the
+actual executable name if needed.
 ```sh
-pay-respects nushell
+pay-respects nu
 pay-respects pwsh
 ```
 
 # USAGE
 
 Fix your previous command
-
-	f
+```
+f
+```
 
 Fix your current typed command
-
 ```
 <C-x> <C-x>
 ```
