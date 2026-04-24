@@ -9,9 +9,6 @@ use std::sync::mpsc::channel;
 use std::thread;
 use std::time::Duration;
 
-#[cfg(windows)]
-use pay_respects_utils::files::path_convert;
-
 use crate::data::Data;
 use crate::init::Init;
 use crate::integrations::get_error_from_multiplexer;

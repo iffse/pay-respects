@@ -13,6 +13,10 @@ use std::io::{Write, stderr};
 
 use std::cmp::min;
 
+#[cfg(target_os = "windows")]
+use crossterm::event::KeyEventKind;
+
+
 pub fn select(
 	prelude: &str,
 	active_items: &[String],
@@ -42,6 +46,11 @@ pub fn select(
 
 	loop {
 		if let Event::Key(key) = event::read()? {
+			// somehow windows receives two events
+			#[cfg(target_os = "windows")]
+			if key.kind != KeyEventKind::Press {
+				continue;
+			}
 			match key.code {
 				// Navigation keys
 				KeyCode::Char('j') | KeyCode::Down => {
