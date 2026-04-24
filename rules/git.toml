@@ -201,3 +201,13 @@ suggest = [
 '''
 git init''',
 ]
+
+[[match_err]]
+pattern = [
+	"would clobber existing tag"
+]
+suggest = [
+'''
+#[cmd_contains(tag)]
+{{command}} --force''',
+]
