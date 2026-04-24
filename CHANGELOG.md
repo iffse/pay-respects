@@ -11,6 +11,10 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+## [0.8.7]
+
+This release fixes various problems specific to Windows.
+
 ### Breaking Changes
 
 - For Nushell and PowerShell, the shell argument will now be treated as the
@@ -532,6 +536,7 @@ normalized to `--nocnf`
 History start.
 
 [unreleased]: https://github.com/iffse/pay-respects/compare/v0.8.6..HEAD
+[0.8.7]: https://github.com/iffse/pay-respects/compare/v0.8.6..v0.8.7
 [0.8.6]: https://github.com/iffse/pay-respects/compare/v0.8.5..v0.8.6
 [0.8.5]: https://github.com/iffse/pay-respects/compare/v0.8.4..v0.8.5
 [0.8.4]: https://github.com/iffse/pay-respects/compare/v0.8.3..v0.8.4
