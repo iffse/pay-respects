@@ -206,13 +206,17 @@ Install from your package manager if available:
 
 </details>
 
-Alternatively, install pre-built binaries from [GitHub releases]. An [install
-script] is available:
+Alternatively, install pre-built binaries from [GitHub releases]. Install
+scripts are available. For Unix:
 ```sh
 curl -sSfL https://raw.githubusercontent.com/iffse/pay-respects/main/install.sh | sh
 ```
+For Windows, with PowerShell:
+```pwsh
+irm https://raw.githubusercontent.com/iffse/pay-respects/main/install.ps1 | iex
+```
+
 [GitHub releases]: https://github.com/iffse/pay-respects/releases
-[install script]: ./install.sh
 
 <details>
 	<summary>Cargo / Compile from source (any OS/architecture supported by Rust)</summary>

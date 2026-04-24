@@ -11,9 +11,10 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
-### Breaking
+### Breaking Changes
 
-- For Nushell and PowerShell, the shell argument will be treated as the shell executable name.
+- For Nushell and PowerShell, the shell argument will now be treated as the
+shell executable name.
  - If you were using `pay-respects nushell` and your binary is named `nu`, you
 	 have to change it to `pay-respects nu`
 
