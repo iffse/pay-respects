@@ -26,6 +26,6 @@ bind -x '"\C-x\C-x":__pr_inline'
 
 {%- if cnf %}
 command_not_found_handle() {
-	eval $(__pr_base "cnf" "$@")
+	eval $(__pr_base "cnf" "$*")
 }
 {% endif %}
