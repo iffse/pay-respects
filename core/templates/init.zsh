@@ -26,6 +26,6 @@ bindkey '^X^X' __pr_inline
 
 {%- if cnf %}
 command_not_found_handler() {
-	eval $(__pr_base "cnf" "$@")
+	eval $(__pr_base "cnf" "$*")
 }
 {% endif %}
