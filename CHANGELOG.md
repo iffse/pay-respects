@@ -11,6 +11,17 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Bash and Zsh: Command not found handler was not getting the arguments after
+reworked templates
+- AI module: Removed `extra_body` from requests if unused.
+
+### Added
+
+- Selection now supports pagination.
+- AI module: Added `extra` field.
+
 ## [0.8.7]
 
 This release fixes various problems specific to Windows.
