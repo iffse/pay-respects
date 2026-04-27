@@ -4,7 +4,7 @@
 
 use colored::*;
 
-const PROJECT_NAME: &str = env!("CARGO_PKG_NAME");
+const PROJECT_NAME: &str = "pay-respects";
 
 pub fn print_warning(message: &str) {
 	eprintln!("{}: {}", PROJECT_NAME.yellow(), message);
