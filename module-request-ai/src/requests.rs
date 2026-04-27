@@ -3,7 +3,7 @@ use serde_json::Value;
 use std::collections::HashMap;
 
 use futures_util::StreamExt;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
 use crate::buffer;
 
@@ -13,19 +13,19 @@ struct Conf {
 	model: String,
 }
 
-#[derive(Serialize)]
-struct Input {
-	role: String,
-	content: String,
-}
-
-#[derive(Serialize)]
-struct Messages {
-	messages: Vec<Input>,
-	model: String,
-	stream: bool,
-	extra_body: Option<Value>,
-}
+// #[derive(Serialize)]
+// struct Input {
+// 	role: String,
+// 	content: String,
+// }
+//
+// #[derive(Serialize)]
+// struct Messages {
+// 	messages: Vec<Input>,
+// 	model: String,
+// 	stream: bool,
+// 	extra_body: Option<Value>,
+// }
 
 #[derive(Debug, Deserialize)]
 pub struct ChatCompletion {
@@ -54,6 +54,13 @@ struct AiPrompt<'a> {
 	error_msg: &'a str,
 	additional_prompt: &'a str,
 	set_locale: &'a str,
+}
+
+#[derive(Template)]
+#[template(path = "request.txt")]
+struct Request {
+	extra: Option<String>,
+	extra_body: Option<String>,
 }
 
 pub async fn ai_suggestion(last_command: &str, error_msg: &str, locale: &str) {
@@ -109,26 +116,20 @@ pub async fn ai_suggestion(last_command: &str, error_msg: &str, locale: &str) {
 	#[cfg(debug_assertions)]
 	eprintln!("AI module: AI prompt: {}", ai_prompt);
 
-	let extra_body: Option<Value> = if let Ok(extra_body) = std::env::var("_PR_AI_EXTRA_BODY") {
-		Some(serde_json::from_str(&extra_body).unwrap())
-	} else {
-		None
-	};
+	let extra: Option<String> = std::env::var("_PR_AI_EXTRA").ok();
+	let extra_body: Option<String> = std::env::var("_PR_AI_EXTRA_BODY").ok();
 
-	let body = Messages {
-		messages: vec![Input {
-			role: "user".to_string(),
-			content: ai_prompt.trim().to_string(),
-		}],
-		model: conf.model,
-		stream: true,
-		extra_body,
-	};
+	let body = Request { extra, extra_body };
+	let body = body.render().unwrap();
+	let mut json_body: Value = serde_json::from_str(&body).unwrap();
+	json_body["model"] = Value::String(conf.model);
+	json_body["messages"][0]["content"] = Value::String(ai_prompt);
+	json_body["stream"] = Value::Bool(true);
 
 	let client = reqwest::Client::new();
 	let res = client
 		.post(&conf.url)
-		.body(serde_json::to_string(&body).unwrap())
+		.body(serde_json::to_string(&json_body).unwrap())
 		.header("Content-Type", "application/json")
 		.bearer_auth(&conf.key)
 		.send()

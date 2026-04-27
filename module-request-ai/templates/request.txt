@@ -1,0 +1,16 @@
+{
+	"messages": [
+		{
+			"role": "user",
+			"content": ""
+		}
+	],
+	"model": "",
+	"stream": true
+	{%- if let Some(extra) = self.extra %}
+	,{{ extra }}
+	{%- endif %}
+	{%- if let Some(extra_body) = self.extra_body %}
+	, "extra_body": {{ extra_body }}
+	{%- endif %}
+}
