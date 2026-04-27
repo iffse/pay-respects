@@ -20,6 +20,8 @@ struct Page {
 #[cfg(target_os = "windows")]
 use crossterm::event::KeyEventKind;
 
+const MAX_ITEMS: usize = 10;
+
 pub fn select(
 	prelude: &str,
 	active_items: &[String],
@@ -124,8 +126,14 @@ pub fn select(
 				KeyCode::Char('b') | KeyCode::PageUp => {
 					prev_page!();
 				}
-				// Shortcut keys (1-9)
+				// Shortcut keys (1-0)
 				KeyCode::Char(c) if c.is_ascii_digit() => {
+					if c == '0' {
+						if page_len!() == 10 {
+							current = MAX_ITEMS - 1;
+						}
+						break;
+					}
 					let idx = c.to_digit(10).unwrap() as usize - 1;
 					if idx < pages[page_idx].items.len() {
 						current = idx;
@@ -175,8 +183,11 @@ pub fn select_simple(prelude: &str, items: &[String]) -> Result<usize, Box<dyn s
 }
 
 fn select_idx(idx: usize) -> String {
-	if idx < 9 {
-		format!("{}", idx + 1)
+	let idx = idx + 1;
+	if idx < MAX_ITEMS {
+		format!("{}", idx)
+	} else if idx == MAX_ITEMS {
+		String::from("0")
 	} else {
 		String::from("-")
 	}
@@ -191,7 +202,7 @@ fn get_pages(active_items: &[String], max_height: usize) -> Vec<Page> {
 			eprintln!("An item is too long to fit in the terminal.");
 			std::process::exit(1);
 		}
-		if current_page.lines + item_lines > max_height || current_page.items.len() >= 9 {
+		if current_page.lines + item_lines > max_height || current_page.items.len() >= MAX_ITEMS {
 			pages.push(current_page);
 			current_page = Page::default();
 		}
