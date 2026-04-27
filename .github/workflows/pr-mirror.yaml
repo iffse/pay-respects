@@ -1,0 +1,26 @@
+name: Merge to Codeberg
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  mirror:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.CODEBERG_SSH_KEY }}" > ~/.ssh/key
+          chmod 600 ~/.ssh/key
+          ssh-keyscan codeberg.org >> ~/.ssh/known_hosts
+          echo "Host codeberg.org" > ~/.ssh/config
+          echo "  IdentityFile ~/.ssh/key" >> ~/.ssh/config
+
+      - name: Push to Codeberg
+        run: |
+          git push git@codeberg.org:iff/pay-respects.git
