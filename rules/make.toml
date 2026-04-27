@@ -1,0 +1,11 @@
+command = "make"
+
+[[match_err]]
+pattern = [
+	"No rule to make target"
+]
+suggest = [
+'''
+#[INLINE]
+{{command[0]}} {{typo[1]({{shell(make -qp | awk -F: '/^[a-zA-Z0-9][^$#\\/\\t=]*:([^=]|$)/ {print $1}')}})}}''',
+]
