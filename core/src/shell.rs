@@ -144,7 +144,12 @@ pub fn error_output_threaded(shell: &str, command: &str, timeout: u64) -> String
 					clean_shell_command(shell, command)
 						.env("LC_ALL", "C")
 						.output()
-						.expect("failed to execute process"),
+						.unwrap_or_else(|_| {
+							panic!(
+								"failed to execute process, is '{}' the correct executable?",
+								shell
+							)
+						}),
 				)
 				.expect("failed to send output");
 		});
@@ -167,7 +172,12 @@ pub fn command_output(shell: &str, command: &str) -> String {
 	let output = clean_shell_command(shell, command)
 		.env("LC_ALL", "C")
 		.output()
-		.expect("failed to execute process");
+		.unwrap_or_else(|_| {
+			panic!(
+				"failed to execute process, is '{}' the correct executable?",
+				shell
+			)
+		});
 
 	let err = String::from_utf8_lossy(&output.stderr);
 	if !err.is_empty() {
@@ -182,7 +192,12 @@ pub fn command_output_or_error(shell: &str, command: &str) -> String {
 	let output = clean_shell_command(shell, command)
 		.env("LC_ALL", "C")
 		.output()
-		.expect("failed to execute process");
+		.unwrap_or_else(|_| {
+			panic!(
+				"failed to execute process, is '{}' the correct executable?",
+				shell
+			)
+		});
 
 	if !output.stdout.is_empty() {
 		String::from_utf8_lossy(&output.stdout).to_string()
