@@ -180,7 +180,7 @@ pub fn find_similars(typo: &str, candidates: &[String]) -> Option<Vec<String>> {
 	match get_search_type() {
 		SearchType::DamerauLevenshtein => edit_distance_bests(typo, candidates),
 		SearchType::TrigramDamerauLevenshtein => {
-			fuzzy_best_n(typo, candidates, get_trigram_minimum_score(), 9)
+			fuzzy_best_n(typo, candidates, get_trigram_minimum_score(), 99)
 		}
 	}
 }

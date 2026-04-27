@@ -11,38 +11,85 @@ use crossterm::{
 };
 use std::io::{Write, stderr};
 
-use std::cmp::min;
+#[derive(Default)]
+struct Page {
+	items: Vec<usize>,
+	lines: usize,
+}
 
 #[cfg(target_os = "windows")]
 use crossterm::event::KeyEventKind;
-
 
 pub fn select(
 	prelude: &str,
 	active_items: &[String],
 	inactive_items: &[String],
 ) -> Result<usize, Box<dyn std::error::Error>> {
-	terminal::enable_raw_mode()?;
+	let height = terminal::size()?.1 as usize;
+	let prelude_lines = prelude.lines().count();
 
+	if height < prelude_lines + 1 {
+		terminal::disable_raw_mode()?;
+		eprintln!("Terminal height too small.");
+		std::process::exit(1);
+	}
+
+	let pages = get_pages(active_items, height - prelude_lines - 2);
+
+	terminal::enable_raw_mode()?;
 	drain_input();
 
 	execute!(stderr(), cursor::Hide)?;
 	eprint!("{}\r\n", prelude);
 
-	let lines = {
-		let mut lines = 0;
-		for item in active_items {
-			lines += item.lines().count();
-		}
-		lines
-	};
-	let total_lines = lines + prelude.lines().count();
-
-	let shortcut_max = min(active_items.len(), 9);
 	let mut current = 0;
+	let mut page_idx = 0;
+	let total_pages = pages.len();
+
+	macro_rules! page_range {
+		() => {
+			pages[page_idx].items[0]..pages[page_idx].items[pages[page_idx].items.len() - 1] + 1
+		};
+	}
+	macro_rules! page_len {
+		() => {
+			pages[page_idx].items.len()
+		};
+	}
+	macro_rules! next_page {
+		() => {
+			page_idx = (page_idx + 1) % pages.len();
+			current = 0;
+		};
+	}
+	macro_rules! prev_page {
+		() => {
+			page_idx = if page_idx == 0 {
+				pages.len() - 1
+			} else {
+				page_idx - 1
+			};
+			current = pages[page_idx].items.len() - 1;
+		};
+	}
+	macro_rules! clear_lines {
+		() => {
+			if pages.len() == 1 {
+				pages[page_idx].lines
+			} else {
+				pages[page_idx].lines + 1
+			}
+		};
+	}
 
 	// Initial draw
-	draw(active_items, inactive_items, current)?;
+	draw(
+		&active_items[page_range!()],
+		&inactive_items[page_range!()],
+		current,
+		page_idx,
+		total_pages,
+	)?;
 
 	loop {
 		if let Event::Key(key) = event::read()? {
@@ -51,22 +98,36 @@ pub fn select(
 			if key.kind != KeyEventKind::Press {
 				continue;
 			}
+
+			let clear_lines = clear_lines!();
 			match key.code {
 				// Navigation keys
 				KeyCode::Char('j') | KeyCode::Down => {
-					current = (current + 1) % active_items.len();
+					// current = (current + 1) % active_items.len();
+					if current + 1 >= page_len!() {
+						next_page!();
+					} else {
+						current += 1;
+					}
 				}
 				KeyCode::Char('k') | KeyCode::Up => {
-					current = if current == 0 {
-						active_items.len() - 1
+					if current == 0 {
+						prev_page!();
 					} else {
-						current - 1
+						current -= 1
 					};
+				}
+				// Page navigation keys
+				KeyCode::Char('f') | KeyCode::PageDown => {
+					next_page!();
+				}
+				KeyCode::Char('b') | KeyCode::PageUp => {
+					prev_page!();
 				}
 				// Shortcut keys (1-9)
 				KeyCode::Char(c) if c.is_ascii_digit() => {
 					let idx = c.to_digit(10).unwrap() as usize - 1;
-					if idx < shortcut_max {
+					if idx < pages[page_idx].items.len() {
 						current = idx;
 						break;
 					}
@@ -74,25 +135,32 @@ pub fn select(
 				// Quit keys
 				KeyCode::Char('c') | KeyCode::Char('d') => {
 					if key.modifiers.contains(event::KeyModifiers::CONTROL) {
-						cleanup(total_lines)?;
+						cleanup(pages[page_idx].lines)?;
 						quit();
 					}
 				}
 				KeyCode::Esc | KeyCode::Char('q') => {
-					cleanup(total_lines)?;
+					cleanup(pages[page_idx].lines)?;
 					quit()
 				}
 				KeyCode::Enter => break,
 				_ => {}
 			}
 
-			redraw(active_items, inactive_items, current, lines)?;
+			redraw(
+				&active_items[page_range!()],
+				&inactive_items[page_range!()],
+				current,
+				clear_lines,
+				page_idx,
+				total_pages,
+			)?;
 		}
 		drain_input();
 	}
 
 	// Cleanup
-	cleanup(total_lines)?;
+	cleanup(clear_lines!() + prelude_lines)?;
 	terminal::disable_raw_mode()?;
 
 	Ok(current)
@@ -114,22 +182,59 @@ fn select_idx(idx: usize) -> String {
 	}
 }
 
+fn get_pages(active_items: &[String], max_height: usize) -> Vec<Page> {
+	let mut pages = Vec::new();
+	let mut current_page = Page::default();
+	for (idx, item) in active_items.iter().enumerate() {
+		let item_lines = item.lines().count();
+		if item_lines > max_height {
+			eprintln!("An item is too long to fit in the terminal.");
+			std::process::exit(1);
+		}
+		if current_page.lines + item_lines > max_height || current_page.items.len() >= 9 {
+			pages.push(current_page);
+			current_page = Page::default();
+		}
+		current_page.items.push(idx);
+		current_page.lines += item_lines;
+	}
+	if !current_page.items.is_empty() {
+		pages.push(current_page);
+	}
+	pages
+}
+
+fn print(str: &str) {
+	// TODO: Trimming long lines to fit terminal width
+	// Not working well due to color codes.
+	eprint!("{}\r\n", str);
+}
+
 fn draw(
 	active_items: &[String],
 	inactive_items: &[String],
 	selected: usize,
+	current_page: usize,
+	total_pages: usize,
 ) -> Result<(), Box<dyn std::error::Error>> {
 	for (i, item) in active_items.iter().enumerate() {
 		execute!(stderr(), terminal::Clear(ClearType::CurrentLine))?;
 		if i == selected {
 			let prefix = format!("> {}) ", select_idx(i)).cyan().bold();
 			let line = format!("{}{}", prefix, item);
-			eprint!("{}\r\n", line);
+			print(&line);
 		} else {
 			let prefix = format!("  {}) ", select_idx(i)).cyan();
 			let line = format!("{}{}", prefix, inactive_items.get(i).unwrap());
-			eprint!("{}\r\n", line);
+			print(&line);
 		}
+	}
+	if total_pages > 1 {
+		execute!(stderr(), terminal::Clear(ClearType::CurrentLine))?;
+		let page_info = format!("[{}/{}]", current_page + 1, total_pages)
+			.cyan()
+			.to_string();
+		print(&page_info);
 	}
 	stderr().flush()?;
 	Ok(())
@@ -140,9 +245,17 @@ fn redraw(
 	inactive_items: &[String],
 	selected: usize,
 	lines: usize,
+	currrent_page: usize,
+	total_pages: usize,
 ) -> Result<(), Box<dyn std::error::Error>> {
 	execute!(stderr(), cursor::MoveUp(lines as u16))?;
-	draw(active_items, inactive_items, selected)
+	draw(
+		active_items,
+		inactive_items,
+		selected,
+		currrent_page,
+		total_pages,
+	)
 }
 
 fn cleanup(lines: usize) -> Result<(), Box<dyn std::error::Error>> {
