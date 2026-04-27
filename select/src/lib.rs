@@ -163,7 +163,7 @@ pub fn select(
 	cleanup(clear_lines!() + prelude_lines)?;
 	terminal::disable_raw_mode()?;
 
-	Ok(current)
+	Ok(pages[page_idx].items[current])
 }
 
 pub fn select_simple(prelude: &str, items: &[String]) -> Result<usize, Box<dyn std::error::Error>> {
