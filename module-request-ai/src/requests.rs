@@ -1,6 +1,5 @@
 use askama::Template;
 use serde_json::Value;
-use std::collections::HashMap;
 
 use futures_util::StreamExt;
 use serde::Deserialize;
@@ -71,15 +70,25 @@ pub async fn ai_suggestion(last_command: &str, error_msg: &str, locale: &str) {
 		}
 	};
 
-	let error_msg = if error_msg.chars().count() > 300 {
-		&error_msg.chars().take(300).collect::<String>()
-	} else {
-		error_msg
-	};
+	let char_limit = 500;
 
-	let mut map = HashMap::new();
-	map.insert("last_command", last_command);
-	map.insert("error_msg", error_msg);
+	let error_msg = if error_msg.chars().count() > 500 + 3 {
+		let half = char_limit / 2;
+		format!(
+			"{}...{}",
+			error_msg.chars().take(half).collect::<String>(),
+			error_msg
+				.chars()
+				.rev()
+				.take(half)
+				.collect::<String>()
+				.chars()
+				.rev()
+				.collect::<String>()
+		)
+	} else {
+		error_msg.to_string()
+	};
 
 	let user_locale = {
 		let locale = std::env::var("_PR_AI_LOCALE").unwrap_or_else(|_| locale.to_string());
@@ -104,7 +113,7 @@ pub async fn ai_suggestion(last_command: &str, error_msg: &str, locale: &str) {
 
 	let ai_prompt = AiPrompt {
 		last_command,
-		error_msg,
+		error_msg: &error_msg,
 		additional_prompt: &addtional_prompt,
 		set_locale: &set_locale,
 	}
