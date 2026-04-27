@@ -148,7 +148,7 @@ pub fn select(
 					}
 				}
 				KeyCode::Esc | KeyCode::Char('q') => {
-					cleanup(pages[page_idx].lines)?;
+					cleanup(clear_lines!() + prelude_lines)?;
 					quit()
 				}
 				KeyCode::Enter => break,
