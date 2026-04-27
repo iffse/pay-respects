@@ -260,6 +260,11 @@ fn redraw(
 	total_pages: usize,
 ) -> Result<(), Box<dyn std::error::Error>> {
 	execute!(stderr(), cursor::MoveUp(lines as u16))?;
+	for _ in 0..lines {
+		execute!(stderr(), terminal::Clear(ClearType::CurrentLine))?;
+		eprint!("\r\n");
+	}
+	execute!(stderr(), cursor::MoveUp(lines as u16))?;
 	draw(
 		active_items,
 		inactive_items,
