@@ -52,7 +52,7 @@ pub fn inline(data: &mut Data) {
 	if data.candidates.is_empty() {
 		return;
 	}
-	println!("{}", data.candidates[0]);
+	println!("{} ", data.candidates[0]);
 }
 
 pub fn echo(data: &mut Data) {
