@@ -12,11 +12,9 @@ steps:
     commands:
       - apk add --no-cache git
       - git fetch --tags origin
-      - LAST_COMMIT_TS=$(git log -1 --format=%ct)
-      - NOW_TS=$(date +%s)
-      - DIFF=$((NOW_TS - LAST_COMMIT_TS))
+      - GIT_TAGS=$(git tag --points-at HEAD)
       - |
-        if [ "$DIFF" -le 86400 ]; then
+        if ! echo "$GIT_TAGS" | grep -q "nightly"; then
           echo "Updating nightly tag"
 
           git tag -f nightly
@@ -32,6 +30,6 @@ steps:
           git config --global user.name "$GIT_NAME"
           git config --global user.email "$GIT_EMAIL"
 
-          git push git@codeberg.org:iff/pay-respects.git --tags --force
+          git push git@codeberg.org:iff/pay-respects.git tag nightly --force
         fi
 
