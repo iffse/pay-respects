@@ -39,6 +39,7 @@ pub fn select(
 	let pages = get_pages(active_items, height - prelude_lines - 2);
 
 	terminal::enable_raw_mode()?;
+	execute!(stderr(), terminal::DisableLineWrap)?;
 	drain_input();
 
 	execute!(stderr(), cursor::Hide)?;
@@ -216,8 +217,6 @@ fn get_pages(active_items: &[String], max_height: usize) -> Vec<Page> {
 }
 
 fn print(str: &str) {
-	// TODO: Trimming long lines to fit terminal width
-	// Not working well due to color codes.
 	eprint!("{}\r\n", str);
 }
 
@@ -291,6 +290,7 @@ fn cleanup(lines: usize) -> Result<(), Box<dyn std::error::Error>> {
 
 fn quit() -> ! {
 	execute!(stderr(), cursor::Show).unwrap();
+	execute!(stderr(), terminal::EnableLineWrap).unwrap();
 	terminal::disable_raw_mode().unwrap();
 	let msg = "<Cancelled>".red();
 	eprintln!("{}", msg);
