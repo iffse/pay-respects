@@ -37,6 +37,8 @@ pub fn select(
 	}
 
 	let pages = get_pages(active_items, height - prelude_lines - 2);
+	let active_items = add_padding(active_items, 5);
+	let inactive_items = add_padding(inactive_items, 5);
 
 	terminal::enable_raw_mode()?;
 	execute!(stderr(), terminal::DisableLineWrap)?;
@@ -303,4 +305,11 @@ fn drain_input() {
 	while event::poll(std::time::Duration::from_millis(10)).unwrap() {
 		event::read().unwrap();
 	}
+}
+
+fn add_padding(vec: &[String], width: usize) -> Vec<String> {
+	let spaces = " ".repeat(width);
+	let from = '\n';
+	let to = format!("\r\n{}", spaces);
+	vec.iter().map(|s| s.replace(from, &to)).collect()
 }

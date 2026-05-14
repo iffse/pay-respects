@@ -112,27 +112,15 @@ pub fn select_candidate(data: &mut Data) {
 	#[cfg(debug_assertions)]
 	eprintln!("candidates: {candidates:?}");
 
-	let mut active_candidates = candidates
+	let active_candidates = candidates
 		.iter()
 		.map(|candidate| highlight_difference(data, candidate, true).unwrap())
 		.collect::<Vec<String>>();
 
-	if active_candidates.iter().any(|x| x.contains('\n')) {
-		for candidate in active_candidates.iter_mut() {
-			*candidate = candidate.replace("\n", "\r\n     ").to_string();
-		}
-	}
-
-	let mut inactive_candidates = candidates
+	let inactive_candidates = candidates
 		.iter()
 		.map(|candidate| highlight_difference(data, candidate, false).unwrap())
 		.collect::<Vec<String>>();
-
-	if inactive_candidates.iter().any(|x| x.contains('\n')) {
-		for candidate in inactive_candidates.iter_mut() {
-			*candidate = candidate.replace("\n", "\r\n     ").to_string();
-		}
-	}
 
 	let msg = format!("{}", t!("multi-suggest", num = candidates.len()))
 		.bold()
