@@ -54,12 +54,24 @@ pub fn suggestion_match(
 	};
 	let split_command = split_command(last_command);
 
-	let error_lower = error_msg.to_lowercase();
+	let error_lower = error_msg
+		.split_whitespace()
+		.collect::<Vec<_>>()
+		.join("")
+		.to_lowercase();
 
 	let mut pure_suggest;
 	for match_err in rule.match_err {
 		let patterns = match match_err.pattern {
-			Some(patterns) => patterns,
+			Some(patterns) => patterns
+				.iter()
+				.map(|x| {
+					x.split_whitespace()
+						.collect::<Vec<_>>()
+						.join("")
+						.to_lowercase()
+				})
+				.collect(),
 			None => vec!["".to_string()],
 		};
 		for pattern in patterns {

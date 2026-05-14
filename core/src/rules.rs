@@ -16,7 +16,11 @@ pub fn match_rule(executable: &str, data: &Data) -> Option<Vec<String>> {
 fn match_pattern(executable: &str, data: &Data) -> Option<Vec<String>> {
 	// variables to be used by parsed rules
 	let error_msg = &data.error;
-	let error_lower = error_msg.to_lowercase();
+	let error_lower = error_msg
+		.split_whitespace()
+		.collect::<Vec<_>>()
+		.join("")
+		.to_lowercase();
 	let shell = &data.shell;
 	let last_command = &data.command;
 	let executables = &data.executables;
@@ -38,7 +42,11 @@ fn match_inline(executable: &str, data: &Data) -> Option<Vec<String>> {
 	// variables to be used by parsed rules
 	// error variables are not used by inlines, they are here for reusing codes
 	let error_msg = &data.error;
-	let error_lower = error_msg.to_lowercase();
+	let error_lower = error_msg
+		.split_whitespace()
+		.collect::<Vec<_>>()
+		.join("")
+		.to_lowercase();
 	let shell = &data.shell;
 	let last_command = &data.command;
 	let executables = &data.executables;

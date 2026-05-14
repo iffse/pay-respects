@@ -188,7 +188,12 @@ fn parse_match_err(rules: &[Rule]) -> Vec<Vec<(Option<Vec<String>>, Vec<String>)
 					let pattern = if let Some(pattern) = &x.pattern {
 						let pattern = pattern
 							.iter()
-							.map(|x| x.to_lowercase())
+							.map(|x| {
+								x.split_whitespace()
+									.collect::<Vec<_>>()
+									.join("")
+									.to_lowercase()
+							})
 							.collect::<Vec<String>>();
 						Some(pattern)
 					} else {
