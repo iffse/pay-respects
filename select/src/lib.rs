@@ -217,7 +217,8 @@ fn get_pages(active_items: &[String], max_height: usize) -> Vec<Page> {
 }
 
 fn print(str: &str) {
-	eprint!("{}\r\n", str);
+	let str = str.replace("\r\n", " \r\n");
+	eprint!("{} \r\n", str);
 }
 
 fn draw(
