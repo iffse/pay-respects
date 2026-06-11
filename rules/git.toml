@@ -211,3 +211,14 @@ suggest = [
 #[cmd_contains(tag)]
 {{command}} --force''',
 ]
+
+[[match_err]]
+pattern = [
+  "fatal: invalid reference:"
+]
+suggest = [
+'''
+#[cmd_contains(switch)]
+{{command[0]}} switch -c {{command[2:]}}'''
+]
+
