@@ -19,7 +19,7 @@ sys-locale = "0.3"
 rust-i18n = "4"
 regex-lite = "0.1"
 askama = "0.16"
-itertools = "0.14.0"
+itertools = "0.15.0"
 
 # config file
 toml = { version = "1.0" }
