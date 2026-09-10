@@ -11,6 +11,11 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Zellij: `dump-screen` requires a path argument, so terminal capture failed
+and leaked a usage error to the terminal.
+
 ## [0.8.8]
 
 ### Fixed
