@@ -111,8 +111,11 @@ fn get_error_from_zellij(shell: &str, prefix: &str, command: &str) -> Option<Str
 		return None;
 	}
 
-	let capture_command = "zellij action dump-screen --full";
-	let output = command_output(shell, capture_command);
+	let file = NamedTempFile::new().ok()?;
+	let path = file.path().to_str()?;
+	let capture_command = format!("zellij action dump-screen --full {}", path);
+	let _ = command_output(shell, &capture_command);
+	let output = std::fs::read_to_string(path).ok()?;
 
 	parse_output(prefix, command, &output)
 }
