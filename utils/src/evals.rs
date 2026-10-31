@@ -402,7 +402,7 @@ fn trigram_edit_fuzzy_score_main(query: &str, text: &str, substring: bool) -> f3
 		trigram_jaccard_score(&query, &text)
 	};
 	// early rejection
-	if !too_short && tri < 0.01 {
+	if !too_short && tri < 0.01 && compare_string(&query, &text) > 1 {
 		#[cfg(debug_assertions)]
 		{
 			eprintln!("Early rejection comparing\n - '{query}'\n - '{text}'\n score: {tri}");
@@ -751,5 +751,14 @@ mod tests {
 		let input = "vimhelloworld";
 		let result = segment(input, &dict);
 		assert_eq!(result, vec!["vim", "helloworld"]);
+	}
+	#[test]
+	fn transpoded_executable_should_beat_alias() {
+		let rustc_score = trigram_edit_fuzzy_score("rsutc", "rustc");
+		let alias_score = trigram_edit_fuzzy_score("rsutc", "gstc");
+		assert!(
+			rustc_score > alias_score,
+			"rustc ({rustc_score}) should outrank gstc ({alias_score})"
+		);
 	}
 }
