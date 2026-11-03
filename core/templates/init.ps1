@@ -27,6 +27,8 @@ function __pr_base {
 		$env:_PR_LAST_COMMAND = $Command
 		$env:_PR_ALIAS = (Get-Alias | Out-String)
 		$env:_PR_SHELL = "{{ shell }}"
+		$env:_PR_SHELL_TYPE = "{{ shell_type }}"
+
 
 		& '{{ binary_path }}'
 
@@ -36,6 +38,7 @@ function __pr_base {
 		$env:_PR_LAST_COMMAND = $null;
 		$env:_PR_ALIAS = $null;
 		$env:_PR_SHELL = $null;
+		$env:_PR_SHELL_TYPE = $null;
 	}
 }
 

@@ -58,7 +58,9 @@ impl ScriptHandler for ExternalScripts {
 			.env("_PR_COMMAND", command)
 			.env("_PR_LAST_COMMAND", context.last_command)
 			.env("_PR_ERROR_MSG", context.error_msg)
-			.env("_PR_SHELL", context.shell)
+			.env("_PR_SHELL", context.shell_type)
+			.env("_PR_SHELL_TYPE", context.shell_type)
+			.env("_PR_SHELL_BINARY", context.shell)
 			.env("_PR_EXECUTABLES", executables)
 			.stdin(Stdio::null());
 

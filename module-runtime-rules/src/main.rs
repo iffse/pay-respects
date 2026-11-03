@@ -25,6 +25,7 @@ use pay_respects_utils::{
 	evals::{split_command, split_comment},
 	files::get_path_files,
 	modes::{Mode, run_mode},
+	shell::{detect_shell_type, normalize_shell_type},
 };
 
 use crate::config::{get_target_rule, load_config};
@@ -34,12 +35,22 @@ use crate::script::ExternalScripts;
 fn main() -> Result<(), std::io::Error> {
 	let executable = std::env::var("_PR_COMMAND").expect("_PR_COMMAND not set");
 	let shell = std::env::var("_PR_SHELL").expect("_PR_SHELL not set");
+	let shell_type = std::env::var("_PR_SHELL_TYPE")
+		.ok()
+		.filter(|shell_type| !shell_type.is_empty())
+		.and_then(|shell_type| normalize_shell_type(&shell_type).map(str::to_string))
+		.unwrap_or_else(|| {
+			detect_shell_type(&shell)
+				.map(str::to_string)
+				.unwrap_or_else(|| shell.clone())
+		});
 	let mut last_command = std::env::var("_PR_LAST_COMMAND").expect("_PR_LAST_COMMAND not set");
 	let error_msg = std::env::var("_PR_ERROR_MSG").expect("_PR_ERROR_MSG not set");
 
 	#[cfg(debug_assertions)]
 	{
 		eprintln!("shell: {}", shell);
+		eprintln!("shell_type: {}", shell_type);
 		eprintln!("executable: {}", executable);
 		eprintln!("last_command: {}", last_command);
 		eprintln!("error_msg: {}", error_msg);
@@ -50,7 +61,7 @@ fn main() -> Result<(), std::io::Error> {
 		last_command = split.join(" ");
 	}
 
-	pay_respects_utils::shell::set_shell_type(&shell);
+	pay_respects_utils::shell::set_shell_type(&shell_type);
 	pay_respects_utils::settings::load_config();
 
 	let config = load_config();
@@ -81,6 +92,7 @@ fn main() -> Result<(), std::io::Error> {
 	};
 	let context = Context {
 		shell: &shell,
+		shell_type: &shell_type,
 		last_command: &last_command,
 		error_msg: &error_msg,
 		executables: &executables,

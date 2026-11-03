@@ -21,7 +21,7 @@ pub fn suggest_candidates(data: &mut Data) {
 	if data.split.is_empty() {
 		return;
 	}
-	let shell = &data.shell;
+	let shell = &data.shell_type;
 	let command = &data.command;
 	let mut final_candidates = vec![];
 
@@ -155,7 +155,7 @@ pub fn select_candidate(data: &mut Data) {
 }
 
 pub fn execute_suggestion(data: &Data) -> Result<(), String> {
-	let shell = &data.shell;
+	let shell = &data.shell_type;
 	let command = &data.suggest.clone().unwrap();
 	#[cfg(debug_assertions)]
 	eprintln!("running command: {command}");
@@ -189,7 +189,7 @@ pub fn inline_suggestion(data: &mut Data) {
 	if let Some(candidates) = get_standard_suggestions(data) {
 		data.candidates = candidates
 			.iter()
-			.map(|s| shell_syntax(&data.shell, s))
+			.map(|s| shell_syntax(&data.shell_type, s))
 			.collect();
 	}
 }

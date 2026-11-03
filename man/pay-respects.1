@@ -4,11 +4,17 @@
 .SH NAME
 pay\-respects \- Blazing fast terminal command suggestions
 .SH SYNOPSIS
-\f[B]pay\-respects\f[R] \f[I]shell\f[R] [\f[I]options\f[R]]
+\f[B]pay\-respects\f[R] [\f[I]shell\-binary\f[R]] [\f[I]options\f[R]]
 \f[B]pay\-respects\f[R] \(enmigrate\-rules \f[I]file\f[R]
 .SH DESCRIPTION
 pay\-respects is a terminal suggestion tool that fixes your previous or
 current typed command, with a sub\-millisecond (<1ms) performance.
+.PP
+The optional positional argument is the shell executable.
+Its type is detected from the name.
+Use \f[CR]\-\-shell\-type\f[R] when the name does not contain a known
+shell name, for example
+\f[CR]pay\-respects zsh\-fork \-\-shell\-type zsh\f[R].
 .SH OPTIONS
 .TP
 \-h, \(enhelp
@@ -16,6 +22,10 @@ Show help message and exit.
 .TP
 \(enalias
 Set a custom alias instead of \f[CR]f\f[R]
+.TP
+\-s, \(enshell\-type <type>
+Shell type when the binary name differs, such as \f[CR]zsh\-fork\f[R].
+The type is detected from the binary name when omitted.
 .TP
 \(enmigrate\-rules <file>
 Convert a version 1 rule file to version 2 on \f[CR]stdout\f[R].
@@ -86,6 +96,10 @@ The binary name of the current working shell
 _PR_LAST_COMMAND
 The last command
 .SS Optional
+.TP
+_PR_SHELL_TYPE
+The shell type when it differs from the binary name.
+Detected from \f[CR]_PR_SHELL\f[R] if absent
 .TP
 _PR_ALIAS
 A list of aliases to commands.

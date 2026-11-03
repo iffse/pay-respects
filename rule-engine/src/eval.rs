@@ -14,6 +14,7 @@ pub enum Mode {
 
 pub struct Context<'a> {
 	pub shell: &'a str,
+	pub shell_type: &'a str,
 	pub last_command: &'a str,
 	pub error_msg: &'a str,
 	pub executables: &'a [String],
@@ -101,6 +102,7 @@ pub fn evaluate_rule<F: FunctionHandler, S: ScriptHandler>(
 		}
 		let context = Context {
 			shell: context.shell,
+			shell_type: context.shell_type,
 			last_command: &command,
 			error_msg: context.error_msg,
 			executables: context.executables,
@@ -164,7 +166,7 @@ fn condition_match(
 		Condition::Length(length) => split.len() == *length,
 		Condition::MinLength(length) => split.len() >= *length,
 		Condition::MaxLength(length) => split.len() <= *length + 1,
-		Condition::Shell(shell) => context.shell == shell,
+		Condition::Shell(shell) => context.shell_type == shell,
 		Condition::CommandSucceeds(template) => render_template(template, context)
 			.iter()
 			.any(|command| !command.trim().is_empty() && command_succeeds(context.shell, command)),

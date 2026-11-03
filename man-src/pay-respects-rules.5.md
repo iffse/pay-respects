@@ -144,7 +144,9 @@ The script gets the same environment variables as a module:
 - `_PR_COMMAND`: Command without arguments
 - `_PR_LAST_COMMAND`: Full command
 - `_PR_ERROR_MSG`: Error message
-- `_PR_SHELL`: Current shell
+- `_PR_SHELL`: Shell type, kept for compatibility
+- `_PR_SHELL_TYPE`: Shell type
+- `_PR_SHELL_BINARY`: Shell executable
 - `_PR_EXECUTABLES`: Executables separated by spaces. Empty when the list is
 	too large.
 

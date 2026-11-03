@@ -13,6 +13,7 @@ fn evaluate(
 	let rule: RuleSet = parse_str(rule).unwrap();
 	let context = Context {
 		shell: "bash",
+		shell_type: "bash",
 		last_command: command,
 		error_msg: error,
 		executables,
@@ -309,6 +310,7 @@ MyFunction'''
 	.unwrap();
 	let context = Context {
 		shell: "bash",
+		shell_type: "bash",
 		last_command: "x",
 		error_msg: "",
 		executables: &[],
@@ -437,6 +439,7 @@ script = { interpreter = "/usr/bin/python3", file = "{{$file}}" }
 	.unwrap();
 	let context = Context {
 		shell: "bash",
+		shell_type: "bash",
 		last_command: "x src",
 		error_msg: "",
 		executables: &[],

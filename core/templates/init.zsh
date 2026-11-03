@@ -10,7 +10,7 @@ function __pr_base() {
 	{%- else %}
 	prefix=$(print -P "$PROMPT")
 	{% endif %}
-	_PR_MODE="$1" _PR_PREFIX="$prefix" _PR_LAST_COMMAND="$2" _PR_ALIAS="`alias`" _PR_SHELL="{{ shell }}" "{{ binary_path }}"
+	_PR_MODE="$1" _PR_PREFIX="$prefix" _PR_LAST_COMMAND="$2" _PR_ALIAS="`alias`" _PR_SHELL="{{ shell }}" _PR_SHELL_TYPE="{{ shell_type }}" "{{ binary_path }}"
 }
 
 function __pr_inline() {

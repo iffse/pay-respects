@@ -16,7 +16,8 @@ Priority is used to retrieve suggestions in a specific order after sorting. Defa
 
 When running your module, you will get the following environment variables:
 
-- `_PR_SHELL`: User shell
+- `_PR_SHELL`: User shell executable
+- `_PR_SHELL_TYPE`: User shell type
 - `_PR_COMMAND`: The command, without arguments
 - `_PR_LAST_COMMAND`: Full command with arguments
 - `_PR_ERROR_MSG`: Error message from the command

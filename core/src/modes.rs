@@ -108,6 +108,7 @@ pub fn noconfirm(data: &mut Data) {
 
 pub fn cnf(data: &mut Data) {
 	let shell = data.shell.clone();
+	let shell_type = data.shell_type.clone();
 	let mut split = data.split.clone();
 
 	let executable = split[0].clone();
@@ -249,9 +250,9 @@ pub fn cnf(data: &mut Data) {
 			eprintln!("\n{}", output.cyan());
 			let status = suggestions::run_suggestion(data, &data.command);
 			if status.success() {
-				shell_evaluated_commands(&shell, &data.command, true);
+				shell_evaluated_commands(&shell_type, &data.command, true);
 			} else {
-				shell_evaluated_commands(&shell, &data.command, false);
+				shell_evaluated_commands(&shell_type, &data.command, false);
 				data.update_error(None);
 				suggestion(data);
 			}

@@ -4,6 +4,7 @@ fn _pr_base {|mode last_command|
 	tmp E:_PR_MODE = $mode
 	tmp E:_PR_LAST_COMMAND = $last_command
 	tmp E:_PR_SHELL = '{{ shell }}'
+	tmp E:_PR_SHELL_TYPE = '{{ shell_type }}'
 	{%- if let Some(prefix) = self.prefix %}
 	tmp E:_PR_PREFIX = '{{ prefix }}'
 	{%- endif %}

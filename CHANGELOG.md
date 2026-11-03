@@ -39,6 +39,8 @@ Runtime rules:
 Shell integrations:
 
 - Dash, Xonsh, and Elvish initialization and command execution.
+- Shell type is auto-detected from the shell binary name. Use `--shell-type`
+for renamed binaries such as `zsh-fork`.
 
 CLI:
 

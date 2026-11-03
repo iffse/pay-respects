@@ -8,13 +8,17 @@ pay-respects - Blazing fast terminal command suggestions
 
 # SYNOPSIS
 
-**pay-respects** *shell* [*options*]
+**pay-respects** [*shell-binary*] [*options*]
 **pay-respects** --migrate-rules *file*
 
 # DESCRIPTION
 
 pay-respects is a terminal suggestion tool that fixes your previous or current
 typed command, with a sub-millisecond (<1ms) performance.
+
+The optional positional argument is the shell executable. Its type is detected
+from the name. Use `--shell-type` when the name does not contain a known shell
+name, for example `pay-respects zsh-fork --shell-type zsh`.
 
 # OPTIONS
 
@@ -23,6 +27,10 @@ typed command, with a sub-millisecond (<1ms) performance.
 
 --alias
 : Set a custom alias instead of `f`
+
+-s, --shell-type &lt;type&gt;
+: Shell type when the binary name differs, such as `zsh-fork`. The type is
+detected from the binary name when omitted.
 
 --migrate-rules &lt;file&gt;
 : Convert a version 1 rule file to version 2 on `stdout`.
@@ -101,6 +109,10 @@ _PR_LAST_COMMAND
 : The last command
 
 ## Optional
+
+_PR_SHELL_TYPE
+: The shell type when it differs from the binary name. Detected from
+`_PR_SHELL` if absent
 
 _PR_ALIAS
 : A list of aliases to commands. Separated by newlines with zsh-like

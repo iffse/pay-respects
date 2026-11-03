@@ -23,10 +23,12 @@ use crate::shell::builtin_commands;
 use crate::shell::expand_alias_multiline;
 use crate::shell::get_error;
 use crate::shell::get_shell;
+use crate::shell::get_shell_type;
 use crate::shell::last_command;
 
 pub struct Data {
 	pub shell: String,
+	pub shell_type: String,
 	pub env: Option<String>,
 	pub prompt_prefix: Option<String>,
 	pub input_command: String,
@@ -49,8 +51,10 @@ pub struct Data {
 impl Data {
 	pub fn init() -> Data {
 		let shell = get_shell();
+		let shell_type = get_shell_type(&shell);
+		pay_respects_utils::shell::set_shell_type(&shell_type);
 		let command = last_command(&shell).trim().to_string();
-		let alias = alias_map(&shell);
+		let alias = alias_map(&shell_type);
 		let mode = run_mode();
 		let (mut executables, modules, fallbacks);
 		let lib_dir = {
@@ -158,6 +162,7 @@ impl Data {
 
 		let mut init = Data {
 			shell,
+			shell_type,
 			env: None,
 			prompt_prefix,
 			input_command,
@@ -186,13 +191,13 @@ impl Data {
 		}
 
 		// setting utils functions
-		pay_respects_utils::shell::set_shell_type(&init.shell);
 		pay_respects_utils::settings::load_config();
 
 		#[cfg(debug_assertions)]
 		{
 			eprintln!("/// data initialization");
 			eprintln!("shell: {}", init.shell);
+			eprintln!("shell_type: {}", init.shell_type);
 			eprintln!("env: {:?}", init.env);
 			eprintln!("command: {}", init.command);
 			eprintln!("error: {}", init.error);

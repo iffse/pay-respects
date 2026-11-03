@@ -13,7 +13,7 @@ function __pr_base -a mode last_command
 	{%- else %}
 	set prefix (set -q SHELL_PROMPT_SUFFIX; and echo $SHELL_PROMPT_SUFFIX; or fish_prompt)
 	{% endif %}
-	_PR_MODE="$mode" _PR_PREFIX="$prefix" _PR_LAST_COMMAND="$last_command" _PR_ALIAS="$(alias)" _PR_SHELL="{{ shell }}" "{{ binary_path }}"
+	_PR_MODE="$mode" _PR_PREFIX="$prefix" _PR_LAST_COMMAND="$last_command" _PR_ALIAS="$(alias)" _PR_SHELL="{{ shell }}" _PR_SHELL_TYPE="{{ shell_type }}" "{{ binary_path }}"
 end
 
 function __pr_inline

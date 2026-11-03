@@ -21,6 +21,7 @@ def _pr_base(mode, last_command):
     env["_PR_MODE"] = mode
     env["_PR_LAST_COMMAND"] = last_command
     env["_PR_SHELL"] = "{{ shell }}"
+    env["_PR_SHELL_TYPE"] = "{{ shell_type }}"
     env["_PR_ALIAS"] = _pr_aliases()
     {%- if let Some(prefix) = self.prefix %}
     env["_PR_PREFIX"] = '{{ prefix }}'

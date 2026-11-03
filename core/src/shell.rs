@@ -1,6 +1,9 @@
 use askama::Template;
 use pay_respects_utils::lists::{alias_skip_expand, blocking_commands, privilege_list};
 use pay_respects_utils::log::dlog;
+use pay_respects_utils::shell::{
+	ShellType, detect_shell_type, get_shell_type as get_global_shell_type, normalize_shell_type,
+};
 use pay_respects_utils::strings::print_error;
 
 use std::process::{Stdio, exit};
@@ -18,26 +21,26 @@ use pay_respects_utils::remove_env_var;
 /// Run the command without any shell configuration files (noprofile, norc)
 fn clean_shell_command(shell: &str, command: &str) -> std::process::Command {
 	let mut cmd = std::process::Command::new(shell);
-	match shell {
-		"bash" => {
+	match get_global_shell_type() {
+		ShellType::Bash => {
 			cmd.arg("--noprofile").arg("--norc").arg("-c").arg(command);
 		}
-		"zsh" => {
+		ShellType::Zsh => {
 			cmd.arg("--no-rcs").arg("-c").arg(command);
 		}
-		"fish" => {
+		ShellType::Fish => {
 			cmd.arg("--no-config").arg("-c").arg(command);
 		}
-		"dash" => {
+		ShellType::Dash => {
 			cmd.arg("-c").arg(command);
 		}
-		"xonsh" => {
+		ShellType::Xonsh => {
 			cmd.arg("--no-rc").arg("-c").arg(command);
 		}
-		"elvish" => {
+		ShellType::Elvish => {
 			cmd.arg("-norc").arg("-c").arg(command);
 		}
-		"pwsh" | "powershell" => {
+		ShellType::Powershell => {
 			// omg powershell
 			let invariant_culture_command = format!(
 				"$CurrentCulture = [System.Globalization.CultureInfo]::InvariantCulture; $CurrentUICulture = [System.Globalization.CultureInfo]::InvariantCulture; {}",
@@ -47,10 +50,10 @@ fn clean_shell_command(shell: &str, command: &str) -> std::process::Command {
 				.arg("-c")
 				.arg(invariant_culture_command);
 		}
-		"nu" => {
+		ShellType::Nu => {
 			cmd.arg("--no-config-file").arg("-c").arg(command);
 		}
-		_ => {
+		ShellType::Generic => {
 			cmd.arg("-c").arg(command);
 		}
 	}
@@ -240,6 +243,7 @@ pub fn module_output(data: &Data, module: &str) -> Option<Vec<String>> {
 	let output = clean_shell_command(shell, module)
 		.env("_PR_COMMAND", executable)
 		.env("_PR_SHELL", shell)
+		.env("_PR_SHELL_TYPE", &data.shell_type)
 		.env("_PR_LAST_COMMAND", last_command)
 		.env("_PR_ERROR_MSG", error_msg)
 		.env("_PR_EXECUTABLES", executables)
@@ -389,11 +393,13 @@ pub fn initialization(init: &mut Init) {
 	let prefix = init.cmd_prefix.as_deref();
 
 	let shell = &init.shell;
+	let shell_type = &init.shell_type;
 
 	#[derive(Template)]
 	#[template(path = "init.bash", escape = "none")]
 	struct BashTemplate<'a> {
 		shell: &'a str,
+		shell_type: &'a str,
 		alias: &'a str,
 		binary_path: &'a str,
 		cnf: bool,
@@ -403,6 +409,7 @@ pub fn initialization(init: &mut Init) {
 	#[template(path = "init.zsh", escape = "none")]
 	struct ZshTemplate<'a> {
 		shell: &'a str,
+		shell_type: &'a str,
 		alias: &'a str,
 		binary_path: &'a str,
 		cnf: bool,
@@ -412,6 +419,7 @@ pub fn initialization(init: &mut Init) {
 	#[template(path = "init.fish", escape = "none")]
 	struct FishTemplate<'a> {
 		shell: &'a str,
+		shell_type: &'a str,
 		alias: &'a str,
 		binary_path: &'a str,
 		cnf: bool,
@@ -421,6 +429,7 @@ pub fn initialization(init: &mut Init) {
 	#[template(path = "init.dash", escape = "none")]
 	struct DashTemplate<'a> {
 		shell: &'a str,
+		shell_type: &'a str,
 		alias: &'a str,
 		binary_path: &'a str,
 		prefix: Option<&'a str>,
@@ -429,6 +438,7 @@ pub fn initialization(init: &mut Init) {
 	#[template(path = "init.xonsh", escape = "none")]
 	struct XonshTemplate<'a> {
 		shell: &'a str,
+		shell_type: &'a str,
 		alias: &'a str,
 		binary_path: &'a str,
 		cnf: bool,
@@ -438,6 +448,7 @@ pub fn initialization(init: &mut Init) {
 	#[template(path = "init.elv", escape = "none")]
 	struct ElvishTemplate<'a> {
 		shell: &'a str,
+		shell_type: &'a str,
 		alias: &'a str,
 		binary_path: &'a str,
 		prefix: Option<&'a str>,
@@ -446,6 +457,7 @@ pub fn initialization(init: &mut Init) {
 	#[template(path = "init.ps1", escape = "none")]
 	struct PowershellTemplate<'a> {
 		shell: &'a str,
+		shell_type: &'a str,
 		alias: &'a str,
 		binary_path: &'a str,
 		cnf: bool,
@@ -455,14 +467,16 @@ pub fn initialization(init: &mut Init) {
 	#[template(path = "init.nu", escape = "none")]
 	struct NuTemplate<'a> {
 		shell: &'a str,
+		shell_type: &'a str,
 		alias: &'a str,
 		binary_path: &'a str,
 		prefix: Option<&'a str>,
 	}
 
-	let initialize = match shell.as_str() {
+	let initialize = match shell_type.as_str() {
 		"bash" => BashTemplate {
 			shell,
+			shell_type,
 			alias,
 			binary_path,
 			cnf,
@@ -472,6 +486,7 @@ pub fn initialization(init: &mut Init) {
 		.unwrap(),
 		"zsh" => ZshTemplate {
 			shell,
+			shell_type,
 			alias,
 			binary_path,
 			cnf,
@@ -481,6 +496,7 @@ pub fn initialization(init: &mut Init) {
 		.unwrap(),
 		"fish" => FishTemplate {
 			shell,
+			shell_type,
 			alias,
 			binary_path,
 			cnf,
@@ -490,6 +506,7 @@ pub fn initialization(init: &mut Init) {
 		.unwrap(),
 		"dash" => DashTemplate {
 			shell,
+			shell_type,
 			alias,
 			binary_path,
 			prefix,
@@ -498,6 +515,7 @@ pub fn initialization(init: &mut Init) {
 		.unwrap(),
 		"xonsh" => XonshTemplate {
 			shell,
+			shell_type,
 			alias,
 			binary_path,
 			cnf,
@@ -507,6 +525,7 @@ pub fn initialization(init: &mut Init) {
 		.unwrap(),
 		"elvish" => ElvishTemplate {
 			shell,
+			shell_type,
 			alias,
 			binary_path,
 			prefix,
@@ -515,6 +534,7 @@ pub fn initialization(init: &mut Init) {
 		.unwrap(),
 		"pwsh" | "powershell" | "ps" => PowershellTemplate {
 			shell,
+			shell_type,
 			alias,
 			binary_path,
 			cnf,
@@ -524,6 +544,7 @@ pub fn initialization(init: &mut Init) {
 		.unwrap(),
 		"nu" | "nush" | "nushell" => NuTemplate {
 			shell,
+			shell_type,
 			alias,
 			binary_path,
 			prefix,
@@ -550,6 +571,15 @@ pub fn get_shell() -> String {
 			));
 			std::process::exit(1);
 		}
+	}
+}
+
+pub fn get_shell_type(shell: &str) -> String {
+	match std::env::var("_PR_SHELL_TYPE") {
+		Ok(shell_type) if !shell_type.is_empty() => normalize_shell_type(&shell_type)
+			.unwrap_or(&shell_type)
+			.to_string(),
+		_ => detect_shell_type(shell).unwrap_or(shell).to_string(),
 	}
 }
 

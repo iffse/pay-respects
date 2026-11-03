@@ -17,6 +17,7 @@ pub fn match_rule(executable: &str, data: &Data) -> Option<Vec<String>> {
 	};
 	let context = Context {
 		shell: &data.shell,
+		shell_type: &data.shell_type,
 		last_command: &data.command,
 		error_msg: &data.error,
 		executables: &data.executables,

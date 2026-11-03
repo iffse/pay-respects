@@ -29,7 +29,11 @@ Pick your shell:
 > ```
 > Arguments:
 > - `--alias [alias]`: Command name, defaults to `f`
+> - `--shell-type <type>`: Shell type when the binary name differs
 > - `--nocnf`: Disable the `command_not_found` handler
+>
+> The shell binary name is detected automatically. Use `--shell-type` for forks
+> such as `pay-respects zsh-fork --shell-type zsh`.
 >
 > Dash has no inline mode or command-not-found handler.
 
@@ -103,11 +107,12 @@ Pick your shell:
 >
 > Example:
 > ```sh
-> eval $(_PR_SHELL=sh _PR_LAST_COMMAND="git comit" pay-respects)
+> eval $(_PR_SHELL=zsh-fork _PR_SHELL_TYPE=zsh _PR_LAST_COMMAND="git comit" pay-respects)
 > ```
 
 > These variables are optional. They let pay-respects skip work:
 >
+> - `_PR_SHELL_TYPE`: Shell type. Auto-detected from `_PR_SHELL` if absent.
 > - `_PR_ALIAS`: Aliases to commands, separated by newlines in zsh format,
 > for example `gc=git commit`
 > - `_PR_ERROR_MSG`: Error message from the previous command. If absent,

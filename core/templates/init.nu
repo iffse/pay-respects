@@ -32,7 +32,7 @@ def __pr_base [mode: string, command: string] {
 	{%- else %}
 	let prefix = if ($env.PROMPT_INDICATOR | is-not-empty) { $env.PROMPT_INDICATOR } else { do $env.PROMPT_COMMAND }
 	{%- endif %}
-	with-env { _PR_MODE: $mode, _PR_PREFIX: $prefix, _PR_LAST_COMMAND: $command, _PR_ALIAS: $alias, _PR_SHELL: {{ shell }} } {
+	with-env { _PR_MODE: $mode, _PR_PREFIX: $prefix, _PR_LAST_COMMAND: $command, _PR_ALIAS: $alias, _PR_SHELL: {{ shell }}, _PR_SHELL_TYPE: {{ shell_type }} } {
 		`{{ binary_path }}`
 	}
 }
