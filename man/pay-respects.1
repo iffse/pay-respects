@@ -78,11 +78,15 @@ f
 .EE
 .PP
 Put the selected fix back into the prompt, to be edited with the
-shell\(cqs own key bindings, on zsh, fish, and Nushell
+shell\(cqs own key bindings, on fish and Nushell
 .IP
 .EX
 f + <e>
 .EE
+.PP
+On other shells, or with \f[CR][ui] prompt_edit = false\f[R], the fix is
+opened in \f[CR]$VISUAL\f[R]/\f[CR]$EDITOR\f[R] instead and run when
+saved.
 .PP
 Fix your current typed command
 .IP

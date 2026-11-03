@@ -20,6 +20,7 @@ use sys_locale::get_locale;
 mod args;
 mod config;
 mod data;
+mod editor;
 mod highlighting;
 mod init;
 mod integrations;

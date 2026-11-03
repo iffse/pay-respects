@@ -803,7 +803,7 @@ pub fn shell_evaluated_commands(shell: &str, command: &str, success: bool) {
 
 /// Shells that can put a command back into their prompt buffer.
 pub fn prompt_insert_supported(shell_type: &str) -> bool {
-	matches!(shell_type, "zsh" | "fish" | "nu")
+	matches!(shell_type, "fish" | "nu")
 }
 
 /// Prints shell code that puts `command` back into the prompt without running
@@ -816,11 +816,6 @@ pub fn print_prompt_command(shell_type: &str, command: &str) {
 
 fn prompt_command(shell_type: &str, command: &str) -> Option<String> {
 	#[derive(Template)]
-	#[template(path = "prompt.zsh", escape = "none")]
-	struct ZshPromptTemplate<'a> {
-		command: &'a str,
-	}
-	#[derive(Template)]
 	#[template(path = "prompt.fish", escape = "none")]
 	struct FishPromptTemplate<'a> {
 		command: &'a str,
@@ -832,11 +827,6 @@ fn prompt_command(shell_type: &str, command: &str) -> Option<String> {
 	}
 
 	let print = match shell_type {
-		"zsh" => ZshPromptTemplate {
-			command: &escape_double_quoted(command),
-		}
-		.render()
-		.unwrap(),
 		"fish" => FishPromptTemplate {
 			command: &escape_double_quoted(command),
 		}
@@ -916,20 +906,17 @@ mod tests {
 
 	#[test]
 	fn prompt_insert_is_only_offered_for_supported_shells() {
-		for shell in ["zsh", "fish", "nu"] {
+		for shell in ["fish", "nu"] {
 			assert!(prompt_insert_supported(shell));
 		}
-		for shell in ["bash", "dash", "pwsh", "xonsh", "elvish"] {
+		for shell in ["bash", "zsh", "dash", "pwsh", "xonsh", "elvish"] {
 			assert!(!prompt_insert_supported(shell));
 		}
 	}
 
 	#[test]
 	fn prompt_command_targets_the_shell_and_escapes_the_command() {
-		assert_eq!(
-			prompt_command("zsh", "echo \"$HOME\" 1\\2").unwrap(),
-			r#"print -z "echo \"\$HOME\" 1\\2""#
-		);
+		assert!(prompt_command("zsh", "echo hi").is_none());
 		assert_eq!(
 			prompt_command("fish", "git status").unwrap(),
 			r#"commandline --replace "git status""#

@@ -38,8 +38,8 @@ const BOTTOM_MARGIN: usize = 2;
 pub enum Choice {
 	/// Run the selected item.
 	Picked(usize),
-	/// Put the selected item back into the shell prompt to be edited.
-	Prompt(usize),
+	/// Edit the selected item before using it.
+	Edit(usize),
 }
 
 pub fn select(
@@ -256,7 +256,7 @@ pub fn select(
 
 	let index = pages[page_idx].items[current];
 	if edit {
-		Ok(Choice::Prompt(index))
+		Ok(Choice::Edit(index))
 	} else {
 		Ok(Choice::Picked(index))
 	}
@@ -278,7 +278,7 @@ pub fn select_simple(
 		.collect::<Vec<String>>();
 	Ok(
 		match select(ui, prelude, hint, &active_items, &inactive_items, false)? {
-			Choice::Picked(index) | Choice::Prompt(index) => index,
+			Choice::Picked(index) | Choice::Edit(index) => index,
 		},
 	)
 }

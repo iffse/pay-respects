@@ -14,6 +14,10 @@ pub struct UiConfig {
 	pub prelude: bool,
 	/// Print the line with the key hints.
 	pub hint: bool,
+	/// Put the selected suggestion back into the prompt for editing. When
+	/// false, or when the shell cannot do it, the command is opened in the
+	/// editor instead.
+	pub prompt_edit: bool,
 	pub colors: Colors,
 }
 
@@ -22,6 +26,7 @@ impl Default for UiConfig {
 		Self {
 			prelude: true,
 			hint: true,
+			prompt_edit: true,
 			colors: Colors::default(),
 		}
 	}
@@ -35,6 +40,9 @@ impl UiConfig {
 		if let Some(hint) = reader.hint {
 			self.hint = hint;
 		}
+		if let Some(prompt_edit) = reader.prompt_edit {
+			self.prompt_edit = prompt_edit;
+		}
 	}
 }
 
@@ -42,6 +50,7 @@ impl UiConfig {
 pub struct UiConfigReader {
 	pub prelude: Option<bool>,
 	pub hint: Option<bool>,
+	pub prompt_edit: Option<bool>,
 }
 
 /// Text colors for the interface. Values accept color names (`red`, `bright
@@ -165,6 +174,19 @@ hint = false
 
 		assert!(!ui.prelude);
 		assert!(!ui.hint);
+		assert!(ui.prompt_edit);
+	}
+
+	#[test]
+	fn can_prefer_the_editor() {
+		let ui = parse(
+			"
+[ui]
+prompt_edit = false
+",
+		);
+
+		assert!(!ui.prompt_edit);
 	}
 
 	#[test]
@@ -173,6 +195,7 @@ hint = false
 
 		assert!(ui.prelude);
 		assert!(ui.hint);
+		assert!(ui.prompt_edit);
 		assert_eq!(ui.colors.wrong, Color::Red);
 		assert_eq!(ui.colors.correct, Color::Green);
 		assert_eq!(ui.colors.accent, Color::Blue);

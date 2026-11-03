@@ -88,10 +88,13 @@ f
 ```
 
 Put the selected fix back into the prompt, to be edited with the shell's own key
-bindings, on zsh, fish, and Nushell
+bindings, on fish and Nushell
 ```
 f + <e>
 ```
+
+On other shells, or with `[ui] prompt_edit = false`, the fix is opened in
+`$VISUAL`/`$EDITOR` instead and run when saved.
 
 Fix your current typed command
 ```

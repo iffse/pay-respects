@@ -114,6 +114,8 @@ pub enum Acceptance {
 	Run,
 	/// Put it back into the prompt for the user to edit.
 	Prompt,
+	/// Editing was cancelled.
+	Cancelled,
 }
 
 pub fn select_candidate(data: &mut Data) -> Acceptance {
@@ -130,7 +132,6 @@ pub fn select_candidate(data: &mut Data) -> Acceptance {
 		.map(|candidate| highlight_difference(data, candidate, false).unwrap())
 		.collect::<Vec<String>>();
 
-	let editable = crate::shell::prompt_insert_supported(&data.shell_type);
 	let colors = data.config.ui.colors;
 
 	let msg = format!("{}", t!("multi-suggest", num = candidates.len()))
@@ -140,19 +141,14 @@ pub fn select_candidate(data: &mut Data) -> Acceptance {
 	let confirm = format!("[{}]", t!("confirm-yes"))
 		.color(colors.correct)
 		.to_string();
-	let mut hint = format!(
-		"{} {} {}",
+	let hint = format!(
+		"{} {} {} {} {}",
 		"[↑/↓/j/k]".color(colors.accent),
 		confirm,
-		"[ESC]".color(colors.wrong)
+		"[ESC]".color(colors.wrong),
+		"[e]".color(colors.accent),
+		t!("edit").color(colors.accent)
 	);
-	if editable {
-		hint.push_str(&format!(
-			" {} {}",
-			"[e]".color(colors.accent),
-			t!("edit").color(colors.accent)
-		));
-	}
 
 	let choice = select(
 		&data.config.ui,
@@ -160,47 +156,65 @@ pub fn select_candidate(data: &mut Data) -> Acceptance {
 		&hint,
 		&active_candidates,
 		&inactive_candidates,
-		editable,
+		true,
 	)
 	.unwrap_or_else(|err| {
 		print_error(&format!("Selection failed: {}", err));
 		exit(1);
 	});
 
-	let (selection, acceptance) = match choice {
-		Choice::Picked(index) => (index, Acceptance::Run),
-		Choice::Prompt(index) => (index, Acceptance::Prompt),
+	let (selection, edit) = match choice {
+		Choice::Picked(index) => (index, false),
+		Choice::Edit(index) => (index, true),
 	};
 
-	let selected = active_candidates[selection].to_string();
+	let mut suggestion = candidates[selection].to_string();
+
+	if edit {
+		let use_prompt =
+			data.config.ui.prompt_edit && crate::shell::prompt_insert_supported(&data.shell_type);
+
+		if use_prompt {
+			data.update_suggest(&suggestion);
+			data.expand_suggest();
+			let command = history_command(
+				&data.shell,
+				data.privilege.as_deref(),
+				data.suggest.as_deref().unwrap_or_default(),
+			);
+			crate::shell::print_prompt_command(&data.shell_type, &command);
+			data.candidates.clear();
+			return Acceptance::Prompt;
+		}
+
+		let command = history_command(&data.shell, data.privilege.as_deref(), &suggestion);
+		let Some(edited) = crate::editor::edit(&command) else {
+			data.candidates.clear();
+			return Acceptance::Cancelled;
+		};
+		// the editor returns the command as it should be run, keep it verbatim
+		data.privilege = None;
+		suggestion = edited;
+	}
+
+	data.update_suggest(&suggestion);
+	data.expand_suggest();
+
+	let highlighted =
+		highlight_difference(data, &suggestion, true).unwrap_or_else(|| suggestion.clone());
 	let output = if let Some(prefix) = &data.prompt_prefix {
-		let output = format_prefix(prefix, &selected, colors.accent);
+		let output = format_prefix(prefix, &highlighted, colors.accent);
 		data.input_command = remove_color_codes(&output)
 			.trim_start_matches(prefix)
 			.to_string();
 		output
 	} else {
-		selected
+		highlighted
 	};
-	if acceptance == Acceptance::Run {
-		eprintln!("{}", output);
-	}
-
-	let suggestion = candidates[selection].to_string();
-	data.update_suggest(&suggestion);
-	data.expand_suggest();
-
-	if acceptance == Acceptance::Prompt {
-		let command = history_command(
-			&data.shell,
-			data.privilege.as_deref(),
-			data.suggest.as_deref().unwrap_or_default(),
-		);
-		crate::shell::print_prompt_command(&data.shell_type, &command);
-	}
+	eprintln!("{}", output);
 
 	data.candidates.clear();
-	acceptance
+	Acceptance::Run
 }
 
 pub fn execute_suggestion(data: &Data) -> Result<(), String> {

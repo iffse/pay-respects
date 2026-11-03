@@ -58,6 +58,10 @@ search_threshold = 3
 prelude = true
 # Print the line with the key hints
 hint = true
+# Put the selected suggestion back into the prompt to be edited with the
+# shell's own key bindings. When false, or when the shell cannot do it, the
+# command is opened in `$VISUAL`/`$EDITOR` instead
+prompt_edit = true
 
 # Interface colors. Accepts color names ("red", "bright blue") and hex codes
 # ("#ff8800"). The selection interface, the highlighted suggestions and the
