@@ -4,54 +4,142 @@
 
 # Writing Rules
 
-Rule files placed under [rules](./rules) in the project directory are parsed at
-compilation, everything is parsed to Rust code before compiling. You don't have
-to know the project structure nor Rust to write blazing fast rules!
+Rule files live under [rules](./rules). Core parses them at build time. The
+`runtime-rules` module reads them from the user configuration at run time.
 
-Runtime-rules support is provided by `runtime-rules` module. Directories are
-searched with the following priority:
+New rules should use [version 2](#version-2). Version 1 still works, but the
+runtime module prints a warning when it loads one.
 
-- `XDG_CONFIG_HOME`, defaults to `$HOME/.config`.
-- `XDG_CONFIG_DIRS`, defaults to `/etc/xdg`.
-- `XDG_DATA_DIRS`, defaults to `/usr/local/share:/usr/share`.
+## Locations
 
-The actual rule file should be placed under `pay-respects/rules/`, for example:
-`~/.config/pay-respects/rules/cargo.toml`. Note that for runtime rules, the
-name of the file **MUST** match the command name. Except `_PR_GENERAL.toml`,
-that is always parsed.
+Runtime rules are loaded from:
 
-## Syntax
+- `XDG_CONFIG_HOME`, default `$HOME/.config`
+- `XDG_CONFIG_DIRS`, default `/etc/xdg`
+- `XDG_DATA_DIRS`, default `/usr/local/share:/usr/share`
 
-Syntax of a rule file:
+Place files under `pay-respects/rules/`, for example
+`~/.config/pay-respects/rules/cargo.toml`. Name the file after the main
+command. `_PR_GENERAL.toml` is always parsed.
+
+## Version 2
+
 ```toml
-# The name of the command
-# If multiple commands could share the same rules, add it to extends
+version = 2
+commands = ["hello", "hi"]
+
+[[match]]
+# Error patterns are optional. A match without patterns always runs.
+error = [
+	"pattern 1",
+	"pattern 2",
+]
+vars = { dir = "{{command[1]}}" }
+
+[[match.suggest]]
+# Conditions are checked before the suggestion is used.
+when = [
+	"executable(sudo)",
+	"!cmd_contains(sudo)",
+]
+run = "sudo {{command}}"
+
+[[match.suggest]]
+when = ["length(2)"]
+inline = true
+run = "{{command[0]}} fix {{command[1]}}"
+
+[[match.suggest]]
+run = "cd {{$dir}}"
+
+[[match.suggest]]
+function = "MyRustFunction"
+
+[[match.suggest]]
+script = { interpreter = "/usr/bin/python3", file = "git-fix.py" }
+```
+
+Fields:
+
+- `version`: `2` for this format.
+- `commands`: Command names that share the file. Aliases go here.
+- `error`: Case and whitespace insensitive substrings from the error output.
+	Omit it to always match.
+- `vars`: Optional variables for the match. Use a table or an array of
+	`[name, value]` pairs.
+- `when`: Conditions, one string per condition. Conditions are ANDed.
+- `inline`: Also allow the suggestion in inline mode. Patterns are ignored in
+	inline mode.
+- `run`: One suggestion template. Use another `[[match.suggest]]` block for
+	another suggestion.
+- `function`: Call a Rust function from
+	[`rules_function.rs`](./core/src/rules_function.rs). Runtime rules skip it
+	because they cannot run Rust functions.
+- `script`: Run a script with an external interpreter. Use exactly one of
+	`run`, `function`, or `script`.
+
+Variables are expanded before the suggestion template is parsed. A value can
+use placeholders or other variables, so `{{$dir}}` also works inside another
+placeholder. Unknown variables and cycles fail at parse time.
+
+The pair form is useful when variable order matters:
+
+```toml
+[[match]]
+vars = [
+	["cmd", "{{command[0]}}"],
+	["arg", "{{command[1]}}"],
+]
+```
+
+Each condition is its own string. A comma inside a regex does not need
+escaping.
+
+## Scripts
+
+`script` runs a script with an external interpreter. Scripts are only available
+in runtime rules. Core rejects them at build time.
+
+```toml
+[[match.suggest]]
+script = { interpreter = "/usr/bin/python3", file = "git-fix.py" }
+```
+
+`file` can be absolute. A relative path is searched in these directories:
+
+- `XDG_CONFIG_HOME/pay-respects/scripts`, default `$HOME/.config/pay-respects/scripts`
+- `XDG_CONFIG_DIRS/pay-respects/scripts`, default `/etc/xdg/pay-respects/scripts`
+- `XDG_DATA_DIRS/pay-respects/scripts`, default
+	`/usr/local/share/pay-respects/scripts:/usr/share/pay-respects/scripts`
+- The directory of the rule file
+
+The interpreter is run with the script file as its only argument. This works
+with Python, Lua, Node, shell, and other interpreters that accept a file path.
+
+The script gets the same environment variables as a module:
+
+- `_PR_COMMAND`: Command without arguments
+- `_PR_LAST_COMMAND`: Full command
+- `_PR_ERROR_MSG`: Error message
+- `_PR_SHELL`: Current shell
+- `_PR_EXECUTABLES`: Executables separated by spaces. Empty when the list is
+	too large.
+
+Print suggestions to `stdout`. Separate multiple suggestions with `<_PR_BR>`.
+Without the separator, each non-empty line becomes one suggestion.
+
+Variables are substituted in `interpreter` and `file` before they are used.
+
+## Version 1 (deprecated)
+
+```toml
 command = "hello"
 extends = ["goodbye"]
 
-# You can add as many `[[match_err]]` section as you want
 [[match_err]]
-# Note:
-# - Patterns should be the output with `LC_ALL=C` environment variable
-# - This is a first-pass match. It should be quick so regex is not supported
-# - This field is optional, always match if omitted
 pattern = [
 	"pattern 1",
-	"pattern 2"
 ]
-# If pattern is matched, suggest changing the first argument to fix:
-suggest = [
-'''
-{{command[0]}} fix {{command[2:]}} '''
-]
-
-[[match_err]]
-pattern = [
-	"pattern 1"
-]
-# this will add a `sudo` before the command if:
-# - the `sudo` is found as executable
-# - the last command does not contain `sudo`
 suggest = [
 '''
 #[executable(sudo), !cmd_contains(sudo)]
@@ -59,99 +147,70 @@ sudo {{command}} '''
 ]
 ```
 
-## Rust Functions
+In version 1, `extends` lists aliases. Conditions go inside a `#[...]` block at
+the start of the suggestion. Commas inside a regex must be escaped as `\,`.
 
-You can also write in Rust if the rule is very complex. This is only allowed
-during compilation, by previously defining your function in
-[`rules_functions.rs`](./core/src/rules_function.rs):
-```toml
-[[match_err]]
-pattern = [
-	"pattern 1"
-]
-suggest = [
-'''
-#[FUNCTION]
-MyRustFunction '''
-]
-```
+Version 1 remains supported at run time. Migrate to version 2 before it is
+removed.
 
 ## Placeholders
 
-The placeholder is evaluated as following:
+- `{{command}}`: The full command without changes
+- `{{command[1]}}`: The first argument. The command itself is index 0.
+	- Negative values count from the end.
+- `{{command[2:5]}}`: Arguments from index 2 through index 5.
+	- An empty side starts at the beginning or ends at the last argument.
+- `{{typo[2](fix1, fix2)}}`: Replace the second argument with the closest
+	candidate.
+	- A candidate list needs at least two values.
+	- `path` searches executables in `$PATH`.
+	- `file` searches files on disk.
+	- `{{shell(<command>)}}` uses each output line as a candidate.
+- `{{select[3](one, two)}}`: Create one suggestion per selection.
+	- Only one `select` is allowed in a template.
+	- Use `{{selection}}` to place the same selection in another position.
+	- The index is optional and only affects `path`. It defaults to `0`.
+- `{{opt::<Regular Expression>}}`: Remove the captured patterns from the
+	command before later placeholders run.
+- `{{cmd::<Regular Expression>}}`: Insert the captures from the command.
+- `{{err::<Regular Expression>}}`: Insert the captures from the error message.
+	Matching is case-sensitive.
+- `{{shell(<command>)}}`: Insert the output of a shell command.
+	- Inside `typo` or `select`, each output line becomes a candidate or
+		selection.
 
-- `{{command}}`: All the command without any modification
-- `{{command[1]}}`: The first argument of the command (the command itself has
-index of 0)
-	- Negative values will count from reverse.
-- `{{command[2:5]}}`: The second to fifth arguments
-	- If any of the side is not specified, then it defaults to the start (if it
-	is left) or the end (if it is right)
-- `{{typo[2](fix1, fix2)}}`: Try to change the second argument to candidates in
-the parenthesis.
-	- The argument in parentheses must have at least 2 values
-	- Single arguments are reserved for specific matches, for instance, `path` to
-	search all commands found in the `$PATH` environment, or the `{{shell}}`
-	placeholder, among others
-- `{{select[3](selection1, selection2)}}`: A derivative of `typo` placeholder.
-Will create a suggestion for each selection in the parenthesis
-	- The argument in parentheses also must have at least 2 values
-	- Single arguments are reserved for specific selections, for instance, `path`
-	to search all commands found in the `$PATH` environment with the minimum
-	shared linguistic distance, or the `{{shell}}` placeholder
-	- To avoid permutations and combinations, only one instance is evaluated. If
-	you need to apply the same selection in multiple places, use
-	`{{selection}}`
-	- Index is optional as it only has effect when using with `path`, and
-	defaults to `0`
-- `{{opt::<Regular Expression>}}`: Optional patterns captured in the command
-with RegEx ([see regex crate for syntax])
-	- All patterns matching this placeholder will be removed from indexing
-- `{{cmd::<Regular Expression>}}`: Get the matching captures from the last command
-	- Unlike `{{opt}}`, this won't remove the string after matching
-- `{{err::<Regular Expression}}`: Get the matching captures from the error
-	message (**case-sensitive**)
-- `{{shell(<shell commands>)}}`: Replace with the output of the shell command
-	- Can be used along `{{typo}}` or `{{select}}` as its only argument, where
-	each newline will be evaluated to a candidate/selection
+Regex syntax follows [regex-lite].
 
-[see regex crate for syntax]: https://docs.rs/regex-lite/latest/regex_lite/#syntax
+[regex-lite]: https://docs.rs/regex-lite/latest/regex_lite/#syntax
 
 ## Conditions
 
-Suggestions can have additional conditions to check. To specify conditions, add
-a `#[...]` at the first line (just like derive macros in Rust). Available
-conditions:
+- `executable`: The argument is in `$PATH`
+- `cmd_contains`: The last command matches the regex
+- `err_contains`: The error message matches the regex, ignoring case and
+	whitespace
+- `length`: The command has exactly this many arguments
+- `min_length`: The command has at least this many arguments
+- `max_length`: The command has at most this many arguments
+- `shell`: The current shell equals the argument
 
-- `executable`: Check if the argument can be found in path
-- `cmd_contains`: Check if the last user input contains the argument. Regex
-supported (using `,` requires escaping, i.e. `\,`)
-- `err_contains`: Same as `cmd_contains` but for error message (all lowercase)
-- `length`: Check if the given command has the length of the argument
-- `min_length`: Check if the given command has at least the length of the argument
-- `max_length`: Check if the given command has at most the length of the argument
-- `shell`: Check if the current running shell is the argument
-
-## Identifiers
-
-Identifiers are used to reuse rules for specific purposes:
-
-- `INLINE`: Reuse the rule for `inline` mode. Patterns are ignored.
+Prefix a condition with `!` to negate it.
 
 ## Other Considerations
 
-When suggesting a chained command with `&&`, try to break it into multiple lines.
+When a suggestion chains commands with `&&`, prefer multiple lines.
 
-- More readable if the commands are long
-- Automatic conversion to compatible syntax where `&&` is unavailable (e.g. nushell)
+- Long commands read better that way.
+- The shell integration can convert `&&` where the shell does not support it,
+	for example Nushell.
 
 Example:
+
 ```toml
-suggest = [
-'''
+[[match.suggest]]
+run = '''
 command1 &&
 command2 '''
-]
 ```
 
 # SEE ALSO

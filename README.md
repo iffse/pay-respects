@@ -324,7 +324,7 @@ The project is mirrored on several sites. Pick the one you prefer:
 - **Binaries**: AGPL-3.0
 	- Core and modules
 - **Libraries**: MPL-2.0
-	- Parser, utils, and select
+	- Parser, rule engine, utils, and select
 
 ## Benchmarks
 

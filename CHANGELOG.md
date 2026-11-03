@@ -13,13 +13,23 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ### Added
 
+- Shared rule engine crate with a typed rule IR and one evaluator for both
+compile time and runtime rules.
+- Rule format version 2 with separate match and suggestion blocks.
+- Rule format version 2 variables, used as `{{$name}}` in suggestions.
+- Rule format version 2 scripts, run with an external interpreter in runtime
+rules.
+- Runtime rules now support command aliases and version 2 files.
 - AI module: Configuration via the `[module.request-ai]` section in
 `config.toml`.
 
 ### Changed
 
-- AI module: Ask for default behavior when no user API key is configured
-consent on first use.
+- Core and the runtime rules module now share the same parser and evaluator.
+- Runtime rules now treat `extends` as aliases, matching core.
+- Runtime rules print a deprecation warning for version 1 files.
+- Runtime rules skip Rust function suggestions instead of panicking.
+- AI module: Ask before using the built-in API key when `enabled` is unset.
 - AI module: The command and error message are now at the end of the prompt for
 caching.
 
@@ -433,7 +443,7 @@ characters
 ### Changed
 
 - Running standard modules in a separated thread
-- Bash init: use `fc` instead of history
+- Bash init: Use `fc` instead of history
 
 ## [0.6.8] - 2025-01-02
 

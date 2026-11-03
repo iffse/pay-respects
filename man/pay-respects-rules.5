@@ -2,209 +2,281 @@
 .\"
 .TH "PAY_RESPECTS" "5" "April 2026" "pay\-respects 0.8.8" "Rule File"
 .SH Writing Rules
-Rule files placed under rules in the project directory are parsed at
-compilation, everything is parsed to Rust code before compiling.
-You don\(cqt have to know the project structure nor Rust to write
-blazing fast rules!
+Rule files live under rules.
+Core parses them at build time.
+The \f[CR]runtime\-rules\f[R] module reads them from the user
+configuration at run time.
 .PP
-Runtime\-rules support is provided by \f[CR]runtime\-rules\f[R] module.
-Directories are searched with the following priority:
+New rules should use version 2.
+Version 1 still works, but the runtime module prints a warning when it
+loads one.
+.SS Locations
+Runtime rules are loaded from:
 .IP \(bu 2
-\f[CR]XDG_CONFIG_HOME\f[R], defaults to \f[CR]$HOME/.config\f[R].
+\f[CR]XDG_CONFIG_HOME\f[R], default \f[CR]$HOME/.config\f[R]
 .IP \(bu 2
-\f[CR]XDG_CONFIG_DIRS\f[R], defaults to \f[CR]/etc/xdg\f[R].
+\f[CR]XDG_CONFIG_DIRS\f[R], default \f[CR]/etc/xdg\f[R]
 .IP \(bu 2
-\f[CR]XDG_DATA_DIRS\f[R], defaults to
-\f[CR]/usr/local/share:/usr/share\f[R].
+\f[CR]XDG_DATA_DIRS\f[R], default \f[CR]/usr/local/share:/usr/share\f[R]
 .PP
-The actual rule file should be placed under
-\f[CR]pay\-respects/rules/\f[R], for example:
+Place files under \f[CR]pay\-respects/rules/\f[R], for example
 \f[CR]\(ti/.config/pay\-respects/rules/cargo.toml\f[R].
-Note that for runtime rules, the name of the file \f[B]MUST\f[R] match
-the command name.
-Except \f[CR]_PR_GENERAL.toml\f[R], that is always parsed.
-.SS Syntax
-Syntax of a rule file:
+Name the file after the main command.
+\f[CR]_PR_GENERAL.toml\f[R] is always parsed.
+.SS Version 2
 .IP
 .EX
-\f[I]# The name of the command\f[R]
-\f[I]# If multiple commands could share the same rules, add it to extends\f[R]
+version = 2
+commands = [\(dqhello\(dq, \(dqhi\(dq]
+
+\f[B][[match]]\f[R]
+\f[I]# Error patterns are optional. A match without patterns always runs.\f[R]
+error = [
+    \(dqpattern 1\(dq,
+    \(dqpattern 2\(dq,
+]
+vars = { dir = \(dq{{command[1]}}\(dq }
+
+\f[B][[match.suggest]]\f[R]
+\f[I]# Conditions are checked before the suggestion is used.\f[R]
+when = [
+    \(dqexecutable(sudo)\(dq,
+    \(dq!cmd_contains(sudo)\(dq,
+]
+run = \(dqsudo {{command}}\(dq
+
+\f[B][[match.suggest]]\f[R]
+when = [\(dqlength(2)\(dq]
+inline = true
+run = \(dq{{command[0]}} fix {{command[1]}}\(dq
+
+\f[B][[match.suggest]]\f[R]
+run = \(dqcd {{$dir}}\(dq
+
+\f[B][[match.suggest]]\f[R]
+function = \(dqMyRustFunction\(dq
+
+\f[B][[match.suggest]]\f[R]
+script = { interpreter = \(dq/usr/bin/python3\(dq, file = \(dqgit\-fix.py\(dq }
+.EE
+.PP
+Fields:
+.IP \(bu 2
+\f[CR]version\f[R]: \f[CR]2\f[R] for this format.
+.IP \(bu 2
+\f[CR]commands\f[R]: Command names that share the file.
+Aliases go here.
+.IP \(bu 2
+\f[CR]error\f[R]: Case and whitespace insensitive substrings from the
+error output.
+Omit it to always match.
+.IP \(bu 2
+\f[CR]vars\f[R]: Optional variables for the match.
+Use a table or an array of \f[CR][name, value]\f[R] pairs.
+.IP \(bu 2
+\f[CR]when\f[R]: Conditions, one string per condition.
+Conditions are ANDed.
+.IP \(bu 2
+\f[CR]inline\f[R]: Also allow the suggestion in inline mode.
+Patterns are ignored in inline mode.
+.IP \(bu 2
+\f[CR]run\f[R]: One suggestion template.
+Use another \f[CR][[match.suggest]]\f[R] block for another suggestion.
+.IP \(bu 2
+\f[CR]function\f[R]: Call a Rust function from
+\f[CR]rules_function.rs\f[R].
+Runtime rules skip it because they cannot run Rust functions.
+.IP \(bu 2
+\f[CR]script\f[R]: Run a script with an external interpreter.
+Use exactly one of \f[CR]run\f[R], \f[CR]function\f[R], or
+\f[CR]script\f[R].
+.PP
+Variables are expanded before the suggestion template is parsed.
+A value can use placeholders or other variables, so \f[CR]{{$dir}}\f[R]
+also works inside another placeholder.
+Unknown variables and cycles fail at parse time.
+.PP
+The pair form is useful when variable order matters:
+.IP
+.EX
+\f[B][[match]]\f[R]
+vars = [
+    [\(dqcmd\(dq, \(dq{{command[0]}}\(dq],
+    [\(dqarg\(dq, \(dq{{command[1]}}\(dq],
+]
+.EE
+.PP
+Each condition is its own string.
+A comma inside a regex does not need escaping.
+.SS Scripts
+\f[CR]script\f[R] runs a script with an external interpreter.
+Scripts are only available in runtime rules.
+Core rejects them at build time.
+.IP
+.EX
+\f[B][[match.suggest]]\f[R]
+script = { interpreter = \(dq/usr/bin/python3\(dq, file = \(dqgit\-fix.py\(dq }
+.EE
+.PP
+\f[CR]file\f[R] can be absolute.
+A relative path is searched in these directories:
+.IP \(bu 2
+\f[CR]XDG_CONFIG_HOME/pay\-respects/scripts\f[R], default
+\f[CR]$HOME/.config/pay\-respects/scripts\f[R]
+.IP \(bu 2
+\f[CR]XDG_CONFIG_DIRS/pay\-respects/scripts\f[R], default
+\f[CR]/etc/xdg/pay\-respects/scripts\f[R]
+.IP \(bu 2
+\f[CR]XDG_DATA_DIRS/pay\-respects/scripts\f[R], default
+\f[CR]/usr/local/share/pay\-respects/scripts:/usr/share/pay\-respects/scripts\f[R]
+.IP \(bu 2
+The directory of the rule file
+.PP
+The interpreter is run with the script file as its only argument.
+This works with Python, Lua, Node, shell, and other interpreters that
+accept a file path.
+.PP
+The script gets the same environment variables as a module:
+.IP \(bu 2
+\f[CR]_PR_COMMAND\f[R]: Command without arguments
+.IP \(bu 2
+\f[CR]_PR_LAST_COMMAND\f[R]: Full command
+.IP \(bu 2
+\f[CR]_PR_ERROR_MSG\f[R]: Error message
+.IP \(bu 2
+\f[CR]_PR_SHELL\f[R]: Current shell
+.IP \(bu 2
+\f[CR]_PR_EXECUTABLES\f[R]: Executables separated by spaces.
+Empty when the list is too large.
+.PP
+Print suggestions to \f[CR]stdout\f[R].
+Separate multiple suggestions with \f[CR]<_PR_BR>\f[R].
+Without the separator, each non\-empty line becomes one suggestion.
+.PP
+Variables are substituted in \f[CR]interpreter\f[R] and \f[CR]file\f[R]
+before they are used.
+.SS Version 1 (deprecated)
+.IP
+.EX
 command = \(dqhello\(dq
 extends = [\(dqgoodbye\(dq]
 
-\f[I]# You can add as many \(ga[[match_err]]\(ga section as you want\f[R]
 \f[B][[match_err]]\f[R]
-\f[I]# Note:\f[R]
-\f[I]# \- Patterns should be the output with \(gaLC_ALL=C\(ga environment variable\f[R]
-\f[I]# \- This is a first\-pass match. It should be quick so regex is not supported\f[R]
-\f[I]# \- This field is optional, always match if omitted\f[R]
 pattern = [
     \(dqpattern 1\(dq,
-    \(dqpattern 2\(dq
 ]
-\f[I]# If pattern is matched, suggest changing the first argument to fix:\f[R]
-suggest = [
-\(aq\(aq\(aq
-{{command[0]}} fix {{command[2:]}} \(aq\(aq\(aq
-]
-
-\f[B][[match_err]]\f[R]
-pattern = [
-    \(dqpattern 1\(dq
-]
-\f[I]# this will add a \(gasudo\(ga before the command if:\f[R]
-\f[I]# \- the \(gasudo\(ga is found as executable\f[R]
-\f[I]# \- the last command does not contain \(gasudo\(ga\f[R]
 suggest = [
 \(aq\(aq\(aq
 #[executable(sudo), !cmd_contains(sudo)]
 sudo {{command}} \(aq\(aq\(aq
 ]
 .EE
-.SS Rust Functions
-You can also write in Rust if the rule is very complex.
-This is only allowed during compilation, by previously defining your
-function in \f[CR]rules_functions.rs\f[R]:
-.IP
-.EX
-\f[B][[match_err]]\f[R]
-pattern = [
-    \(dqpattern 1\(dq
-]
-suggest = [
-\(aq\(aq\(aq
-#[FUNCTION]
-MyRustFunction \(aq\(aq\(aq
-]
-.EE
+.PP
+In version 1, \f[CR]extends\f[R] lists aliases.
+Conditions go inside a \f[CR]#[...]\f[R] block at the start of the
+suggestion.
+Commas inside a regex must be escaped as \f[CR]\(rs,\f[R].
+.PP
+Version 1 remains supported at run time.
+Migrate to version 2 before it is removed.
 .SS Placeholders
-The placeholder is evaluated as following:
 .IP \(bu 2
-\f[CR]{{command}}\f[R]: All the command without any modification
+\f[CR]{{command}}\f[R]: The full command without changes
 .IP \(bu 2
-\f[CR]{{command[1]}}\f[R]: The first argument of the command (the
-command itself has index of 0)
+\f[CR]{{command[1]}}\f[R]: The first argument.
+The command itself is index 0.
 .RS 2
 .IP \(bu 2
-Negative values will count from reverse.
+Negative values count from the end.
 .RE
 .IP \(bu 2
-\f[CR]{{command[2:5]}}\f[R]: The second to fifth arguments
+\f[CR]{{command[2:5]}}\f[R]: Arguments from index 2 through index 5.
 .RS 2
 .IP \(bu 2
-If any of the side is not specified, then it defaults to the start (if
-it is left) or the end (if it is right)
+An empty side starts at the beginning or ends at the last argument.
 .RE
 .IP \(bu 2
-\f[CR]{{typo[2](fix1, fix2)}}\f[R]: Try to change the second argument to
-candidates in the parenthesis.
+\f[CR]{{typo[2](fix1, fix2)}}\f[R]: Replace the second argument with the
+closest candidate.
 .RS 2
 .IP \(bu 2
-The argument in parentheses must have at least 2 values
+A candidate list needs at least two values.
 .IP \(bu 2
-Single arguments are reserved for specific matches, for instance,
-\f[CR]path\f[R] to search all commands found in the \f[CR]$PATH\f[R]
-environment, or the \f[CR]{{shell}}\f[R] placeholder, among others
+\f[CR]path\f[R] searches executables in \f[CR]$PATH\f[R].
+.IP \(bu 2
+\f[CR]file\f[R] searches files on disk.
+.IP \(bu 2
+\f[CR]{{shell(<command>)}}\f[R] uses each output line as a candidate.
 .RE
 .IP \(bu 2
-\f[CR]{{select[3](selection1, selection2)}}\f[R]: A derivative of
-\f[CR]typo\f[R] placeholder.
-Will create a suggestion for each selection in the parenthesis
+\f[CR]{{select[3](one, two)}}\f[R]: Create one suggestion per selection.
 .RS 2
 .IP \(bu 2
-The argument in parentheses also must have at least 2 values
+Only one \f[CR]select\f[R] is allowed in a template.
 .IP \(bu 2
-Single arguments are reserved for specific selections, for instance,
-\f[CR]path\f[R] to search all commands found in the \f[CR]$PATH\f[R]
-environment with the minimum shared linguistic distance, or the
-\f[CR]{{shell}}\f[R] placeholder
+Use \f[CR]{{selection}}\f[R] to place the same selection in another
+position.
 .IP \(bu 2
-To avoid permutations and combinations, only one instance is evaluated.
-If you need to apply the same selection in multiple places, use
-\f[CR]{{selection}}\f[R]
-.IP \(bu 2
-Index is optional as it only has effect when using with \f[CR]path\f[R],
-and defaults to \f[CR]0\f[R]
+The index is optional and only affects \f[CR]path\f[R].
+It defaults to \f[CR]0\f[R].
 .RE
 .IP \(bu 2
-\f[CR]{{opt::<Regular Expression>}}\f[R]: Optional patterns captured in
-the command with RegEx (\c
+\f[CR]{{opt::<Regular Expression>}}\f[R]: Remove the captured patterns
+from the command before later placeholders run.
+.IP \(bu 2
+\f[CR]{{cmd::<Regular Expression>}}\f[R]: Insert the captures from the
+command.
+.IP \(bu 2
+\f[CR]{{err::<Regular Expression>}}\f[R]: Insert the captures from the
+error message.
+Matching is case\-sensitive.
+.IP \(bu 2
+\f[CR]{{shell(<command>)}}\f[R]: Insert the output of a shell command.
+.RS 2
+.IP \(bu 2
+Inside \f[CR]typo\f[R] or \f[CR]select\f[R], each output line becomes a
+candidate or selection.
+.RE
+.PP
+Regex syntax follows \c
 .UR https://docs.rs/regex-lite/latest/regex_lite/#syntax
-see regex crate for syntax
+regex\-lite
 .UE \c
-)
-.RS 2
-.IP \(bu 2
-All patterns matching this placeholder will be removed from indexing
-.RE
-.IP \(bu 2
-\f[CR]{{cmd::<Regular Expression>}}\f[R]: Get the matching captures from
-the last command
-.RS 2
-.IP \(bu 2
-Unlike \f[CR]{{opt}}\f[R], this won\(cqt remove the string after
-matching
-.RE
-.IP \(bu 2
-\f[CR]{{err::<Regular Expression}}\f[R]: Get the matching captures from
-the error message (\f[B]case\-sensitive\f[R])
-.IP \(bu 2
-\f[CR]{{shell(<shell commands>)}}\f[R]: Replace with the output of the
-shell command
-.RS 2
-.IP \(bu 2
-Can be used along \f[CR]{{typo}}\f[R] or \f[CR]{{select}}\f[R] as its
-only argument, where each newline will be evaluated to a
-candidate/selection
-.RE
+\&.
 .SS Conditions
-Suggestions can have additional conditions to check.
-To specify conditions, add a \f[CR]#[...]\f[R] at the first line (just
-like derive macros in Rust).
-Available conditions:
 .IP \(bu 2
-\f[CR]executable\f[R]: Check if the argument can be found in path
+\f[CR]executable\f[R]: The argument is in \f[CR]$PATH\f[R]
 .IP \(bu 2
-\f[CR]cmd_contains\f[R]: Check if the last user input contains the
-argument.
-Regex supported (using \f[CR],\f[R] requires escaping,
-i.e.\ \f[CR]\(rs,\f[R])
+\f[CR]cmd_contains\f[R]: The last command matches the regex
 .IP \(bu 2
-\f[CR]err_contains\f[R]: Same as \f[CR]cmd_contains\f[R] but for error
-message (all lowercase)
+\f[CR]err_contains\f[R]: The error message matches the regex, ignoring
+case and whitespace
 .IP \(bu 2
-\f[CR]length\f[R]: Check if the given command has the length of the
-argument
+\f[CR]length\f[R]: The command has exactly this many arguments
 .IP \(bu 2
-\f[CR]min_length\f[R]: Check if the given command has at least the
-length of the argument
+\f[CR]min_length\f[R]: The command has at least this many arguments
 .IP \(bu 2
-\f[CR]max_length\f[R]: Check if the given command has at most the length
-of the argument
+\f[CR]max_length\f[R]: The command has at most this many arguments
 .IP \(bu 2
-\f[CR]shell\f[R]: Check if the current running shell is the argument
-.SS Identifiers
-Identifiers are used to reuse rules for specific purposes:
-.IP \(bu 2
-\f[CR]INLINE\f[R]: Reuse the rule for \f[CR]inline\f[R] mode.
-Patterns are ignored.
+\f[CR]shell\f[R]: The current shell equals the argument
+.PP
+Prefix a condition with \f[CR]!\f[R] to negate it.
 .SS Other Considerations
-When suggesting a chained command with \f[CR]&&\f[R], try to break it
-into multiple lines.
+When a suggestion chains commands with \f[CR]&&\f[R], prefer multiple
+lines.
 .IP \(bu 2
-More readable if the commands are long
+Long commands read better that way.
 .IP \(bu 2
-Automatic conversion to compatible syntax where \f[CR]&&\f[R] is
-unavailable (e.g.\ nushell)
+The shell integration can convert \f[CR]&&\f[R] where the shell does not
+support it, for example Nushell.
 .PP
 Example:
 .IP
 .EX
-suggest = [
-\(aq\(aq\(aq
+\f[B][[match.suggest]]\f[R]
+run = \(aq\(aq\(aq
 command1 &&
 command2 \(aq\(aq\(aq
-]
 .EE
 .SH SEE ALSO
 \f[B]pay\-respects\f[R](1), \f[B]pay\-respects\-modules\f[R](5)
