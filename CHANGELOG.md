@@ -74,6 +74,11 @@ Tests:
 - Suggestion test cases now use category prefixes. See
 `tests/cases/index.md`.
 
+### Fixed
+
+- Accepted privileged suggestions keep the privilege in shell history.
+Commands with redirections or pipelines use a shell wrapper.
+
 ## [0.8.8]
 
 ### Fixed

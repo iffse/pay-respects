@@ -1,0 +1,16 @@
+case="Privilege redirection history"
+command="echo 1 > target"
+error="permission denied"
+expect='sudo bash -c \"echo 1 > target\"'
+
+mkdir -p bin
+cat > bin/sudo <<'EOF'
+#!/bin/sh
+exec "$@"
+EOF
+chmod +x bin/sudo
+export PATH="$PWD/bin:$PATH"
+export _PR_EXECUTABLES="sudo"
+export _PR_MODE=noconfirm
+
+targets="core"

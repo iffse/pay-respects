@@ -609,13 +609,17 @@ pub fn shell_syntax(shell: &str, command: &str) -> String {
 	}
 }
 
+pub fn history_command(shell: &str, privilege: Option<&str>, command: &str) -> String {
+	match privilege {
+		Some(privilege) => add_privilege(shell, privilege, command),
+		None => command.to_string(),
+	}
+}
+
 pub fn add_privilege(shell: &str, privilege: &str, command: &str) -> String {
-	if command.contains("&")
-		|| command.contains("|")
-		|| command.contains('>')
-		|| command.contains('|')
-		|| command.contains('&')
-		|| command.contains(';')
+	if command
+		.chars()
+		.any(|character| matches!(character, '&' | '|' | '>' | '<' | ';' | '\n'))
 	{
 		format!(
 			"{} {} -c \"{}\"",
@@ -811,12 +815,25 @@ pub fn shell_evaluated_commands(shell: &str, command: &str, success: bool) {
 
 #[cfg(test)]
 mod tests {
-	use super::shell_syntax;
+	use super::{history_command, shell_syntax};
 
 	#[test]
 	fn converts_chained_lines_for_new_shells() {
 		for shell in ["xonsh", "elvish"] {
 			assert_eq!(shell_syntax(shell, "one &&\ntwo"), "one ;\ntwo");
 		}
+	}
+
+	#[test]
+	fn includes_privilege_in_history_command() {
+		assert_eq!(
+			history_command("bash", Some("sudo"), "echo 1"),
+			"sudo echo 1"
+		);
+		assert_eq!(history_command("bash", None, "echo 1"), "echo 1");
+		assert_eq!(
+			history_command("bash", Some("sudo"), "echo 1 > /etc/systemfile"),
+			"sudo bash -c \"echo 1 > /etc/systemfile\""
+		);
 	}
 }

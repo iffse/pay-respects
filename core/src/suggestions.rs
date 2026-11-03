@@ -14,7 +14,8 @@ use crate::highlighting::highlight_difference;
 use crate::integrations::get_error_from_multiplexer;
 use crate::rules::match_rule;
 use crate::shell::{
-	add_candidates_no_dup, add_privilege, module_output, shell_evaluated_commands, shell_syntax,
+	add_candidates_no_dup, add_privilege, history_command, module_output, shell_evaluated_commands,
+	shell_syntax,
 };
 
 pub fn suggest_candidates(data: &mut Data) {
@@ -157,6 +158,7 @@ pub fn select_candidate(data: &mut Data) {
 pub fn execute_suggestion(data: &Data) -> Result<(), String> {
 	let shell = &data.shell_type;
 	let command = &data.suggest.clone().unwrap();
+	let history_command = history_command(&data.shell, data.privilege.as_deref(), command);
 	#[cfg(debug_assertions)]
 	eprintln!("running command: {command}");
 
@@ -170,10 +172,10 @@ pub fn execute_suggestion(data: &Data) -> Result<(), String> {
 	let process = run_suggestion(data, command);
 
 	if process.success() {
-		shell_evaluated_commands(shell, command, true);
+		shell_evaluated_commands(shell, &history_command, true);
 		Ok(())
 	} else {
-		shell_evaluated_commands(shell, command, false);
+		shell_evaluated_commands(shell, &history_command, false);
 		if now.elapsed() > Duration::from_secs(3) {
 			exit(1);
 		}

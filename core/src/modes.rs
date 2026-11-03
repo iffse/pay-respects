@@ -9,7 +9,7 @@ use pay_respects_utils::files::best_match_file;
 
 use crate::data::Data;
 use crate::highlighting::highlight_difference;
-use crate::shell::{add_candidates_no_dup, shell_evaluated_commands};
+use crate::shell::{add_candidates_no_dup, history_command, shell_evaluated_commands};
 use crate::suggestions::{inline_suggestion, suggest_candidates};
 use crate::system;
 use crate::{config, suggestions};
@@ -248,11 +248,13 @@ pub fn cnf(data: &mut Data) {
 				data.input_command.clone()
 			};
 			eprintln!("\n{}", output.cyan());
+			let history_command =
+				history_command(&data.shell, data.privilege.as_deref(), &data.command);
 			let status = suggestions::run_suggestion(data, &data.command);
 			if status.success() {
-				shell_evaluated_commands(&shell_type, &data.command, true);
+				shell_evaluated_commands(&shell_type, &history_command, true);
 			} else {
-				shell_evaluated_commands(&shell_type, &data.command, false);
+				shell_evaluated_commands(&shell_type, &history_command, false);
 				data.update_error(None);
 				suggestion(data);
 			}
