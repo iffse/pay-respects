@@ -1,0 +1,46 @@
+version = 2
+commands = [
+	'go',
+]
+
+[[match]]
+error = [
+	'no go files listed',
+]
+
+[[match.suggest]]
+when = [
+	'length(3)',
+	'!cmd_contains(\.go$)',
+]
+run = '''{{command}}.go'''
+
+[[match]]
+error = [
+	'unknown command',
+]
+
+[[match.suggest]]
+when = [
+	'length(2)',
+]
+run = '''go {{typo[1](
+build,
+clean,
+doc,
+env,
+fix,
+fmt,
+generate,
+get,
+help,
+install,
+list,
+mod,
+run,
+test,
+tool,
+version,
+vet,
+work
+)}}'''

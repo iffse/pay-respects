@@ -1,0 +1,36 @@
+version = 2
+commands = [
+	'python',
+	'python3',
+]
+
+[[match]]
+error = [
+	"can't open file",
+	'No such file or directory',
+]
+
+[[match.suggest]]
+when = [
+	'length(2)',
+	'!cmd_contains(\.py$)',
+]
+run = '''{{command}}.py'''
+
+[[match]]
+error = [
+	'command not found',
+	'is not recognized as a name of a cmdlet',
+]
+
+[[match.suggest]]
+when = [
+	'cmd_contains(^python(?:\s|$))',
+]
+run = '''python3 {{command[1:]}}'''
+
+[[match.suggest]]
+when = [
+	'cmd_contains(^python3(?:\s|$))',
+]
+run = '''python {{command[1:]}}'''

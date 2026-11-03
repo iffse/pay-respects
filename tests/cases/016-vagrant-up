@@ -1,0 +1,5 @@
+case="vagrant up"
+command="vagrant ssh"
+error="A Vagrant environment or target machine is required to run this command. Run \`vagrant up\` to start it."
+expect="vagrant up &&"
+targets="core runtime"

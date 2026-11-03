@@ -1,0 +1,7 @@
+case="git merge unrelated"
+command="git merge other"
+error="fatal: refusing to merge unrelated histories"
+expect="git merge other --allow-unrelated-histories"
+match="exact"
+
+targets="core runtime"

@@ -1,0 +1,25 @@
+version = 2
+commands = [
+	'terraform',
+]
+
+[[match]]
+error = [
+	'initialization required',
+	'this module is not yet installed',
+]
+
+[[match.suggest]]
+run = '''terraform init &&
+{{command}}'''
+
+[[match]]
+error = [
+	'has no command named',
+]
+
+[[match.suggest]]
+when = [
+	'err_contains(did you mean)',
+]
+run = '''{{command[0]}} {{err::(?:Did you mean ")([^"]+)}} {{command[2:]}}'''

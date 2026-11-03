@@ -1,0 +1,7 @@
+case="Prompt literal"
+command="$ git status"
+error="$: command not found"
+expect="git status"
+match="exact"
+
+targets="core runtime"

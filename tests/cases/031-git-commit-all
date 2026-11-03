@@ -1,0 +1,5 @@
+case="git commit all"
+command="git commit"
+error="no changes added to commit"
+expect="git commit -a"
+targets="core runtime"

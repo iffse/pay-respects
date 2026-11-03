@@ -1,0 +1,7 @@
+case="open URL"
+command="open github.com"
+error="The file github.com does not exist."
+expect="open http://github.com"
+match="exact"
+
+targets="core runtime"

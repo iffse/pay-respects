@@ -87,13 +87,23 @@ fn main() -> Result<(), std::io::Error> {
 	};
 
 	let mut functions = NoFunctions;
+	let mut seen = Vec::new();
+	let command = last_command.trim();
 	for loaded in &rules {
 		let rule_dir = loaded.path.parent().unwrap_or(Path::new("."));
 		let mut scripts = ExternalScripts::new(rule_dir, &script_dirs);
 		for suggestion in evaluate_rule(&loaded.rule, &context, mode, &mut functions, &mut scripts)
 		{
+			let suggestion = suggestion.trim();
+			if suggestion.is_empty()
+				|| suggestion == command
+				|| seen.iter().any(|item: &String| item == suggestion)
+			{
+				continue;
+			}
 			print!("{}", suggestion);
 			print!("<_PR_BR>");
+			seen.push(suggestion.to_string());
 		}
 	}
 

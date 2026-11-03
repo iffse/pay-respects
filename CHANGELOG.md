@@ -21,6 +21,9 @@ compile time and runtime rules.
 rules.
 - Runtime rules now support command aliases and version 2 files.
 - `--migrate-rules` converts version 1 rule files to version 2.
+- New rules for `apt`, `docker`, `go`, `grep`, `ln`, `open`, `python`,
+`terraform`, and `vagrant`.
+- More suggestions for `git`, `brew`, and common command typos.
 - AI module: Configuration via the `[module.request-ai]` section in
 `config.toml`.
 
@@ -30,6 +33,8 @@ rules.
 - Runtime rules now treat `extends` as aliases, matching core.
 - Runtime rules print a deprecation warning for version 1 files.
 - Runtime rules skip Rust function suggestions instead of panicking.
+- Runtime rules skip suggestions equal to the command and duplicate
+suggestions.
 - AI module: Ask before using the built-in API key when `enabled` is unset.
 - AI module: The command and error message are now at the end of the prompt for
 caching.

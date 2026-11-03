@@ -1,0 +1,9 @@
+case="git merge typo"
+command="git merge freature"
+error="merge: freature - not something we can merge
+Did you mean this?
+	origin/feature"
+expect="git merge origin/feature"
+match="exact"
+
+targets="core runtime"

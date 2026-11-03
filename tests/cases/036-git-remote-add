@@ -1,0 +1,7 @@
+case="git remote add"
+command="git remote set-url origin URL"
+error="fatal: No such remote: origin"
+expect="git remote add origin URL"
+match="exact"
+
+targets="core runtime"

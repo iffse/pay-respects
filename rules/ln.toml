@@ -1,0 +1,12 @@
+version = 2
+commands = [
+	'ln',
+]
+
+[[match]]
+error = [
+	'hard link not allowed for directory',
+]
+
+[[match.suggest]]
+run = '''ln -s {{command[1:]}}'''

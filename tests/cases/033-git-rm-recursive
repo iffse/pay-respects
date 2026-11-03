@@ -1,0 +1,7 @@
+case="git rm recursive"
+command="git rm dir"
+error="fatal: not removing 'dir' recursively without -r"
+expect="git rm -r dir"
+match="exact"
+
+targets="core runtime"

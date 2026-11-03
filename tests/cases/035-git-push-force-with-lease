@@ -1,0 +1,7 @@
+case="git push force with lease"
+command="git push"
+error="! [rejected] main -> main (non-fast-forward)
+failed to push some refs to origin
+Updates were rejected because the tip of your current branch is behind"
+expect="git push --force-with-lease"
+targets="core runtime"

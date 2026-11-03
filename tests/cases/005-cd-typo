@@ -1,0 +1,7 @@
+case="cd typo"
+command="cs /etc"
+error="cs: command not found"
+expect="cd /etc"
+match="exact"
+
+targets="core runtime"

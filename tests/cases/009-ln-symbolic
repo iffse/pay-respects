@@ -1,0 +1,7 @@
+case="ln symbolic"
+command="ln src link"
+error="ln: 'src': hard link not allowed for directory"
+expect="ln -s src link"
+match="exact"
+
+targets="core runtime"

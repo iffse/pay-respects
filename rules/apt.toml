@@ -1,0 +1,68 @@
+version = 2
+commands = [
+	'apt',
+	'apt-get',
+]
+
+[[match]]
+error = [
+	'Invalid operation',
+]
+
+[[match.suggest]]
+when = [
+	'cmd_contains(^apt-get search(?:\s|$))',
+]
+run = '''apt-cache search {{command[2:]}}'''
+
+[[match.suggest]]
+when = [
+	'cmd_contains(^apt-get )',
+	'!cmd_contains(^apt-get search(?:\s|$))',
+]
+run = '''{{command[0]}} {{typo[1](
+autoclean,
+autoremove,
+changelog,
+clean,
+depends,
+dist-upgrade,
+download,
+full-upgrade,
+install,
+list,
+policy,
+purge,
+reinstall,
+remove,
+show,
+source,
+update,
+upgrade
+)}} {{command[2:]}}'''
+
+[[match.suggest]]
+when = [
+	'!cmd_contains(^apt-get )',
+]
+run = '''{{command[0]}} {{typo[1](
+autoclean,
+autoremove,
+changelog,
+clean,
+depends,
+dist-upgrade,
+download,
+full-upgrade,
+install,
+list,
+policy,
+purge,
+reinstall,
+remove,
+search,
+show,
+source,
+update,
+upgrade
+)}} {{command[2:]}}'''

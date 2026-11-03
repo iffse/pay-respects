@@ -1,0 +1,7 @@
+case="grep recursive"
+command="grep foo src"
+error="grep: src: Is a directory"
+expect="grep -r foo src"
+match="exact"
+
+targets="core runtime"

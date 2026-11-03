@@ -132,3 +132,36 @@ error = [
 
 [[match.suggest]]
 run = '''{{command[0]}} upgrade {{command[2:]}}'''
+
+[[match]]
+error = [
+	'already installed and up-to-date',
+]
+
+[[match.suggest]]
+when = [
+	'cmd_contains(^brew install )',
+]
+run = '''{{command[0]}} reinstall {{command[2:]}}'''
+
+[[match]]
+error = [
+	'brew link --overwrite --dry-run',
+]
+
+[[match.suggest]]
+when = [
+	'cmd_contains(^brew (?:ln|link) )',
+]
+run = '''brew link --overwrite --dry-run {{command[2:]}}'''
+
+[[match]]
+error = [
+	'brew uninstall --force',
+]
+
+[[match.suggest]]
+when = [
+	'cmd_contains(^brew (?:uninstall|rm|remove) )',
+]
+run = '''brew uninstall --force {{command[2:]}}'''

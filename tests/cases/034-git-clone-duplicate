@@ -1,0 +1,7 @@
+case="git clone duplicate"
+command="git clone git clone URL"
+error="fatal: Too many arguments."
+expect="git clone URL"
+match="exact"
+
+targets="core runtime"

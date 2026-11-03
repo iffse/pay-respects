@@ -1,0 +1,7 @@
+case="go file extension"
+command="go run main"
+error="go: no go files listed"
+expect="go run main.go"
+match="exact"
+
+targets="core runtime"

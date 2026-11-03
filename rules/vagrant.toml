@@ -1,0 +1,13 @@
+version = 2
+commands = [
+	'vagrant',
+]
+
+[[match]]
+error = [
+	'run `vagrant up`',
+]
+
+[[match.suggest]]
+run = '''vagrant up &&
+{{command}}'''

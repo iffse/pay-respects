@@ -1,0 +1,19 @@
+version = 2
+commands = [
+	'open',
+	'xdg-open',
+	'gnome-open',
+	'kde-open',
+]
+
+[[match]]
+error = [
+	'does not exist',
+	'No such file or directory',
+]
+
+[[match.suggest]]
+when = [
+	'cmd_contains(^\S+ (?:www\.|[^:/ ]+\.(?:com|org|net|io|dev|me|ly|se|edu|info)))',
+]
+run = '''{{command[0]}} http://{{command[1:]}}'''

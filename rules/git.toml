@@ -144,7 +144,7 @@ run = '''git pull &&
 when = [
 	'cmd_contains(push)',
 ]
-run = '''{{command}} --force'''
+run = '''{{command}} --force-with-lease'''
 
 [[match]]
 error = [
@@ -247,3 +247,114 @@ when = [
 	'cmd_contains(switch)',
 ]
 run = '''{{command[0]}} switch -c {{command[2:]}}'''
+
+[[match]]
+error = [
+	'Use -f if you really want to add them.',
+]
+
+[[match.suggest]]
+when = [
+	'cmd_contains(^git add )',
+]
+run = '''git add --force {{command[2:]}}'''
+
+[[match]]
+error = [
+	'no changes added to commit',
+]
+
+[[match.suggest]]
+when = [
+	'cmd_contains(^git commit)',
+]
+run = '''git commit -a {{command[2:]}}'''
+
+[[match.suggest]]
+when = [
+	'cmd_contains(^git commit)',
+]
+run = '''git commit -p {{command[2:]}}'''
+
+[[match]]
+error = [
+	'refusing to merge unrelated histories',
+]
+
+[[match.suggest]]
+when = [
+	'cmd_contains(^git merge)',
+]
+run = '''{{command}} --allow-unrelated-histories'''
+
+[[match]]
+error = [
+	'No such remote',
+]
+
+[[match.suggest]]
+when = [
+	'cmd_contains(^git remote set-url)',
+]
+run = '''git remote add {{command[3:]}}'''
+
+[[match]]
+error = [
+	'recursively without -r',
+]
+
+[[match.suggest]]
+when = [
+	'cmd_contains(^git rm )',
+]
+run = '''git rm -r {{command[2:]}}'''
+
+[[match]]
+error = [
+	'use --cached to keep the file, or -f to force removal',
+]
+
+[[match.suggest]]
+when = [
+	'cmd_contains(^git rm )',
+]
+run = '''git rm --cached {{command[2:]}}'''
+
+[[match.suggest]]
+when = [
+	'cmd_contains(^git rm )',
+]
+run = '''git rm -f {{command[2:]}}'''
+
+[[match]]
+error = [
+	'Too many arguments',
+]
+
+[[match.suggest]]
+when = [
+	'cmd_contains(^git clone git clone )',
+]
+run = '''git clone {{command[4:]}}'''
+
+[[match]]
+error = [
+	'The upstream branch of your current branch does not match',
+]
+
+[[match.suggest]]
+when = [
+	'cmd_contains(^git push)',
+]
+run = '''{{err::(?m)^ +(git push \S+ \S+)}}'''
+
+[[match]]
+error = [
+	'not something we can merge',
+]
+
+[[match.suggest]]
+when = [
+	'err_contains(did you mean this)',
+]
+run = '''git merge {{err::(?:Did you mean this\?\n\t)([^\n]+)}}'''

@@ -1,0 +1,7 @@
+case="man without space"
+command="manfoo"
+error="manfoo: command not found"
+expect="man foo"
+match="exact"
+
+targets="core runtime"

@@ -1,0 +1,5 @@
+case="docker login"
+command="docker push example"
+error="access denied, may require 'docker login'"
+expect="docker login &&"
+targets="core runtime"

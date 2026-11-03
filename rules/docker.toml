@@ -1,0 +1,25 @@
+version = 2
+commands = [
+	'docker',
+]
+
+[[match]]
+error = [
+	'may require',
+]
+
+[[match.suggest]]
+when = [
+	'err_contains(docker login)',
+]
+run = '''docker login &&
+{{command}}'''
+
+[[match]]
+error = [
+	'image is being used by running container',
+]
+
+[[match.suggest]]
+run = '''docker container rm -f {{err::(?:running container )(\S+)}} &&
+{{command}}'''

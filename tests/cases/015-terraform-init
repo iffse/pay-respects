@@ -1,0 +1,5 @@
+case="terraform init"
+command="terraform plan"
+error="Error: Initialization required. Please run terraform init"
+expect="terraform init &&"
+targets="core runtime"
