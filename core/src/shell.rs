@@ -28,6 +28,15 @@ fn clean_shell_command(shell: &str, command: &str) -> std::process::Command {
 		"fish" => {
 			cmd.arg("--no-config").arg("-c").arg(command);
 		}
+		"dash" => {
+			cmd.arg("-c").arg(command);
+		}
+		"xonsh" => {
+			cmd.arg("--no-rc").arg("-c").arg(command);
+		}
+		"elvish" => {
+			cmd.arg("-norc").arg("-c").arg(command);
+		}
 		"pwsh" | "powershell" => {
 			// omg powershell
 			let invariant_culture_command = format!(
@@ -311,6 +320,14 @@ pub fn alias_map(shell: &str) -> Option<HashMap<String, String>> {
 				alias_map.insert(alias.to_string(), command.to_string());
 			}
 		}
+		"dash" => {
+			for line in env.lines() {
+				let line = line.trim_matches('\'');
+				if let Some((alias, command)) = line.split_once('=') {
+					alias_map.insert(alias.to_string(), command.to_string());
+				}
+			}
+		}
 		"pwsh" | "powershell" | "ps" => {
 			for line in env.lines() {
 				if !line.starts_with("Alias ") {
@@ -401,6 +418,31 @@ pub fn initialization(init: &mut Init) {
 		prefix: Option<&'a str>,
 	}
 	#[derive(Template)]
+	#[template(path = "init.dash", escape = "none")]
+	struct DashTemplate<'a> {
+		shell: &'a str,
+		alias: &'a str,
+		binary_path: &'a str,
+		prefix: Option<&'a str>,
+	}
+	#[derive(Template)]
+	#[template(path = "init.xonsh", escape = "none")]
+	struct XonshTemplate<'a> {
+		shell: &'a str,
+		alias: &'a str,
+		binary_path: &'a str,
+		cnf: bool,
+		prefix: Option<&'a str>,
+	}
+	#[derive(Template)]
+	#[template(path = "init.elv", escape = "none")]
+	struct ElvishTemplate<'a> {
+		shell: &'a str,
+		alias: &'a str,
+		binary_path: &'a str,
+		prefix: Option<&'a str>,
+	}
+	#[derive(Template)]
 	#[template(path = "init.ps1", escape = "none")]
 	struct PowershellTemplate<'a> {
 		shell: &'a str,
@@ -442,6 +484,31 @@ pub fn initialization(init: &mut Init) {
 			alias,
 			binary_path,
 			cnf,
+			prefix,
+		}
+		.render()
+		.unwrap(),
+		"dash" => DashTemplate {
+			shell,
+			alias,
+			binary_path,
+			prefix,
+		}
+		.render()
+		.unwrap(),
+		"xonsh" => XonshTemplate {
+			shell,
+			alias,
+			binary_path,
+			cnf,
+			prefix,
+		}
+		.render()
+		.unwrap(),
+		"elvish" => ElvishTemplate {
+			shell,
+			alias,
+			binary_path,
 			prefix,
 		}
 		.render()
@@ -505,7 +572,9 @@ pub fn builtin_commands(shell: &str) -> Vec<String> {
 pub fn shell_syntax(shell: &str, command: &str) -> String {
 	#[allow(clippy::single_match)]
 	match shell {
-		"nu" => command.replace("&&\n", ";\n").to_string(),
+		"nu" | "nush" | "nushell" | "xonsh" | "elvish" => {
+			command.replace("&&\n", ";\n").to_string()
+		}
 		_ => command.to_string(),
 	}
 }
@@ -591,6 +660,18 @@ pub fn shell_evaluated_commands(shell: &str, command: &str, success: bool) {
 		cd: &'a str,
 	}
 	#[derive(Template)]
+	#[template(path = "eval.xonsh", escape = "none")]
+	struct XonshEvalTemplate<'a> {
+		command: &'a str,
+		cd: Option<&'a str>,
+	}
+	#[derive(Template)]
+	#[template(path = "eval.elv", escape = "none")]
+	struct ElvishEvalTemplate<'a> {
+		command: &'a str,
+		cd: Option<&'a str>,
+	}
+	#[derive(Template)]
 	#[template(path = "eval.ps1", escape = "none")]
 	struct PwshTemplate<'a> {
 		command: &'a str,
@@ -653,6 +734,31 @@ pub fn shell_evaluated_commands(shell: &str, command: &str, success: bool) {
 			};
 			template.render().unwrap()
 		}
+		"xonsh" => {
+			let escape = |s: &str| {
+				s.replace('\\', "\\\\")
+					.replace('"', "\\\"")
+					.replace('\n', "\\n")
+					.replace('\r', "\\r")
+					.replace('\t', "\\t")
+			};
+			let command = escape(command);
+			let cd_escaped = cd.as_deref().map(escape);
+			let template = XonshEvalTemplate {
+				command: &command,
+				cd: cd_escaped.as_deref(),
+			};
+			template.render().unwrap()
+		}
+		"elvish" => {
+			let command = command.replace('\'', "''");
+			let cd_escaped = cd.as_deref().map(|cd| cd.replace('\'', "''"));
+			let template = ElvishEvalTemplate {
+				command: &command,
+				cd: cd_escaped.as_deref(),
+			};
+			template.render().unwrap()
+		}
 		"pwsh" | "powershell" | "ps" => {
 			// Single-quoted PowerShell string: only ' needs escaping (doubled).
 			let command = command.replace('\'', "''");
@@ -670,5 +776,17 @@ pub fn shell_evaluated_commands(shell: &str, command: &str, success: bool) {
 	let print = print.trim();
 	if !print.is_empty() {
 		println!("{}", print);
+	}
+}
+
+#[cfg(test)]
+mod tests {
+	use super::shell_syntax;
+
+	#[test]
+	fn converts_chained_lines_for_new_shells() {
+		for shell in ["xonsh", "elvish"] {
+			assert_eq!(shell_syntax(shell, "one &&\ntwo"), "one ;\ntwo");
+		}
 	}
 }

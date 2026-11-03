@@ -104,11 +104,16 @@ fn print_help() {
 		t!(
 			"help",
 			usage = format!("{}\n\n{}", init, options),
-			eval = "Bash / Zsh / Fish".bold().to_string(),
+			eval = "Bash / Zsh / Fish / Dash / Xonsh / Elvish"
+				.bold()
+				.to_string(),
 			eval_examples = r#"
 eval "$(pay-respects bash)"
 eval "$(pay-respects zsh)"
 pay-respects fish | source
+eval "$(pay-respects dash)"
+execx($(pay-respects xonsh))
+eval (pay-respects elvish | slurp)
 "#,
 			manual = "Nushell / PowerShell".bold().to_string(),
 			manual_examples = r#"
@@ -151,6 +156,9 @@ mod tests {
 			[String::new(), String::from("-v")],
 			[String::new(), String::from("--version")],
 			[String::new(), String::from("zsh")],
+			[String::new(), String::from("dash")],
+			[String::new(), String::from("xonsh")],
+			[String::new(), String::from("elvish")],
 		] {
 			println!("Arguments {:?} should return Exit", args);
 			assert!(matches!(handle_args(args), Status::Exit));

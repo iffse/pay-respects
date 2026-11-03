@@ -32,14 +32,35 @@ typed command, with a sub-millisecond (<1ms) performance.
 
 # INITIALIZATION
 
-## Bash / Zsh / Fish
+## Bash / Zsh / Fish / Dash
 
 Add the following line to your configuration file:
 ```sh
 eval "$(pay-respects bash --alias)"
 eval "$(pay-respects zsh --alias)"
 pay-respects fish --alias | source
+eval "$(pay-respects dash --alias)"
 ```
+
+Dash has no inline mode or command-not-found handler.
+
+## Xonsh
+
+Add the following line to `~/.xonshrc`:
+```xsh
+execx($(pay-respects xonsh --alias), 'exec', __xonsh__.ctx, filename='pay-respects')
+```
+
+Inline mode requires prompt_toolkit.
+
+## Elvish
+
+Add the following line to `~/.config/elvish/rc.elv`:
+```elv
+eval (pay-respects elvish --alias | slurp)
+```
+
+Inline mode is bound to `Ctrl-X`. Elvish has no command-not-found handler.
 
 ## Nushell / PowerShell
 

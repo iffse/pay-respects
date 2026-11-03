@@ -36,6 +36,10 @@ Runtime rules:
 
 - Runtime rules now support command aliases and version 2 files.
 
+Shell integrations:
+
+- Dash, Xonsh, and Elvish initialization and command execution.
+
 CLI:
 
 - `--migrate-rules` converts version 1 rule files to version 2.

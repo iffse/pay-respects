@@ -1,0 +1,72 @@
+import os as _pr_os
+import subprocess as _pr_subprocess
+import time as _pr_time
+
+from xonsh.events import events as _pr_events
+
+
+def _pr_aliases():
+    lines = []
+    for name, value in aliases.items():
+        if isinstance(value, (list, tuple)):
+            value = " ".join(str(part) for part in value)
+        elif not isinstance(value, str):
+            continue
+        lines.append(name + "=" + value)
+    return "\n".join(lines)
+
+
+def _pr_base(mode, last_command):
+    env = _pr_os.environ.copy()
+    env["_PR_MODE"] = mode
+    env["_PR_LAST_COMMAND"] = last_command
+    env["_PR_SHELL"] = "{{ shell }}"
+    env["_PR_ALIAS"] = _pr_aliases()
+    {%- if let Some(prefix) = self.prefix %}
+    env["_PR_PREFIX"] = '{{ prefix }}'
+    {%- endif %}
+    result = _pr_subprocess.run(
+        ["{{ binary_path }}"],
+        env=env,
+        stdout=_pr_subprocess.PIPE,
+        text=True,
+    )
+    return result.stdout
+
+
+def _pr_main():
+    try:
+        command = __xonsh__.history[-1].cmd.rstrip("\n")
+    except (IndexError, AttributeError):
+        return
+    output = _pr_base("suggest", command)
+    if output.strip():
+        execx(output)
+
+
+aliases["{{ alias }}"] = lambda args: _pr_main()
+
+{%- if cnf %}
+if hasattr(_pr_events, "on_command_not_found"):
+    @_pr_events.on_command_not_found
+    def _pr_command_not_found(cmd, **kwargs):
+        command = " ".join(cmd)
+        output = _pr_base("cnf", command)
+        if output.strip():
+            execx(output)
+            return ["true"]
+        return None
+{% endif %}
+
+@_pr_events.on_ptk_create
+def _pr_keybindings(bindings, **kwargs):
+    from prompt_toolkit.filters import has_selection
+    from prompt_toolkit.keys import Keys
+
+    @bindings.add(Keys.ControlX, Keys.ControlX, filter=~has_selection)
+    def _pr_inline(event):
+        buffer = event.current_buffer
+        output = _pr_base("inline", buffer.text)
+        if output.strip():
+            buffer.text = output.strip()
+            buffer.cursor_position = len(buffer.text)

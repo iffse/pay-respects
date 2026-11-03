@@ -10,6 +10,9 @@ pub enum ShellType {
 	Bash,
 	Zsh,
 	Fish,
+	Dash,
+	Xonsh,
+	Elvish,
 	Nu,
 	Powershell,
 }
@@ -62,6 +65,9 @@ pub fn set_shell_type(shell: &str) {
 		"bash" => static_write!(SHELL_TYPE, Bash),
 		"zsh" => static_write!(SHELL_TYPE, Zsh),
 		"fish" => static_write!(SHELL_TYPE, Fish),
+		"dash" => static_write!(SHELL_TYPE, Dash),
+		"xonsh" => static_write!(SHELL_TYPE, Xonsh),
+		"elvish" => static_write!(SHELL_TYPE, Elvish),
 		"nu" | "nushell" => static_write!(SHELL_TYPE, Nu),
 		"powershell" | "pwsh" => static_write!(SHELL_TYPE, Powershell),
 		_ => {}

@@ -1,0 +1,14 @@
+alias {{ alias }}="__pr_main suggest"
+
+__pr_main() {
+	eval "$(__pr_base "$1" "$(fc -ln -1)")"
+}
+
+__pr_base() {
+	{%- if let Some(prefix) = self.prefix %}
+	prefix='{{ prefix }}'
+	{%- else %}
+	prefix="$PS1"
+	{% endif %}
+	_PR_MODE="$1" _PR_PREFIX="$prefix" _PR_LAST_COMMAND="$2" _PR_ALIAS="$(alias)" _PR_SHELL="{{ shell }}" "{{ binary_path }}"
+}

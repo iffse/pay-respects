@@ -1,0 +1,6 @@
+{%- if !command.is_empty() %}
+__xonsh__.history.append({"inp": "{{ command }}", "rtn": 0, "ts": [_pr_time.time(), _pr_time.time()]})
+{%- endif %}
+{%- if let Some(cd) = self.cd %}
+cd "{{ cd }}"
+{%- endif %}

@@ -18,17 +18,42 @@ Your command failed. Press `F` and get back to work!
 Pick your shell:
 
 <details>
-	<summary>Bash / Zsh / Fish</summary>
+	<summary>Bash / Zsh / Fish / Dash</summary>
 
 > Add the matching line to your shell configuration file:
 > ```sh
 > eval "$(pay-respects bash --alias)"
 > eval "$(pay-respects zsh --alias)"
 > pay-respects fish --alias | source
+> eval "$(pay-respects dash --alias)"
 > ```
 > Arguments:
-> - `--alias [alias]`: Key binding, defaults to `f`
+> - `--alias [alias]`: Command name, defaults to `f`
 > - `--nocnf`: Disable the `command_not_found` handler
+>
+> Dash has no inline mode or command-not-found handler.
+
+</details>
+
+<details>
+	<summary>Xonsh</summary>
+
+> Add this line to `~/.xonshrc`:
+> ```xsh
+> execx($(pay-respects xonsh --alias), 'exec', __xonsh__.ctx, filename='pay-respects')
+> ```
+> `Ctrl-X` `Ctrl-X` runs inline mode when prompt_toolkit is available.
+
+</details>
+
+<details>
+	<summary>Elvish</summary>
+
+> Add this line to `~/.config/elvish/rc.elv`:
+> ```elv
+> eval (pay-respects elvish --alias | slurp)
+> ```
+> `Ctrl-X` runs inline mode. Elvish has no command-not-found handler.
 
 </details>
 

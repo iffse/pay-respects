@@ -6,13 +6,15 @@
 - ⚠️: Partial working
 - ❌: Not implemented / Cannot implement
 
-| Feature           | Bash | Zsh | Fish | Nush | Pwsh   |
-|-------------------|------|-----|------|------|--------|
-| Inline mode       | ✅   | ✅  | ✅   | ✅   | ✅     |
-| Get other alias   | ✅   | ✅  | ✅   | ✅   | ❌     |
-| Command not found | ✅   | ✅  | ✅   | ❌   | ⚠️ [^1] |
+| Feature           | Bash | Zsh | Fish | Dash | Xonsh   | Elvish | Nush | Pwsh   |
+|-------------------|------|-----|------|------|---------|--------|------|--------|
+| Inline mode       | ✅   | ✅  | ✅   | ❌   | ⚠️ [^2] | ✅     | ✅   | ✅     |
+| Get other alias   | ✅   | ✅  | ✅   | ✅   | ✅      | ❌     | ✅   | ❌     |
+| Command not found | ✅   | ✅  | ✅   | ❌   | ⚠️ [^3] | ❌     | ❌   | ⚠️ [^1] |
 
 [^1]: Cannot retrieve arguments.
+[^2]: Requires prompt_toolkit.
+[^3]: Requires Xonsh 0.25 or newer.
 
 ## Features Pending Implementation
 
