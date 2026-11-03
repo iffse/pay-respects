@@ -5,3 +5,5 @@ error=""
 expect="hx file-to-be-open"
 
 touch file-to-be-open
+
+export _PR_EXECUTABLES="hx"

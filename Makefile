@@ -36,7 +36,7 @@ install-all:
 	cargo install --path module-runtime-rules
 	cargo install --path module-request-ai
 
-test-suggestions: build
+test-suggestions: build-all
 	cd tests && bash test.sh
 
 test: test-rust test-suggestions

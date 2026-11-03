@@ -1,0 +1,5 @@
+command = "deprecatedtest"
+
+[[match_err]]
+pattern = ["failed"]
+suggest = ["old suggestion"]

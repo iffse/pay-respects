@@ -28,7 +28,9 @@ run_test() {
 run_case() {
 	(
 		source $1
-		run_test
+		case " ${targets:-core runtime} " in
+		*" core "*) run_test ;;
+		esac
 	)
 
 }

@@ -4,3 +4,5 @@ error="no such file or directory"
 expect="cd correct"
 
 mkdir -p correct
+
+export _PR_EXECUTABLES="cd"

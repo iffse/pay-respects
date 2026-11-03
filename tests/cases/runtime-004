@@ -1,0 +1,7 @@
+case="Runtime: v1 warning"
+command="deprecatedtest"
+error="failed"
+expect="old suggestion"
+match="exact"
+targets="runtime"
+expect_stderr="deprecated rule format"

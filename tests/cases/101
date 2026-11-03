@@ -4,3 +4,5 @@ error=""
 expect="foocommand i-made-this-up"
 
 touch i-made-this-up
+
+targets="core"

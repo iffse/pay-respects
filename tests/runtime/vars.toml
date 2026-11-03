@@ -1,0 +1,9 @@
+version = 2
+commands = ["vartest", "vt"]
+
+[[match]]
+error = ["failed"]
+vars = { dir = "{{command[1]}}" }
+
+[[match.suggest]]
+run = "cd {{$dir}}"

@@ -5,3 +5,5 @@ expect="\
 mkdir -p dir/ &&
 touch dir/file\
 "
+
+export _PR_EXECUTABLES="touch"

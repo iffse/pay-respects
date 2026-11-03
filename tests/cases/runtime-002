@@ -1,0 +1,6 @@
+case="Runtime: alias"
+command="vt src"
+error="failed"
+expect="cd src"
+match="exact"
+targets="runtime"

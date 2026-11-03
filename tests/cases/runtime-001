@@ -1,0 +1,6 @@
+case="Runtime: vars"
+command="vartest src"
+error="failed"
+expect="cd src"
+match="exact"
+targets="runtime"

@@ -2,3 +2,5 @@ case="Typo: Command"
 command="echp"
 error="command not found"
 expect="echo"
+
+export _PR_EXECUTABLES="echo"

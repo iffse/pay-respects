@@ -1,0 +1,8 @@
+version = 2
+commands = ["scripttest"]
+
+[[match]]
+error = ["failed"]
+
+[[match.suggest]]
+script = { interpreter = "/bin/sh", file = "scripttest.sh" }

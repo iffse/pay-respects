@@ -1,0 +1,6 @@
+case="Runtime: script"
+command="scripttest x"
+error="failed"
+expect="script scripttest x"
+match="exact"
+targets="runtime"
