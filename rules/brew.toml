@@ -1,12 +1,15 @@
-command = "brew"
-
-[[match_err]]
-pattern = [
-	"unknown command"
+version = 2
+commands = [
+	'brew',
 ]
-suggest = [
-'''
-{{command[0]}} {{typo[1](
+
+[[match]]
+error = [
+	'unknown command',
+]
+
+[[match.suggest]]
+run = '''{{command[0]}} {{typo[1](
 --cache,
 --caskroom,
 --cellar,
@@ -120,14 +123,12 @@ uses,
 vendor-gems,
 vendor-install,
 verify
-)}} {{command[2:]}} '''
+)}} {{command[2:]}}'''
+
+[[match]]
+error = [
+	'this command updates brew itself',
 ]
 
-[[match_err]]
-pattern = [
-	"this command updates brew itself"
-]
-suggest = [
-'''
-{{command[0]}} upgrade {{command[2:]}} '''
-]
+[[match.suggest]]
+run = '''{{command[0]}} upgrade {{command[2:]}}'''

@@ -1,13 +1,18 @@
-command = "yarn"
-
-[[match_err]]
-pattern = [
-	"not found"
+version = 2
+commands = [
+	'yarn',
 ]
-suggest = [
-'''
-#[err_contains(command)]
-{{command[0]}} {{typo[1](
+
+[[match]]
+error = [
+	'not found',
+]
+
+[[match.suggest]]
+when = [
+	'err_contains(command)',
+]
+run = '''{{command[0]}} {{typo[1](
 access,
 add,
 audit,
@@ -51,14 +56,12 @@ versions,
 why,
 workspace,
 workspaces
-)}} {{command[2:]}} '''
+)}} {{command[2:]}}'''
+
+[[match]]
+error = [
+	'`install` has been replaced with `add`',
 ]
 
-[[match_err]]
-pattern = [
-	"`install` has been replaced with `add`"
-]
-suggest = [
-'''
-yarn add {{command[2:]}} '''
-]
+[[match.suggest]]
+run = '''yarn add {{command[2:]}}'''

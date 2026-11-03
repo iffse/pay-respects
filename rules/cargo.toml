@@ -1,20 +1,31 @@
-command = "cargo"
-
-[[match_err]]
-pattern = [
-	"no such command"
+version = 2
+commands = [
+	'cargo',
 ]
-suggest = [
-'''
-#[err_contains(did you mean)]
-{{command[0]}} {{err::(?:Did you mean `)(.*)(?:`\?)}} {{command[2:]}} ''',
-'''
-#[err_contains(a command with a similar name exists)]
-{{command[0]}} {{err::(?:a command with a similar name exists: `)(\S+)(?:`)}} {{command[2:]}} ''',
-'''
-#[!err_contains(did you mean),
-!err_contains(a command with a similar name exists)]
-{{command[0]}} {{typo[1](
+
+[[match]]
+error = [
+	'no such command',
+]
+
+[[match.suggest]]
+when = [
+	'err_contains(did you mean)',
+]
+run = '''{{command[0]}} {{err::(?:Did you mean `)(.*)(?:`\?)}} {{command[2:]}}'''
+
+[[match.suggest]]
+when = [
+	'err_contains(a command with a similar name exists)',
+]
+run = '''{{command[0]}} {{err::(?:a command with a similar name exists: `)(\S+)(?:`)}} {{command[2:]}}'''
+
+[[match.suggest]]
+when = [
+	'!err_contains(did you mean)',
+	'!err_contains(a command with a similar name exists)',
+]
+run = '''{{command[0]}} {{typo[1](
 add,
 bench,
 build,
@@ -63,24 +74,23 @@ vendor,
 verify-project,
 version,
 yank
-)}} {{command[2:]}} ''',
+)}} {{command[2:]}}'''
+
+[[match]]
+error = [
+	'requires the features',
 ]
 
-[[match_err]]
-pattern = [
-"requires the features",
+[[match.suggest]]
+when = [
+	'err_contains(consider enabling them by passing)',
 ]
-suggest = [
-'''
-#[err_contains(consider enabling them by passing)]
-{{command}} {{err::(?:`)(--features=.*")(?:`)}} ''',
+run = '''{{command}} {{err::(?:`)(--features=.*")(?:`)}}'''
+
+[[match]]
+error = [
+	'using `cargo install` to install the binaries from the package in current working directory is no longer supported',
 ]
 
-[[match_err]]
-pattern = [
-"using `cargo install` to install the binaries from the package in current working directory is no longer supported",
-]
-suggest = [
-'''
-{{command}} --path .'''
-]
+[[match.suggest]]
+run = '''{{command}} --path .'''

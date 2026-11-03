@@ -1,19 +1,20 @@
-command = "size"
-
-[[match_err]]
-pattern = [
-	"file format not recognized",
-]
-suggest = [
-'''
-du -h {{command[1:]}} '''
+version = 2
+commands = [
+	'size',
 ]
 
-[[match_err]]
-pattern = [
-	"is a directory",
+[[match]]
+error = [
+	'file format not recognized',
 ]
-suggest = [
-'''
-du -hs {{command[1:]}} '''
+
+[[match.suggest]]
+run = '''du -h {{command[1:]}}'''
+
+[[match]]
+error = [
+	'is a directory',
 ]
+
+[[match.suggest]]
+run = '''du -hs {{command[1:]}}'''

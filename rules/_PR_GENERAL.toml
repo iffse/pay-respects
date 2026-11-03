@@ -1,25 +1,28 @@
-command = "_PR_general"
-
-[[match_err]]
-pattern = [
-	"command not found",
-	"unknown command",
-	"nu::shell::external_command",
-	"is not recognized as a name of a cmdlet"
-]
-suggest = [
-'''
-{{select[0](path)}} {{command[1:]}} ''',
+version = 2
+commands = [
+	'_PR_general',
 ]
 
-[[match_err]]
-pattern = [
-	"permission denied",
-	"is not an executable file"
+[[match]]
+error = [
+	'command not found',
+	'unknown command',
+	'nu::shell::external_command',
+	'is not recognized as a name of a cmdlet',
 ]
-suggest = [
-'''
-#[cmd_contains((?m)^(\S*)\/(\S*))]
-chmod +x {{command[0]}} &&
+
+[[match.suggest]]
+run = '''{{select[0](path)}} {{command[1:]}}'''
+
+[[match]]
+error = [
+	'permission denied',
+	'is not an executable file',
+]
+
+[[match.suggest]]
+when = [
+	'cmd_contains((?m)^(\S*)\/(\S*))',
+]
+run = '''chmod +x {{command[0]}} &&
 {{command}}'''
-]

@@ -1,12 +1,15 @@
-command = "npm"
-
-[[match_err]]
-pattern = [
-	"unknown command"
+version = 2
+commands = [
+	'npm',
 ]
-suggest = [
-'''
-{{command[0]}} {{typo[1](
+
+[[match]]
+error = [
+	'unknown command',
+]
+
+[[match.suggest]]
+run = '''{{command[0]}} {{typo[1](
 access,
 adduser,
 audit,
@@ -74,5 +77,4 @@ update,
 version,
 view,
 whoami
-)}} {{command[2:]}} '''
-]
+)}} {{command[2:]}}'''

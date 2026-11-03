@@ -1,11 +1,15 @@
-command = "mkdir"
+version = 2
+commands = [
+	'mkdir',
+]
 
-[[match_err]]
-pattern = [
-	"cannot create directory"
+[[match]]
+error = [
+	'cannot create directory',
 ]
-suggest = [
-'''
-#[err_contains(no such file or directory)]
-{{command[0]}} -p {{command[1:]}}'''
+
+[[match.suggest]]
+when = [
+	'err_contains(no such file or directory)',
 ]
+run = '''{{command[0]}} -p {{command[1:]}}'''

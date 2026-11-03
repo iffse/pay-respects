@@ -1,10 +1,12 @@
-command = "snap"
+version = 2
+commands = [
+	'snap',
+]
 
-[[match_err]]
-pattern = [
-	"published using classic confinement"
+[[match]]
+error = [
+	'published using classic confinement',
 ]
-suggest = [
-'''
-{{command}} --classic '''
-]
+
+[[match.suggest]]
+run = '''{{command}} --classic'''

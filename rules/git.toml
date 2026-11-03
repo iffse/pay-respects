@@ -1,16 +1,25 @@
-command = "git"
-
-[[match_err]]
-pattern = [
-	"is not a git command"
+version = 2
+commands = [
+	'git',
 ]
-suggest = [
-'''
-#[err_contains(the most similar command is)]
-{{command[0]}} {{err::(?:The most similar command is )(\S+)}} {{command[2:]}}''',
-'''
-#[!err_contains(the most similar command is), INLINE]
-{{command[0]}} {{typo[1](
+
+[[match]]
+error = [
+	'is not a git command',
+]
+
+[[match.suggest]]
+when = [
+	'err_contains(the most similar command is)',
+]
+run = '''{{command[0]}} {{err::(?:The most similar command is )(\S+)}} {{command[2:]}}'''
+
+[[match.suggest]]
+when = [
+	'!err_contains(the most similar command is)',
+]
+inline = true
+run = '''{{command[0]}} {{typo[1](
 add,
 am,
 archive,
@@ -67,158 +76,174 @@ remote,
 repack,
 replace,
 )}} {{command[2:]}}'''
+
+[[match]]
+error = [
+	'did not match any file',
 ]
 
-[[match_err]]
-pattern = [
-	"did not match any file"
+[[match.suggest]]
+when = [
+	'cmd_contains(checkout)',
 ]
-suggest = [
-'''
-#[cmd_contains(checkout)]
-git checkout {{typo[2]({{shell(git branch | sed 's/^*//')}})}} ''',
-'''
-#[cmd_contains(checkout)]
-git checkout -b {{command[2]}} '''
+run = '''git checkout {{typo[2]({{shell(git branch | sed 's/^*//')}})}}'''
+
+[[match.suggest]]
+when = [
+	'cmd_contains(checkout)',
+]
+run = '''git checkout -b {{command[2]}}'''
+
+[[match]]
+error = [
+	'has no upstream branch',
+	'No configured push destination.',
 ]
 
-[[match_err]]
-pattern = [
-	"has no upstream branch",
-	"No configured push destination.",
+[[match.suggest]]
+when = [
+	'cmd_contains(push)',
 ]
-suggest = [
-'''
-#[cmd_contains(push)]
-git push --set-upstream {{select({{shell(git remote)}})}} {{shell(git rev-parse --abbrev-ref HEAD)}} ''',
+run = '''git push --set-upstream {{select({{shell(git remote)}})}} {{shell(git rev-parse --abbrev-ref HEAD)}}'''
+
+[[match]]
+error = [
+	'no tracking information for the current branch',
 ]
 
-[[match_err]]
-pattern = [
-	"no tracking information for the current branch"
+[[match.suggest]]
+when = [
+	'cmd_contains(pull)',
 ]
-suggest = [
-'''
-#[cmd_contains(pull)]
-git pull --set-upstream {{select({{shell(git remote)}})}} {{shell(git rev-parse --abbrev-ref HEAD)}} '''
+run = '''git pull --set-upstream {{select({{shell(git remote)}})}} {{shell(git rev-parse --abbrev-ref HEAD)}}'''
+
+[[match]]
+error = [
+	'a branch named',
 ]
 
-[[match_err]]
-pattern = [
-	"a branch named"
+[[match.suggest]]
+when = [
+	'cmd_contains(branch)',
 ]
-suggest = [
-'''
-#[cmd_contains(branch)]
-git checkout {{command[2]}} '''
+run = '''git checkout {{command[2]}}'''
+
+[[match]]
+error = [
+	'updates were rejected',
 ]
 
-[[match_err]]
-pattern = [
-	"updates were rejected"
+[[match.suggest]]
+when = [
+	'cmd_contains(push)',
 ]
-suggest = [
-'''
-#[cmd_contains(push)]
-git pull &&
-{{command}} ''',
-'''
-#[cmd_contains(push)]
-{{command}} --force '''
+run = '''git pull &&
+{{command}}'''
+
+[[match.suggest]]
+when = [
+	'cmd_contains(push)',
+]
+run = '''{{command}} --force'''
+
+[[match]]
+error = [
+	'you have unstaged changes',
+	'stash them',
 ]
 
-[[match_err]]
-pattern = [
-	"you have unstaged changes",
-	"stash them"
+[[match.suggest]]
+when = [
+	'cmd_contains(pull)',
 ]
-suggest = [
-'''
-#[cmd_contains(pull)]
-{{command}} --rebase --autostash ''',
-'''
-git stash &&
+run = '''{{command}} --rebase --autostash'''
+
+[[match.suggest]]
+run = '''git stash &&
 {{command}} &&
-git stash pop '''
+git stash pop'''
+
+[[match]]
+error = [
+	'you have divergent branches and need to specify how to reconcile them',
 ]
 
-[[match_err]]
-pattern = [
-	"you have divergent branches and need to specify how to reconcile them"
+[[match.suggest]]
+when = [
+	'cmd_contains(pull)',
 ]
-suggest = [
-'''
-#[cmd_contains(pull)]
-{{command}} --rebase ''',
-'''
-#[cmd_contains(pull)]
-{{command}} --no-rebase '''
+run = '''{{command}} --rebase'''
+
+[[match.suggest]]
+when = [
+	'cmd_contains(pull)',
+]
+run = '''{{command}} --no-rebase'''
+
+[[match]]
+error = [
+	'is not fully merged',
 ]
 
-[[match_err]]
-pattern = [
-	"is not fully merged"
+[[match.suggest]]
+when = [
+	'cmd_contains(branch -d)',
 ]
-suggest = [
-'''
-#[cmd_contains(branch -d)]
-{{command[:1]}} -D {{command[3:]}} ''',
+run = '''{{command[:1]}} -D {{command[3:]}}'''
+
+[[match]]
+error = [
+	'Changes not staged for commit',
 ]
 
-[[match_err]]
-pattern = [
-	"Changes not staged for commit"
-]
-suggest = [
-'''
-git add . '''
+[[match.suggest]]
+run = '''git add .'''
+
+[[match]]
+error = [
+	'use "git push" to publish your local commits',
 ]
 
-[[match_err]]
-pattern = [
-	"use \"git push\" to publish your local commits"
-]
-suggest = [
-'''
-git push ''',
+[[match.suggest]]
+run = '''git push'''
+
+[[match]]
+error = [
+	'Nothing specified',
 ]
 
-[[match_err]]
-pattern = [
-	"Nothing specified"
+[[match.suggest]]
+when = [
+	'cmd_contains(add)',
 ]
-suggest = [
-'''
-#[cmd_contains(add)]
-git add . ''',
+run = '''git add .'''
+
+[[match]]
+error = [
+	'fatal: not a git repository',
 ]
 
-[[match_err]]
-pattern = [
-	"fatal: not a git repository"
-]
-suggest = [
-'''
-git init''',
+[[match.suggest]]
+run = '''git init'''
+
+[[match]]
+error = [
+	'would clobber existing tag',
 ]
 
-[[match_err]]
-pattern = [
-	"would clobber existing tag"
+[[match.suggest]]
+when = [
+	'cmd_contains(tag)',
 ]
-suggest = [
-'''
-#[cmd_contains(tag)]
-{{command}} --force''',
+run = '''{{command}} --force'''
+
+[[match]]
+error = [
+	'fatal: invalid reference:',
 ]
 
-[[match_err]]
-pattern = [
-  "fatal: invalid reference:"
+[[match.suggest]]
+when = [
+	'cmd_contains(switch)',
 ]
-suggest = [
-'''
-#[cmd_contains(switch)]
-{{command[0]}} switch -c {{command[2:]}}'''
-]
-
+run = '''{{command[0]}} switch -c {{command[2:]}}'''

@@ -1,8 +1,13 @@
-command = "sl"
-
-[[match_err]]
-suggest = [
-'''
-#[INLINE, !executable(sl)]
-ls {{command[1:]}} '''
+version = 2
+commands = [
+	'sl',
 ]
+
+[[match]]
+
+[[match.suggest]]
+when = [
+	'!executable(sl)',
+]
+inline = true
+run = '''ls {{command[1:]}}'''

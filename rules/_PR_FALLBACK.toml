@@ -1,32 +1,33 @@
-command = "_PR_fallback"
-
-[[match_err]]
-pattern = [
-	"access",
-	"permission",
-	"permitted",
-	"privilege",
-	"protected",
-	"root",
-	"sudo",
-	"super-user",
-	"superuser",
-]
-suggest = [
-'''
-#[FUNCTION]
-SetPrivilege
-'''
+version = 2
+commands = [
+	'_PR_fallback',
 ]
 
-[[match_err]]
-suggest = [
-'''
-#[FUNCTION, min_length(2), INLINE]
-DesperateFileLookUp
-''',
-'''
-#[FUNCTION, INLINE]
-DesperateFuzzyRecovery
-''',
+[[match]]
+error = [
+	'access',
+	'permission',
+	'permitted',
+	'privilege',
+	'protected',
+	'root',
+	'sudo',
+	'super-user',
+	'superuser',
 ]
+
+[[match.suggest]]
+function = 'SetPrivilege'
+
+[[match]]
+
+[[match.suggest]]
+when = [
+	'min_length(2)',
+]
+inline = true
+function = 'DesperateFileLookUp'
+
+[[match.suggest]]
+inline = true
+function = 'DesperateFuzzyRecovery'

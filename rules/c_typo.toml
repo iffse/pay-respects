@@ -1,17 +1,23 @@
-command = "c"
-
-[[match_err]]
-pattern = [
-	"command not found",
-	"unknown command",
-	"nu::shell::external_command"
-]
-suggest = [
-'''
-#[length(2)]
-cd {{command[1:]}} ''',
-'''
-#[min_length(3)]
-cp {{command[1:]}} '''
+version = 2
+commands = [
+	'c',
 ]
 
+[[match]]
+error = [
+	'command not found',
+	'unknown command',
+	'nu::shell::external_command',
+]
+
+[[match.suggest]]
+when = [
+	'length(2)',
+]
+run = '''cd {{command[1:]}}'''
+
+[[match.suggest]]
+when = [
+	'min_length(3)',
+]
+run = '''cp {{command[1:]}}'''

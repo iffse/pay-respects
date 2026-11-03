@@ -1,25 +1,34 @@
-command = "pacman"
-extends = ["paru", "yay"]
-
-[[match_err]]
-pattern = [
-	"no operation specified"
-]
-suggest = [
-'''
-#[length(1)]
-{{command}} -Syu''',
-'''
-#[min_length(2)]
-{{command[0]}} -S {{command[1:]}}''',
+version = 2
+commands = [
+	'pacman',
+	'paru',
+	'yay',
 ]
 
-[[match_err]]
-pattern = [
-	"no targets specified"
+[[match]]
+error = [
+	'no operation specified',
 ]
-suggest = [
-'''
-#[cmd_contains(-S)]
-{{command[0]}} -Syu''',
+
+[[match.suggest]]
+when = [
+	'length(1)',
 ]
+run = '''{{command}} -Syu'''
+
+[[match.suggest]]
+when = [
+	'min_length(2)',
+]
+run = '''{{command[0]}} -S {{command[1:]}}'''
+
+[[match]]
+error = [
+	'no targets specified',
+]
+
+[[match.suggest]]
+when = [
+	'cmd_contains(-S)',
+]
+run = '''{{command[0]}} -Syu'''

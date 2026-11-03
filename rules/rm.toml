@@ -1,31 +1,30 @@
-command = "rm"
-
-[[match_err]]
-pattern = [
-	"is a directory",
-	"try --recursive"
-]
-suggest = [
-'''
-{{command[0]}} -r {{command[1:]}} '''
+version = 2
+commands = [
+	'rm',
 ]
 
-[[match_err]]
-pattern = [
-	"write-protected",
-]
-suggest = [
-'''
-{{command[0]}} -f {{command[1:]}} '''
+[[match]]
+error = [
+	'is a directory',
+	'try --recursive',
 ]
 
-[[match_err]]
-pattern = [
-	"no such file or directory",
-	"file(s) not found"
-]
-suggest = [
-'''
-{{command[0]}} {{opt::(?:\s)(-[\w]+)}} {{typo[1:](file)}} '''
+[[match.suggest]]
+run = '''{{command[0]}} -r {{command[1:]}}'''
+
+[[match]]
+error = [
+	'write-protected',
 ]
 
+[[match.suggest]]
+run = '''{{command[0]}} -f {{command[1:]}}'''
+
+[[match]]
+error = [
+	'no such file or directory',
+	'file(s) not found',
+]
+
+[[match.suggest]]
+run = '''{{command[0]}} {{opt::(?:\s)(-[\w]+)}} {{typo[1:](file)}}'''

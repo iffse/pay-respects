@@ -1,77 +1,77 @@
-command = "jj"
-
-[[match_err]]
-pattern = [
-	"There is no jj repo in \".\"",
-]
-suggest = [
-'''
-{{command[0]}} git init
-''',
+version = 2
+commands = [
+	'jj',
 ]
 
-[[match_err]]
-pattern = [
-	"unrecognized subcommand",
-]
-suggest = [
-'''
-#[err_contains('git')]
-{{command[0]}} git {{command[2:]}}
-''',
-'''
-#[cmd_contains(\s((push)|(fetch)|(clone)|(init)|(remote))), INLINE]
-{{command[0]}} git {{command[1:]}}
-''',
-'''
-#[cmd_contains(\s(pull)), INLINE]
-{{command[0]}} git fetch
-''',
+[[match]]
+error = [
+	'There is no jj repo in "."',
 ]
 
-[[match_err]]
-pattern = [
-	"error: commit",
-	"is immutable`",
-	"pass `--ignore-immutable`", # deprecated
-]
-suggest = [
-'''
-{{command}} --ignore-immutable
-''',
+[[match.suggest]]
+run = '''{{command[0]}} git init'''
+
+[[match]]
+error = [
+	'unrecognized subcommand',
 ]
 
-[[match_err]]
-pattern = [
-	"no bookmarks found in the default push revset",
+[[match.suggest]]
+when = [
+	"err_contains('git')",
 ]
-suggest = [
-'''
-{{command}} --change @
-''',
+run = '''{{command[0]}} git {{command[2:]}}'''
+
+[[match.suggest]]
+when = [
+	'cmd_contains(\s((push)|(fetch)|(clone)|(init)|(remote)))',
+]
+inline = true
+run = '''{{command[0]}} git {{command[1:]}}'''
+
+[[match.suggest]]
+when = [
+	'cmd_contains(\s(pull))',
+]
+inline = true
+run = '''{{command[0]}} git fetch'''
+
+[[match]]
+error = [
+	'error: commit',
+	'is immutable`',
+	'pass `--ignore-immutable`', # deprecated
 ]
 
-[[match_err]]
-pattern = [
-	"hint: run",
-	"and try again",
+[[match.suggest]]
+run = '''{{command}} --ignore-immutable'''
+
+[[match]]
+error = [
+	'no bookmarks found in the default push revset',
 ]
-suggest = [
-'''
-{{err::Hint: Run `(.*)` and try again.}} &&
-{{command}}
-''',
-'''
-{{err::Hint: Run `(.*)` and try again.}}
-''',
+
+[[match.suggest]]
+run = '''{{command}} --change @'''
+
+[[match]]
+error = [
+	'hint: run',
+	'and try again',
 ]
+
+[[match.suggest]]
+run = '''{{err::Hint: Run `(.*)` and try again.}} &&
+{{command}}'''
+
+[[match.suggest]]
+run = '''{{err::Hint: Run `(.*)` and try again.}}'''
 
 # deprecated
-[[match_err]]
-pattern = [
-	"use --allow-new to push new bookmark"
+[[match]]
+error = [
+	'use --allow-new to push new bookmark',
 ]
-suggest = [
-'''
-{{command}} --allow-new'''
-]
+
+[[match.suggest]]
+run = '''{{command}} --allow-new'''

@@ -1,13 +1,14 @@
-command = "mv"
-
-[[match_err]]
-pattern = [
-	"no such file or directory",
-	"not a directory"
-]
-suggest = [
-'''
-mkdir --parents {{command[-1]}} &&
-{{command}} '''
+version = 2
+commands = [
+	'mv',
 ]
 
+[[match]]
+error = [
+	'no such file or directory',
+	'not a directory',
+]
+
+[[match.suggest]]
+run = '''mkdir --parents {{command[-1]}} &&
+{{command}}'''
