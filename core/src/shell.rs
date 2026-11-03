@@ -823,6 +823,33 @@ mod tests {
 		prefix: Option<&'a str>,
 	}
 
+	#[derive(Template)]
+	#[template(path = "init.nu", escape = "none")]
+	struct NuInitTemplate<'a> {
+		shell: &'a str,
+		shell_type: &'a str,
+		alias: &'a str,
+		binary_path: &'a str,
+		prefix: Option<&'a str>,
+	}
+
+	#[test]
+	fn nushell_init_ignores_its_own_history_entry() {
+		let init = NuInitTemplate {
+			shell: "nu",
+			shell_type: "nu",
+			alias: "f",
+			binary_path: "pay-respects",
+			prefix: None,
+		}
+		.render()
+		.unwrap();
+
+		assert!(init.contains("let alias = 'f'"));
+		assert!(init.contains("($entry.command | str trim) != $alias"));
+		assert!(!init.contains("(history | last).command"));
+	}
+
 	#[test]
 	fn elvish_init_exports_alias_from_eval() {
 		let init = ElvishInitTemplate {

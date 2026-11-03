@@ -3,7 +3,11 @@ def --env {{ alias }} [] {
 }
 
 def --env __pr_main [mode: string] {
-	let command = (history | last).command
+	# skip self
+	let alias = '{{ alias }}'
+	let entries = (history | where { |entry| ($entry.command | str trim) != $alias })
+	if ($entries | is-empty) { return }
+	let command = ($entries | last).command
 	let output = (__pr_base $mode $command)
 	if ($output | str trim | is-empty) { return }
 

@@ -85,6 +85,7 @@ Tests:
 Commands with redirections or pipelines use a shell wrapper.
 - The selection UI adapts to terminal resizes instead of keeping the layout
 it was started with.
+- Nushell with SQLite history no longer suggests fixes for the alias itself.
 
 ## [0.8.8]
 
