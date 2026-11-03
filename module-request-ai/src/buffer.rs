@@ -13,7 +13,13 @@ fn termwidth() -> usize {
 
 fn fill(str: &mut str) -> String {
 	let width = termwidth();
-	textwrap_fill(str, width)
+	let mut filled = textwrap_fill(str, width);
+	// `textwrap` drops trailing whitespace, which glues words together when a
+	// chunk boundary falls right after a space.
+	if str.ends_with(char::is_whitespace) && !filled.ends_with(char::is_whitespace) {
+		filled.push(' ');
+	}
+	filled
 }
 
 fn clear_line() {
@@ -164,6 +170,7 @@ fn fix_data(data: &mut String) {
 #[allow(unused)]
 mod tests {
 	use super::*;
+	use pay_respects_utils::ui::Colors;
 
 	#[test]
 	fn test_fix_data() {
@@ -171,5 +178,13 @@ mod tests {
 		fix_data(&mut data);
 		let expected = "hello\n<note>\nfoo\n</note>\nbar".to_string();
 		assert_eq!(data, expected);
+	}
+
+	#[test]
+	fn keeps_trailing_space_between_chunks() {
+		let mut buffer = Buffer::new(Colors::default());
+		buffer.proc("git ");
+		buffer.proc("status");
+		assert_eq!(buffer.buf, "git status");
 	}
 }

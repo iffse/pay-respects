@@ -29,22 +29,24 @@ struct Conf {
 // 	extra_body: Option<Value>,
 // }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Default, Deserialize)]
 pub struct ChatCompletion {
 	// id: String,
 	// object: String,
 	// created: usize,
+	#[serde(default)]
 	choices: Vec<Choice>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Default, Deserialize)]
 pub struct Choice {
+	#[serde(default)]
 	delta: Delta,
 	// index: usize,
 	// finish_reason: Option<String>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Default, Deserialize)]
 pub struct Delta {
 	content: Option<String>,
 }
@@ -163,27 +165,23 @@ pub async fn ai_suggestion(last_command: &str, error_msg: &str, locale: &str, co
 	}
 
 	let mut stream = res.bytes_stream();
-	let mut json_buffer = String::new();
 	let mut buffer = buffer::Buffer::new(config.ui.colors);
+	let mut pending = Vec::new();
 
 	while let Some(item) = stream.next().await {
-		let item = item.unwrap();
-		let str = std::str::from_utf8(&item).unwrap();
-
-		json_buffer.push_str(str);
-
-		if !json_buffer.contains("\n\ndata: ") {
-			continue;
-		}
-
-		while json_buffer.contains("\n\ndata: ") {
-			proc_stream_buffer(&mut json_buffer, &mut buffer);
+		match item {
+			Ok(item) => proc_chunk(&mut pending, &item, &mut buffer),
+			Err(err) => {
+				print_error(&format!("AI module: stream error: {}", err));
+				break;
+			}
 		}
 	}
-	// remaining buffer
-	json_buffer.push_str("\n\ndata: "); // hackey
-	while json_buffer.contains("\n\ndata: ") {
-		proc_stream_buffer(&mut json_buffer, &mut buffer);
+
+	// Process a trailing event that was not followed by a blank line.
+	pending.extend_from_slice(b"\n\n");
+	while let Some(event) = next_event(&mut pending) {
+		proc_event(&event, &mut buffer);
 	}
 
 	let suggestions = buffer
@@ -195,27 +193,58 @@ pub async fn ai_suggestion(last_command: &str, error_msg: &str, locale: &str, co
 		.trim_end_matches("</suggest>")
 		.replace("<br>", "<_PR_BR>");
 
+	if suggestions.is_empty() {
+		return;
+	}
+
 	println!("{}", suggestions);
 }
 
-fn proc_stream_buffer(json_buffer: &mut String, buffer: &mut buffer::Buffer) {
-	let data_loc = json_buffer.find("\n\ndata: ").unwrap();
-	let binding = json_buffer.clone();
-	let split = binding.split_at(data_loc);
-	let json = split.0;
-	*json_buffer = split.1.trim_start().to_string();
+/// Feeds a chunk of the response to the event parser. Carriage returns are
+/// dropped since they are only used by the server as line separators.
+fn proc_chunk(pending: &mut Vec<u8>, chunk: &[u8], buffer: &mut buffer::Buffer) {
+	pending.extend(chunk.iter().copied().filter(|&byte| byte != b'\r'));
 
-	proc_json(json, buffer);
+	while let Some(event) = next_event(pending) {
+		proc_event(&event, buffer);
+	}
 }
 
-fn proc_json(res: &str, buffer: &mut buffer::Buffer) {
-	if let Some(data) = res.trim().strip_prefix("data: ") {
-		if data == "[DONE]" {
+/// Splits the next complete server-sent event off the buffer.
+fn next_event(pending: &mut Vec<u8>) -> Option<Vec<u8>> {
+	let end = pending.windows(2).position(|window| window == b"\n\n")?;
+	let mut event = pending.drain(..end + 2).collect::<Vec<u8>>();
+	event.truncate(end);
+	Some(event)
+}
+
+fn proc_event(event: &[u8], buffer: &mut buffer::Buffer) {
+	let event = String::from_utf8_lossy(event);
+
+	for line in event.lines() {
+		let Some(data) = line.trim().strip_prefix("data:") else {
+			continue;
+		};
+		let data = data.trim();
+		if data.is_empty() || data == "[DONE]" {
+			continue;
+		}
+		proc_json(data, buffer);
+	}
+}
+
+fn proc_json(data: &str, buffer: &mut buffer::Buffer) {
+	let json = match serde_json::from_str::<ChatCompletion>(data) {
+		Ok(json) => json,
+		Err(err) => {
+			pay_respects_utils::dlog!(3, "AI module: skipping stream chunk: {} ({})", data, err);
 			return;
 		}
-		let json = serde_json::from_str::<ChatCompletion>(data)
-			.unwrap_or_else(|_| panic!("AI module: Failed to parse JSON content: {}", data));
-		let choice = json.choices.first().expect("AI module: No choices found");
+	};
+
+	// Some providers send chunks with an empty choice list before or after the
+	// ones carrying content.
+	for choice in &json.choices {
 		if let Some(content) = &choice.delta.content {
 			buffer.proc(content);
 		}
@@ -288,5 +317,62 @@ mod tests {
 
 		assert!(instructions < command);
 		assert!(command < error);
+	}
+
+	fn process(chunks: &[&[u8]]) -> String {
+		let mut buffer = buffer::Buffer::new(pay_respects_utils::ui::Colors::default());
+		let mut pending = Vec::new();
+		for chunk in chunks {
+			proc_chunk(&mut pending, chunk, &mut buffer);
+		}
+		pending.extend_from_slice(b"\n\n");
+		while let Some(event) = next_event(&mut pending) {
+			proc_event(&event, &mut buffer);
+		}
+		buffer.buf
+	}
+
+	#[test]
+	fn skips_chunks_with_empty_choices() {
+		let stream = concat!(
+			"data: {\"choices\":[]}\n\n",
+			"data: {\"choices\":[{\"delta\":{\"content\":\"gi\"}}]}\n\n",
+			"data: {\"choices\":[],\"usage\":{\"total_tokens\":1}}\n\n",
+			"data: {\"choices\":[{\"delta\":{\"content\":\"t status\"}}]}\n\n",
+			"data: [DONE]\n\n",
+		);
+
+		assert_eq!(process(&[stream.as_bytes()]), "git status");
+	}
+
+	#[test]
+	fn skips_malformed_chunks() {
+		let stream = concat!(
+			"data: not json\n\n",
+			"data: {\"choices\":[{\"delta\":{\"content\":\"ok\"}}]}\n\n",
+		);
+
+		assert_eq!(process(&[stream.as_bytes()]), "ok");
+	}
+
+	#[test]
+	fn tolerates_crlf_and_chunks_without_delta() {
+		let stream = concat!(
+			"data: {\"choices\":[{\"finish_reason\":\"stop\"}]}\r\n\r\n",
+			"data: {\"choices\":[{\"delta\":{\"content\":\"a\"}}]}\r\n\r\n",
+			"data: {\"choices\":[{\"delta\":{\"content\":\"b\"}}]}\r\n\r\n",
+		);
+
+		assert_eq!(process(&[stream.as_bytes()]), "ab");
+	}
+
+	#[test]
+	fn tolerates_split_utf8() {
+		let stream = "data: {\"choices\":[{\"delta\":{\"content\":\"你好\"}}]}\n\n";
+		let bytes = stream.as_bytes();
+		let split = bytes.iter().position(|&byte| byte == 0xE4).unwrap() + 1;
+		let (first, second) = bytes.split_at(split);
+
+		assert_eq!(process(&[first, second]), "你好");
 	}
 }

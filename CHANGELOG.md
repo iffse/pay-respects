@@ -91,6 +91,8 @@ Commands with redirections or pipelines use a shell wrapper.
 - The selection UI adapts to terminal resizes instead of keeping the layout
 it was started with.
 - Nushell with SQLite history no longer suggests fixes for the alias itself.
+- AI module: streaming no longer panics on chunks without choices or with
+invalid JSON, and keeps spaces split across chunks.
 
 ## [0.8.8]
 
