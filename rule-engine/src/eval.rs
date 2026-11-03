@@ -1,6 +1,6 @@
 use pay_respects_utils::evals::{
-	best_matches, cmd_regex, err_regex, eval_shell_command, opt_regex, regex_match,
-	regex_match_spaceless, split_command, suggest_typo,
+	best_matches, cmd_regex, command_succeeds, err_regex, eval_shell_command, opt_regex,
+	regex_match, regex_match_spaceless, split_command, suggest_typo,
 };
 use pay_respects_utils::files::best_match_file;
 
@@ -83,7 +83,6 @@ pub fn evaluate_rule<F: FunctionHandler, S: ScriptHandler>(
 	scripts: &mut S,
 ) -> Vec<String> {
 	let error = normalize_error(context.error_msg);
-	let split = split_command(context.last_command);
 	let mut candidates = Vec::new();
 
 	for match_rule in &rule.matches {
@@ -96,23 +95,35 @@ pub fn evaluate_rule<F: FunctionHandler, S: ScriptHandler>(
 			continue;
 		}
 
+		let mut command = context.last_command.to_string();
+		for operation in &match_rule.preprocess {
+			operation.apply(&mut command);
+		}
+		let context = Context {
+			shell: context.shell,
+			last_command: &command,
+			error_msg: context.error_msg,
+			executables: context.executables,
+		};
+		let split = split_command(context.last_command);
+
 		for suggestion in &match_rule.suggestions {
 			if mode == Mode::Inline && !suggestion.inline {
 				continue;
 			}
-			if !conditions_match(&suggestion.conditions, context, mode, &error, &split) {
+			if !conditions_match(&suggestion.conditions, &context, mode, &error, &split) {
 				continue;
 			}
 
 			match &suggestion.action {
 				Action::Template(template) => {
-					candidates.extend(render_template(template, context));
+					candidates.extend(render_template(template, &context));
 				}
 				Action::Function(name) => {
-					candidates.extend(functions.evaluate(name, context));
+					candidates.extend(functions.evaluate(name, &context));
 				}
 				Action::Script(script) => {
-					candidates.extend(scripts.evaluate(script, context));
+					candidates.extend(scripts.evaluate(script, &context));
 				}
 			}
 		}
@@ -154,6 +165,9 @@ fn condition_match(
 		Condition::MinLength(length) => split.len() >= *length,
 		Condition::MaxLength(length) => split.len() <= *length + 1,
 		Condition::Shell(shell) => context.shell == shell,
+		Condition::CommandSucceeds(template) => render_template(template, context)
+			.iter()
+			.any(|command| !command.trim().is_empty() && command_succeeds(context.shell, command)),
 		Condition::Not(condition) => !condition_match(condition, context, mode, error, split),
 	}
 }

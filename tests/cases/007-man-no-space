@@ -4,4 +4,12 @@ error="manfoo: command not found"
 expect="man foo"
 match="exact"
 
+mkdir -p bin
+cat > bin/man <<'EOF'
+#!/bin/sh
+exit 0
+EOF
+chmod +x bin/man
+export PATH="$PWD/bin:$PATH"
+
 targets="core runtime"

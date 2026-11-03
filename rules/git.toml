@@ -330,12 +330,12 @@ run = '''git rm -f {{command[2:]}}'''
 error = [
 	'Too many arguments',
 ]
+preprocess = [
+	'replacen("git clone git clone", "git clone", 1)',
+]
 
 [[match.suggest]]
-when = [
-	'cmd_contains(^git clone git clone )',
-]
-run = '''git clone {{command[4:]}}'''
+run = '''{{command}}'''
 
 [[match]]
 error = [

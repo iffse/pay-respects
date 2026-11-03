@@ -110,6 +110,131 @@ suggest = [
 }
 
 #[test]
+fn preprocesses_command_before_conditions_and_suggestions() {
+	let candidates = evaluate(
+		r#"
+version = 2
+commands = ["x"]
+
+[[match]]
+preprocess = [
+	'replace("a", "b")',
+	'replacen("b", "c", 1)',
+]
+
+[[match.suggest]]
+when = ["cmd_contains(^x c b$)"]
+run = "{{command}}"
+"#,
+		Mode::Suggestion,
+		"x a a",
+		"",
+		&[],
+	);
+
+	assert_eq!(candidates, vec!["x c b"]);
+}
+
+#[test]
+fn preprocess_arguments_support_quotes_commas_and_escapes() {
+	let candidates = evaluate(
+		r#"
+version = 2
+commands = ["x"]
+
+[[match]]
+preprocess = [
+	'replace("a, b", "c\"d")',
+]
+
+[[match.suggest]]
+run = "{{command}}"
+"#,
+		Mode::Suggestion,
+		"x a, b",
+		"",
+		&[],
+	);
+
+	assert_eq!(candidates, vec!["x c\"d"]);
+}
+
+#[test]
+fn evaluates_command_succeeds() {
+	let candidates = evaluate(
+		r#"
+version = 2
+commands = ["x"]
+
+[[match]]
+[[match.suggest]]
+when = ['command_succeeds(test -n "{{command[0]}}")']
+run = "ok"
+"#,
+		Mode::Suggestion,
+		"x",
+		"",
+		&[],
+	);
+
+	assert_eq!(candidates, vec!["ok"]);
+
+	let candidates = evaluate(
+		r#"
+version = 2
+commands = ["x"]
+
+[[match]]
+[[match.suggest]]
+when = ["command_succeeds(false)"]
+run = "bad"
+"#,
+		Mode::Suggestion,
+		"x",
+		"",
+		&[],
+	);
+
+	assert!(candidates.is_empty());
+}
+
+#[test]
+fn reports_invalid_preprocess() {
+	let cases = [
+		(r#"preprocess = ['append("a", "b")']"#, "unknown preprocess"),
+		(r#"preprocess = ['replace("a")']"#, "expects 2 arguments"),
+		(
+			r#"preprocess = ['replacen("a", "b", nope)']"#,
+			"invalid replacen count",
+		),
+		(r#"preprocess = ['replace("a, "b")']"#, "unclosed quote"),
+	];
+
+	for (preprocess, expected) in cases {
+		let rule = format!(
+			r#"
+version = 2
+commands = ["x"]
+
+[[match]]
+{}
+
+[[match.suggest]]
+run = "x"
+"#,
+			preprocess
+		);
+		let error = parse_str(&rule).unwrap_err();
+		assert!(
+			error.to_string().contains(expected),
+			"{}: {}",
+			preprocess,
+			error
+		);
+	}
+}
+
+#[test]
 fn evaluates_select() {
 	let candidates = evaluate(
 		r#"

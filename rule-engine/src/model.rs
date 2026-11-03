@@ -10,7 +10,32 @@ pub struct RuleSet {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MatchRule {
 	pub patterns: Vec<String>,
+	pub preprocess: Vec<Preprocess>,
 	pub suggestions: Vec<Suggestion>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum Preprocess {
+	Replace {
+		from: String,
+		to: String,
+	},
+	ReplaceN {
+		from: String,
+		to: String,
+		count: usize,
+	},
+}
+
+impl Preprocess {
+	pub fn apply(&self, command: &mut String) {
+		match self {
+			Preprocess::Replace { from, to } => *command = command.replace(from, to),
+			Preprocess::ReplaceN { from, to, count } => {
+				*command = command.replacen(from, to, *count);
+			}
+		}
+	}
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -82,6 +107,7 @@ pub enum Condition {
 	MinLength(usize),
 	MaxLength(usize),
 	Shell(String),
+	CommandSucceeds(Template),
 	Not(Box<Condition>),
 }
 
@@ -122,6 +148,9 @@ impl Condition {
 	fn needs_executables(&self) -> bool {
 		match self {
 			Condition::Executable(_) => true,
+			Condition::CommandSucceeds(template) => {
+				template.parts.iter().any(Part::needs_executables)
+			}
 			Condition::Not(condition) => condition.needs_executables(),
 			_ => false,
 		}

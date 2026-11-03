@@ -5,7 +5,7 @@ use pay_respects_utils::strings::split_unescaped_character;
 use serde::Deserialize;
 
 use crate::error::RuleError;
-use crate::model::{Action, Condition, MatchRule, RuleSet, ScriptSpec, Suggestion};
+use crate::model::{Action, Condition, MatchRule, Preprocess, RuleSet, ScriptSpec, Suggestion};
 use crate::template;
 
 #[derive(Clone, Copy)]
@@ -53,6 +53,8 @@ struct RuleFileV2 {
 struct MatchV2 {
 	error: Option<Vec<String>>,
 	vars: Option<VarsV2>,
+	#[serde(default)]
+	preprocess: Vec<String>,
 	#[serde(default)]
 	suggest: Vec<SuggestionV2>,
 }
@@ -144,6 +146,7 @@ fn parse_v1(content: &str) -> Result<RuleSet, RuleError> {
 				.collect::<Result<Vec<Suggestion>, RuleError>>()?;
 			Ok(MatchRule {
 				patterns: normalize_patterns(match_err.pattern),
+				preprocess: Vec::new(),
 				suggestions,
 			})
 		})
@@ -166,6 +169,14 @@ fn parse_v2(content: &str, options: ParseOptions) -> Result<RuleSet, RuleError> 
 		.into_iter()
 		.map(|match_rule| {
 			let vars = build_vars(match_rule.vars)?;
+			let preprocess = match_rule
+				.preprocess
+				.into_iter()
+				.map(|operation| {
+					let operation = expand_vars(&operation, &vars)?;
+					parse_preprocess(&operation)
+				})
+				.collect::<Result<Vec<Preprocess>, RuleError>>()?;
 			let suggestions = match_rule
 				.suggest
 				.into_iter()
@@ -173,6 +184,7 @@ fn parse_v2(content: &str, options: ParseOptions) -> Result<RuleSet, RuleError> 
 				.collect::<Result<Vec<Suggestion>, RuleError>>()?;
 			Ok(MatchRule {
 				patterns: normalize_patterns(match_rule.error),
+				preprocess,
 				suggestions,
 			})
 		})
@@ -207,6 +219,153 @@ fn build_vars(vars: Option<VarsV2>) -> Result<HashMap<String, String>, RuleError
 	}
 
 	Ok(parsed)
+}
+
+fn parse_preprocess(input: &str) -> Result<Preprocess, RuleError> {
+	let input = input.trim();
+	let open = input
+		.find('(')
+		.ok_or_else(|| RuleError::Invalid(format!("preprocess is missing `(`: {}", input)))?;
+	let close = input
+		.rfind(')')
+		.ok_or_else(|| RuleError::Invalid(format!("preprocess is missing `)`: {}", input)))?;
+	if close <= open {
+		return Err(RuleError::Invalid(format!(
+			"preprocess has an invalid argument list: {}",
+			input
+		)));
+	}
+
+	let name = input[..open].trim();
+	let args = split_preprocess_args(&input[open + 1..close])?;
+
+	match name {
+		"replace" => {
+			if args.len() != 2 {
+				return Err(RuleError::Invalid(format!(
+					"replace expects 2 arguments: {}",
+					input
+				)));
+			}
+			Ok(Preprocess::Replace {
+				from: args[0].clone(),
+				to: args[1].clone(),
+			})
+		}
+		"replacen" => {
+			if args.len() != 3 {
+				return Err(RuleError::Invalid(format!(
+					"replacen expects 3 arguments: {}",
+					input
+				)));
+			}
+			let count = args[2]
+				.parse::<usize>()
+				.map_err(|_| RuleError::Invalid(format!("invalid replacen count: {}", args[2])))?;
+			Ok(Preprocess::ReplaceN {
+				from: args[0].clone(),
+				to: args[1].clone(),
+				count,
+			})
+		}
+		_ => Err(RuleError::Invalid(format!("unknown preprocess: {}", name))),
+	}
+}
+
+fn split_preprocess_args(input: &str) -> Result<Vec<String>, RuleError> {
+	let mut args = Vec::new();
+	let mut current = String::new();
+	let mut quote = None;
+	let mut quoted = false;
+	let mut after_quote = false;
+	let mut escaped = false;
+	let mut any = false;
+
+	for character in input.chars() {
+		any = true;
+		if escaped {
+			match character {
+				'n' => current.push('\n'),
+				'r' => current.push('\r'),
+				't' => current.push('\t'),
+				'\\' => current.push('\\'),
+				'\'' => current.push('\''),
+				'"' => current.push('"'),
+				',' => current.push(','),
+				character => {
+					current.push('\\');
+					current.push(character);
+				}
+			}
+			after_quote = false;
+			escaped = false;
+			continue;
+		}
+
+		if character == '\\' {
+			escaped = true;
+			continue;
+		}
+
+		if let Some(delimiter) = quote {
+			if character == delimiter {
+				quote = None;
+				after_quote = true;
+			} else {
+				current.push(character);
+			}
+			continue;
+		}
+
+		if character.is_whitespace() && after_quote {
+			continue;
+		}
+
+		match character {
+			'\'' | '"' => {
+				if !quoted && current.trim().is_empty() {
+					current.clear();
+				}
+				quote = Some(character);
+				quoted = true;
+				after_quote = false;
+			}
+			',' => {
+				push_preprocess_arg(&mut args, &mut current, quoted);
+				quoted = false;
+				after_quote = false;
+			}
+			character => {
+				current.push(character);
+				after_quote = false;
+			}
+		}
+	}
+
+	if escaped {
+		current.push('\\');
+	}
+	if quote.is_some() {
+		return Err(RuleError::Invalid(format!(
+			"unclosed quote in preprocess: {}",
+			input
+		)));
+	}
+	if any {
+		push_preprocess_arg(&mut args, &mut current, quoted);
+	}
+
+	Ok(args)
+}
+
+fn push_preprocess_arg(args: &mut Vec<String>, current: &mut String, quoted: bool) {
+	let arg = if quoted {
+		current.clone()
+	} else {
+		current.trim().to_string()
+	};
+	args.push(arg);
+	current.clear();
 }
 
 fn parse_v1_suggestion(input: &str) -> Result<Suggestion, RuleError> {
@@ -391,6 +550,7 @@ fn parse_condition(input: &str) -> Result<Condition, RuleError> {
 		"min_length" => Condition::MinLength(parse_usize(arg, "min_length")?),
 		"max_length" => Condition::MaxLength(parse_usize(arg, "max_length")?),
 		"shell" => Condition::Shell(arg.to_string()),
+		"command_succeeds" => Condition::CommandSucceeds(template::parse(arg)?),
 		_ => {
 			return Err(RuleError::Invalid(format!(
 				"unknown condition: {}",

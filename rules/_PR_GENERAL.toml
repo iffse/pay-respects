@@ -37,6 +37,7 @@ run = '''{{command[1:]}}'''
 [[match.suggest]]
 when = [
 	'cmd_contains(^man\S+$)',
+	'command_succeeds(man -w {{cmd::^man(\S+)$}})',
 ]
 run = '''man {{cmd::^man(\S+)$}}'''
 

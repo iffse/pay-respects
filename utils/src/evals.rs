@@ -53,6 +53,19 @@ pub fn cmd_regex(regex: &str, command: &str) -> String {
 	cmd.join(" ")
 }
 
+/// Runs a shell command and returns whether it exited successfully.
+pub fn command_succeeds(shell: &str, command: &str) -> bool {
+	std::process::Command::new(shell)
+		.arg("-c")
+		.arg(command)
+		.stdin(std::process::Stdio::null())
+		.stdout(std::process::Stdio::null())
+		.stderr(std::process::Stdio::null())
+		.status()
+		.map(|status| status.success())
+		.unwrap_or(false)
+}
+
 /// Returns the output of a shell command as a vector of strings
 /// Each string is a line of output
 pub fn eval_shell_command(shell: &str, command: &str) -> Vec<String> {

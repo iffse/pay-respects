@@ -19,6 +19,10 @@ compile time and runtime rules.
 - Rule format version 2 variables, used as `{{$name}}` in suggestions.
 - Rule format version 2 scripts, run with an external interpreter in runtime
 rules.
+- Rule match preprocessors with `replace` and `replacen` for literal command
+rewrites.
+- `command_succeeds` conditions for running a check command before a
+suggestion.
 - Runtime rules now support command aliases and version 2 files.
 - `--migrate-rules` converts version 1 rule files to version 2.
 - New rules for `apt`, `docker`, `go`, `grep`, `ln`, `open`, `python`,

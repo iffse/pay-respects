@@ -30,6 +30,10 @@ error = [
 	"pattern 1",
 	"pattern 2",
 ]
+preprocess = [
+	'replace("old", "new")',
+	'replacen("old", "new", 1)',
+]
 vars = { dir = "{{command[1]}}" }
 
 [[match.suggest]]
@@ -61,6 +65,9 @@ Fields:
 - `commands`: Command names that share the file. Aliases go here.
 - `error`: Case and whitespace insensitive substrings from the error output.
 	Omit it to always match.
+- `preprocess`: Optional literal command rewrites. Use `replace("from", "to")`
+	to rewrite every match, or `replacen("from", "to", count)` to rewrite the
+	first `count` matches.
 - `vars`: Optional variables for the match. Use a table or an array of
 	`[name, value]` pairs.
 - `when`: Conditions, one string per condition. Conditions are ANDed.
@@ -90,6 +97,22 @@ vars = [
 
 Each condition is its own string. A comma inside a regex does not need
 escaping.
+
+Preprocessors run before conditions and suggestions. They are literal string
+rewrites, not regular expressions. Conditions, functions, scripts, and all
+placeholders see the preprocessed command.
+
+```toml
+[[match]]
+error = ["already installed"]
+preprocess = ['replacen("brew install", "brew reinstall", 1)']
+
+[[match.suggest]]
+run = "{{command}}"
+```
+
+Quoted arguments can contain commas. Use `\"` for a double quote and `\\` for a
+backslash.
 
 ## Scripts
 
@@ -166,8 +189,20 @@ Regex syntax follows [regex-lite].
 - `min_length`: The command has at least this many arguments
 - `max_length`: The command has at most this many arguments
 - `shell`: The current shell equals the argument
+- `command_succeeds`: The argument is a template. The condition passes when
+	the rendered command exits with status 0.
+	- The command runs with the current shell.
+	- Output is discarded.
+	- Put expensive checks after cheap conditions.
 
 Prefix a condition with `!` to negate it.
+
+For example, this condition only allows the suggestion when the argument is a
+directory:
+
+```toml
+when = ['command_succeeds(test -d {{command[1]}})']
+```
 
 ## Other Considerations
 

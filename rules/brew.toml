@@ -137,12 +137,12 @@ run = '''{{command[0]}} upgrade {{command[2:]}}'''
 error = [
 	'already installed and up-to-date',
 ]
+preprocess = [
+	'replacen("brew install", "brew reinstall", 1)',
+]
 
 [[match.suggest]]
-when = [
-	'cmd_contains(^brew install )',
-]
-run = '''{{command[0]}} reinstall {{command[2:]}}'''
+run = '''{{command}}'''
 
 [[match]]
 error = [
