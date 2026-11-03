@@ -26,7 +26,7 @@ pub fn log_plain(debug_level: usize, message: &str) -> String {
 	format!("[{}]: {}", debug_level, message)
 }
 
-pub fn format_prefix(prefix: &str, string: &str) -> String {
+pub fn format_prefix(prefix: &str, string: &str, color: Color) -> String {
 	let indent_count = prefix.chars().count();
 	let indent = format!("{} ", " ".repeat(indent_count));
 	let stripped = string
@@ -35,7 +35,7 @@ pub fn format_prefix(prefix: &str, string: &str) -> String {
 		.collect::<Vec<_>>()
 		.join("\n");
 	let string = stripped.replace("\n", &format!("\n{}", indent));
-	format!("{} {}", prefix.cyan().bold(), string)
+	format!("{} {}", prefix.color(color).bold(), string)
 }
 
 pub fn remove_color_codes(input: &str) -> String {

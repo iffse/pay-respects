@@ -101,25 +101,29 @@ fn ai_enabled(config: &config::Config, mode: Option<&str>) -> bool {
 		return false;
 	}
 
-	prompt_ai_consent()
+	prompt_ai_consent(config)
 }
 
-fn prompt_ai_consent() -> bool {
-	let msg = t!("ai-consent-prompt").to_string().bold().blue();
+fn prompt_ai_consent(config: &config::Config) -> bool {
+	let colors = config.ui.colors;
+	let msg = t!("ai-consent-prompt")
+		.to_string()
+		.color(colors.accent)
+		.bold()
+		.to_string();
 	let hint = format!(
 		"{} {} {}",
-		"[↑/↓/j/k]".blue(),
-		"[Enter]".green(),
-		"[ESC]".red()
+		"[↑/↓/j/k]".color(colors.accent),
+		"[Enter]".color(colors.correct),
+		"[ESC]".color(colors.wrong)
 	);
-	let prelude = format!("{}\n\r{}", msg, hint);
 	let items = [
 		t!("ai-consent-builtin").to_string(),
 		t!("ai-consent-builtin-always").to_string(),
 		t!("ai-consent-disable").to_string(),
 	];
 
-	match select_simple(&prelude, &items) {
+	match select_simple(&config.ui, &msg, &hint, &items) {
 		Ok(0) => true,
 		Ok(1) => {
 			if let Err(err) = config::set_enabled(true) {

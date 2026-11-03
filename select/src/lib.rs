@@ -10,12 +10,19 @@ use crossterm::{
 	terminal::{self, ClearType},
 };
 use pay_respects_utils::strings::print_error;
+use pay_respects_utils::ui::UiConfig;
 use std::io::{Write, stderr};
 
 #[derive(Default)]
 struct Page {
 	items: Vec<usize>,
 	lines: usize,
+}
+
+/// The items of the current page, in their selected and unselected forms.
+struct Rows<'a> {
+	active: &'a [String],
+	inactive: &'a [String],
 }
 
 #[cfg(target_os = "windows")]
@@ -27,13 +34,16 @@ const MAX_ITEMS: usize = 10;
 const BOTTOM_MARGIN: usize = 2;
 
 pub fn select(
+	ui: &UiConfig,
 	prelude: &str,
+	hint: &str,
 	active_items: &[String],
 	inactive_items: &[String],
 ) -> Result<usize, Box<dyn std::error::Error>> {
-	let prelude_lines = prelude_height(prelude);
+	let header = build_header(ui, prelude, hint);
+	let header_lines = header_height(&header);
 	let mut size = terminal::size()?;
-	let mut list_lines = available_height(size.1, prelude_lines);
+	let mut list_lines = available_height(size.1, header_lines);
 
 	if list_lines == 0 {
 		print_error("Terminal height too small.");
@@ -56,11 +66,13 @@ pub fn select(
 	drain_input();
 
 	execute!(stderr(), cursor::Hide)?;
-	// The prelude is the anchor of the whole UI: on a resize the cursor is
+	// The header is the anchor of the whole UI: on a resize the cursor is
 	// restored here and everything below is redrawn, since the terminal may
 	// have scrolled the previous frame out of place.
 	execute!(stderr(), cursor::SavePosition)?;
-	eprint!("{}\r\n", prelude);
+	if !header.is_empty() {
+		eprint!("{}\r\n", header);
+	}
 
 	let mut current = 0;
 	let mut page_idx = 0;
@@ -94,8 +106,11 @@ pub fn select(
 
 	// Initial draw
 	let mut drawn = draw(
-		&active_items[page_range!()],
-		&inactive_items[page_range!()],
+		ui,
+		Rows {
+			active: &active_items[page_range!()],
+			inactive: &inactive_items[page_range!()],
+		},
 		current,
 		page_idx,
 		pages.len(),
@@ -154,20 +169,23 @@ pub fn select(
 				KeyCode::Char('c') | KeyCode::Char('d')
 					if key.modifiers.contains(event::KeyModifiers::CONTROL) =>
 				{
-					cleanup(drawn + prelude_lines)?;
-					quit();
+					cleanup(drawn + header_lines)?;
+					quit(ui);
 				}
 				KeyCode::Esc | KeyCode::Char('q') => {
-					cleanup(drawn + prelude_lines)?;
-					quit()
+					cleanup(drawn + header_lines)?;
+					quit(ui)
 				}
 				KeyCode::Enter => break,
 				_ => {}
 			}
 
 			drawn = redraw(
-				&active_items[page_range!()],
-				&inactive_items[page_range!()],
+				ui,
+				Rows {
+					active: &active_items[page_range!()],
+					inactive: &inactive_items[page_range!()],
+				},
 				current,
 				drawn,
 				page_idx,
@@ -180,7 +198,7 @@ pub fn select(
 		let new_size = terminal::size()?;
 		if new_size != size {
 			size = new_size;
-			list_lines = available_height(size.1, prelude_lines);
+			list_lines = available_height(size.1, header_lines);
 			if list_lines == 0 {
 				continue;
 			}
@@ -196,14 +214,19 @@ pub fn select(
 
 			// The frame may have been reflowed or scrolled by the terminal, so
 			// relative cursor movements are no longer reliable. Go back to the
-			// saved anchor and redraw the prelude and the list from there.
+			// saved anchor and redraw the header and the list from there.
 			execute!(stderr(), cursor::RestorePosition)?;
 			execute!(stderr(), terminal::Clear(ClearType::FromCursorDown))?;
 			execute!(stderr(), cursor::SavePosition)?;
-			eprint!("{}\r\n", prelude);
+			if !header.is_empty() {
+				eprint!("{}\r\n", header);
+			}
 			drawn = draw(
-				&active_items[page_range!()],
-				&inactive_items[page_range!()],
+				ui,
+				Rows {
+					active: &active_items[page_range!()],
+					inactive: &inactive_items[page_range!()],
+				},
 				current,
 				page_idx,
 				pages.len(),
@@ -213,18 +236,27 @@ pub fn select(
 	}
 
 	// Cleanup
-	cleanup(drawn + prelude_lines)?;
+	cleanup(drawn + header_lines)?;
 	terminal::disable_raw_mode()?;
 
 	Ok(pages[page_idx].items[current])
 }
 
-pub fn select_simple(prelude: &str, items: &[String]) -> Result<usize, Box<dyn std::error::Error>> {
+pub fn select_simple(
+	ui: &UiConfig,
+	prelude: &str,
+	hint: &str,
+	items: &[String],
+) -> Result<usize, Box<dyn std::error::Error>> {
 	let active_items = items
 		.iter()
-		.map(|s| s.cyan().to_string())
+		.map(|s| s.color(ui.colors.accent).to_string())
 		.collect::<Vec<String>>();
-	select(prelude, &active_items, items)
+	let inactive_items = items
+		.iter()
+		.map(|s| ui.colors.base(s).to_string())
+		.collect::<Vec<String>>();
+	select(ui, prelude, hint, &active_items, &inactive_items)
 }
 
 fn select_idx(idx: usize) -> String {
@@ -238,10 +270,25 @@ fn select_idx(idx: usize) -> String {
 	}
 }
 
-/// Number of rows occupied by the prelude, including the newline printed after
+/// Number of rows occupied by the header, including the newline printed after
 /// it.
-fn prelude_height(prelude: &str) -> usize {
-	prelude.matches('\n').count() + 1
+fn header_height(header: &str) -> usize {
+	if header.is_empty() {
+		return 0;
+	}
+	header.matches('\n').count() + 1
+}
+
+/// Builds the lines printed above the list, honoring the display options.
+fn build_header(ui: &UiConfig, prelude: &str, hint: &str) -> String {
+	let mut lines = Vec::new();
+	if ui.prelude && !prelude.is_empty() {
+		lines.push(prelude);
+	}
+	if ui.hint && !hint.is_empty() {
+		lines.push(hint);
+	}
+	lines.join("\n\r")
 }
 
 /// Rows available for the item list.
@@ -296,23 +343,24 @@ fn print(str: &str, max_lines: usize) -> usize {
 }
 
 fn draw(
-	active_items: &[String],
-	inactive_items: &[String],
+	ui: &UiConfig,
+	rows: Rows,
 	selected: usize,
 	current_page: usize,
 	total_pages: usize,
 	max_lines: usize,
 ) -> Result<usize, Box<dyn std::error::Error>> {
 	let mut lines = 0;
+	let colors = &ui.colors;
 
-	for (i, item) in active_items.iter().enumerate() {
+	for (i, item) in rows.active.iter().enumerate() {
 		execute!(stderr(), terminal::Clear(ClearType::CurrentLine))?;
 		let line = if i == selected {
-			let prefix = format!("> {}) ", select_idx(i)).cyan().bold();
+			let prefix = format!("> {}) ", select_idx(i)).color(colors.accent).bold();
 			format!("{}{}", prefix, item)
 		} else {
-			let prefix = format!("  {}) ", select_idx(i)).cyan();
-			format!("{}{}", prefix, inactive_items.get(i).unwrap())
+			let prefix = format!("  {}) ", select_idx(i)).color(colors.accent);
+			format!("{}{}", prefix, rows.inactive.get(i).unwrap())
 		};
 		lines += print(&line, max_lines.saturating_sub(lines));
 		if lines >= max_lines {
@@ -323,7 +371,7 @@ fn draw(
 	if total_pages > 1 {
 		execute!(stderr(), terminal::Clear(ClearType::CurrentLine))?;
 		let page_info = format!("[{}/{}]", current_page + 1, total_pages)
-			.cyan()
+			.color(colors.accent)
 			.to_string();
 		// The page indicator gets one row of its own, reserved by
 		// `BOTTOM_MARGIN`.
@@ -335,8 +383,8 @@ fn draw(
 }
 
 fn redraw(
-	active_items: &[String],
-	inactive_items: &[String],
+	ui: &UiConfig,
+	rows: Rows,
 	selected: usize,
 	drawn_lines: usize,
 	current_page: usize,
@@ -344,14 +392,7 @@ fn redraw(
 	max_lines: usize,
 ) -> Result<usize, Box<dyn std::error::Error>> {
 	clear_lines(drawn_lines)?;
-	draw(
-		active_items,
-		inactive_items,
-		selected,
-		current_page,
-		total_pages,
-		max_lines,
-	)
+	draw(ui, rows, selected, current_page, total_pages, max_lines)
 }
 
 fn clear_lines(lines: usize) -> Result<(), Box<dyn std::error::Error>> {
@@ -378,11 +419,11 @@ fn cleanup(lines: usize) -> Result<(), Box<dyn std::error::Error>> {
 	Ok(())
 }
 
-fn quit() -> ! {
+fn quit(ui: &UiConfig) -> ! {
 	execute!(stderr(), cursor::Show).unwrap();
 	execute!(stderr(), terminal::EnableLineWrap).unwrap();
 	terminal::disable_raw_mode().unwrap();
-	let msg = "<Cancelled>".red();
+	let msg = "<Cancelled>".color(ui.colors.wrong);
 	eprintln!("{}", msg);
 	std::process::exit(0);
 }
@@ -469,5 +510,27 @@ mod tests {
 		assert_eq!(locate_item(&pages, 3), Some((1, 1)));
 		assert_eq!(locate_item(&pages, 4), Some((2, 0)));
 		assert_eq!(locate_item(&pages, 9), None);
+	}
+
+	#[test]
+	fn header_honors_display_options() {
+		let ui = UiConfig::default();
+		assert_eq!(build_header(&ui, "msg", "hint"), "msg\n\rhint");
+		assert_eq!(header_height("msg\n\rhint"), 2);
+
+		let hidden = UiConfig {
+			prelude: false,
+			hint: false,
+			..Default::default()
+		};
+		assert_eq!(build_header(&hidden, "msg", "hint"), "");
+		assert_eq!(header_height(""), 0);
+
+		let hint_only = UiConfig {
+			prelude: false,
+			..Default::default()
+		};
+		assert_eq!(build_header(&hint_only, "msg", "hint"), "hint");
+		assert_eq!(header_height("hint"), 1);
 	}
 }

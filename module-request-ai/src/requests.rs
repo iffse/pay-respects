@@ -164,7 +164,7 @@ pub async fn ai_suggestion(last_command: &str, error_msg: &str, locale: &str, co
 
 	let mut stream = res.bytes_stream();
 	let mut json_buffer = String::new();
-	let mut buffer = buffer::Buffer::new();
+	let mut buffer = buffer::Buffer::new(config.ui.colors);
 
 	while let Some(item) = stream.next().await {
 		let item = item.unwrap();

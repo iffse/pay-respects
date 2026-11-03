@@ -122,21 +122,34 @@ pub fn select_candidate(data: &mut Data) {
 		.collect::<Vec<String>>();
 
 	let msg = format!("{}", t!("multi-suggest", num = candidates.len()))
+		.color(data.config.ui.colors.accent)
 		.bold()
-		.blue();
-	let confirm = format!("[{}]", t!("confirm-yes")).green();
-	let hint = format!("{} {} {}", "[↑/↓/j/k]".blue(), confirm, "[ESC]".red());
-	let prelude = format!("{}\n\r{}", msg, hint);
+		.to_string();
+	let confirm = format!("[{}]", t!("confirm-yes"))
+		.color(data.config.ui.colors.correct)
+		.to_string();
+	let hint = format!(
+		"{} {} {}",
+		"[↑/↓/j/k]".color(data.config.ui.colors.accent),
+		confirm,
+		"[ESC]".color(data.config.ui.colors.wrong)
+	);
 
-	let selection =
-		select(&prelude, &active_candidates, &inactive_candidates).unwrap_or_else(|err| {
-			print_error(&format!("Selection failed: {}", err));
-			exit(1);
-		});
+	let selection = select(
+		&data.config.ui,
+		&msg,
+		&hint,
+		&active_candidates,
+		&inactive_candidates,
+	)
+	.unwrap_or_else(|err| {
+		print_error(&format!("Selection failed: {}", err));
+		exit(1);
+	});
 
 	let selected = active_candidates[selection].to_string();
 	let output = if let Some(prefix) = &data.prompt_prefix {
-		let output = format_prefix(prefix, &selected);
+		let output = format_prefix(prefix, &selected, data.config.ui.colors.accent);
 		data.input_command = remove_color_codes(&output)
 			.trim_start_matches(prefix)
 			.to_string();

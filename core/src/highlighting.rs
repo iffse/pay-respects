@@ -2,6 +2,7 @@ use crate::data::Data;
 use crate::shell::is_privileged;
 use colored::*;
 use pay_respects_utils::evals::split_command;
+use pay_respects_utils::ui::Colors;
 
 // to_string() is necessary here, otherwise there won't be color in the output
 #[warn(clippy::unnecessary_to_owned)]
@@ -20,6 +21,7 @@ pub fn highlight_difference(data: &Data, suggested_command: &str, active: bool) 
 	}
 
 	let privileged = is_privileged(data, &split_suggested_command[0]);
+	let colors = data.config.ui.colors;
 
 	let mut old_entries = Vec::new();
 	for command in &split_suggested_command {
@@ -46,16 +48,16 @@ pub fn highlight_difference(data: &Data, suggested_command: &str, active: bool) 
 			continue;
 		}
 		if skip {
-			*entry = entry.normal().to_string();
+			*entry = colors.base(entry).to_string();
 			continue;
 		}
 		for old in &old_entries {
 			if old == entry {
-				*entry = color_same(entry, active).to_string();
+				*entry = color_same(entry, active, &colors);
 				continue 'next;
 			}
 		}
-		*entry = color_diff(entry, active);
+		*entry = color_diff(entry, active, &colors);
 	}
 
 	if privileged
@@ -63,11 +65,11 @@ pub fn highlight_difference(data: &Data, suggested_command: &str, active: bool) 
 			|| suggested_command.contains("||")
 			|| suggested_command.contains('>'))
 	{
-		split_suggested_command[1] =
-			color_diff(&format!("{} -c \"\n", shell), active) + split_suggested_command[1].as_str();
+		split_suggested_command[1] = color_diff(&format!("{} -c \"\n", shell), active, &colors)
+			+ split_suggested_command[1].as_str();
 		let len = split_suggested_command.len() - 1;
 		split_suggested_command[len] =
-			split_suggested_command[len].clone() + color_diff("\n\"", active).as_str();
+			split_suggested_command[len].clone() + color_diff("\n\"", active, &colors).as_str();
 	}
 
 	if let Some(sudo) = data.privilege.clone() {
@@ -75,13 +77,13 @@ pub fn highlight_difference(data: &Data, suggested_command: &str, active: bool) 
 			|| suggested_command.contains("||")
 			|| suggested_command.contains('>')
 		{
-			split_suggested_command[0] = color_same(&format!("{} -c \"\n", shell), active)
+			split_suggested_command[0] = color_same(&format!("{} -c \"\n", shell), active, &colors)
 				+ split_suggested_command[0].as_str();
 			let len = split_suggested_command.len() - 1;
 			split_suggested_command[len] =
-				split_suggested_command[len].clone() + color_same("\n\"", active).as_str();
+				split_suggested_command[len].clone() + color_same("\n\"", active, &colors).as_str();
 		}
-		split_suggested_command.insert(0, color_same(&sudo, active));
+		split_suggested_command.insert(0, color_same(&sudo, active, &colors));
 	}
 
 	let highlighted = split_suggested_command.join(" ").replace(" \n ", "\n");
@@ -89,18 +91,18 @@ pub fn highlight_difference(data: &Data, suggested_command: &str, active: bool) 
 	Some(highlighted)
 }
 
-fn color_same(str: &str, active: bool) -> String {
+fn color_same(str: &str, active: bool, colors: &Colors) -> String {
 	if active {
-		str.blue().to_string()
+		str.color(colors.accent).to_string()
 	} else {
-		str.normal().to_string()
+		colors.base(str).to_string()
 	}
 }
 
-fn color_diff(str: &str, active: bool) -> String {
+fn color_diff(str: &str, active: bool, colors: &Colors) -> String {
 	if active {
-		str.red().bold().to_string()
+		str.color(colors.wrong).bold().to_string()
 	} else {
-		str.normal().bold().to_string()
+		colors.base(str).bold().to_string()
 	}
 }

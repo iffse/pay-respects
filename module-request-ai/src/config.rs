@@ -3,6 +3,7 @@ use std::path::Path;
 use pay_respects_utils::files::{config_files, user_config_path};
 use pay_respects_utils::merge_option;
 use pay_respects_utils::strings::print_error;
+use pay_respects_utils::ui::{ColorsReader, UiConfig, UiConfigReader};
 use serde::Deserialize;
 use toml_edit::{DocumentMut, Item, Table};
 
@@ -16,11 +17,15 @@ pub struct Config {
 	pub extra_body: Option<String>,
 	pub locale: Option<String>,
 	pub additional_prompt: Option<String>,
+	#[serde(skip)]
+	pub ui: UiConfig,
 }
 
 #[derive(Debug, Default, Deserialize)]
 struct ConfigReader {
 	module: Option<ModuleConfigReader>,
+	ui: Option<UiConfigReader>,
+	colors: Option<ColorsReader>,
 }
 
 #[derive(Debug, Default, Deserialize)]
@@ -55,6 +60,13 @@ impl Config {
 }
 
 fn merge_reader(config: &mut Config, reader: ConfigReader) {
+	if let Some(ui) = reader.ui {
+		config.ui.merge(ui);
+	}
+	if let Some(colors) = reader.colors {
+		config.ui.colors.merge(colors);
+	}
+
 	let Some(module) = reader.module else {
 		return;
 	};
@@ -195,6 +207,32 @@ minimum_score = 0.5
 
 		assert_eq!(config.enabled, None);
 		assert!(config.api_key.is_none());
+	}
+
+	#[test]
+	fn parses_ui_and_colors() {
+		let config = parse(
+			r##"
+[ui]
+prelude = false
+
+[colors]
+accent = "#123456"
+wrong = "bright red"
+"##,
+		);
+
+		assert!(!config.ui.prelude);
+		assert!(config.ui.hint);
+		assert_eq!(
+			config.ui.colors.accent,
+			colored::Color::TrueColor {
+				r: 0x12,
+				g: 0x34,
+				b: 0x56
+			}
+		);
+		assert_eq!(config.ui.colors.wrong, colored::Color::BrightRed);
 	}
 
 	#[test]

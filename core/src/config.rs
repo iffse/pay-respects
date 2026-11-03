@@ -1,4 +1,5 @@
 use pay_respects_utils::strings::print_error;
+use pay_respects_utils::ui::{ColorsReader, UiConfig, UiConfigReader};
 use serde::Deserialize;
 
 use pay_respects_utils::files::config_files;
@@ -13,6 +14,8 @@ pub struct ConfigReader {
 	pub blocking_commands: Option<Vec<String>>,
 	pub eval_method: Option<EvalMethod>,
 	pub package_manager: Option<PackageManagerConfig>,
+	pub ui: Option<UiConfigReader>,
+	pub colors: Option<ColorsReader>,
 }
 
 #[allow(dead_code)]
@@ -45,6 +48,7 @@ pub struct Config {
 	pub eval_method: EvalMethod,
 	pub package_manager: Option<String>,
 	pub install_method: InstallMethod,
+	pub ui: UiConfig,
 }
 
 impl Default for Config {
@@ -57,6 +61,7 @@ impl Default for Config {
 			eval_method: EvalMethod::Internal,
 			package_manager: None,
 			install_method: InstallMethod::Default,
+			ui: UiConfig::default(),
 		}
 	}
 }
@@ -69,6 +74,13 @@ impl Config {
 		if let Some(reader) = reader.package_manager {
 			merge_option!(self, reader, package_manager);
 			merge!(self, reader, install_method);
+		}
+
+		if let Some(ui) = reader.ui {
+			self.ui.merge(ui);
+		}
+		if let Some(colors) = reader.colors {
+			self.ui.colors.merge(colors);
 		}
 	}
 
@@ -106,4 +118,49 @@ pub fn load_config() -> Config {
 		config.merge(reader);
 	}
 	config
+}
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+	use colored::Color;
+
+	#[test]
+	fn parses_ui_and_colors() {
+		let reader: ConfigReader = toml::from_str(
+			r##"
+[ui]
+prelude = false
+hint = false
+
+[colors]
+accent = "#ff0000"
+normal = "white"
+"##,
+		)
+		.unwrap();
+
+		let mut config = Config::default();
+		config.merge(reader);
+
+		assert!(!config.ui.prelude);
+		assert!(!config.ui.hint);
+		assert_eq!(
+			config.ui.colors.accent,
+			Color::TrueColor { r: 255, g: 0, b: 0 }
+		);
+		assert_eq!(config.ui.colors.normal, Some(Color::White));
+	}
+
+	#[test]
+	fn defaults_keep_the_interface_visible() {
+		let reader: ConfigReader = toml::from_str("").unwrap();
+		let mut config = Config::default();
+		config.merge(reader);
+
+		assert!(config.ui.prelude);
+		assert!(config.ui.hint);
+		assert_eq!(config.ui.colors.wrong, Color::Red);
+		assert_eq!(config.ui.colors.correct, Color::Green);
+	}
 }

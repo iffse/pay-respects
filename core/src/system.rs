@@ -276,12 +276,13 @@ pub fn install_package(data: &mut Data, package_manager: &str, install: &str) ->
 
 	pay_respects_utils::dlog!(2, "install: {}", install);
 
+	let color = data.config.ui.colors.accent;
 	let output = if let Some(prefix) = &data.prompt_prefix {
-		format_prefix(prefix, &install)
+		format_prefix(prefix, &install, color)
 	} else {
 		install.clone()
 	};
-	eprintln!("{}", output.cyan());
+	eprintln!("{}", output.color(color));
 
 	let result = Command::new(shell)
 		.arg("-c")
@@ -297,12 +298,13 @@ pub fn install_package(data: &mut Data, package_manager: &str, install: &str) ->
 pub fn install_package_shell(data: &Data, package_manager: &str, install: &str) -> String {
 	let command = data.command.clone();
 
+	let color = data.config.ui.colors.accent;
 	let output = if let Some(prefix) = &data.prompt_prefix {
-		format_prefix(prefix, install)
+		format_prefix(prefix, install, color)
 	} else {
 		install.to_string()
 	};
-	eprintln!("{}", output.cyan());
+	eprintln!("{}", output.color(color));
 
 	match package_manager {
 		"guix" => format!("{} -- {}", install, command),

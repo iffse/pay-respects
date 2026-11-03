@@ -52,6 +52,26 @@ search_type = "TrigramDamerauLevenshtein"
 # Avoids false positive when input strings are too short
 search_threshold = 3
 
+# Selection interface
+[ui]
+# Print the message above the list
+prelude = true
+# Print the line with the key hints
+hint = true
+
+# Interface colors. Accepts color names ("red", "bright blue") and hex codes
+# ("#ff8800"). The selection interface, the highlighted suggestions and the
+# messages all use these.
+[colors]
+# Parts to correct and error messages
+wrong = "red"
+# Confirmations and successful states
+correct = "green"
+# Unchanged parts and interface elements
+accent = "blue"
+# Normal text. Set to "none" to keep the terminal's default foreground
+normal = "none"
+
 # Minimum score for the result to be valid: [0,1]
 [trigram]
 minimum_score = 0.5

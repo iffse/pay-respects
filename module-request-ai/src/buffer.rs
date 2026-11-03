@@ -23,6 +23,7 @@ fn clear_line() {
 }
 
 use colored::Colorize;
+use pay_respects_utils::ui::Colors;
 
 #[derive(PartialEq)]
 enum State {
@@ -34,13 +35,15 @@ enum State {
 pub struct Buffer {
 	pub buf: String,
 	state: State,
+	colors: Colors,
 }
 
 impl Buffer {
-	pub fn new() -> Self {
+	pub fn new(colors: Colors) -> Self {
 		Buffer {
 			buf: String::new(),
 			state: State::Write,
+			colors,
 		}
 	}
 	pub fn proc(&mut self, data: &str) {
@@ -70,8 +73,8 @@ impl Buffer {
 			match line.trim() {
 				"<note>" => {
 					let warn = format!("{}:", t!("ai-suggestion"))
+						.color(self.colors.accent)
 						.bold()
-						.blue()
 						.to_string();
 					eprintln!("{}", warn);
 				}
@@ -80,7 +83,10 @@ impl Buffer {
 				}
 				"<think>" => {
 					self.state = State::Think;
-					let warn = format!("{}:", t!("ai-thinking")).bold().blue().to_string();
+					let warn = format!("{}:", t!("ai-thinking"))
+						.color(self.colors.accent)
+						.bold()
+						.to_string();
 					eprintln!("{}", warn);
 				}
 				"```" => {}

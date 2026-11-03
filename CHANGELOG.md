@@ -55,6 +55,11 @@ AI module:
 
 - Configuration via the `[module.request-ai]` section in `config.toml`.
 
+Interface:
+
+- `[ui]` sets whether the selection prelude and hint are printed.
+- `[colors]` sets the interface colors, accepting names and hex codes.
+
 ### Changed
 
 Rule engine:

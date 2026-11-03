@@ -35,10 +35,17 @@ pub fn suggestion(data: &mut Data) {
 			data.update_error(msg);
 
 			let retry_message = format!("{}...", t!("retry"));
-			eprintln!("\n{}\n", retry_message.cyan().bold());
+			eprintln!(
+				"\n{}\n",
+				retry_message.color(data.config.ui.colors.accent).bold()
+			);
 		}
 	}
-	eprintln!("{}: {}\n", t!("no-suggestion"), last_command.red());
+	eprintln!(
+		"{}: {}\n",
+		t!("no-suggestion"),
+		last_command.color(data.config.ui.colors.wrong)
+	);
 	eprintln!(
 		"{}\n{}",
 		t!("contribute"),
@@ -78,7 +85,7 @@ pub fn noconfirm(data: &mut Data) {
 
 		let output = if let Some(prefix) = &data.prompt_prefix {
 			data.input_command = remove_color_codes(&highlighted);
-			format_prefix(prefix, &highlighted)
+			format_prefix(prefix, &highlighted, data.config.ui.colors.accent)
 		} else {
 			candidate.clone()
 		};
@@ -95,10 +102,17 @@ pub fn noconfirm(data: &mut Data) {
 			data.update_error(msg);
 
 			let retry_message = format!("{}...", t!("retry"));
-			eprintln!("\n{}\n", retry_message.cyan().bold());
+			eprintln!(
+				"\n{}\n",
+				retry_message.color(data.config.ui.colors.accent).bold()
+			);
 		}
 	}
-	eprintln!("{}: {}\n", t!("no-suggestion"), last_command.red());
+	eprintln!(
+		"{}: {}\n",
+		t!("no-suggestion"),
+		last_command.color(data.config.ui.colors.wrong)
+	);
 	eprintln!(
 		"{}\n{}",
 		t!("contribute"),
@@ -115,7 +129,7 @@ pub fn cnf(data: &mut Data) {
 	let shell_msg = format!("{}:", shell);
 	eprintln!(
 		"{} {}: {}\n",
-		shell_msg.bold().red(),
+		shell_msg.bold().color(data.config.ui.colors.wrong),
 		t!("command-not-found"),
 		executable
 	);
@@ -166,7 +180,10 @@ pub fn cnf(data: &mut Data) {
 			let msg = Some(status.err().unwrap());
 			data.update_error(msg);
 			let retry_message = format!("{}...", t!("retry"));
-			eprintln!("\n{}\n", retry_message.cyan().bold());
+			eprintln!(
+				"\n{}\n",
+				retry_message.color(data.config.ui.colors.accent).bold()
+			);
 			suggestion(data);
 		}
 	} else {
@@ -215,15 +232,26 @@ pub fn cnf(data: &mut Data) {
 			.map(|p| system::install_string(data, &package_manager, p))
 			.collect::<Vec<String>>();
 
-		let msg = format!("{}:", t!("install-package")).bold().blue();
-		let confirm = format!("[{}]", t!("confirm-yes")).green();
-		let hint = format!("{} {} {}", "[↑/↓/j/k]".blue(), confirm, "[ESC]".red());
+		let colors = data.config.ui.colors;
+		let msg = format!("{}:", t!("install-package"))
+			.color(colors.accent)
+			.bold()
+			.to_string();
+		let confirm = format!("[{}]", t!("confirm-yes"))
+			.color(colors.correct)
+			.to_string();
+		let hint = format!(
+			"{} {} {}",
+			"[↑/↓/j/k]".color(colors.accent),
+			confirm,
+			"[ESC]".color(colors.wrong)
+		);
 
-		let prelude = format!("{}\n\r{}", msg, hint);
-		let selection = select_simple(&prelude, &packages).unwrap_or_else(|err| {
-			print_error(&format!("Selection failed: {}", err));
-			exit(1);
-		});
+		let selection =
+			select_simple(&data.config.ui, &msg, &hint, &packages).unwrap_or_else(|err| {
+				print_error(&format!("Selection failed: {}", err));
+				exit(1);
+			});
 
 		let package = packages[selection].to_string();
 
@@ -241,11 +269,11 @@ pub fn cnf(data: &mut Data) {
 		// retry after installing package
 		if system::install_package(data, &package_manager, &package) {
 			let output = if let Some(prefix) = &data.prompt_prefix {
-				format_prefix(prefix, &data.input_command)
+				format_prefix(prefix, &data.input_command, data.config.ui.colors.accent)
 			} else {
 				data.input_command.clone()
 			};
-			eprintln!("\n{}", output.cyan());
+			eprintln!("\n{}", output.color(data.config.ui.colors.accent));
 			let history_command =
 				history_command(&data.shell, data.privilege.as_deref(), &data.command);
 			let status = suggestions::run_suggestion(data, &data.command);
