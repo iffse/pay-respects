@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use crate::{init::Init, shell::initialization};
 use colored::Colorize;
 use pay_respects_utils::strings::print_error;
@@ -47,6 +49,26 @@ pub fn handle_args(args: impl IntoIterator<Item = String>) -> Status {
 					return Status::Error;
 				}
 			},
+			"--migrate-rules" => {
+				let Some(path) = iter.next() else {
+					print_error("--migrate-rules requires a file.");
+					return Status::Error;
+				};
+				if iter.peek().is_some() {
+					print_error("--migrate-rules accepts one file at a time.");
+					return Status::Error;
+				}
+				match pay_respects_rule_engine::migrate_file(Path::new(&path)) {
+					Ok(content) => {
+						print!("{}", content);
+						return Status::Exit;
+					}
+					Err(err) => {
+						print_error(&format!("Failed to migrate {}: {}", path, err));
+						return Status::Error;
+					}
+				}
+			}
 			_ => {
 				if arg.starts_with('-') {
 					print_error(&format!("Unknown option: {}", arg));
@@ -75,6 +97,7 @@ fn print_help() {
 	-a, --alias [<alias>]        Set alias for the function (default: f)
 	    --nocnf                  Do not load cnf file
 	-P, --prompt-prefix <prefix> Force a prompt prefix (e.g. ">" or "❯")
+	    --migrate-rules <file>   Convert a version 1 rule file to version 2
 "#;
 	println!(
 		"{}",
@@ -145,10 +168,21 @@ mod tests {
 			[String::new(), String::from("-a")],
 			[String::new(), String::from("--alias")],
 			[String::new(), String::from("--nocnf")],
+			[String::new(), String::from("--migrate-rules")],
 		] {
 			println!("Arguments {:?} should return Error", args);
 			assert!(matches!(handle_args(args), Status::Error));
 		}
+
+		assert!(matches!(
+			handle_args([
+				String::new(),
+				String::from("--migrate-rules"),
+				String::from("one.toml"),
+				String::from("two.toml"),
+			]),
+			Status::Error
+		));
 
 		for args in [
 			[String::new(), String::from("-a"), String::from("--nocnf")],

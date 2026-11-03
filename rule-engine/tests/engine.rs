@@ -385,6 +385,48 @@ run = "{{$a}}"
 }
 
 #[test]
+fn migrates_v1_to_v2() {
+	let v1 = r#"
+command = "hello"
+extends = ["hi"]
+
+[[match_err]]
+pattern = ["failed"]
+suggest = [
+'''
+#[executable(sudo), INLINE]
+sudo {{command}} ''',
+'''
+#[FUNCTION, min_length(2)]
+MyFunction ''',
+]
+"#;
+	let v2 = pay_respects_rule_engine::migrate_str(v1).unwrap();
+	let rule = parse_str(&v2).unwrap();
+
+	assert_eq!(rule.version, 2);
+	assert_eq!(rule.commands, vec!["hello", "hi"]);
+	assert_eq!(rule.matches.len(), 1);
+	assert_eq!(rule.matches[0].suggestions.len(), 2);
+	assert!(v2.contains("when = ["));
+	assert!(v2.contains("inline = true"));
+	assert!(v2.contains("function = 'MyFunction'"));
+}
+
+#[test]
+fn rejects_migrating_v2() {
+	let error = pay_respects_rule_engine::migrate_str(
+		r#"
+version = 2
+commands = ["x"]
+"#,
+	)
+	.unwrap_err();
+
+	assert!(error.to_string().contains("already version 2"));
+}
+
+#[test]
 fn reports_unknown_conditions() {
 	let error = parse_str(
 		r#"
