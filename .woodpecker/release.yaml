@@ -35,10 +35,12 @@ steps:
         set -eu
         version="${CI_COMMIT_TAG#v}"
         for target in x86_64-unknown-linux-musl aarch64-unknown-linux-musl; do
-          tar --zstd -cf "pay-respects-${version}-${target}.tar.zst" \
+          # $${...} keeps the shell variables away from Woodpecker's
+          # pre-processor, which would otherwise expand them to nothing
+          tar --zstd -cf "pay-respects-$${version}-$${target}.tar.zst" \
             LICENSE \
             man \
-            -C "target/${target}/release" \
+            -C "target/$${target}/release" \
             pay-respects \
             _pay-respects-module-100-runtime-rules \
             _pay-respects-fallback-100-request-ai

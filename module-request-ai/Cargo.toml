@@ -1,6 +1,6 @@
 [package]
 name = "pay-respects-module-request-ai"
-version = "0.2.10"
+version = "0.3.0"
 edition = "2024"
 
 description = "AI request module for the pay-respects CLI tool"
@@ -22,8 +22,8 @@ askama = "0.16"
 # config file
 toml = { version = "1.0" }
 toml_edit = { version = "0.25" }
-pay-respects-utils = { version = "0.1", path = "../utils" }
-pay-respects-select = { version = "0.1", path = "../select" }
+pay-respects-utils = { version = "0.2", path = "../utils" }
+pay-respects-select = { version = "0.2", path = "../select" }
 
 # reqwest = { version = "0.13", features = ["stream", "json"] }
 reqwest = { version = "0.12", features = ["stream", "json", "rustls-tls"], default-features = false }

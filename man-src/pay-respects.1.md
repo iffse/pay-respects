@@ -1,4 +1,4 @@
-% PAY_RESPECTS(1) pay-respects 0.8.8 | User Commands
+% PAY_RESPECTS(1) pay-respects 0.9.0 | User Commands
 % iff
 % April 2026
 

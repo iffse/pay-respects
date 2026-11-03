@@ -1,4 +1,4 @@
-% PAY_RESPECTS(5) pay-respects 0.8.8 | Configuration File
+% PAY_RESPECTS(5) pay-respects 0.9.0 | Configuration File
 % iff
 % April 2026
 

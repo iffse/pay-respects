@@ -1038,7 +1038,7 @@ dependencies = [
 
 [[package]]
 name = "pay-respects"
-version = "0.8.8"
+version = "0.9.0"
 dependencies = [
  "askama",
  "colored",
@@ -1057,7 +1057,7 @@ dependencies = [
 
 [[package]]
 name = "pay-respects-module-request-ai"
-version = "0.2.10"
+version = "0.3.0"
 dependencies = [
  "askama",
  "colored",
@@ -1078,7 +1078,7 @@ dependencies = [
 
 [[package]]
 name = "pay-respects-module-runtime-rules"
-version = "0.1.14"
+version = "0.2.0"
 dependencies = [
  "pay-respects-rule-engine",
  "pay-respects-utils",
@@ -1088,7 +1088,7 @@ dependencies = [
 
 [[package]]
 name = "pay-respects-parser"
-version = "0.3.16"
+version = "0.4.0"
 dependencies = [
  "pay-respects-rule-engine",
  "postcard",
@@ -1108,7 +1108,7 @@ dependencies = [
 
 [[package]]
 name = "pay-respects-select"
-version = "0.1.4"
+version = "0.2.0"
 dependencies = [
  "colored",
  "crossterm",
@@ -1117,7 +1117,7 @@ dependencies = [
 
 [[package]]
 name = "pay-respects-utils"
-version = "0.1.18"
+version = "0.2.0"
 dependencies = [
  "colored",
  "itertools 0.14.0",
