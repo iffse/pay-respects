@@ -2,6 +2,7 @@
 
 set -u
 
+# Case categories are documented in tests/cases/index.md.
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 CORE_BIN="$ROOT/target/debug/pay-respects"
 RUNTIME_BIN="$ROOT/target/debug/_pay-respects-module-100-runtime-rules"
@@ -129,7 +130,7 @@ echo "Starting suggestion tests..."
 echo "-----------------------------------------"
 
 for suite in core runtime; do
-	for file in "$ROOT"/tests/cases/*; do
+	for file in "$ROOT"/tests/cases/[A-Z]-*; do
 		run_case "$suite" "$file"
 		status=$?
 		case $status in
