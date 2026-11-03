@@ -5,6 +5,7 @@
 pay\-respects \- Blazing fast terminal command suggestions
 .SH SYNOPSIS
 \f[B]pay\-respects\f[R] \f[I]shell\f[R] [\f[I]options\f[R]]
+\f[B]pay\-respects\f[R] \(enmigrate\-rules \f[I]file\f[R]
 .SH DESCRIPTION
 pay\-respects is a terminal suggestion tool that fixes your previous or
 current typed command, with a sub\-millisecond (<1ms) performance.
@@ -15,6 +16,9 @@ Show help message and exit.
 .TP
 \(enalias
 Set a custom alias instead of \f[CR]f\f[R]
+.TP
+\(enmigrate\-rules <file>
+Convert a version 1 rule file to version 2 on \f[CR]stdout\f[R].
 .TP
 \(ennocnf
 Disable command\-not\-found handler

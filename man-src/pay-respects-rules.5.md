@@ -153,6 +153,18 @@ the start of the suggestion. Commas inside a regex must be escaped as `\,`.
 Version 1 remains supported at run time. Migrate to version 2 before it is
 removed.
 
+## Migrating from Version 1
+
+Use the built-in converter:
+
+```sh
+pay-respects --migrate-rules ~/.config/pay-respects/rules/git.toml > git.toml
+```
+
+The command writes the converted file to `stdout`. It accepts one file at a
+time. Comments are not preserved. Review the output before replacing the old
+file.
+
 ## Placeholders
 
 - `{{command}}`: The full command without changes

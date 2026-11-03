@@ -9,6 +9,7 @@ pay-respects - Blazing fast terminal command suggestions
 # SYNOPSIS
 
 **pay-respects** *shell* [*options*]
+**pay-respects** --migrate-rules *file*
 
 # DESCRIPTION
 
@@ -22,6 +23,9 @@ typed command, with a sub-millisecond (<1ms) performance.
 
 --alias
 : Set a custom alias instead of `f`
+
+--migrate-rules &lt;file&gt;
+: Convert a version 1 rule file to version 2 on `stdout`.
 
 --nocnf
 : Disable command-not-found handler

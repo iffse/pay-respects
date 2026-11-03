@@ -20,6 +20,7 @@ compile time and runtime rules.
 - Rule format version 2 scripts, run with an external interpreter in runtime
 rules.
 - Runtime rules now support command aliases and version 2 files.
+- `--migrate-rules` converts version 1 rule files to version 2.
 - AI module: Configuration via the `[module.request-ai]` section in
 `config.toml`.
 

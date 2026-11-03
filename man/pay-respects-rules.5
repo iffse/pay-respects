@@ -179,6 +179,17 @@ Commas inside a regex must be escaped as \f[CR]\(rs,\f[R].
 .PP
 Version 1 remains supported at run time.
 Migrate to version 2 before it is removed.
+.SS Migrating from Version 1
+Use the built\-in converter:
+.IP
+.EX
+pay\-respects \-\-migrate\-rules \(ti/.config/pay\-respects/rules/git.toml > git.toml
+.EE
+.PP
+The command writes the converted file to \f[CR]stdout\f[R].
+It accepts one file at a time.
+Comments are not preserved.
+Review the output before replacing the old file.
 .SS Placeholders
 .IP \(bu 2
 \f[CR]{{command}}\f[R]: The full command without changes
