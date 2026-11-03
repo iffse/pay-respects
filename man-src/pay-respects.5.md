@@ -83,4 +83,32 @@ package_manager = "pacman"
 # - System
 # - Shell (nix and guix only)
 install_method = "System"
+
+# Configuration for the `request-ai` module
+[module.request-ai]
+# Enable AI suggestions.
+# If unset, and no API key is configured, pay-respects asks whether to use the
+# built-in API key. Set to false to disable the module.
+enabled = true
+
+# API key. Leave unset to use the built-in API key.
+api_key = "..."
+
+# Any OpenAI-compatible API endpoint
+api_url = "https://api.openai.com/v1/chat/completions"
+
+# Model name
+model = "gpt-4o-mini"
+
+# Extra JSON fields to include in the request
+extra = '"temperature" = 0.5'
+
+# Extra JSON object for the `extra_body` field
+extra_body = '{"chat_template_kwargs": {"enable_thinking": false}}'
+
+# Locale in which the AI explains the suggestion
+locale = "en-US"
+
+# Additional prompt
+additional_prompt = "User's environment is Zsh running in Arch Linux."
 ```

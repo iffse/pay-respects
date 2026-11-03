@@ -257,8 +257,18 @@ See the following pages:
 > **Disclaimer**: You are using AI generated content on your own risk. Please
 > double-check its suggestions before accepting.
 
-AI suggestions should work out of the box with `request-ai` module installed.
-You can disable it by setting `_PR_AI_DISABLE`:
+AI suggestions are opt-in. When `request-ai` is installed and no API key is
+configured, the module asks whether to use the built-in API key. The choice can
+be remembered in the configuration file:
+
+```toml
+[module.request-ai]
+enabled = true
+```
+
+Set `enabled = false`, or set `_PR_AI_DISABLE` to any value, to disable AI
+suggestions:
+
 ```sh
 export _PR_AI_DISABLE=1
 ```

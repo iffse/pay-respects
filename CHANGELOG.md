@@ -11,6 +11,16 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- AI module: Configuration via the `[module.request-ai]` section in
+`config.toml`.
+
+### Changed
+
+- AI module: Ask for default behavior when no user API key is configured
+consent on first use.
+
 ## [0.8.8]
 
 ### Fixed

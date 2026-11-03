@@ -15,10 +15,16 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 use std::env;
+use std::io::IsTerminal;
+
+use colored::Colorize;
+use pay_respects_select::select_simple;
+use pay_respects_utils::strings::print_error;
+use sys_locale::get_locale;
 
 use crate::requests::ai_suggestion;
-use sys_locale::get_locale;
 mod buffer;
+mod config;
 mod requests;
 
 #[macro_use]
@@ -30,10 +36,8 @@ async fn main() -> Result<(), std::io::Error> {
 	if std::env::var("_PR_AI_DISABLE").is_ok() {
 		return Ok(());
 	}
-	let mode = std::env::var("_PR_MODE");
-	if let Ok(mode) = mode
-		&& mode.as_str() == "noconfirm"
-	{
+	let mode = std::env::var("_PR_MODE").ok();
+	if mode.as_deref() == Some("noconfirm") {
 		return Ok(());
 	}
 
@@ -57,10 +61,15 @@ async fn main() -> Result<(), std::io::Error> {
 		}
 	};
 	rust_i18n::set_locale(&locale[0..2]);
+	colored::control::set_override(true);
+
+	let config = config::load();
+	if config.enabled == Some(false) {
+		return Ok(());
+	}
 
 	let command = std::env::var("_PR_LAST_COMMAND").expect("_PR_LAST_COMMAND not set");
 	let error = std::env::var("_PR_ERROR_MSG").expect("_PR_ERROR_MSG not set");
-	colored::control::set_override(true);
 
 	#[cfg(debug_assertions)]
 	{
@@ -73,7 +82,87 @@ async fn main() -> Result<(), std::io::Error> {
 	if command.split_whitespace().count() == 1 {
 		return Ok(());
 	}
-	ai_suggestion(&command, &error, &locale).await;
+
+	if !ai_enabled(&config, mode.as_deref()) {
+		return Ok(());
+	}
+	ai_suggestion(&command, &error, &locale, &config).await;
 
 	Ok(())
+}
+
+fn ai_enabled(config: &config::Config, mode: Option<&str>) -> bool {
+	if let Some(enabled) = config.enabled {
+		return enabled;
+	}
+
+	if config.has_custom_api_key() {
+		return true;
+	}
+
+	// Do not ask in non-interactive modes or when the prompt would not be visible.
+	if matches!(mode, Some("inline") | Some("echo")) || !std::io::stderr().is_terminal() {
+		return false;
+	}
+
+	prompt_ai_consent()
+}
+
+fn prompt_ai_consent() -> bool {
+	let msg = t!("ai-consent-prompt").to_string().bold().blue();
+	let hint = format!(
+		"{} {} {}",
+		"[↑/↓/j/k]".blue(),
+		"[Enter]".green(),
+		"[ESC]".red()
+	);
+	let prelude = format!("{}\n\r{}", msg, hint);
+	let items = [
+		t!("ai-consent-builtin").to_string(),
+		t!("ai-consent-builtin-always").to_string(),
+		t!("ai-consent-disable").to_string(),
+	];
+
+	match select_simple(&prelude, &items) {
+		Ok(0) => true,
+		Ok(1) => {
+			if let Err(err) = config::set_enabled(true) {
+				print_error(&format!("Failed to save configuration: {}", err));
+			}
+			true
+		}
+		Ok(_) => {
+			if let Err(err) = config::set_enabled(false) {
+				print_error(&format!("Failed to save configuration: {}", err));
+			}
+			false
+		}
+		Err(err) => {
+			print_error(&format!("Selection failed: {}", err));
+			false
+		}
+	}
+}
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+
+	#[test]
+	fn explicit_enabled_is_respected() {
+		let config = config::Config {
+			enabled: Some(true),
+			..Default::default()
+		};
+		assert!(ai_enabled(&config, None));
+	}
+
+	#[test]
+	fn explicit_disabled_is_respected() {
+		let config = config::Config {
+			enabled: Some(false),
+			..Default::default()
+		};
+		assert!(!ai_enabled(&config, None));
+	}
 }

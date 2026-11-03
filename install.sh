@@ -79,19 +79,6 @@ main() {
 		echo "Note: ${BIN_DIR} is not on your \$PATH. pay-respects will not work unless it is added to \$PATH."
 	fi
 	echo ""
-	echo "pay-respects has an optional AI module to provide suggestions when no rules match"
-	echo "The module works out-of-the-box with no data collection"
-	echo "Do you want to keep the AI module? [Y/n]"
-	read -r _keep_AI
-	if [ "${_keep_AI}" = "N" ] || [ "${_keep_AI}" = "n" ] ; then
-		for _module in ${_modules}; do
-			if echo "${_module}" | grep -q "request-ai"; then
-				ensure try_sudo rm -f -- "${BIN_DIR}/${_module}"
-				echo "AI module removed."
-			fi
-		done
-	fi
-
 }
 
 # Parse the arguments passed and set variables accordingly.

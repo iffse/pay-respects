@@ -156,7 +156,7 @@ fn system_config_path() -> Vec<String> {
 	xdg_config_dirs
 }
 
-fn user_config_path() -> String {
+pub fn user_config_path() -> String {
 	#[cfg(windows)]
 	let xdg_config_home = std::env::var("APPDATA").unwrap();
 	#[cfg(not(windows))]

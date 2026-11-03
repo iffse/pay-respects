@@ -5,6 +5,7 @@ use futures_util::StreamExt;
 use serde::Deserialize;
 
 use crate::buffer;
+use crate::config::Config;
 
 struct Conf {
 	key: String,
@@ -62,8 +63,8 @@ struct Request {
 	extra_body: Option<String>,
 }
 
-pub async fn ai_suggestion(last_command: &str, error_msg: &str, locale: &str) {
-	let conf = match Conf::new() {
+pub async fn ai_suggestion(last_command: &str, error_msg: &str, locale: &str, config: &Config) {
+	let conf = match Conf::new(config) {
 		Some(conf) => conf,
 		None => {
 			return;
@@ -91,7 +92,10 @@ pub async fn ai_suggestion(last_command: &str, error_msg: &str, locale: &str) {
 	};
 
 	let user_locale = {
-		let locale = std::env::var("_PR_AI_LOCALE").unwrap_or_else(|_| locale.to_string());
+		let locale = std::env::var("_PR_AI_LOCALE")
+			.ok()
+			.or_else(|| config.locale.clone())
+			.unwrap_or_else(|| locale.to_string());
 		if locale.len() < 2 {
 			"en-US".to_string()
 		} else {
@@ -105,11 +109,10 @@ pub async fn ai_suggestion(last_command: &str, error_msg: &str, locale: &str) {
 		"".to_string()
 	};
 
-	let addtional_prompt = if std::env::var("_PR_AI_ADDITIONAL_PROMPT").is_ok() {
-		std::env::var("_PR_AI_ADDITIONAL_PROMPT").unwrap()
-	} else {
-		"".to_string()
-	};
+	let addtional_prompt = std::env::var("_PR_AI_ADDITIONAL_PROMPT")
+		.ok()
+		.or_else(|| config.additional_prompt.clone())
+		.unwrap_or_default();
 
 	let ai_prompt = AiPrompt {
 		last_command,
@@ -125,8 +128,12 @@ pub async fn ai_suggestion(last_command: &str, error_msg: &str, locale: &str) {
 	#[cfg(debug_assertions)]
 	eprintln!("AI module: AI prompt: {}", ai_prompt);
 
-	let extra: Option<String> = std::env::var("_PR_AI_EXTRA").ok();
-	let extra_body: Option<String> = std::env::var("_PR_AI_EXTRA_BODY").ok();
+	let extra = std::env::var("_PR_AI_EXTRA")
+		.ok()
+		.or_else(|| config.extra.clone());
+	let extra_body = std::env::var("_PR_AI_EXTRA_BODY")
+		.ok()
+		.or_else(|| config.extra_body.clone());
 
 	let body = Request { extra, extra_body };
 	let body = body.render().unwrap();
@@ -215,16 +222,15 @@ fn proc_json(res: &str, buffer: &mut buffer::Buffer) {
 }
 
 impl Conf {
-	pub fn new() -> Option<Self> {
+	pub fn new(config: &Config) -> Option<Self> {
 		let key = match std::env::var("_PR_AI_API_KEY") {
 			Ok(key) => key,
-			Err(_) => {
-				if let Some(key) = option_env!("_DEF_PR_AI_API_KEY") {
-					key.to_string()
-				} else {
-					"Y29uZ3JhdHVsYXRpb25zLCB5b3UgZm91bmQgdGhlIHNlY3JldCE=".to_string()
-				}
-			}
+			Err(_) => match &config.api_key {
+				Some(key) => key.clone(),
+				None => option_env!("_DEF_PR_AI_API_KEY")
+					.unwrap_or("Y29uZ3JhdHVsYXRpb25zLCB5b3UgZm91bmQgdGhlIHNlY3JldCE=")
+					.to_string(),
+			},
 		};
 		if key.is_empty() {
 			return None;
@@ -232,13 +238,12 @@ impl Conf {
 
 		let url = match std::env::var("_PR_AI_URL") {
 			Ok(url) => url,
-			Err(_) => {
-				if let Some(url) = option_env!("_DEF_PR_AI_URL") {
-					url.to_string()
-				} else {
-					"https://pay-respects-serverless.iffse.eu.org/".to_string()
-				}
-			}
+			Err(_) => match &config.api_url {
+				Some(url) => url.clone(),
+				None => option_env!("_DEF_PR_AI_URL")
+					.unwrap_or("https://pay-respects-serverless.iffse.eu.org/")
+					.to_string(),
+			},
 		};
 		if url.is_empty() {
 			return None;
@@ -246,13 +251,10 @@ impl Conf {
 
 		let model = match std::env::var("_PR_AI_MODEL") {
 			Ok(model) => model,
-			Err(_) => {
-				if let Some(model) = option_env!("_DEF_PR_AI_MODEL") {
-					model.to_string()
-				} else {
-					"uwu".to_string()
-				}
-			}
+			Err(_) => match &config.model {
+				Some(model) => model.clone(),
+				None => option_env!("_DEF_PR_AI_MODEL").unwrap_or("uwu").to_string(),
+			},
 		};
 		if model.is_empty() {
 			return None;

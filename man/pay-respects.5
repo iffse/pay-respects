@@ -89,6 +89,34 @@ package_manager = \(dqpacman\(dq
 \f[I]# \- System\f[R]
 \f[I]# \- Shell (nix and guix only)\f[R]
 install_method = \(dqSystem\(dq
+
+\f[I]# Configuration for the \(garequest\-ai\(ga module\f[R]
+\f[B][module.request\-ai]\f[R]
+\f[I]# Enable AI suggestions.\f[R]
+\f[I]# If unset, and no API key is configured, pay\-respects asks whether to use the\f[R]
+\f[I]# built\-in API key. Set to false to disable the module.\f[R]
+enabled = true
+
+\f[I]# API key. Leave unset to use the built\-in API key.\f[R]
+api_key = \(dq...\(dq
+
+\f[I]# Any OpenAI\-compatible API endpoint\f[R]
+api_url = \(dqhttps://api.openai.com/v1/chat/completions\(dq
+
+\f[I]# Model name\f[R]
+model = \(dqgpt\-4o\-mini\(dq
+
+\f[I]# Extra JSON fields to include in the request\f[R]
+extra = \(aq\(dqtemperature\(dq = 0.5\(aq
+
+\f[I]# Extra JSON object for the \(gaextra_body\(ga field\f[R]
+extra_body = \(aq{\(dqchat_template_kwargs\(dq: {\(dqenable_thinking\(dq: false}}\(aq
+
+\f[I]# Locale in which the AI explains the suggestion\f[R]
+locale = \(dqen\-US\(dq
+
+\f[I]# Additional prompt\f[R]
+additional_prompt = \(dqUser\(aqs environment is Zsh running in Arch Linux.\(dq
 .EE
 .SH AUTHORS
 iff.

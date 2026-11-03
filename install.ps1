@@ -49,15 +49,3 @@ if ($CurrentPath -notlike "*$InstallDir*") {
 }
 
 Write-Host "Installation of $($Release.tag_name) finished!"
-
-Write-Host "pay-respects has an optional AI module to provide suggestions when no rules match"
-Write-Host "The module works out-of-the-box with no data collection"
-Write-Host "Do you want to keep the AI module? (Y/n)" -ForegroundColor Yellow
-$Response = Read-Host
-if ($Response -eq "n" -or $Response -eq "N") {
-	$AIModulePath = Join-Path $InstallDir "_pay-respects-fallback-100-request-ai.exe"
-	if (Test-Path $AIModulePath) {
-		Remove-Item -Path $AIModulePath -Recurse -Force
-		Write-Host "AI module removed." -ForegroundColor Green
-	}
-}
