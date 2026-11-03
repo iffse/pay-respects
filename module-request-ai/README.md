@@ -1,83 +1,75 @@
 # Request AI Module
 
-Module for [pay-respects](https://codeberg.org/iff/pay-respects) to request AI for suggestions.
+Adds AI suggestions to [pay-respects] when no rule matches.
 
-## Configurations
+[pay-respects]: https://codeberg.org/iff/pay-respects
+
+## Configuration
 
 The module reads the same `config.toml` as pay-respects:
 
 ```toml
 [module.request-ai]
-# Enable AI suggestions.
-# If unset, and no API key is configured, the module asks whether to use the
-# built-in API key.
+# Set to true or false. When unset and no API key is configured, the module
+# asks whether to use the built-in key.
 enabled = true
 
-# Your own API key. Leave unset to use the built-in API key.
+# Your API key. Leave unset to use the built-in key.
 api_key = "..."
 
-# Any OpenAI compatible URL can be used, e.g.:
-# - https://api.openai.com/v1/chat/completions: OpenAI ChatGPT
+# Any OpenAI-compatible endpoint works:
+# - https://api.openai.com/v1/chat/completions: OpenAI
 # - https://api.groq.com/openai/v1/chat/completions: GroqCloud
 # - http://localhost:11434/v1/chat/completions: Local Ollama
 api_url = "https://api.openai.com/v1/chat/completions"
 
-# Model used. Reasoning models are also supported
+# Model name. Reasoning models work too.
 model = "gpt-4o-mini"
 
-# Extra Json field requests, e.g. `"temperature" = 0.5`
+# Extra JSON fields for the request, for example `"temperature" = 0.5`.
 extra = '"temperature" = 0.5'
 
-# A Json object for the `extra_body` field
+# JSON object for the `extra_body` field.
 extra_body = '{"chat_template_kwargs": {"enable_thinking": false}}'
 
-# Locale in which the AI explains the suggestion. Defaults to user system
-# locale. Useful when you use small models that speak only English, for
-# example.
+# Language for the explanation. Defaults to the system locale.
 locale = "en-US"
 
-# Additional prompts to be included. (Yes, you can include role-playing
-# prompts you pervert)
-# - User's environment is Zsh running in Arch Linux.
-# - You are a cute catgirl. Always use cute phrases and expressions to prove
-#   your cuteness in the <note> section, including cat imitations like nya~,
-#   にゃ~,　喵～.
+# Extra text added before the prompt.
 additional_prompt = "User's environment is Zsh running in Arch Linux."
 ```
 
-When `enabled` is not set:
+When `enabled` is unset:
 
-- If an API key is configured (in `config.toml` or via `_PR_AI_API_KEY`), the
-	module is enabled and uses that key.
-- Otherwise, the module asks whether to use the built-in API key. The regular
-	option applies to the current invocation only; the `(always)` options write
-	`enabled = true` or `enabled = false` to the user configuration file.
-- In non-interactive modes, or when no terminal is available, the module
-	skips the request instead of asking.
+- If an API key is configured in `config.toml` or `_PR_AI_API_KEY`, the module
+	uses that key.
+- Otherwise the module asks whether to use the built-in key. The first option
+	applies to this request. The `(always)` options also write `enabled = true`
+	or `enabled = false` to your config.
+- In non-interactive modes, or when stderr is not a terminal, the module skips
+	the prompt and sends no request.
 
-The following environment variables are still supported and take precedence
-over `config.toml`:
+Environment variables still work and override `config.toml`:
 
-- `_PR_AI_API_KEY`: Your own API key
-- `_PR_AI_URL`: Any OpenAI compatible URL (see `api_url` above)
-- `_PR_AI_MODEL`: Model used
-- `_PR_AI_EXTRA`: Extra Json field requests, e.g. `"temperature" = 0.5`
-- `_PR_AI_EXTRA_BODY`: A Json object for the `extra_body` field, e.g. `{"chat_template_kwargs": {"enable_thinking": false}}`
-- `_PR_AI_DISABLE`: Setting to any value disables AI integration
-- `_PR_AI_LOCALE`: Locale in which the AI explains the suggestion
-- `_PR_AI_ADDITIONAL_PROMPT`: Additional prompts to be included
+- `_PR_AI_API_KEY`: API key
+- `_PR_AI_URL`: OpenAI-compatible endpoint
+- `_PR_AI_MODEL`: Model name
+- `_PR_AI_EXTRA`: Extra JSON fields, for example `"temperature" = 0.5`
+- `_PR_AI_EXTRA_BODY`: JSON object for `extra_body`
+- `_PR_AI_DISABLE`: Any value disables the module
+- `_PR_AI_LOCALE`: Language for the explanation
+- `_PR_AI_ADDITIONAL_PROMPT`: Extra text added before the prompt
 
-Compile time variables: Default values for the respective variables above when not set
+These build-time variables set fallback values:
 
 - `_DEF_PR_AI_API_KEY`
 - `_DEF_PR_AI_URL`
 - `_DEF_PR_AI_MODEL`
 
-If default values were not provided, pay-respects' own values will be used
-after you agree to use the built-in API key. Your request will be filtered to
-avoid abuse usages. Request will then be forwarded to a LLM provider that will
-not use your data for training. This service is provided free and is not
-guaranteed to always work. Donations would be appreciated:
+If no compile-time defaults are set, pay-respects uses its own key after you
+agree to use it. The proxy filters requests for abuse, then forwards them to a
+provider that does not train on your data. The service is free and may stop at
+any time. Donations are welcome:
 
 <div>
 	<a
@@ -119,13 +111,17 @@ guaranteed to always work. Donations would be appreciated:
 	>
 </div>
 
-## Advanced Usages
+## Advanced Usage
 
-For non-trivial suggestions, you can add more context as comments (for Bash and Zsh, interactive comments needs to be explicitly enabled):
+Add context as a comment at the end of a command. Bash and Zsh need interactive
+comments enabled.
+
 ```sh
-rustup # how do I setup nightly toolchain?
+rustup # how do I set up the nightly toolchain?
 ```
-Or just a comment:
+
+A comment alone works too:
+
 ```sh
-# git cache credential for 3 hours
+# cache git credentials for 3 hours
 ```

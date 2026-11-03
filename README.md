@@ -1,65 +1,54 @@
 # Pay Respects
 
-Typed a wrong command or don't know what to do? Pay Respects will suggest a fix to your console command by simply pressing `F`!
+Typed a command wrong? Not sure what to do? Press `F` and pay-respects
+suggests a fix.
 
-- 🚀 **Blazing fast suggestion**: Sub-millisecond (<1ms) performance! See
+- 🚀 **Fast startup**: Initialization stays under 1 ms in the
 [benchmarks](#benchmarks).
-- 🎯 **Accurate results**: Suggestions are verified before being prompted to
-the user, no `sudo` suggestions when you are using `doas`!
-- ✏️ **Easy to write rules**: You don't need to know Rust. The rules are
-written in a TOML format that gets parsed into Rust code!
-- 🦀 **Full Rust capability**: Raw Rust code can be used if TOML rules are not
-enough for complex situations!
-- 🔩 **Modular**: TOML and Rust not your taste? Add sources using your favorite
-language with a custom module!
-- 🤖 **AI Support**: AI module comes in aid when there is no rule for your
-error!
-- 🪶 **Tiny binary size**: Not even 1MB for core features!
+- 🎯 **Checked suggestions**: Suggestions are validated before they reach you.
+If you use `doas`, you will not get a `sudo` suggestion.
+- ✏️ **Rules in TOML**: You do not need to know Rust. TOML rules are compiled
+into Rust code.
+- 🦀 **Rust for complex cases**: Use raw Rust when TOML is not enough.
+- 🔩 **Modules in any language**: A custom module only needs to print
+suggestions to stdout.
+- 🤖 **Optional AI**: The AI module answers when no rule matches.
+- 🪶 **Small binary**: The core binary is under 1 MB.
 
 ![showcase](https://raw.githubusercontent.com/iffse/static-assets/refs/heads/main/pay-respects/showcase.gif)
 
 ## How to Pay Respects
 
-Please follow the instruction for your shell:
+Pick your shell:
 
 <details>
 	<summary>Bash / Zsh / Fish</summary>
 
-> Append the following line to your configuration file (`--alias` no longer
-> required for v0.7+):
+> Add the matching line to your shell configuration file:
 > ```sh
 > eval "$(pay-respects bash --alias)"
 > eval "$(pay-respects zsh --alias)"
 > pay-respects fish --alias | source
 > ```
 > Arguments:
-> - `--alias [alias]`: Alias to a custom key, defaults to `f`
-> - `--nocnf`: Disables `command_not_found` handler
-
-> Manual aliasing (**REMOVED** after v0.7):
-> ```sh
-> alias f="$(pay-respects bash)"
-> alias f="$(pay-respects zsh)"
-> alias f="$(pay-respects fish)"
-> ```
+> - `--alias [alias]`: Key binding, defaults to `f`
+> - `--nocnf`: Disable the `command_not_found` handler
 
 </details>
 
 <details>
 	<summary>Nushell</summary>
 
-> Add the following output to your configuration file:
+> Add the generated lines to your Nushell config:
 > ```sh
-> # replace `nu` for `nush` or `nushell` if your executable is named differently
+> # replace `nu` with `nush` or `nushell` if your binary has a different name
 > pay-respects nu --alias [<alias>]
 > ```
 
-> Or save it as a file:
+> Or save them to a file and source it:
 > ```sh
 > pay-respects nu --alias [<alias>] | save -f ~/.pay-respects.nu
-> ```
-> and source from your config file:
-> ```sh
+>
 > source ~/.pay-respects.nu
 > ```
 
@@ -68,13 +57,13 @@ Please follow the instruction for your shell:
 <details>
 	<summary>PowerShell</summary>
 
-> Append the following output to your profile:
+> Add the generated lines to your profile:
 > ```pwsh
-> # replace `pwsh` for `powershell` if your executable is named differently
+> # replace `pwsh` with `powershell` if your binary has a different name
 > pay-respects pwsh --alias [<alias>]
 > ```
 
-> Or directly pipe the output to your profile:
+> Or append them directly:
 > ```pwsh
 > pay-respects pwsh --alias [<alias>] >> $PROFILE
 > ```
@@ -82,40 +71,37 @@ Please follow the instruction for your shell:
 </details>
 
 <details>
-	<summary>Custom initialization for arbitrary shell</summary>
+	<summary>Custom initialization for any shell</summary>
 
-> pay-respects only requires 2 environment variables to work:
+> pay-respects needs two environment variables:
 >
-> - `_PR_SHELL`: The binary name of the current working shell
-> - `_PR_LAST_COMMAND`: The last command
+> - `_PR_SHELL`: Binary name of the current shell
+> - `_PR_LAST_COMMAND`: Last command
 >
-> pay-respects echos back, if applicable, commands that should be evaluated by
-> the working shell, such as `cd` commands to change the directory
+> pay-respects prints commands that the shell should evaluate, such as `cd`.
 >
-> General example:
+> Example:
 > ```sh
 > eval $(_PR_SHELL=sh _PR_LAST_COMMAND="git comit" pay-respects)
 > ```
 
-> Following variables are not required, but can be used to reduce unnecessary
-> operations:
+> These variables are optional. They let pay-respects skip work:
 >
-> - `_PR_ALIAS`: A list of aliases to commands. Separated by newlines with
-> zsh-like formatting, e.g. `gc=git commit`
-> - `_PR_ERROR_MSG`: Error message from the previous command. `pay-respects`
-> will capture output from multiplexers or rerun previous command to get the
-> error message if absent
-> - `_PR_EXECUTABLES`: A space separated list of commands/executables.
-> `pay-respects` will search for `$PATH` if absent
+> - `_PR_ALIAS`: Aliases to commands, separated by newlines in zsh format,
+> for example `gc=git commit`
+> - `_PR_ERROR_MSG`: Error message from the previous command. If absent,
+> pay-respects reads it from a multiplexer log or reruns the command.
+> - `_PR_EXECUTABLES`: Space-separated list of executables. If absent,
+> pay-respects scans `$PATH`.
 
 </details>
 
-You can now **[Press `F` to Pay Respects]**!
+Press **[`F` to pay respects]**.
 
-[Press `F` to Pay Respects]: https://en.wikipedia.org/wiki/Press_F_to_pay_respects
+[`F` to pay respects]: https://en.wikipedia.org/wiki/Press_F_to_pay_respects
 
-You will also have a key-binding available on `Ctrl+X` for **experimental
-inline mode**, on-the-fly correction with no execution:
+`Ctrl+X` `Ctrl+X` runs experimental inline mode. It fixes the command in place
+without executing it:
 
 - `gitcommit` + `C-X` `C-X` → `git commit`
 - `z payrespe` + `C-X` `C-X` → `cd /home/iff/Code/pay-respects`
@@ -124,33 +110,31 @@ inline mode**, on-the-fly correction with no execution:
 	<summary>Integrations with other tools</summary>
 
 > - **tmux**, **GNU Screen**, **Zellij**, **WezTerm**, **kitty**:
-> 	- Command log capturing inside the session without the need to rerun commands
-> to get error messages. **Requires English locale** (actually `LANG=C`, which
-> output is used for matching) to guarantee correct logs.
-> 	- Requires a prompt prefix before your command. Initialization templates
-> set it for you automatically.
-> - **zoxide**: Uses zoxide's database to navigate through directories.
+> 	- Read the command log from the session. This avoids rerunning the command
+> to get its error message. Set `LANG=C` so the log matches reliably.
+> 	- The prompt must show a prefix before the command. The generated shell
+> config sets this up.
+> - **zoxide**: Uses its database to navigate directories.
 
 </details>
 
 <details>
-	<summary>Environment variable configurations</summary>
+	<summary>Environment variable configuration</summary>
 
-> - `_PR_LIB`: Directory of modules, analogous to `PATH`. If not provided,
->   search in `PATH` or compile-time provided value
-> - `_PR_PACKAGE_MANAGER`: Use defined package manager instead of
-> auto-detecting alphabetically. Empty value disables package search
-> functionality
-> 	- `_DEF_PR_PACKAGE_MANAGER`: compile-time value
+> - `_PR_LIB`: Module directories, separated like `PATH`. If unset,
+> pay-respects uses `PATH` and the compile-time value.
+> - `_PR_PACKAGE_MANAGER`: Package manager to use instead of guessing from an
+> alphabetical list. Set it to an empty value to disable package search.
+> 	- `_DEF_PR_PACKAGE_MANAGER`: Compile-time value
 
-> You can specify different modes to run with `_PR_MODE`:
+> `_PR_MODE` selects the run mode:
 >
-> - `noconfirm`: Execute suggestions without confirm
-> - `inline`: Returns best fix with no execution
-> - `echo`: Print suggestions to `stdout` without executing
-> - `cnf`: Used for command not found hook
+> - `noconfirm`: Execute a suggestion without confirmation
+> - `inline`: Print the best fix without executing it
+> - `echo`: Print suggestions to `stdout` without executing them
+> - `cnf`: Internal mode for the command-not-found hook
 >
-> Example usage with `noconfirm`:
+> Example with `noconfirm`:
 >
 > ```sh
 > # new versions
@@ -165,16 +149,16 @@ inline mode**, on-the-fly correction with no execution:
 > }
 > ```
 >
-> Relating to features:
+> Other options:
 >
-> - `_PR_NO_CONFIG`: Don't load configurations
-> - `_PR_NO_DESPERATE`: Disable desperate functions, which are slow but might
-> give better results
-> - `_PR_PREFIX`: Shell prefix before the command acting as identifier.
-> Required for multiplexer command log capturing
-> - Disabling integrations:
+> - `_PR_NO_CONFIG`: Skip configuration files
+> - `_PR_NO_DESPERATE`: Disable slow fallback checks that sometimes give a
+> better result
+> - `_PR_PREFIX`: Prompt prefix before the command. Needed to read logs from
+> multiplexers.
+> - Disable integrations:
 > 	- `_PR_NO_ZOXIDE`
-> 	- `_PR_NO_MULTIPLEXER`: Equivalent of turning all the followings:
+> 	- `_PR_NO_MULTIPLEXER`: Same as setting all of these:
 > 		- `_PR_NO_TMUX`
 > 		- `_PR_NO_SCREEN`
 > 		- `_PR_NO_ZELLIJ`
@@ -206,12 +190,12 @@ Install from your package manager if available:
 
 </details>
 
-Alternatively, install pre-built binaries from [GitHub releases]. Install
-scripts are available. For Unix:
+Pre-built binaries are on [GitHub releases]. Install scripts are also
+available. On Unix:
 ```sh
 curl -sSfL https://raw.githubusercontent.com/iffse/pay-respects/main/install.sh | sh
 ```
-For Windows, with PowerShell:
+On Windows, with PowerShell:
 ```pwsh
 irm https://raw.githubusercontent.com/iffse/pay-respects/main/install.ps1 | iex
 ```
@@ -219,18 +203,19 @@ irm https://raw.githubusercontent.com/iffse/pay-respects/main/install.ps1 | iex
 [GitHub releases]: https://github.com/iffse/pay-respects/releases
 
 <details>
-	<summary>Cargo / Compile from source (any OS/architecture supported by Rust)</summary>
+	<summary>Cargo / Compile from source (any OS and architecture supported by Rust)</summary>
 
-> This installation requires you to have Cargo (the Rust package manager) installed.
+> You need Cargo for this.
 
-> Install from [crates.io](https://crates.io/), modules are optional
+> Install the core package and any modules you want from
+> [crates.io](https://crates.io/):
 > ```sh
 > cargo install pay-respects
 > cargo install pay-respects-module-runtime-rules
 > cargo install pay-respects-module-request-ai
 > ```
 
-> Clone from git and install, suitable for adding custom compile-time rules:
+> A git clone is better if you want custom compile-time rules:
 > ```sh
 > git clone --depth 1 https://github.com/iffse/pay-respects
 > cd pay-respects
@@ -247,39 +232,36 @@ See [configuration](./config.md).
 
 ## Rules & Modules
 
-See the following pages:
-
 - [Writing rules (TOML or Rust)](./rules.md)
 - [Custom modules](./modules.md)
 
 ## AI Integration
 
-> **Disclaimer**: You are using AI generated content on your own risk. Please
-> double-check its suggestions before accepting.
+> **Disclaimer**: AI suggestions can be wrong. Check them before you accept
+> one.
 
 AI suggestions are opt-in. When `request-ai` is installed and no API key is
-configured, the module asks whether to use the built-in API key. The choice can
-be remembered in the configuration file:
+configured, the module asks whether to use the built-in key. You can remember
+the answer in the configuration file:
 
 ```toml
 [module.request-ai]
 enabled = true
 ```
 
-Set `enabled = false`, or set `_PR_AI_DISABLE` to any value, to disable AI
-suggestions:
+Set `enabled = false`, or set `_PR_AI_DISABLE` to any value, to turn AI
+suggestions off:
 
 ```sh
 export _PR_AI_DISABLE=1
 ```
 
-An API key is included with the source (your distribution might have stripped
-them out). It should always work unless I can no longer afford this public service or rate
-limits are reached.
+A built-in API key ships with the source. Some distributions remove it. The
+service is free while I can cover the cost. It may stop when rate limits hit.
 
-[I don't track nor store
+[The proxy does not track or store
 anything.](https://github.com/iffse/pay-respects-serverless)
-If it's useful to you, consider making a donation:
+If the service is useful to you, consider a donation:
 
 <div>
 	<a
@@ -321,19 +303,17 @@ If it's useful to you, consider making a donation:
 	>
 </div>
 
-[AI usages and API configurations](./module-request-ai/README.md)
+[AI usage and API configuration](./module-request-ai/README.md)
 
 ## Contributing
 
-Current option to write rules should cover most of the cases. We need more
-rules, contributions are welcomed!
+The current rule format covers most cases. More rules are welcome.
 
-There's also a [roadmap] for contribution opportunities.
+See the [roadmap] for open work.
 
 [roadmap]: ./roadmap.md
 
-This project is hosted at various sites, you can choose the one that you feel
-most comfortable with:
+The project is mirrored on several sites. Pick the one you prefer:
 
 - [Codeberg](https://codeberg.org/iff/pay-respects)
 - [GitHub](https://github.com/iffse/pay-respects)
@@ -348,10 +328,9 @@ most comfortable with:
 
 ## Benchmarks
 
-Benchmark script can be executed with `make bench` using `hyperfine`. Here are
-the results on my potato computer (AMD Ryzen 5 5600X, DDR4 2400 MHz, HDD 7200
-RPM with Btrfs transparent compression, glibc build), you can expect better
-results on yours.
+Run `make bench` with `hyperfine` to reproduce these numbers. The results below
+come from my machine (AMD Ryzen 5 5600X, DDR4 2400 MHz, HDD 7200 RPM with Btrfs
+compression, glibc build). Yours will differ.
 
 | Case                      | Results             |
 |---------------------------|---------------------|
@@ -367,14 +346,14 @@ results on yours.
 
 Caveats:
 
-- **Integrations are turned off**: In real usage you may feel a delay due to the
-execution of `zoxide` itself, for instance, which takes 50ms.
-- Binaries are **optimized for size, not speed**, using regex-lite instead of
-regex because it's smaller, although slower. A smaller binary helps in
-loading times, specially for cold runs.
+- **Integrations are off**: In real use, a delay can come from a tool such as
+`zoxide`. It takes about 50 ms on its own.
+- Binaries are **optimized for size, not speed**. They use regex-lite instead
+of regex because it is smaller, though slower. A smaller binary loads faster,
+especially on a cold run.
 
 ## Flowchart
 
-Here's a flowchart on how this program works:
+How it works:
 
 ![flowchart](https://raw.githubusercontent.com/iffse/static-assets/refs/heads/main/pay-respects/flowchart.svg)

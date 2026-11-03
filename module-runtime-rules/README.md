@@ -1,20 +1,20 @@
 # Runtime Rules Module
 
-Module for [pay-respects] which allows you to add rules at runtime.
+Adds runtime rules to [pay-respects].
 
-Syntax is currently 100% compatible with [upstream's compile-time rules].
+The syntax matches [upstream's compile-time rules].
 
 [pay-respects]: https://codeberg.org/iff/pay-respects
 [upstream's compile-time rules]: https://codeberg.org/iff/pay-respects/src/branch/main/rules.md
 
-Rules are searched in these directories:
+Rules are loaded from these directories:
 
-- `XDG_CONFIG_HOME`, defaults to `$HOME/.config`.
-- `XDG_CONFIG_DIRS`, defaults to `/etc/xdg`.
-- `XDG_DATA_DIRS`, defaults to `/usr/local/share:/usr/share`.
+- `XDG_CONFIG_HOME`, default `$HOME/.config`
+- `XDG_CONFIG_DIRS`, default `/etc/xdg`
+- `XDG_DATA_DIRS`, default `/usr/local/share:/usr/share`
 
-The actual rule file should be placed under `pay-respects/rules/`, for example:
-`~/.config/pay-respects/rules/cargo.toml`. To avoid parsing unnecessary rules,
-the name of the file **MUST** match the command name.
+Place rule files under `pay-respects/rules/`. For example,
+`~/.config/pay-respects/rules/cargo.toml`. The file name must match the command
+name. This avoids parsing rules that will never match.
 
-An exception is `_PR_GENERAL.toml` that is always parsed.
+`_PR_GENERAL.toml` is always parsed.
