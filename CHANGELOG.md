@@ -83,6 +83,8 @@ Tests:
 
 - Accepted privileged suggestions keep the privilege in shell history.
 Commands with redirections or pipelines use a shell wrapper.
+- The selection UI adapts to terminal resizes instead of keeping the layout
+it was started with.
 
 ## [0.8.8]
 
