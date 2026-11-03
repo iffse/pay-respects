@@ -286,6 +286,39 @@ pub fn compare_string(a: &str, b: &str) -> usize {
 	damerau_levenshtein_chars(&a, &b)
 }
 
+fn distance_if_within_one_edit(a: &str, b: &str) -> Option<usize> {
+	let a: Vec<char> = a.chars().collect();
+	let b: Vec<char> = b.chars().collect();
+
+	let (m, n) = (a.len(), b.len());
+
+	if m.abs_diff(n) > 1 {
+		return None;
+	}
+
+	if a == b {
+		return Some(0);
+	}
+
+	let mut i = 0;
+
+	while i < m.min(n) && a[i] == b[i] {
+		i += 1;
+	}
+
+	if m != n {
+		let (longer, shorter) = if m > n { (&a, &b) } else { (&b, &a) };
+
+		return (longer[i + 1..] == shorter[i..]).then_some(1);
+	}
+
+	if a[i + 1..] == b[i + 1..] {
+		return Some(1);
+	}
+
+	(i + 1 < m && a[i] == b[i + 1] && a[i + 1] == b[i] && a[i + 2..] == b[i + 2..]).then_some(1)
+}
+
 /// Trigram fuzzy similarity score between two strings in [0.0, 1.0]
 pub fn trigram_fuzzy_score(query: &str, text: &str) -> f32 {
 	if query.is_empty() || text.is_empty() {
@@ -421,17 +454,24 @@ fn trigram_edit_fuzzy_score_main(query: &str, text: &str, substring: bool) -> f3
 	} else {
 		trigram_jaccard_score(&query, &text)
 	};
-	// early rejection
-	if !too_short && tri < 0.01 {
-		crate::dlog!(
-			7,
-			"Early rejection comparing\n - '{}'\n - '{}'\n score: {}",
-			query,
-			text,
-			tri
-		);
-		return tri;
-	}
+	// Early rejection, preserving the distance for later reuse.
+	let known_distance = if !too_short && tri < 0.01 {
+		match distance_if_within_one_edit(&query, &text) {
+			Some(distance) => Some(distance),
+			None => {
+				crate::dlog!(
+					7,
+					"Early rejection comparing\n - '{}'\n - '{}'\n score: {}",
+					query,
+					text,
+					tri
+				);
+				return tri;
+			}
+		}
+	} else {
+		None
+	};
 
 	// bonuses
 	let mut bonus = 0.0;
@@ -451,7 +491,7 @@ fn trigram_edit_fuzzy_score_main(query: &str, text: &str, substring: bool) -> f3
 	let edit = if substring && !too_short {
 		best_substring_edit_score(&query, &text)
 	} else {
-		let dist = compare_string(&query, &text) as f32;
+		let dist = known_distance.unwrap_or_else(|| compare_string(&query, &text)) as f32;
 		(1.0 - dist / q_len.min(t_len) as f32).max(0.0)
 	};
 
@@ -775,5 +815,39 @@ mod tests {
 		let input = "vimhelloworld";
 		let result = segment(input, &dict);
 		assert_eq!(result, vec!["vim", "helloworld"]);
+	}
+
+	#[test]
+	fn detects_edits_within_one() {
+		assert_eq!(distance_if_within_one_edit("", ""), Some(0));
+		assert_eq!(distance_if_within_one_edit("", "a"), Some(1));
+		assert_eq!(distance_if_within_one_edit("abc", "ab"), Some(1));
+		assert_eq!(distance_if_within_one_edit("abc", "axc"), Some(1));
+		assert_eq!(distance_if_within_one_edit("abc", "acb"), Some(1));
+		assert_eq!(distance_if_within_one_edit("abc", "xyz"), None);
+		assert_eq!(distance_if_within_one_edit("abc", "abxy"), None);
+	}
+
+	#[test]
+	fn transposed_executable_should_beat_alias() {
+		let rustc_score = trigram_edit_fuzzy_score("rsutc", "rustc");
+		let alias_score = trigram_edit_fuzzy_score("rsutc", "gstc");
+		assert!(
+			rustc_score > alias_score,
+			"rustc ({rustc_score}) should outrank gstc ({alias_score})"
+		);
+	}
+
+	#[test]
+	fn unrelated_candidate_is_rejected() {
+		let score = trigram_edit_fuzzy_score("rsutc", "docker");
+		assert_eq!(score, 0.0);
+	}
+
+	#[test]
+	fn substring_match_is_preserved() {
+		let score = trigram_substring_edit_fuzzy_score("rustc", "prefix_rustc_suffix");
+
+		assert!(score > 0.0);
 	}
 }
