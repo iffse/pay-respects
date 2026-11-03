@@ -3,8 +3,8 @@
 Rule files live under [rules](./rules). Core parses them at build time. The
 `runtime-rules` module reads them from the user configuration at run time.
 
-New rules should use [version 2](#version-2). Version 1 still works, but the
-runtime module prints a warning when it loads one.
+New rules should use [version 2](#version-2). Version 1 is deprecated. See
+[version 1 rules](./rules-v1.md) for the old format and migration instructions.
 
 ## Locations
 
@@ -125,41 +125,6 @@ Print suggestions to `stdout`. Separate multiple suggestions with `<_PR_BR>`.
 Without the separator, each non-empty line becomes one suggestion.
 
 Variables are substituted in `interpreter` and `file` before they are used.
-
-## Version 1 (deprecated)
-
-```toml
-command = "hello"
-extends = ["goodbye"]
-
-[[match_err]]
-pattern = [
-	"pattern 1",
-]
-suggest = [
-'''
-#[executable(sudo), !cmd_contains(sudo)]
-sudo {{command}} '''
-]
-```
-
-In version 1, `extends` lists aliases. Conditions go inside a `#[...]` block at
-the start of the suggestion. Commas inside a regex must be escaped as `\,`.
-
-Version 1 remains supported at run time. Migrate to version 2 before it is
-removed.
-
-## Migrating from Version 1
-
-Use the built-in converter:
-
-```sh
-pay-respects --migrate-rules ~/.config/pay-respects/rules/git.toml > git.toml
-```
-
-The command writes the converted file to `stdout`. It accepts one file at a
-time. Comments are not preserved. Review the output before replacing the old
-file.
 
 ## Placeholders
 
