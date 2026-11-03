@@ -108,8 +108,7 @@ pub fn desperate_fuzzy_recovery(
 		for i in 2..split.len() + 1 {
 			head = split[..i].join("");
 
-			#[cfg(debug_assertions)]
-			eprintln!("i: {}, head: {}, lengh: {}", i, head, head.len());
+			pay_respects_utils::dlog!(7, "i: {}, head: {}, lengh: {}", i, head, head.len());
 
 			if head.len() >= get_search_threshold() {
 				split = std::iter::once(&head)
@@ -117,8 +116,7 @@ pub fn desperate_fuzzy_recovery(
 					.cloned()
 					.collect::<Vec<String>>();
 
-				#[cfg(debug_assertions)]
-				eprintln!("split: {:?}", split);
+				pay_respects_utils::dlog!(7, "split: {:?}", split);
 				break;
 			}
 		}
@@ -176,8 +174,8 @@ pub fn desperate_fuzzy_recovery(
 		}
 	}
 
-	#[cfg(debug_assertions)]
-	eprintln!(
+	pay_respects_utils::dlog!(
+		6,
 		"split and segments:\n - split: {:?}\n - segments: {:?}",
 		split[0..].iter().collect::<Vec<&String>>(),
 		segments

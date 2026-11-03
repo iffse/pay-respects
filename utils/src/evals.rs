@@ -85,8 +85,7 @@ pub fn eval_shell_command(shell: &str, command: &str) -> Vec<String> {
 
 /// Split the full command into command and arguments
 pub fn split_command(command: &str) -> Vec<String> {
-	#[cfg(debug_assertions)]
-	eprintln!("command: {command}");
+	crate::dlog!(7, "command: {}", command);
 	// this regex splits the command separated by spaces, except when the space
 	// - is escaped by a backslash
 	// - surrounded by quotes
@@ -216,8 +215,13 @@ pub fn edit_distance_best(typo: &str, candidates: &[String]) -> Option<String> {
 			min_distance = distance;
 			min_distance_index = Some(i);
 		}
-		#[cfg(debug_assertions)]
-		eprintln!("comparing '{typo}' with '{candidate}': distance = {distance}");
+		crate::dlog!(
+			6,
+			"comparing '{}' with '{}': distance = {}",
+			typo,
+			candidate,
+			distance
+		);
 
 		// finding self, not a typo
 		if distance == 0 {
@@ -238,8 +242,13 @@ pub fn edit_distance_bests(typo: &str, candidates: &[String]) -> Option<Vec<Stri
 			continue;
 		}
 		let distance = compare_string(typo, candidate);
-		#[cfg(debug_assertions)]
-		eprintln!("comparing '{typo}' with '{candidate}': distance = {distance}");
+		crate::dlog!(
+			6,
+			"comparing '{}' with '{}': distance = {}",
+			typo,
+			candidate,
+			distance
+		);
 		use std::cmp::Ordering::*;
 		match distance.cmp(&min_distance) {
 			Equal => {
@@ -372,12 +381,10 @@ pub fn fuzzy_best_n_main(
 
 	results.retain(|m| m.score >= bottom_line);
 	results.truncate(limit);
+	crate::dlog!(6, "Fuzzy search results for query '{}':", query);
 	#[cfg(debug_assertions)]
-	{
-		eprintln!("Fuzzy search results for query '{query}':");
-		for m in &results {
-			eprintln!(" - '{}' (score: {:.2})", m.text, m.score);
-		}
+	for m in &results {
+		crate::dlog!(6, " - '{}' (score: {:.2})", m.text, m.score);
 	}
 	Some(results.into_iter().map(|m| m.text.to_string()).collect())
 }
@@ -416,10 +423,13 @@ fn trigram_edit_fuzzy_score_main(query: &str, text: &str, substring: bool) -> f3
 	};
 	// early rejection
 	if !too_short && tri < 0.01 {
-		#[cfg(debug_assertions)]
-		{
-			eprintln!("Early rejection comparing\n - '{query}'\n - '{text}'\n score: {tri}");
-		}
+		crate::dlog!(
+			7,
+			"Early rejection comparing\n - '{}'\n - '{}'\n score: {}",
+			query,
+			text,
+			tri
+		);
 		return tri;
 	}
 
@@ -458,18 +468,16 @@ fn trigram_edit_fuzzy_score_main(query: &str, text: &str, substring: bool) -> f3
 	}
 	.min(1.0);
 
-	#[cfg(debug_assertions)]
-	{
-		eprintln!(
-			"Comparing
-- '{query}'
-- '{text}'
- trigram score: {tri}
- edit score: {edit}
- bonus: {bonus}
- final score: {score}"
-		);
-	}
+	crate::dlog!(
+		6,
+		"Comparing\n- '{}'\n- '{}'\n trigram score: {}\n edit score: {}\n bonus: {}\n final score: {}",
+		query,
+		text,
+		tri,
+		edit,
+		bonus,
+		score
+	);
 
 	score
 }
@@ -636,9 +644,12 @@ pub fn segment(input: &str, dict: &[String]) -> Vec<String> {
 				// fuzzy recovery: try to find a close match in the dictionary and use that instead of the original word
 				for (idx, dict_word) in dict.iter().enumerate() {
 					if let Some(cost) = fuzzy_match_cost(word, dict_word) {
-						#[cfg(debug_assertions)]
-						eprintln!(
-							"[segment fuzzy] cost between '{word}' and '{dict_word}': {cost}"
+						crate::dlog!(
+							7,
+							"[segment fuzzy] cost between '{}' and '{}': {}",
+							word,
+							dict_word,
+							cost
 						);
 
 						best_cost = match best_cost {

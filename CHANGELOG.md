@@ -42,6 +42,11 @@ Shell integrations:
 - Shell type is auto-detected from the shell binary name. Use `--shell-type`
 for renamed binaries such as `zsh-fork`.
 
+Debugging:
+
+- Debug builds can write debug logs to `stderr` or a file with `_PR_LOG`.
+`_PR_LOG_LEVEL` controls verbosity.
+
 CLI:
 
 - `--migrate-rules` converts version 1 rule files to version 2.

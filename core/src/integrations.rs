@@ -16,12 +16,6 @@ pub fn get_error_from_multiplexer(
 	prompt_prefix: &Option<String>,
 	command: &str,
 ) -> Option<String> {
-	// in debug mode the output is not clear due to logs
-	#[cfg(debug_assertions)]
-	{
-		return None;
-	}
-
 	if std::env::var("_PR_NO_MULTIPLEXER").is_ok() {
 		return None;
 	}
@@ -34,30 +28,25 @@ pub fn get_error_from_multiplexer(
 
 	// terminal multiplexers, higher priority
 	if let Some(error) = get_error_from_tmux(shell, prefix, command) {
-		#[cfg(debug_assertions)]
-		eprintln!("Error captured from tmux: '{}'", error);
+		pay_respects_utils::dlog!(3, "Error captured from tmux: '{}'", error);
 		return Some(error);
 	}
 	if let Some(error) = get_error_from_screen(shell, prefix, command) {
-		#[cfg(debug_assertions)]
-		eprintln!("Error captured from screen: '{}'", error);
+		pay_respects_utils::dlog!(3, "Error captured from screen: '{}'", error);
 		return Some(error);
 	}
 	if let Some(error) = get_error_from_zellij(shell, prefix, command) {
-		#[cfg(debug_assertions)]
-		eprintln!("Error captured from zellij: '{}'", error);
+		pay_respects_utils::dlog!(3, "Error captured from zellij: '{}'", error);
 		return Some(error);
 	}
 
 	// terminals that support capturing output
 	if let Some(error) = get_error_from_kitty(shell, prefix, command) {
-		#[cfg(debug_assertions)]
-		eprintln!("Error captured from kitty: '{}'", error);
+		pay_respects_utils::dlog!(3, "Error captured from kitty: '{}'", error);
 		return Some(error);
 	}
 	if let Some(error) = get_error_from_wezterm(shell, prefix, command) {
-		#[cfg(debug_assertions)]
-		eprintln!("Error captured from wezterm: '{}'", error);
+		pay_respects_utils::dlog!(3, "Error captured from wezterm: '{}'", error);
 		return Some(error);
 	}
 	None

@@ -5,7 +5,6 @@ use std::time::{Duration, Instant};
 
 use colored::Colorize;
 use pay_respects_select::select;
-use pay_respects_utils::log::dlog;
 use pay_respects_utils::strings::{format_prefix, print_error, remove_color_codes};
 
 use crate::config;
@@ -110,8 +109,7 @@ fn get_standard_suggestions(data: &Data) -> Option<Vec<String>> {
 
 pub fn select_candidate(data: &mut Data) {
 	let candidates = &data.candidates;
-	#[cfg(debug_assertions)]
-	eprintln!("candidates: {candidates:?}");
+	pay_respects_utils::dlog!(2, "candidates: {:?}", candidates);
 
 	let active_candidates = candidates
 		.iter()
@@ -159,8 +157,7 @@ pub fn execute_suggestion(data: &Data) -> Result<(), String> {
 	let shell = &data.shell_type;
 	let command = &data.suggest.clone().unwrap();
 	let history_command = history_command(&data.shell, data.privilege.as_deref(), command);
-	#[cfg(debug_assertions)]
-	eprintln!("running command: {command}");
+	pay_respects_utils::dlog!(2, "running command: {}", command);
 
 	let eval_method = &data.config.eval_method;
 	if eval_method == &config::EvalMethod::Shell {
@@ -244,8 +241,7 @@ pub fn shell_execution(data: &Data, command: &str) {
 fn get_suggestion_error(data: &Data, command: &str) -> Result<(), String> {
 	let shell = &data.shell;
 	if let Some(err) = get_error_from_multiplexer(shell, &data.prompt_prefix, &data.input_command) {
-		let message = format!("Captured output from multiplexer: '{}'", err);
-		dlog(5, &message);
+		pay_respects_utils::dlog!(3, "Captured output from multiplexer: '{}'", err);
 		return Err(err);
 	}
 

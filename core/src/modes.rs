@@ -195,8 +195,7 @@ pub fn cnf(data: &mut Data) {
 		};
 		data.config.set_package_manager(&package_manager);
 
-		#[cfg(debug_assertions)]
-		eprintln!("package_manager: {}", package_manager);
+		pay_respects_utils::dlog!(2, "package_manager: {}", package_manager);
 
 		let packages = match system::get_packages(data, &package_manager, &executable) {
 			Some(packages) => packages,
@@ -206,8 +205,7 @@ pub fn cnf(data: &mut Data) {
 			}
 		};
 
-		#[cfg(debug_assertions)]
-		eprintln!("packages: {:?}", packages);
+		pay_respects_utils::dlog!(2, "packages: {:?}", packages);
 
 		// change default install method based on package manager
 		data.config.set_install_method();

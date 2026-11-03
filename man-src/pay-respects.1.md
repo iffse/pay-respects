@@ -125,6 +125,13 @@ command to get the error message if absent
 _PR_EXECUTABLES
 : A space separated list of commands/executables. `pay-respects` will search for `$PATH` if absent
 
+_PR_LOG
+: Debug builds only. Debug log destination. Use `stderr`, a file path, or
+`1` for `pay-respects.log` in the current directory. Unset disables logs
+
+_PR_LOG_LEVEL
+: Maximum debug log level, default `5`
+
 _PR_LIB
 : Directory of modules, analogous to `PATH`. If not provided,
 search in `PATH` or compile-time provided value

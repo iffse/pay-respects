@@ -274,8 +274,7 @@ pub fn install_package(data: &mut Data, package_manager: &str, install: &str) ->
 		_ => elevate(data, &mut install),
 	}
 
-	#[cfg(debug_assertions)]
-	eprintln!("install: {}", install);
+	pay_respects_utils::dlog!(2, "install: {}", install);
 
 	let output = if let Some(prefix) = &data.prompt_prefix {
 		format_prefix(prefix, &install)

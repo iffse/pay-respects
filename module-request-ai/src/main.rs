@@ -71,11 +71,7 @@ async fn main() -> Result<(), std::io::Error> {
 	let command = std::env::var("_PR_LAST_COMMAND").expect("_PR_LAST_COMMAND not set");
 	let error = std::env::var("_PR_ERROR_MSG").expect("_PR_ERROR_MSG not set");
 
-	#[cfg(debug_assertions)]
-	{
-		eprintln!("last_command: {}", command);
-		eprintln!("error_msg: {}", error);
-	}
+	pay_respects_utils::dlog!(2, "last_command: {}\nerror_msg: {}", command, error);
 
 	// skip for commands with no arguments,
 	// very likely to be an error showing the usage

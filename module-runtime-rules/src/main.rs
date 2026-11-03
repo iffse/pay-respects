@@ -47,14 +47,15 @@ fn main() -> Result<(), std::io::Error> {
 	let mut last_command = std::env::var("_PR_LAST_COMMAND").expect("_PR_LAST_COMMAND not set");
 	let error_msg = std::env::var("_PR_ERROR_MSG").expect("_PR_ERROR_MSG not set");
 
-	#[cfg(debug_assertions)]
-	{
-		eprintln!("shell: {}", shell);
-		eprintln!("shell_type: {}", shell_type);
-		eprintln!("executable: {}", executable);
-		eprintln!("last_command: {}", last_command);
-		eprintln!("error_msg: {}", error_msg);
-	}
+	pay_respects_utils::dlog!(
+		2,
+		"shell: {}\nshell_type: {}\nexecutable: {}\nlast_command: {}\nerror_msg: {}",
+		shell,
+		shell_type,
+		executable,
+		last_command,
+		error_msg
+	);
 
 	let mut split = split_command(&last_command);
 	if split_comment(&mut split).is_some() {

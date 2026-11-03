@@ -84,8 +84,7 @@ impl Data {
 			"".to_string()
 		};
 
-		#[cfg(debug_assertions)]
-		eprintln!("lib_dir: {:?}", lib_dir);
+		pay_respects_utils::dlog!(2, "lib_dir: {:?}", lib_dir);
 
 		(executables, modules, fallbacks) = if let Some(lib_dir) = lib_dir {
 			let mut modules = vec![];
@@ -193,18 +192,18 @@ impl Data {
 		// setting utils functions
 		pay_respects_utils::settings::load_config();
 
-		#[cfg(debug_assertions)]
-		{
-			eprintln!("/// data initialization");
-			eprintln!("shell: {}", init.shell);
-			eprintln!("shell_type: {}", init.shell_type);
-			eprintln!("env: {:?}", init.env);
-			eprintln!("command: {}", init.command);
-			eprintln!("error: {}", init.error);
-			eprintln!("modules: {:?}", init.modules);
-			eprintln!("fallbacks: {:?}", init.fallbacks);
-			eprintln!("mode: {:?}", init.mode);
-		}
+		pay_respects_utils::dlog!(
+			1,
+			"/// data initialization\nshell: {}\nshell_type: {}\nenv: {:?}\ncommand: {}\nerror: {}\nmodules: {:?}\nfallbacks: {:?}\nmode: {:?}",
+			init.shell,
+			init.shell_type,
+			init.env,
+			init.command,
+			init.error,
+			init.modules,
+			init.fallbacks,
+			init.mode
+		);
 
 		init
 	}
@@ -215,8 +214,7 @@ impl Data {
 		}
 		let alias = self.alias.as_ref().unwrap();
 		if let Some(command) = expand_alias_multiline(alias, &self.command) {
-			#[cfg(debug_assertions)]
-			eprintln!("expand_command: {}", command);
+			pay_respects_utils::dlog!(2, "expand_command: {}", command);
 			self.update_command(&command);
 		}
 	}
@@ -227,8 +225,7 @@ impl Data {
 		}
 		let alias = self.alias.as_ref().unwrap();
 		if let Some(suggest) = expand_alias_multiline(alias, self.suggest.as_ref().unwrap()) {
-			#[cfg(debug_assertions)]
-			eprintln!("expand_suggest: {}", suggest);
+			pay_respects_utils::dlog!(2, "expand_suggest: {}", suggest);
 			self.update_suggest(&suggest);
 		}
 	}

@@ -127,8 +127,7 @@ pub async fn ai_suggestion(last_command: &str, error_msg: &str, locale: &str, co
 	.trim()
 	.to_string();
 
-	#[cfg(debug_assertions)]
-	eprintln!("AI module: AI prompt: {}", ai_prompt);
+	pay_respects_utils::dlog!(6, "AI module: AI prompt: {}", ai_prompt);
 
 	let extra = std::env::var("_PR_AI_EXTRA")
 		.ok()

@@ -119,6 +119,9 @@ Pick your shell:
 > pay-respects reads it from a multiplexer log or reruns the command.
 > - `_PR_EXECUTABLES`: Space-separated list of executables. If absent,
 > pay-respects scans `$PATH`.
+> - `_PR_LOG`: Debug builds only. Write debug logs to `stderr` or a file path.
+> `1` writes `pay-respects.log` in the current directory. Unset disables logs.
+> - `_PR_LOG_LEVEL`: Maximum debug log level, default `5`.
 
 </details>
 

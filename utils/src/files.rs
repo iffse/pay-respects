@@ -17,8 +17,7 @@ pub fn get_path_files() -> Vec<String> {
 
 	let path_env = path_env();
 
-	#[cfg(debug_assertions)]
-	eprintln!("path_env: {path_env}");
+	crate::dlog!(6, "path_env: {}", path_env);
 
 	let path_env_sep = path_env_sep();
 
@@ -28,8 +27,7 @@ pub fn get_path_files() -> Vec<String> {
 		#[cfg(windows)]
 		let p = path_convert(p);
 
-		#[cfg(debug_assertions)]
-		eprintln!("p={p}");
+		crate::dlog!(7, "p={}", p);
 
 		let files = match std::fs::read_dir(p) {
 			Ok(files) => files,
@@ -52,12 +50,7 @@ pub fn get_path_files() -> Vec<String> {
 		}
 	}
 
-	#[cfg(debug_assertions)]
-	{
-		let mut all_executable = all_executable.clone();
-		all_executable.sort_unstable();
-		eprintln!("all_executable={all_executable:?}");
-	}
+	crate::dlog!(7, "all_executable={:?}", all_executable);
 
 	all_executable
 		.iter()
@@ -78,8 +71,7 @@ pub fn best_match_file(input: &str) -> Option<String> {
 	} else {
 		replace_escaped_character(input, ' ', " ")
 	};
-	#[cfg(debug_assertions)]
-	eprintln!("best_match_file input: {input}");
+	crate::dlog!(5, "best_match_file input: {}", input);
 	let mut exit_dirs = Vec::new();
 	let mut files = loop {
 		match std::fs::read_dir(&input) {
@@ -102,8 +94,7 @@ pub fn best_match_file(input: &str) -> Option<String> {
 			.map(|file| file.unwrap().file_name().into_string().unwrap())
 			.collect::<Vec<String>>();
 
-		#[cfg(debug_assertions)]
-		eprintln!("dir_files: {dir_files:?}");
+		crate::dlog!(6, "dir_files: {:?}", dir_files);
 
 		let best_match = find_similar(&exit_dir, &dir_files);
 		best_match.as_ref()?;
@@ -115,14 +106,14 @@ pub fn best_match_file(input: &str) -> Option<String> {
 		};
 	}
 
-	#[cfg(debug_assertions)]
-	{
-		eprintln!("best_match_file final input: {input}");
-		eprintln!("shell type is: {:?}", get_shell_type());
-	}
+	crate::dlog!(5, "best_match_file final input: {}", input);
+	crate::dlog!(6, "shell type is: {:?}", get_shell_type());
 	let input = shell_path_post_processing(&input);
-	#[cfg(debug_assertions)]
-	eprintln!("best_match_file final input after shell postprocessing: {input}");
+	crate::dlog!(
+		5,
+		"best_match_file final input after shell postprocessing: {}",
+		input
+	);
 	Some(input)
 }
 

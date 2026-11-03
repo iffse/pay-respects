@@ -1,6 +1,5 @@
 use askama::Template;
 use pay_respects_utils::lists::{alias_skip_expand, blocking_commands, privilege_list};
-use pay_respects_utils::log::dlog;
 use pay_respects_utils::shell::{
 	ShellType, detect_shell_type, get_shell_type as get_global_shell_type, normalize_shell_type,
 };
@@ -92,12 +91,10 @@ pub fn add_candidates_no_dup(
 	if new_candidates.is_empty() {
 		return;
 	}
+	pay_respects_utils::dlog!(2, "Adding candidates for command: '{}'", command);
 	#[cfg(debug_assertions)]
-	{
-		eprintln!("Adding candidates for command: '{}'", command);
-		for candidate in new_candidates {
-			eprintln!("  - '{}'", candidate.trim());
-		}
+	for candidate in new_candidates {
+		pay_respects_utils::dlog!(2, "  - '{}'", candidate.trim());
 	}
 	for candidate in new_candidates {
 		let candidate = candidate.trim();
@@ -117,8 +114,7 @@ pub fn get_error(shell: &str, command: &str, data: &Data) -> String {
 		return error_msg;
 	} else {
 		let timeout = data.config.timeout;
-		#[cfg(debug_assertions)]
-		eprintln!("timeout: {}", timeout);
+		pay_respects_utils::dlog!(2, "timeout: {}", timeout);
 
 		let executable = data.get_executable();
 		if executable.is_empty() {
@@ -137,8 +133,7 @@ pub fn get_error(shell: &str, command: &str, data: &Data) -> String {
 		if let Some(error) =
 			get_error_from_multiplexer(shell, &data.prompt_prefix, &data.input_command)
 		{
-			let message = format!("Captured output from multiplexer: '{}'", error);
-			dlog(5, &message);
+			pay_respects_utils::dlog!(3, "Captured output from multiplexer: '{}'", error);
 			error
 		} else {
 			error_output_threaded(shell, command, timeout)

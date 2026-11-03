@@ -115,6 +115,16 @@ _PR_EXECUTABLES
 A space separated list of commands/executables.
 \f[CR]pay\-respects\f[R] will search for \f[CR]$PATH\f[R] if absent
 .TP
+_PR_LOG
+Debug builds only.
+Debug log destination.
+Use \f[CR]stderr\f[R], a file path, or \f[CR]1\f[R] for
+\f[CR]pay\-respects.log\f[R] in the current directory.
+Unset disables logs
+.TP
+_PR_LOG_LEVEL
+Maximum debug log level, default \f[CR]5\f[R]
+.TP
 _PR_LIB
 Directory of modules, analogous to \f[CR]PATH\f[R].
 If not provided, search in \f[CR]PATH\f[R] or compile\-time provided
