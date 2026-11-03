@@ -16,6 +16,18 @@ pub enum Functions {
 
 use Functions::*;
 
+impl Functions {
+	pub fn from_name(name: &str) -> Option<Self> {
+		match name {
+			"DesperateFileLookUp" => Some(DesperateFileLookUp),
+			"DesperateFuzzyRecovery" => Some(DesperateFuzzyRecovery),
+			"SetPrivilege" => Some(SetPrivilege),
+			"ZoxideIntegration" => Some(ZoxideIntegration),
+			_ => None,
+		}
+	}
+}
+
 #[allow(unused_variables)]
 #[allow(clippy::too_many_arguments)]
 pub fn rules_function(

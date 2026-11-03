@@ -64,7 +64,7 @@ pub fn highlight_difference(data: &Data, suggested_command: &str, active: bool) 
 			|| suggested_command.contains('>'))
 	{
 		split_suggested_command[1] =
-			color_diff(&format!("{} -c \"\n", shell), active) + &split_suggested_command[1];
+			color_diff(&format!("{} -c \"\n", shell), active) + split_suggested_command[1].as_str();
 		let len = split_suggested_command.len() - 1;
 		split_suggested_command[len] =
 			split_suggested_command[len].clone() + color_diff("\n\"", active).as_str();
@@ -75,8 +75,8 @@ pub fn highlight_difference(data: &Data, suggested_command: &str, active: bool) 
 			|| suggested_command.contains("||")
 			|| suggested_command.contains('>')
 		{
-			split_suggested_command[0] =
-				color_same(&format!("{} -c \"\n", shell), active) + &split_suggested_command[0];
+			split_suggested_command[0] = color_same(&format!("{} -c \"\n", shell), active)
+				+ split_suggested_command[0].as_str();
 			let len = split_suggested_command.len() - 1;
 			split_suggested_command[len] =
 				split_suggested_command[len].clone() + color_same("\n\"", active).as_str();

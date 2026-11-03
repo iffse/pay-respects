@@ -1,63 +1,65 @@
-use crate::data::Data;
-use pay_respects_parser::{parse_inline_rules, parse_rules};
-use pay_respects_utils::{evals::*, modes::Mode};
+use std::sync::LazyLock;
 
-#[allow(unused)]
-use crate::rules_function::{Functions::*, rules_function};
+use pay_respects_parser::parse_rules;
+use pay_respects_rule_engine::{Context, Mode as RuleMode, NoScripts, RuleSet, evaluate_all};
+use pay_respects_utils::evals::split_command;
+use pay_respects_utils::modes::Mode;
+
+use crate::data::Data;
+use crate::rules_function::{Functions, rules_function};
+
+static RULES: LazyLock<Vec<RuleSet>> = LazyLock::new(|| parse_rules!("rules"));
 
 pub fn match_rule(executable: &str, data: &Data) -> Option<Vec<String>> {
-	use Mode::*;
-	match data.mode {
-		Inline => match_inline(executable, data),
-		_ => match_pattern(executable, data),
-	}
-}
+	let mode = match data.mode {
+		Mode::Inline => RuleMode::Inline,
+		_ => RuleMode::Suggestion,
+	};
+	let context = Context {
+		shell: &data.shell,
+		last_command: &data.command,
+		error_msg: &data.error,
+		executables: &data.executables,
+	};
 
-fn match_pattern(executable: &str, data: &Data) -> Option<Vec<String>> {
-	// variables to be used by parsed rules
-	let error_msg = &data.error;
-	let error_lower = error_msg
-		.split_whitespace()
-		.collect::<Vec<_>>()
-		.join("")
-		.to_lowercase();
-	let shell = &data.shell;
-	let last_command = &data.command;
-	let executables = &data.executables;
-	let mut candidates = vec![];
-	let split = split_command(last_command);
+	let mut functions = |name: &str, _context: &Context| -> Vec<String> {
+		let Some(function) = Functions::from_name(name) else {
+			return Vec::new();
+		};
+		let error_lower = data
+			.error
+			.split_whitespace()
+			.collect::<Vec<&str>>()
+			.join("")
+			.to_lowercase();
+		let split = split_command(&data.command);
+		let mut candidates = Vec::new();
+		rules_function(
+			function,
+			&data.error,
+			&error_lower,
+			&data.shell,
+			&data.command,
+			&data.executables,
+			&split,
+			&mut candidates,
+			data,
+		);
+		candidates
+	};
 
-	// parse rules into rust code
-	parse_rules!("rules");
-
+	let mut scripts = NoScripts;
+	let candidates = evaluate_all(
+		&RULES,
+		executable,
+		&context,
+		mode,
+		&mut functions,
+		&mut scripts,
+	);
 	if candidates.is_empty() {
-		return None;
+		None
+	} else {
+		Some(candidates)
 	}
-	Some(candidates)
-}
-
-#[allow(dead_code)]
-#[allow(unused)]
-fn match_inline(executable: &str, data: &Data) -> Option<Vec<String>> {
-	// variables to be used by parsed rules
-	// error variables are not used by inlines, they are here for reusing codes
-	let error_msg = &data.error;
-	let error_lower = error_msg
-		.split_whitespace()
-		.collect::<Vec<_>>()
-		.join("")
-		.to_lowercase();
-	let shell = &data.shell;
-	let last_command = &data.command;
-	let executables = &data.executables;
-	let mut candidates = vec![];
-	let split = split_command(last_command);
-
-	// parse rules into rust code
-	parse_inline_rules!("rules");
-
-	if candidates.is_empty() {
-		return None;
-	}
-	Some(candidates)
 }

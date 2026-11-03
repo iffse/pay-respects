@@ -15,24 +15,27 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 mod config;
-mod replaces;
-mod rules;
+mod loader;
+mod script;
+
+use std::path::Path;
+
+use pay_respects_rule_engine::{Context, Mode as RuleMode, NoFunctions, evaluate_rule};
 use pay_respects_utils::{
 	evals::{split_command, split_comment},
 	files::get_path_files,
-	modes::run_mode,
+	modes::{Mode, run_mode},
 };
 
 use crate::config::{get_target_rule, load_config};
+use crate::loader::{RuleLoader, script_dirs};
+use crate::script::ExternalScripts;
 
 fn main() -> Result<(), std::io::Error> {
 	let executable = std::env::var("_PR_COMMAND").expect("_PR_COMMAND not set");
 	let shell = std::env::var("_PR_SHELL").expect("_PR_SHELL not set");
 	let mut last_command = std::env::var("_PR_LAST_COMMAND").expect("_PR_LAST_COMMAND not set");
 	let error_msg = std::env::var("_PR_ERROR_MSG").expect("_PR_ERROR_MSG not set");
-	let executables: Vec<String> = get_path_files();
-
-	let mode = run_mode();
 
 	#[cfg(debug_assertions)]
 	{
@@ -40,7 +43,6 @@ fn main() -> Result<(), std::io::Error> {
 		eprintln!("executable: {}", executable);
 		eprintln!("last_command: {}", last_command);
 		eprintln!("error_msg: {}", error_msg);
-		eprintln!("executables: {:?}", executables);
 	}
 
 	let mut split = split_command(&last_command);
@@ -54,37 +56,59 @@ fn main() -> Result<(), std::io::Error> {
 	let config = load_config();
 	let target_rule = get_target_rule(&executable, &config);
 
-	let mut runned_rules = vec![];
-	let mut pending_rules = vec![target_rule];
+	let mut loader = RuleLoader::new();
+	let mut rules = Vec::new();
 
-	while let Some(executable) = pending_rules.pop() {
-		if runned_rules.contains(&executable) {
-			continue;
-		}
-		runned_rules.push(executable.clone());
-		let extends = rules::runtime_match(
-			&mode,
-			&executable,
-			&shell,
-			&last_command,
-			&error_msg,
-			&executables,
-		);
-		if let Some(extends) = extends {
-			for extend in extends {
-				if !runned_rules.contains(&extend) {
-					pending_rules.push(extend);
-				}
-			}
+	if let Some(loaded) = loader.load(&target_rule) {
+		rules.push(loaded.clone());
+	}
+	if !target_rule.eq_ignore_ascii_case("_PR_GENERAL")
+		&& let Some(loaded) = loader.load("_PR_GENERAL")
+	{
+		rules.push(loaded.clone());
+	}
+
+	let executables = if rules.iter().any(|rule| rule.rule.needs_executables()) {
+		load_executables()
+	} else {
+		Vec::new()
+	};
+	let script_dirs = script_dirs();
+
+	let mode = match run_mode() {
+		Mode::Inline => RuleMode::Inline,
+		_ => RuleMode::Suggestion,
+	};
+	let context = Context {
+		shell: &shell,
+		last_command: &last_command,
+		error_msg: &error_msg,
+		executables: &executables,
+	};
+
+	let mut functions = NoFunctions;
+	for loaded in &rules {
+		let rule_dir = loaded.path.parent().unwrap_or(Path::new("."));
+		let mut scripts = ExternalScripts::new(rule_dir, &script_dirs);
+		for suggestion in evaluate_rule(&loaded.rule, &context, mode, &mut functions, &mut scripts)
+		{
+			print!("{}", suggestion);
+			print!("<_PR_BR>");
 		}
 	}
-	rules::runtime_match(
-		&mode,
-		"_PR_GENERAL",
-		&shell,
-		&last_command,
-		&error_msg,
-		&executables,
-	);
+
 	Ok(())
+}
+
+fn load_executables() -> Vec<String> {
+	if let Ok(executables) = std::env::var("_PR_EXECUTABLES")
+		&& !executables.is_empty()
+	{
+		return executables
+			.split(' ')
+			.map(str::to_string)
+			.collect::<Vec<String>>();
+	}
+
+	get_path_files()
 }

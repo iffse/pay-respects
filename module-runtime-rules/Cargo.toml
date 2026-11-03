@@ -12,11 +12,10 @@ include = ["**/*.rs"]
 
 
 [dependencies]
-regex-lite = "0.1"
-
 toml = { version = "1.0" }
 serde = { version = "1.0", features = ["derive"] }
 pay-respects-utils = { version = "0.1", path = "../utils" }
+pay-respects-rule-engine = { version = "0.1", path = "../rule-engine" }
 
 [[bin]]
 name = "_pay-respects-module-100-runtime-rules"
