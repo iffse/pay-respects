@@ -1,19 +1,15 @@
 # Pay Respects
 
-Typed a command wrong? Not sure what to do? Press `F` and pay-respects
-suggests a fix.
+Your command failed. Press `F` and get back to work!
 
-- 🚀 **Fast startup**: Initialization stays under 1 ms in the
+- 🚀 **Fast startup**: Back to work in under 1 ms! See the
 [benchmarks](#benchmarks).
-- 🎯 **Checked suggestions**: Suggestions are validated before they reach you.
-If you use `doas`, you will not get a `sudo` suggestion.
-- ✏️ **Rules in TOML**: You do not need to know Rust. TOML rules are compiled
-into Rust code.
-- 🦀 **Rust for complex cases**: Use raw Rust when TOML is not enough.
-- 🔩 **Modules in any language**: A custom module only needs to print
-suggestions to stdout.
-- 🤖 **Optional AI**: The AI module answers when no rule matches.
-- 🪶 **Small binary**: The core binary is under 1 MB.
+- 🎯 **Checked suggestions**: No blind guesses. Suggestions are checked first!
+- ✏️ **Rules in TOML**: Write fixes without touching Rust!
+- 🦀 **Rust for complex cases**: Go full Rust when TOML cannot keep up!
+- 🔩 **Modules in any language**: Build modules in the language you love!
+- 🤖 **Optional AI**: No rule? Let AI take a shot!
+- 🪶 **Small binary**: Under 1 MB. Your disk will not even notice!
 
 ![showcase](https://raw.githubusercontent.com/iffse/static-assets/refs/heads/main/pay-respects/showcase.gif)
 
