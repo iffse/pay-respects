@@ -20,6 +20,8 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 - AI module: Ask for default behavior when no user API key is configured
 consent on first use.
+- AI module: The command and error message are now at the end of the prompt for
+caching.
 
 ## [0.8.8]
 

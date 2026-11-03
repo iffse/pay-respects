@@ -263,3 +263,29 @@ impl Conf {
 		Some(Conf { key, url, model })
 	}
 }
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+
+	#[test]
+	fn dynamic_values_are_at_the_end() {
+		let prompt = AiPrompt {
+			last_command: "ZZ_LAST_COMMAND_ZZ",
+			error_msg: "ZZ_ERROR_MSG_ZZ",
+			additional_prompt: "",
+			set_locale: "",
+		}
+		.render()
+		.unwrap();
+
+		let instructions = prompt
+			.find("Your answer should be in the following format")
+			.unwrap();
+		let command = prompt.find("ZZ_LAST_COMMAND_ZZ").unwrap();
+		let error = prompt.find("ZZ_ERROR_MSG_ZZ").unwrap();
+
+		assert!(instructions < command);
+		assert!(command < error);
+	}
+}
