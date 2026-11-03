@@ -4,6 +4,8 @@ use serde_json::Value;
 use futures_util::StreamExt;
 use serde::Deserialize;
 
+use pay_respects_utils::strings::print_error;
+
 use crate::buffer;
 use crate::config::Config;
 
@@ -153,11 +155,11 @@ pub async fn ai_suggestion(last_command: &str, error_msg: &str, locale: &str, co
 		.unwrap();
 
 	if res.status() != 200 {
-		eprintln!("AI module: Status code: {}", res.status());
-		eprintln!(
-			"AI module: Error message:\n  {}",
+		print_error(&format!("AI request failed with status: {}", res.status()));
+		print_error(&format!(
+			"AI error message:\n  {}",
 			res.text().await.unwrap().replace("\n", "\n  ")
-		);
+		));
 		return;
 	}
 

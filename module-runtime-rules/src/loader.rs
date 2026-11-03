@@ -2,6 +2,7 @@ use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 
 use pay_respects_rule_engine::{RuleSet, parse_file};
+use pay_respects_utils::strings::{print_error, print_warning};
 
 #[derive(Clone)]
 pub struct LoadedRule {
@@ -31,16 +32,17 @@ impl RuleLoader {
 			let loaded = load_uncached(&self.dirs, command);
 			if let Some(loaded) = &loaded {
 				if loaded.rule.version < 2 && self.deprecation_warned.insert(loaded.path.clone()) {
-					eprintln!(
-						"runtime-rules: warning: {} uses the deprecated rule format; see rules.md#version-2",
+					print_warning(&format!(
+						"{} uses the deprecated rule format. Migrate it with `pay-respects --migrate-rules '{}'`.",
+						loaded.path.display(),
 						loaded.path.display()
-					);
+					));
 				}
 				if loaded.rule.has_functions() && self.function_warned.insert(loaded.path.clone()) {
-					eprintln!(
-						"runtime-rules: warning: {} contains compile-time functions, which are skipped",
+					print_warning(&format!(
+						"{} contains compile-time functions, which are skipped",
 						loaded.path.display()
-					);
+					));
 				}
 			}
 			self.cache.insert(command.to_string(), loaded);
@@ -74,7 +76,7 @@ fn load_uncached(dirs: &[PathBuf], command: &str) -> Option<LoadedRule> {
 			let rule = match parse_file(&path) {
 				Ok(rule) => rule,
 				Err(err) => {
-					eprintln!("runtime-rules: Failed to parse: {}", err);
+					print_error(&format!("Failed to parse rule: {}", err));
 					continue;
 				}
 			};
@@ -91,7 +93,7 @@ fn load_path(path: PathBuf) -> Option<LoadedRule> {
 	match parse_file(&path) {
 		Ok(rule) => Some(LoadedRule { path, rule }),
 		Err(err) => {
-			eprintln!("runtime-rules: Failed to parse: {}", err);
+			print_error(&format!("Failed to parse rule: {}", err));
 			None
 		}
 	}

@@ -1,6 +1,7 @@
 use askama::Template;
 use pay_respects_utils::lists::{alias_skip_expand, blocking_commands, privilege_list};
 use pay_respects_utils::log::dlog;
+use pay_respects_utils::strings::print_error;
 
 use std::process::{Stdio, exit};
 
@@ -160,8 +161,7 @@ pub fn error_output_threaded(shell: &str, command: &str, timeout: u64) -> String
 				false => String::from_utf8_lossy(&output.stderr).to_string(),
 			},
 			Err(_) => {
-				use colored::*;
-				eprintln!("Timeout while executing command: {}", command.red());
+				print_error(&format!("Timeout while executing command: {}", command));
 				exit(1);
 			}
 		}
@@ -181,8 +181,11 @@ pub fn command_output(shell: &str, command: &str) -> String {
 
 	let err = String::from_utf8_lossy(&output.stderr);
 	if !err.is_empty() {
-		eprintln!("Error while executing command: {}", command);
-		eprintln!("  {}", err.replace("\n", "\n  "));
+		print_error(&format!(
+			"Error while executing command: {}\n  {}",
+			command,
+			err.replace("\n", "\n  ")
+		));
 	}
 
 	String::from_utf8_lossy(&output.stdout).to_string()
@@ -252,14 +255,11 @@ pub fn last_command(shell: &str) -> String {
 	let last_command = match std::env::var("_PR_LAST_COMMAND") {
 		Ok(command) => command,
 		Err(_) => {
-			eprintln!(
-				"{}",
-				t!(
-					"no-env-setup",
-					var = "_PR_LAST_COMMAND",
-					help = "pay-respects -h"
-				)
-			);
+			print_error(&t!(
+				"no-env-setup",
+				var = "_PR_LAST_COMMAND",
+				help = "pay-respects -h"
+			));
 			exit(1);
 		}
 	};
@@ -464,7 +464,7 @@ pub fn initialization(init: &mut Init) {
 		.render()
 		.unwrap(),
 		_ => {
-			eprintln!("{}: {}", t!("unknown-shell"), shell);
+			print_error(&format!("Unknown shell: {}", shell));
 			exit(1);
 		}
 	};
@@ -476,10 +476,11 @@ pub fn get_shell() -> String {
 	match std::env::var("_PR_SHELL") {
 		Ok(shell) => shell,
 		Err(_) => {
-			eprintln!(
-				"{}",
-				t!("no-env-setup", var = "_PR_SHELL", help = "pay-respects -h")
-			);
+			print_error(&t!(
+				"no-env-setup",
+				var = "_PR_SHELL",
+				help = "pay-respects -h"
+			));
 			std::process::exit(1);
 		}
 	}

@@ -2,6 +2,7 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
 use pay_respects_rule_engine::{Context, ScriptHandler, ScriptSpec};
+use pay_respects_utils::strings::print_error;
 
 pub struct ExternalScripts {
 	script_dirs: Vec<PathBuf>,
@@ -37,7 +38,7 @@ impl ExternalScripts {
 impl ScriptHandler for ExternalScripts {
 	fn evaluate(&mut self, script: &ScriptSpec, context: &Context) -> Vec<String> {
 		let Some(file) = self.resolve(&script.file) else {
-			eprintln!("runtime-rules: script not found: {}", script.file);
+			print_error(&format!("Script not found: {}", script.file));
 			return Vec::new();
 		};
 
@@ -64,10 +65,7 @@ impl ScriptHandler for ExternalScripts {
 		let output = match process.output() {
 			Ok(output) => output,
 			Err(err) => {
-				eprintln!(
-					"runtime-rules: failed to run {}: {}",
-					script.interpreter, err
-				);
+				print_error(&format!("Failed to run {}: {}", script.interpreter, err));
 				return Vec::new();
 			}
 		};
@@ -75,7 +73,7 @@ impl ScriptHandler for ExternalScripts {
 		if !output.status.success() {
 			let stderr = String::from_utf8_lossy(&output.stderr);
 			if !stderr.trim().is_empty() {
-				eprintln!("runtime-rules: script failed: {}", stderr.trim());
+				print_error(&format!("Script failed: {}", stderr.trim()));
 			}
 		}
 

@@ -13,3 +13,4 @@ include = ["**/*.rs"]
 [dependencies]
 colored = "3.1.1"
 crossterm = "0.29"
+pay-respects-utils = { version = "0.1", path = "../utils" }

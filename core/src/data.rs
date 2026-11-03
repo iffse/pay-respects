@@ -7,7 +7,7 @@ use pay_respects_utils::modes::Mode;
 use pay_respects_utils::modes::run_mode;
 
 use itertools::Itertools;
-use pay_respects_utils::strings::remove_color_codes;
+use pay_respects_utils::strings::{print_error, remove_color_codes};
 
 use std::process::exit;
 
@@ -231,7 +231,7 @@ impl Data {
 	pub fn split(&mut self) {
 		self.command = self.command.trim().to_string();
 		if self.command.is_empty() {
-			eprintln!("{}", t!("empty-command"));
+			print_error(&t!("empty-command"));
 			exit(1);
 		}
 		let mut split = split_command(&self.command);

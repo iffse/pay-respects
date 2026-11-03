@@ -81,7 +81,7 @@ pub fn handle_args(args: impl IntoIterator<Item = String>) -> Status {
 	}
 
 	if init.shell.is_empty() {
-		eprintln!("{}", t!("no-shell"));
+		print_error(&t!("no-shell"));
 		return Status::Error;
 	}
 

@@ -1,5 +1,7 @@
 use std::process::exit;
 
+use crate::strings::print_error;
+
 #[derive(PartialEq, Debug)]
 pub enum Mode {
 	Suggestion,
@@ -18,7 +20,7 @@ pub fn run_mode() -> Mode {
 			"noconfirm" => Mode::NoConfirm,
 			"echo" => Mode::Echo,
 			_ => {
-				eprintln!("Invalid mode: {}", mode);
+				print_error(&format!("Invalid mode: {}", mode));
 				exit(1);
 			}
 		},

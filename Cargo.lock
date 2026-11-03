@@ -1112,6 +1112,7 @@ version = "0.1.4"
 dependencies = [
  "colored",
  "crossterm",
+ "pay-respects-utils",
 ]
 
 [[package]]

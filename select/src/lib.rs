@@ -9,6 +9,7 @@ use crossterm::{
 	execute,
 	terminal::{self, ClearType},
 };
+use pay_respects_utils::strings::print_error;
 use std::io::{Write, stderr};
 
 #[derive(Default)]
@@ -32,7 +33,7 @@ pub fn select(
 
 	if height < prelude_lines + 1 {
 		terminal::disable_raw_mode()?;
-		eprintln!("Terminal height too small.");
+		print_error("Terminal height too small.");
 		std::process::exit(1);
 	}
 
@@ -202,7 +203,7 @@ fn get_pages(active_items: &[String], max_height: usize) -> Vec<Page> {
 	for (idx, item) in active_items.iter().enumerate() {
 		let item_lines = item.lines().count();
 		if item_lines > max_height {
-			eprintln!("An item is too long to fit in the terminal.");
+			print_error("An item is too long to fit in the terminal.");
 			std::process::exit(1);
 		}
 		if current_page.lines + item_lines > max_height || current_page.items.len() >= MAX_ITEMS {
