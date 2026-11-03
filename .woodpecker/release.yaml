@@ -1,0 +1,66 @@
+# Build release archives when a version tag is pushed.
+#
+# Requires a Codeberg access token with repository write access in the
+# `codeberg-woodpecker` Woodpecker secret.
+
+steps:
+  build-x86_64:
+    image: docker.io/messense/rust-musl-cross:x86_64-musl
+    when:
+      - event: tag
+        ref: refs/tags/v*
+    environment:
+      CARGO_INCREMENTAL: 0
+      TARGET: x86_64-unknown-linux-musl
+    commands:
+      - cargo build --release --workspace --locked --target "$TARGET"
+
+  build-aarch64:
+    image: docker.io/messense/rust-musl-cross:aarch64-musl
+    when:
+      - event: tag
+        ref: refs/tags/v*
+    environment:
+      CARGO_INCREMENTAL: 0
+      TARGET: aarch64-unknown-linux-musl
+    commands:
+      - cargo build --release --workspace --locked --target "$TARGET"
+
+  package:
+    image: alpine:3.22
+    when:
+      - event: tag
+        ref: refs/tags/v*
+    depends_on:
+      - build-x86_64
+      - build-aarch64
+    commands:
+      - apk add --no-cache tar zstd
+      - |
+        set -eu
+        version="${CI_COMMIT_TAG#v}"
+        for target in x86_64-unknown-linux-musl aarch64-unknown-linux-musl; do
+          tar --zstd -cf "pay-respects-${version}-${target}.tar.zst" \
+            LICENSE \
+            man \
+            -C "target/${target}/release" \
+            pay-respects \
+            _pay-respects-module-100-runtime-rules \
+            _pay-respects-fallback-100-request-ai
+        done
+      - ls -lh ./*.tar.zst
+
+  release:
+    image: woodpeckerci/plugin-release
+    when:
+      - event: tag
+        ref: refs/tags/v*
+    depends_on:
+      - package
+    settings:
+      api_key:
+        from_secret: codeberg-woodpecker
+      base_url: https://codeberg.org
+      file-exists: overwrite
+      files:
+        - "*.tar.zst"
