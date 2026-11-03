@@ -3,12 +3,13 @@
 # Requires a Codeberg access token with repository write access in the
 # `codeberg-woodpecker` Woodpecker secret.
 
+when:
+  - event: tag
+    ref: refs/tags/v*
+
 steps:
   build-x86_64:
     image: docker.io/messense/rust-musl-cross:x86_64-musl
-    when:
-      - event: tag
-        ref: refs/tags/v*
     environment:
       CARGO_INCREMENTAL: 0
       TARGET: x86_64-unknown-linux-musl
@@ -17,9 +18,6 @@ steps:
 
   build-aarch64:
     image: docker.io/messense/rust-musl-cross:aarch64-musl
-    when:
-      - event: tag
-        ref: refs/tags/v*
     environment:
       CARGO_INCREMENTAL: 0
       TARGET: aarch64-unknown-linux-musl
@@ -28,9 +26,6 @@ steps:
 
   package:
     image: alpine:3.22
-    when:
-      - event: tag
-        ref: refs/tags/v*
     depends_on:
       - build-x86_64
       - build-aarch64
@@ -52,9 +47,6 @@ steps:
 
   release:
     image: woodpeckerci/plugin-release
-    when:
-      - event: tag
-        ref: refs/tags/v*
     depends_on:
       - package
     settings:

@@ -1,9 +1,10 @@
+when:
+  - event: cron
+    cron: "nightly build"
+
 steps:
   - name: nightly-tag
     image: alpine
-    when:
-      event: cron
-      cron: "nightly build"
     environment:
       GIT_NAME: iff
       GIT_EMAIL: iff@ik.me
