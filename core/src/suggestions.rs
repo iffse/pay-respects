@@ -4,7 +4,7 @@ use std::thread;
 use std::time::{Duration, Instant};
 
 use colored::Colorize;
-use pay_respects_select::select;
+use pay_respects_select::{Choice, select};
 use pay_respects_utils::strings::{format_prefix, print_error, remove_color_codes};
 
 use crate::config;
@@ -107,7 +107,16 @@ fn get_standard_suggestions(data: &Data) -> Option<Vec<String>> {
 	None
 }
 
-pub fn select_candidate(data: &mut Data) {
+/// What to do with the selected suggestion.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Acceptance {
+	/// Run it.
+	Run,
+	/// Put it back into the prompt for the user to edit.
+	Prompt,
+}
+
+pub fn select_candidate(data: &mut Data) -> Acceptance {
 	let candidates = &data.candidates;
 	pay_respects_utils::dlog!(2, "candidates: {:?}", candidates);
 
@@ -121,35 +130,51 @@ pub fn select_candidate(data: &mut Data) {
 		.map(|candidate| highlight_difference(data, candidate, false).unwrap())
 		.collect::<Vec<String>>();
 
+	let editable = crate::shell::prompt_insert_supported(&data.shell_type);
+	let colors = data.config.ui.colors;
+
 	let msg = format!("{}", t!("multi-suggest", num = candidates.len()))
-		.color(data.config.ui.colors.accent)
+		.color(colors.accent)
 		.bold()
 		.to_string();
 	let confirm = format!("[{}]", t!("confirm-yes"))
-		.color(data.config.ui.colors.correct)
+		.color(colors.correct)
 		.to_string();
-	let hint = format!(
+	let mut hint = format!(
 		"{} {} {}",
-		"[↑/↓/j/k]".color(data.config.ui.colors.accent),
+		"[↑/↓/j/k]".color(colors.accent),
 		confirm,
-		"[ESC]".color(data.config.ui.colors.wrong)
+		"[ESC]".color(colors.wrong)
 	);
+	if editable {
+		hint.push_str(&format!(
+			" {} {}",
+			"[e]".color(colors.accent),
+			t!("edit").color(colors.accent)
+		));
+	}
 
-	let selection = select(
+	let choice = select(
 		&data.config.ui,
 		&msg,
 		&hint,
 		&active_candidates,
 		&inactive_candidates,
+		editable,
 	)
 	.unwrap_or_else(|err| {
 		print_error(&format!("Selection failed: {}", err));
 		exit(1);
 	});
 
+	let (selection, acceptance) = match choice {
+		Choice::Picked(index) => (index, Acceptance::Run),
+		Choice::Prompt(index) => (index, Acceptance::Prompt),
+	};
+
 	let selected = active_candidates[selection].to_string();
 	let output = if let Some(prefix) = &data.prompt_prefix {
-		let output = format_prefix(prefix, &selected, data.config.ui.colors.accent);
+		let output = format_prefix(prefix, &selected, colors.accent);
 		data.input_command = remove_color_codes(&output)
 			.trim_start_matches(prefix)
 			.to_string();
@@ -157,13 +182,25 @@ pub fn select_candidate(data: &mut Data) {
 	} else {
 		selected
 	};
-	eprintln!("{}", output);
+	if acceptance == Acceptance::Run {
+		eprintln!("{}", output);
+	}
 
 	let suggestion = candidates[selection].to_string();
 	data.update_suggest(&suggestion);
 	data.expand_suggest();
 
+	if acceptance == Acceptance::Prompt {
+		let command = history_command(
+			&data.shell,
+			data.privilege.as_deref(),
+			data.suggest.as_deref().unwrap_or_default(),
+		);
+		crate::shell::print_prompt_command(&data.shell_type, &command);
+	}
+
 	data.candidates.clear();
+	acceptance
 }
 
 pub fn execute_suggestion(data: &Data) -> Result<(), String> {

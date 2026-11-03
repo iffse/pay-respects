@@ -16,6 +16,11 @@ def --env __pr_main [mode: string] {
 	if $data == null { return }
 
 	for d in $data {
+		let prompt = ($d.prompt? | default "")
+		if ($prompt | is-not-empty) {
+			commandline edit --replace $prompt
+			continue
+		}
 		if ($d.command != "") {
 			if $env.config.history.file_format == "plaintext" {
 				$"($d.command)\n" | save --append $nu.history-path

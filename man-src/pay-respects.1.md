@@ -87,6 +87,12 @@ Fix your previous command
 f
 ```
 
+Put the selected fix back into the prompt, to be edited with the shell's own key
+bindings, on zsh, fish, and Nushell
+```
+f + <e>
+```
+
 Fix your current typed command
 ```
 <C-x> <C-x>

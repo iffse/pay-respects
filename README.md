@@ -136,6 +136,12 @@ without executing it:
 - `gitcommit` + `C-X` `C-X` → `git commit`
 - `z payrespe` + `C-X` `C-X` → `cd /home/iff/Code/pay-respects`
 
+In zsh, fish and Nushell, pressing `e` in the suggestion list puts the selected
+fix back into the prompt instead of running it. Edit it with the shell's own
+key bindings and press Enter when ready:
+
+- `gitcommit` + `f` + `e` → `git commit` at the prompt
+
 <details>
 	<summary>Integrations with other tools</summary>
 

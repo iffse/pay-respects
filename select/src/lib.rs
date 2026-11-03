@@ -33,13 +33,23 @@ const MAX_ITEMS: usize = 10;
 /// printing the newline after the last row never scrolls the terminal.
 const BOTTOM_MARGIN: usize = 2;
 
+/// What the user did with the selection.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Choice {
+	/// Run the selected item.
+	Picked(usize),
+	/// Put the selected item back into the shell prompt to be edited.
+	Prompt(usize),
+}
+
 pub fn select(
 	ui: &UiConfig,
 	prelude: &str,
 	hint: &str,
 	active_items: &[String],
 	inactive_items: &[String],
-) -> Result<usize, Box<dyn std::error::Error>> {
+	editable: bool,
+) -> Result<Choice, Box<dyn std::error::Error>> {
 	let header = build_header(ui, prelude, hint);
 	let header_lines = header_height(&header);
 	let mut size = terminal::size()?;
@@ -76,6 +86,7 @@ pub fn select(
 
 	let mut current = 0;
 	let mut page_idx = 0;
+	let mut edit = false;
 
 	macro_rules! page_range {
 		() => {
@@ -177,6 +188,10 @@ pub fn select(
 					quit(ui)
 				}
 				KeyCode::Enter => break,
+				KeyCode::Char('e') if editable => {
+					edit = true;
+					break;
+				}
 				_ => {}
 			}
 
@@ -239,7 +254,12 @@ pub fn select(
 	cleanup(drawn + header_lines)?;
 	terminal::disable_raw_mode()?;
 
-	Ok(pages[page_idx].items[current])
+	let index = pages[page_idx].items[current];
+	if edit {
+		Ok(Choice::Prompt(index))
+	} else {
+		Ok(Choice::Picked(index))
+	}
 }
 
 pub fn select_simple(
@@ -256,7 +276,11 @@ pub fn select_simple(
 		.iter()
 		.map(|s| ui.colors.base(s).to_string())
 		.collect::<Vec<String>>();
-	select(ui, prelude, hint, &active_items, &inactive_items)
+	Ok(
+		match select(ui, prelude, hint, &active_items, &inactive_items, false)? {
+			Choice::Picked(index) | Choice::Prompt(index) => index,
+		},
+	)
 }
 
 fn select_idx(idx: usize) -> String {

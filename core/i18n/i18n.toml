@@ -179,6 +179,18 @@ ja = "エンター"
 ko = "엔터"
 zh = "回车"
 
+[edit]
+en = "Edit"
+es = "Editar"
+de = "Bearbeiten"
+fr = "Modifier"
+it = "Modifica"
+pt = "Editar"
+ru = "Изменить"
+ja = "編集"
+ko = "편집"
+zh = "编辑"
+
 [retry]
 en = "Looking for new suggestion"
 es = "Buscando nueva sugerencia"

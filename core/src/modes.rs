@@ -24,7 +24,9 @@ pub fn suggestion(data: &mut Data) {
 			break;
 		};
 
-		suggestions::select_candidate(data);
+		if suggestions::select_candidate(data) == suggestions::Acceptance::Prompt {
+			return;
+		}
 
 		let execution = suggestions::execute_suggestion(data);
 		if execution.is_ok() {
@@ -171,7 +173,9 @@ pub fn cnf(data: &mut Data) {
 	add_candidates_no_dup(&data.command, &mut data.candidates, &candidates);
 
 	if !data.candidates.is_empty() {
-		suggestions::select_candidate(data);
+		if suggestions::select_candidate(data) == suggestions::Acceptance::Prompt {
+			return;
+		}
 
 		let status = suggestions::execute_suggestion(data);
 		if status.is_err() {

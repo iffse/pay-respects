@@ -748,13 +748,6 @@ pub fn shell_evaluated_commands(shell: &str, command: &str, success: bool) {
 		}
 		"nu" | "nush" | "nushell" => {
 			// JSON-escape the fields so init.nu can parse the output with `from json`
-			let escape_json = |s: &str| {
-				s.replace('\\', "\\\\")
-					.replace('"', "\\\"")
-					.replace('\n', "\\n")
-					.replace('\r', "\\r")
-					.replace('\t', "\\t")
-			};
 			let command = escape_json(command);
 			let cd_escaped = cd.as_deref().map(escape_json).unwrap_or_default();
 			let template = NuTemplate {
@@ -808,9 +801,80 @@ pub fn shell_evaluated_commands(shell: &str, command: &str, success: bool) {
 	}
 }
 
+/// Shells that can put a command back into their prompt buffer.
+pub fn prompt_insert_supported(shell_type: &str) -> bool {
+	matches!(shell_type, "zsh" | "fish" | "nu")
+}
+
+/// Prints shell code that puts `command` back into the prompt without running
+/// it, so the user can edit it with the shell's own line editor.
+pub fn print_prompt_command(shell_type: &str, command: &str) {
+	if let Some(print) = prompt_command(shell_type, command) {
+		println!("{}", print);
+	}
+}
+
+fn prompt_command(shell_type: &str, command: &str) -> Option<String> {
+	#[derive(Template)]
+	#[template(path = "prompt.zsh", escape = "none")]
+	struct ZshPromptTemplate<'a> {
+		command: &'a str,
+	}
+	#[derive(Template)]
+	#[template(path = "prompt.fish", escape = "none")]
+	struct FishPromptTemplate<'a> {
+		command: &'a str,
+	}
+	#[derive(Template)]
+	#[template(path = "prompt.nu", escape = "none")]
+	struct NuPromptTemplate<'a> {
+		command: &'a str,
+	}
+
+	let print = match shell_type {
+		"zsh" => ZshPromptTemplate {
+			command: &escape_double_quoted(command),
+		}
+		.render()
+		.unwrap(),
+		"fish" => FishPromptTemplate {
+			command: &escape_double_quoted(command),
+		}
+		.render()
+		.unwrap(),
+		"nu" => NuPromptTemplate {
+			command: &escape_json(command),
+		}
+		.render()
+		.unwrap(),
+		_ => return None,
+	};
+
+	Some(print.trim().to_string())
+}
+
+/// Escapes a command for a double-quoted shell string.
+fn escape_double_quoted(command: &str) -> String {
+	command
+		.replace('\\', "\\\\")
+		.replace('"', "\\\"")
+		.replace('$', "\\$")
+		.replace('`', "\\`")
+}
+
+/// JSON-escapes a command for the Nushell initialization.
+fn escape_json(command: &str) -> String {
+	command
+		.replace('\\', "\\\\")
+		.replace('"', "\\\"")
+		.replace('\n', "\\n")
+		.replace('\r', "\\r")
+		.replace('\t', "\\t")
+}
+
 #[cfg(test)]
 mod tests {
-	use super::{history_command, shell_syntax};
+	use super::{history_command, prompt_command, prompt_insert_supported, shell_syntax};
 	use askama::Template;
 
 	#[derive(Template)]
@@ -848,6 +912,34 @@ mod tests {
 		assert!(init.contains("let alias = 'f'"));
 		assert!(init.contains("($entry.command | str trim) != $alias"));
 		assert!(!init.contains("(history | last).command"));
+	}
+
+	#[test]
+	fn prompt_insert_is_only_offered_for_supported_shells() {
+		for shell in ["zsh", "fish", "nu"] {
+			assert!(prompt_insert_supported(shell));
+		}
+		for shell in ["bash", "dash", "pwsh", "xonsh", "elvish"] {
+			assert!(!prompt_insert_supported(shell));
+		}
+	}
+
+	#[test]
+	fn prompt_command_targets_the_shell_and_escapes_the_command() {
+		assert_eq!(
+			prompt_command("zsh", "echo \"$HOME\" 1\\2").unwrap(),
+			r#"print -z "echo \"\$HOME\" 1\\2""#
+		);
+		assert_eq!(
+			prompt_command("fish", "git status").unwrap(),
+			r#"commandline --replace "git status""#
+		);
+		assert_eq!(
+			prompt_command("nu", "echo \"hi\"").unwrap(),
+			r#"{ "cd": "", "command": "", "prompt": "echo \"hi\"" }"#
+		);
+		assert!(prompt_command("bash", "echo hi").is_none());
+		assert!(prompt_command("elvish", "echo hi").is_none());
 	}
 
 	#[test]

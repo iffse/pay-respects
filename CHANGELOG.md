@@ -59,6 +59,8 @@ Interface:
 
 - `[ui]` sets whether the selection prelude and hint are printed.
 - `[colors]` sets the interface colors, accepting names and hex codes.
+- Press `e` in the suggestion list to put the fix back into the prompt for
+editing on zsh, fish, and Nushell.
 
 ### Changed
 
