@@ -57,7 +57,8 @@ Pick your shell:
 > ```elv
 > eval (pay-respects elvish --alias | slurp)
 > ```
-> `Ctrl-X` runs inline mode. Elvish has no command-not-found handler.
+> Type `f` to suggest a fix. `Ctrl-X` runs inline mode. Elvish has no
+> command-not-found handler.
 
 </details>
 

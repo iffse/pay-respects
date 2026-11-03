@@ -68,7 +68,8 @@ Add the following line to `~/.config/elvish/rc.elv`:
 eval (pay-respects elvish --alias | slurp)
 ```
 
-Inline mode is bound to `Ctrl-X`. Elvish has no command-not-found handler.
+Type `f` to suggest a fix. Inline mode is bound to `Ctrl-X`. Elvish has no
+command-not-found handler.
 
 ## Nushell / PowerShell
 

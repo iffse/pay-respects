@@ -1,6 +1,6 @@
 use str
 
-fn _pr_base {|mode last_command|
+var _pr_base = {|mode last_command|
 	tmp E:_PR_MODE = $mode
 	tmp E:_PR_LAST_COMMAND = $last_command
 	tmp E:_PR_SHELL = '{{ shell }}'
@@ -11,12 +11,12 @@ fn _pr_base {|mode last_command|
 	'{{ binary_path }}'
 }
 
-fn {{ alias }} {
+var _pr_suggest = {
 	use store
 	var last_command = (edit:command-history &cmd-only &newest-first | drop 1 | take 1)
 	var output = ''
 	try {
-		set output = (_pr_base suggest $last_command | slurp | str:trim-space)
+		set output = ($_pr_base suggest $last_command | slurp | str:trim-space)
 	} catch {
 	}
 	if (not-eq $output '') {
@@ -24,11 +24,11 @@ fn {{ alias }} {
 	}
 }
 
-fn _pr_inline {
+var _pr_inline = {
 	var input = $edit:current-command
 	var output = ''
 	try {
-		set output = (_pr_base inline $input | slurp | str:trim-space)
+		set output = ($_pr_base inline $input | slurp | str:trim-space)
 	} catch {
 	}
 	if (not-eq $output '') {
@@ -36,4 +36,6 @@ fn _pr_inline {
 	}
 }
 
-set edit:insert:binding[Ctrl-X] = { _pr_inline }
+# eval runs in a temporary namespace, so export the alias explicitly
+edit:add-var {{ alias }}~ $_pr_suggest
+set edit:insert:binding[Ctrl-X] = $_pr_inline

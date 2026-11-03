@@ -811,6 +811,33 @@ pub fn shell_evaluated_commands(shell: &str, command: &str, success: bool) {
 #[cfg(test)]
 mod tests {
 	use super::{history_command, shell_syntax};
+	use askama::Template;
+
+	#[derive(Template)]
+	#[template(path = "init.elv", escape = "none")]
+	struct ElvishInitTemplate<'a> {
+		shell: &'a str,
+		shell_type: &'a str,
+		alias: &'a str,
+		binary_path: &'a str,
+		prefix: Option<&'a str>,
+	}
+
+	#[test]
+	fn elvish_init_exports_alias_from_eval() {
+		let init = ElvishInitTemplate {
+			shell: "elvish",
+			shell_type: "elvish",
+			alias: "f",
+			binary_path: "pay-respects",
+			prefix: None,
+		}
+		.render()
+		.unwrap();
+
+		assert!(init.contains("edit:add-var f~ $_pr_suggest"));
+		assert!(init.contains("set edit:insert:binding[Ctrl-X] = $_pr_inline"));
+	}
 
 	#[test]
 	fn converts_chained_lines_for_new_shells() {
