@@ -253,6 +253,7 @@ pub fn select(
 	// Cleanup
 	cleanup(drawn + header_lines)?;
 	terminal::disable_raw_mode()?;
+	execute!(stderr(), terminal::EnableLineWrap)?;
 
 	let index = pages[page_idx].items[current];
 	if edit {

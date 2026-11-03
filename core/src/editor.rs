@@ -67,13 +67,25 @@ fn edit_with(editor: &str, command: &str) -> Option<String> {
 
 #[cfg(unix)]
 fn spawn_editor(editor: &str, path: &Path) -> Option<ExitStatus> {
-	match std::process::Command::new("sh")
+	let mut command = std::process::Command::new("sh");
+	command
 		.arg("-c")
 		.arg(format!("{} \"$1\"", editor))
 		.arg("sh")
-		.arg(path)
-		.status()
+		.arg(path);
+
+	// stdout is the command substitution the shell reads the evaluated commands
+	// from, so the editor has to talk to the terminal directly to draw anything.
+	if let Ok(tty) = std::fs::OpenOptions::new()
+		.read(true)
+		.write(true)
+		.open("/dev/tty")
+		&& let (Ok(stdout), Ok(stderr)) = (tty.try_clone(), tty.try_clone())
 	{
+		command.stdin(tty).stdout(stdout).stderr(stderr);
+	}
+
+	match command.status() {
 		Ok(status) => Some(status),
 		Err(err) => {
 			print_error(&format!("Failed to run editor `{}`: {}", editor, err));
@@ -84,11 +96,20 @@ fn spawn_editor(editor: &str, path: &Path) -> Option<ExitStatus> {
 
 #[cfg(windows)]
 fn spawn_editor(editor: &str, path: &Path) -> Option<ExitStatus> {
-	match std::process::Command::new("cmd")
+	let mut command = std::process::Command::new("cmd");
+	command
 		.arg("/C")
-		.arg(format!("{} \"{}\"", editor, path.display()))
-		.status()
+		.arg(format!("{} \"{}\"", editor, path.display()));
+
+	if let (Ok(stdin), Ok(stdout)) = (
+		std::fs::OpenOptions::new().read(true).open("CONIN$"),
+		std::fs::OpenOptions::new().write(true).open("CONOUT$"),
+	) && let Ok(stderr) = stdout.try_clone()
 	{
+		command.stdin(stdin).stdout(stdout).stderr(stderr);
+	}
+
+	match command.status() {
 		Ok(status) => Some(status),
 		Err(err) => {
 			print_error(&format!("Failed to run editor `{}`: {}", editor, err));
