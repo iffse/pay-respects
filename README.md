@@ -1,15 +1,13 @@
 # Pay Respects
 
-Your command failed. Press `F` and get back to work!
+Your command failed. Press `F` for it and get back to work!
 
-- 🚀 **Fast startup**: Back to work in under 1 ms! See the
-[benchmarks](#benchmarks).
-- 🎯 **Checked suggestions**: No blind guesses. Suggestions are checked first!
+- 🚀 **Performant**: Sub-millisecond (<1ms) performance! See the [benchmarks](#benchmarks).
+- 🎯 **Accurate**: No blind guesses. Suggestions are checked first!
 - ✏️ **Rules in TOML**: Write fixes without touching Rust!
-- 🦀 **Rust for complex cases**: Go full Rust when TOML cannot keep up!
-- 🔩 **Modules in any language**: Build modules in the language you love!
+- 🔩 **Extendable**: Go full Rust, use interpreted scripts, or build a module when TOML is not enough!
 - 🤖 **Optional AI**: No rule? Let AI take a shot!
-- 🪶 **Small binary**: Under 1 MB. Your disk will not even notice!
+- 🪶 **Small binary**: Under 1 MB for core features!
 
 ![showcase](https://raw.githubusercontent.com/iffse/static-assets/refs/heads/main/pay-respects/showcase.gif)
 
@@ -271,7 +269,7 @@ See [configuration](./config.md).
 
 ## Rules & Modules
 
-- [Writing rules (TOML or Rust)](./rules.md)
+- [Writing rules (TOML, Rust, interpreted languages)](./rules.md)
 - [Custom modules](./modules.md)
 
 ## AI Integration

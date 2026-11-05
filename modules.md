@@ -1,5 +1,9 @@
 # Modules
 
+If you only want to add a simple rule in an interpreted language, use [the script feature from the runtime-rules module](./rules.md#scripts).
+
+Modules are designed to be treated as independent, full-featured software.
+
 ## Creating a Module
 
 There are 2 types of modules:
@@ -61,19 +65,35 @@ This is not the default as there is no general way to know its value and depends
 
 If you installed the module with `cargo install`, the binary will be placed in `bin` subdirectory under Cargo's home which should be in the `PATH` anyway. Cargo has no option to place in subdirectories with other names.
 
-The following snippet is what I have included into Arch Linux's package with workflows binaries, adding a `_PR_LIB` declaration along with initialization. The script is `/usr/bin/pay-respects` and the actual executable is located somewhere else.
+The following snippet is what I have included into Arch Linux's package with workflows binaries, adding `_PR_LIB` and `_PR_PACKAGE_MANAGER` declarations along with initialization. The script is `/usr/bin/pay-respects` and the actual executable is located somewhere else.
 ```sh
 #!/bin/sh
-if [ "$#" -gt 1 ] && [ -z "$_PR_LIB" ]; then
-	SHELL=$(basename $SHELL)
+if [ "$#" -ge 1 ] && [ -z "$_PR_LIB" ]; then
+	shell=$(basename "${SHELL:-sh}")
 	LIB="/usr/lib/pay-respects"
-	if [ "$SHELL" = "nu" ]; then
-		echo "env:_PR_LIB=$LIB"
-	elif [[ "$SHELL" = "pwsh" ]]; then
-		echo "\$env:_PR_LIB=\"$LIB\""
-	else
+	PM="pacman"
+	case "$shell" in
+	nu | nush | nushell)
+		echo "\$env._PR_LIB = \"$LIB\""
+		echo "\$env._PR_PACKAGE_MANAGER = \"$PM\""
+		;;
+	pwsh | powershell | ps)
+		echo "\$env:_PR_LIB = \"$LIB\""
+		echo "\$env:_PR_PACKAGE_MANAGER = \"$PM\""
+		;;
+	xonsh)
+		echo "\$_PR_LIB = \"$LIB\""
+		echo "\$_PR_PACKAGE_MANAGER = \"$PM\""
+		;;
+	elvish)
+		echo "set E:_PR_LIB = '$LIB'"
+		echo "set E:_PR_PACKAGE_MANAGER = '$PM'"
+		;;
+	*)
 		echo "export _PR_LIB=$LIB"
-	fi
+		echo "export _PR_PACKAGE_MANAGER=$PM"
+		;;
+	esac
 fi
 /opt/pay-respects/bin/pay-respects "$@"
 ```
